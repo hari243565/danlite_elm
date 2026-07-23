@@ -544,8 +544,10 @@ class ObdParser {
       if (!_matchesRequestedPid('0202', bytes)) return null;
       if (bytes.length < 5) return null;
 
-      final codes = parseDtcs('${bytes[3]} ${bytes[4]}');
-      return codes.isNotEmpty ? codes.first : null;
+      final b1 = _hexToInt(bytes[3]);
+      final b2 = _hexToInt(bytes[4]);
+      if (b1 == null || b2 == null) return null;
+      return decodeDtcPair(b1, b2);
     } catch (e) {
       return null;
     }
@@ -579,158 +581,266 @@ class ObdParser {
   // (typically a leading protocol-search line before the adapter settles on
   // ISO 15765-4, or a mid-stream retry). Ordered so a compound phrase is
   // stripped whole before any single word it contains is matched separately.
-  static const List<String> _dtcChatterPhrases = [
-    'UNABLE TO CONNECT',
-    'BUS INIT',
-    'CAN ERROR',
-    'DATA ERROR',
-    'BUFFER FULL',
-    'NO DATA',
-    'NODATA',
-    'SEARCHING',
-    'STOPPED',
-    'TIMEOUT',
-    'ERROR',
+  static const Set<int> serviceResponseBytes = <int>{0x43, 0x47, 0x4A};
+  static const List<String> _systemLetters = <String>['P', 'C', 'B', 'U'];
+  static const String _hexDigits = '0123456789ABCDEF';
+  static final RegExp _powertrainPattern = RegExp(r'^P[0-3][0-9A-F]{3}$');
+  static final RegExp _anyDtcPattern = RegExp(r'^[PCBU][0-3][0-9A-F]{3}$');
+  static final RegExp _whitespace = RegExp(r'\s+');
+  static final RegExp _nonHex = RegExp(r'[^0-9A-F]');
+  static final RegExp _hexOnly = RegExp(r'^[0-9A-F]+$');
+  static const List<String> _noiseMarkers = <String>[
+    'SEARCHING', 'NO DATA', 'NODATA', 'UNABLE TO CONNECT', 'UNABLE', 'STOPPED',
+    'BUS INIT', 'BUSINIT', 'BUS ERROR', 'BUS BUSY', 'CAN ERROR', 'DATA ERROR',
+    'BUFFER FULL', 'RX ERROR', 'FB ERROR', 'LP ALERT', 'LV RESET', 'ACT ALERT',
+    'ERR', 'ERROR', 'ELM327', 'OBDII', 'OK', '?',
   ];
 
-  static List<String> parseDtcs(String response) {
-    final codes = <String>[];
-    try {
-      if (response.isEmpty) return codes;
-
-      // Deliberately NOT bailing out on a whole-response chatter check here
-      // (unlike parsePid's single-frame path): a multi-frame DTC response can
-      // legitimately have a "SEARCHING..." protocol-search line ahead of the
-      // real 43-header frames, and discarding the entire response because of
-      // that one line is exactly what drops otherwise-valid codes. Chatter
-      // words are stripped token-by-token in _extractDtcHexBytes instead, and
-      // we only give up if nothing usable survives that.
-      final bytes = _extractDtcHexBytes(response);
-      if (bytes.isEmpty) return codes;
-
-      // Split the byte stream at each positive-response header (43/47/4A).
-      // CAN yields a single segment (count byte + codes); the line-oriented
-      // legacy protocols yield one segment per frame (codes only, no count).
-      for (final segment in _splitOnDtcHeaders(bytes)) {
-        _decodeDtcSegment(segment, codes);
-      }
-    } catch (e) {
-      // Return whatever parsed cleanly rather than throwing.
-    }
-    codes.retainWhere((c) => c.toUpperCase().startsWith('P'));
-    return codes;
+  static List<String> parseDtcs(String? response, {DtcCountByteMode countByteMode = DtcCountByteMode.auto}) {
+    try { return parseDetailed(response, countByteMode: countByteMode).powertrainCodes; } catch (_) { return const <String>[]; }
   }
 
-  /// DTC-specific hex tokenizer. Unlike [_extractHexBytes] (which is tuned for
-  /// single-frame PID replies and deliberately reads only the first line),
-  /// this aggregates EVERY frame of a multi-frame response and rejects the
-  /// non-byte artifacts that ISO-TP framing injects.
-  static List<String> _extractDtcHexBytes(String response) {
-    try {
-      var s = response.toUpperCase();
-      // Unify line breaks so multi-frame lines merge into one token stream.
-      s = s.replaceAll('\r', ' ').replaceAll('\n', ' ');
-      // Strip known ELM327 chatter phrases as whole words BEFORE the hex
-      // char-class filter below. Several of these words contain letters that
-      // are themselves valid hex digits (the 'A'/'B' in "UNABLE", the 'D'/'A'
-      // in "NODATA", the 'E'/'D' in "STOPPED", the 'C'/'A'/'E' in
-      // "SEARCHING..."), so blindly keeping [0-9A-F] would let stray
-      // fragments of these words survive as fake data bytes and corrupt the
-      // frame — this is what silently drops/mutates real codes when a
-      // "SEARCHING..." or "NODATA" line is interleaved with genuine frames
-      // in a multi-frame response. Longer/compound phrases are listed before
-      // the shorter words they contain (e.g. "CAN ERROR" before "ERROR") so
-      // nothing is left half-stripped.
-      for (final phrase in _dtcChatterPhrases) {
-        s = s.replaceAll(phrase, ' ');
-      }
-      // Drop ISO-TP per-frame sequence markers ("0:", "1:", "A:") that appear
-      // when the adapter is left auto-formatting (CAF1). Removing them here
-      // keeps the frame-index digit from gluing onto the following data byte.
-      s = s.replaceAll(RegExp(r'[0-9A-F]+\s*:'), ' ');
-      // Keep only hex digits and separators.
-      s = s.replaceAll(RegExp(r'[^0-9A-F ]'), ' ');
-      s = s.replaceAll(RegExp(r'\s+'), ' ').trim();
-      if (s.isEmpty) return [];
-
-      final bytes = <String>[];
-      for (final token in s.split(' ')) {
-        if (token.isEmpty) continue;
-        if (token.length.isEven) {
-          // Clean run of bytes (spaced "43" or packed "430F2176…").
-          for (int i = 0; i + 2 <= token.length; i += 2) {
-            bytes.add(token.substring(i, i + 2));
-          }
-        }
-        // Odd-length token = the ISO-TP total-length header (e.g. "020"/"014")
-        // or a truncated partial frame. It cannot be a clean byte sequence, so
-        // discard it wholesale rather than misalign every subsequent pair.
-      }
-      return bytes;
-    } catch (_) {
-      return [];
-    }
+  static List<String> parseAllDtcs(String? response, {DtcCountByteMode countByteMode = DtcCountByteMode.auto}) {
+    try { return parseDetailed(response, countByteMode: countByteMode).allCodes; } catch (_) { return const <String>[]; }
   }
 
-  static const Set<String> _dtcResponseHeaders = {'43', '47', '4A'};
+  static DtcParseResult parseDetailed(String? response, {DtcCountByteMode countByteMode = DtcCountByteMode.auto}) {
+    final warnings = <String>[];
+    final ordered = <String>[];
+    int? reportedCount;
+    try {
+      if (response == null || response.trim().isEmpty) {
+        return DtcParseResult(powertrainCodes: const <String>[], allCodes: const <String>[], warnings: const <String>['Empty response.']);
+      }
+      final frames = _tokenizeFrames(response, warnings);
+      if (frames.isEmpty) {
+        return DtcParseResult(powertrainCodes: const <String>[], allCodes: const <String>[], warnings: warnings..add('No usable data.'));
+      }
+      final grouped = <String, List<_RawFrame>>{};
+      for (final frame in frames) { grouped.putIfAbsent(frame.ecuId, () => <_RawFrame>[]).add(frame); }
+      for (final entry in grouped.entries) {
+        final assembled = _reassembleIsoTp(entry.value, entry.key, warnings);
+        if (assembled.payload.isEmpty) continue;
+        final decoded = _decodeServicePayload(assembled.payload, entry.key, assembled.sawIsoTpPci, countByteMode, warnings);
+        reportedCount = _accumulateCount(reportedCount, decoded.reportedCount);
+        ordered.addAll(decoded.codes);
+      }
+    } catch (e) { warnings.add('Unrecoverable parser error: $e'); }
 
-  /// Splits the byte stream into per-header segments. Anything before the
-  /// first header (a stray length byte the tokenizer let through) is dropped.
-  /// If no header is present at all — e.g. a bare freeze-frame DTC pair handed
-  /// in as "xx yy" — the whole stream is returned as a single segment.
-  static List<List<String>> _splitOnDtcHeaders(List<String> bytes) {
-    final segments = <List<String>>[];
-    List<String>? current;
-    for (final b in bytes) {
-      if (_dtcResponseHeaders.contains(b)) {
-        current = <String>[];
-        segments.add(current);
+    final seen = <String>{};
+    final unique = <String>[];
+    for (final code in ordered) { if (seen.add(code)) unique.add(code); }
+    final powertrain = <String>[for (final code in unique) if (_powertrainPattern.hasMatch(code)) code];
+
+    return DtcParseResult(powertrainCodes: List<String>.unmodifiable(powertrain), allCodes: List<String>.unmodifiable(unique), warnings: List<String>.unmodifiable(warnings), reportedCount: reportedCount);
+  }
+
+  static String? decodeDtcPair(int byte1, int byte2) {
+    final b1 = byte1 & 0xFF;
+    final b2 = byte2 & 0xFF;
+    if (b1 == 0x00 && b2 == 0x00) return null;
+    final letter = _systemLetters[(b1 >> 6) & 0x03];
+    final second = (b1 >> 4) & 0x03;
+    final third = b1 & 0x0F;
+    final fourth = (b2 >> 4) & 0x0F;
+    final fifth = b2 & 0x0F;
+    final code = '$letter$second${_hexDigits[third]}${_hexDigits[fourth]}${_hexDigits[fifth]}';
+    return _anyDtcPattern.hasMatch(code) ? code : null;
+  }
+
+  static List<_RawFrame> _tokenizeFrames(String response, List<String> warnings) {
+    final frames = <_RawFrame>[];
+    final lines = response.toUpperCase().replaceAll('>', '\n').split(RegExp(r'[\r\n]+'));
+    for (final rawLine in lines) {
+      final line = rawLine.trim();
+      if (line.isEmpty) continue;
+      if (_isNoise(line)) { warnings.add('Ignored: "$line"'); continue; }
+      final colon = line.indexOf(':');
+      if (colon >= 0) {
+        final left = line.substring(0, colon).trim();
+        final right = line.substring(colon + 1);
+        final leftParts = left.isEmpty ? const <String>[] : left.split(_whitespace);
+        final ecuId = leftParts.length > 1 ? leftParts.first : '';
+        final bytes = _hexToBytes(right, warnings);
+        if (bytes.isNotEmpty) frames.add(_RawFrame(ecuId, bytes, preStripped: true));
         continue;
       }
-      current?.add(b);
+      final tokens = line.split(_whitespace).where((t) => t.isNotEmpty).toList(growable: false);
+      if (tokens.isEmpty) continue;
+      if (tokens.length == 1 && tokens.first.length == 3 && _hexOnly.hasMatch(tokens.first)) continue;
+      var ecuId = '';
+      var dataTokens = tokens;
+      final first = tokens.first;
+      if (tokens.length >= 2 && (first.length == 3 || first.length == 8) && _hexOnly.hasMatch(first)) {
+        ecuId = first;
+        dataTokens = tokens.sublist(1);
+      }
+      final bytes = _hexToBytes(dataTokens.join(), warnings);
+      if (bytes.isEmpty) continue;
+      frames.add(_RawFrame(ecuId, bytes, preStripped: false));
     }
-    if (segments.isEmpty) return [bytes];
-    return segments;
+    return frames;
   }
 
-  /// Decodes one header-delimited segment, appending unique codes to [codes].
-  static void _decodeDtcSegment(List<String> segment, List<String> codes) {
-    var data = segment;
-    // A CAN (ISO 15765-4) response prefixes the DTC list with a one-byte
-    // count, which makes the payload length odd (1 count byte + 2 bytes per
-    // DTC). Strip it so the following 2-byte pairs realign; otherwise the
-    // count byte is consumed as half a DTC, every code shifts, a phantom
-    // (typically a bogus C0xxx) is fabricated and a real code is lost.
-    if (data.length.isOdd) {
-      data = data.sublist(1);
-    }
-
-    for (int i = 0; i + 2 <= data.length; i += 2) {
-      final byte1 = _hexToInt(data[i]);
-      final byte2 = data[i + 1];
-      if (byte1 == null || byte2.length != 2) continue; // incomplete — discard
-      if (byte1 == 0 && byte2 == '00') continue; // padding / empty slot
-
-      final code = _decodeDtc(byte1, byte2);
-      if (code != null && !codes.contains(code)) codes.add(code);
-    }
+  static bool _isNoise(String line) {
+    for (final marker in _noiseMarkers) { if (line.contains(marker)) return true; }
+    return false;
   }
 
-  /// Converts a 2-byte DTC into its SAE J2012 string form.
-  /// Prefix comes from the top two bits of the high byte:
-  ///   00 -> P (Powertrain), 01 -> C (Chassis),
-  ///   10 -> B (Body),       11 -> U (Network).
-  static String? _decodeDtc(int byte1, String byte2) {
-    final firstNibble = (byte1 >> 4) & 0x0F;
-    final secondNibble = byte1 & 0x0F;
-
-    const prefixes = ['P', 'C', 'B', 'U'];
-    final prefix = prefixes[(firstNibble >> 2) & 0x03];
-    final digit1 = firstNibble & 0x03;
-
-    final code = '$prefix$digit1'
-        '${secondNibble.toRadixString(16).toUpperCase()}'
-        '${byte2.toUpperCase()}';
-    return code.length == 5 ? code : null;
+  static List<int> _hexToBytes(String input, List<String> warnings) {
+    final cleaned = input.toUpperCase().replaceAll(_nonHex, '');
+    if (cleaned.isEmpty) return const <int>[];
+    var usable = cleaned;
+    if (usable.length.isOdd) { usable = usable.substring(0, usable.length - 1); }
+    final out = <int>[];
+    for (var i = 0; i + 2 <= usable.length; i += 2) {
+      final value = int.tryParse(usable.substring(i, i + 2), radix: 16);
+      if (value != null) out.add(value);
+    }
+    return out;
   }
+
+  static _Reassembly _reassembleIsoTp(List<_RawFrame> frames, String ecuId, List<String> warnings) {
+    final out = <int>[];
+    var sawPci = false;
+    int? declaredLength;
+    int? lastSequence;
+    var truncated = false;
+    if (frames.length == 1 && !frames.first.preStripped) {
+      final unwrapped = _unwrapConcatenatedIsoTp(frames.first.bytes);
+      if (unwrapped != null) return _Reassembly(unwrapped, true);
+    }
+    for (final frame in frames) {
+      if (truncated) break;
+      final bytes = frame.bytes;
+      if (bytes.isEmpty) continue;
+      if (frame.preStripped) { out.addAll(bytes); continue; }
+      final pci = bytes.first;
+      final type = pci >> 4;
+      switch (type) {
+        case 0x0:
+          sawPci = true;
+          final length = pci & 0x0F;
+          var data = bytes.sublist(1);
+          if (length > 0 && length <= data.length) data = data.sublist(0, length);
+          out.addAll(data);
+          break;
+        case 0x1:
+          if (bytes.length < 2) break;
+          sawPci = true;
+          declaredLength = ((pci & 0x0F) << 8) | bytes[1];
+          out.addAll(bytes.sublist(2));
+          lastSequence = 0;
+          break;
+        case 0x2:
+          sawPci = true;
+          final sequence = pci & 0x0F;
+          if (lastSequence != null && sequence != ((lastSequence + 1) & 0x0F)) { truncated = true; break; }
+          lastSequence = sequence;
+          out.addAll(bytes.sublist(1));
+          break;
+        case 0x3: sawPci = true; break;
+        default: out.addAll(bytes); break;
+      }
+    }
+    if (declaredLength != null && declaredLength > 0 && out.length > declaredLength) {
+      return _Reassembly(out.sublist(0, declaredLength), sawPci);
+    }
+    return _Reassembly(out, sawPci);
+  }
+
+  static List<int>? _unwrapConcatenatedIsoTp(List<int> raw) {
+    if (raw.length < 9 || (raw[0] >> 4) != 0x1) return null;
+    final declared = ((raw[0] & 0x0F) << 8) | raw[1];
+    if (declared <= 0) return null;
+    final out = <int>[];
+    var index = 2;
+    final firstChunk = (raw.length - index) >= 6 ? 6 : (raw.length - index);
+    out.addAll(raw.sublist(index, index + firstChunk));
+    index += firstChunk;
+    var expected = 1;
+    while (index < raw.length) {
+      final pci = raw[index];
+      if ((pci >> 4) != 0x2 || (pci & 0x0F) != (expected & 0x0F)) return null;
+      expected++; index += 1;
+      final chunk = (raw.length - index) >= 7 ? 7 : (raw.length - index);
+      if (chunk <= 0) break;
+      out.addAll(raw.sublist(index, index + chunk));
+      index += chunk;
+    }
+    return out.length < declared ? null : out.sublist(0, declared);
+  }
+
+  static _ServiceDecode _decodeServicePayload(List<int> payload, String ecuId, bool sawIsoTpPci, DtcCountByteMode countByteMode, List<String> warnings) {
+    var start = -1;
+    for (var i = 0; i < payload.length; i++) {
+      if (serviceResponseBytes.contains(payload[i])) { start = i; break; }
+    }
+    if (start < 0) return const _ServiceDecode(<String>[], null);
+    var body = payload.sublist(start + 1);
+    int? reported;
+    if (body.isNotEmpty) {
+      final strip = countByteMode == DtcCountByteMode.present || (countByteMode == DtcCountByteMode.auto && (sawIsoTpPci || _looksLikeCountByte(body)));
+      if (strip) { reported = body.first; body = body.sublist(1); }
+    }
+    final codes = <String>[];
+    for (var i = 0; i + 2 <= body.length; i += 2) {
+      final code = decodeDtcPair(body[i], body[i + 1]);
+      if (code != null) codes.add(code);
+    }
+    return _ServiceDecode(codes, reported);
+  }
+
+  static bool _looksLikeCountByte(List<int> body) {
+    if (body.isEmpty) return false;
+    if (body.length.isOdd) return true;
+    final candidate = body.first;
+    final dataEnd = 1 + candidate * 2;
+    if (candidate <= 0 || dataEnd > body.length) return false;
+    for (var i = dataEnd; i < body.length; i++) { if (body[i] != 0x00) return false; }
+    return true;
+  }
+
+  static int? _accumulateCount(int? current, int? incoming) {
+    if (incoming == null) return current;
+    if (current == null) return incoming;
+    return current + incoming;
+  }
+}
+
+enum DtcCountByteMode { auto, present, absent }
+
+class DtcParseResult {
+  final List<String> powertrainCodes;
+  final List<String> allCodes;
+  final List<String> warnings;
+  final int? reportedCount;
+
+  const DtcParseResult({
+    required this.powertrainCodes,
+    required this.allCodes,
+    required this.warnings,
+    this.reportedCount,
+  });
+
+  bool get countMismatch => reportedCount != null && reportedCount != allCodes.length;
+}
+
+class _RawFrame {
+  final String ecuId;
+  final List<int> bytes;
+  final bool preStripped;
+  const _RawFrame(this.ecuId, this.bytes, {required this.preStripped});
+}
+
+class _Reassembly {
+  final List<int> payload;
+  final bool sawIsoTpPci;
+  const _Reassembly(this.payload, this.sawIsoTpPci);
+}
+
+class _ServiceDecode {
+  final List<String> codes;
+  final int? reportedCount;
+  const _ServiceDecode(this.codes, this.reportedCount);
 }

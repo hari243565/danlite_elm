@@ -37,7 +37,10 @@
       "Bash(xxd)",
       "Bash(python3 -c ' *)",
       "Bash(git init *)",
-      "Bash(git add *)"
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(git remote *)",
+      "Bash(git push *)"
     ]
   }
 }
