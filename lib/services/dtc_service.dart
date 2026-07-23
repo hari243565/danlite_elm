@@ -107,11 +107,11 @@ class DtcLocalizations {
     if (langCode == 'hi') {
       final hi = DtcDictionaryHi.descriptions[upper];
       if (hi != null && hi.isNotEmpty) return hi;
-      final jsonHi = _jsonDescriptions[upper]?['hi'];
+      final jsonHi = _jsonDescriptions['hi']?[upper];
       if (jsonHi != null && jsonHi.isNotEmpty) return jsonHi;
     }
     if (englishFallback.isNotEmpty) return englishFallback;
-    final jsonEn = _jsonDescriptions[upper]?['en'];
+    final jsonEn = _jsonDescriptions['en']?[upper];
     if (jsonEn != null && jsonEn.isNotEmpty) return jsonEn;
     return englishFallback;
   }
