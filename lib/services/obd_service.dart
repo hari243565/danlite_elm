@@ -60,6 +60,29 @@ class ObdService extends ChangeNotifier {
   String _lastError = '';
   String get lastError => _lastError;
 
+  bool _linkSynced = true;
+  bool get linkSynced => _linkSynced;
+  bool _adapterWedged = false;
+  bool get adapterWedged => _adapterWedged;
+
+  int _consecutiveParseFailures = 0;
+  int _recoveryAttempts = 0;
+  DateTime? _lastHeaderRepairAt;
+
+  final List<String> _wireLog = <String>[];
+  static const int _wireLogMax = 200;
+  List<String> get wireLog => List.unmodifiable(_wireLog);
+
+  void _logWire(String direction, String data) {
+    final ts = DateTime.now().toIso8601String().substring(11, 23);
+    final printable = data.replaceAll('\r', r'\r').replaceAll('\n', r'\n');
+    _wireLog.add('$ts $direction$printable');
+    if (_wireLog.length > _wireLogMax) _wireLog.removeAt(0);
+    debugPrint('[WIRE] $ts $direction$printable');
+  }
+
+  String exportWireLog() => _wireLog.join('\n');
+
   // Diagnostics — exposed for debugging / status UI
   int _consecutiveTimeouts = 0;
   int get consecutiveTimeouts => _consecutiveTimeouts;
@@ -250,6 +273,7 @@ class ObdService extends ChangeNotifier {
     if (remainder.isNotEmpty) buffer.write(remainder);
 
     final cleaned = _sanitizeResponse(frame);
+    _logWire('RX<', frame);
 
     final pending = isWifi ? _wifiPendingCmd : _btPendingCmd;
     if (pending != null && !pending.isCompleted) {
@@ -389,6 +413,9 @@ class ObdService extends ChangeNotifier {
 
   Future<bool> _runInitSequence() async {
     try {
+      // Init always starts from a clean gate — see _resetDiagnostics().
+      _linkSynced = true;
+      _adapterWedged = false;
       await _send(ObdPids.reset, delay: const Duration(milliseconds: 300));
       await Future.delayed(const Duration(milliseconds: 500));
 
@@ -396,27 +423,26 @@ class ObdService extends ChangeNotifier {
       if (_isDeadResponse(echo)) return false;
 
       await _send(ObdPids.linefeedsOff);
-      await _send('ATS1');    // Spaces ON
-      await _send('ATH1');    // Headers ON
-      await _send('ATCAF0');  // Raw ISO-TP frames
-      await _send('ATAT1');   // Adaptive timing
-      await _send('ATST32');  // 200ms normal window
+      await _send(ObdPids.spacesOff);
+      await _send(ObdPids.headersOff);
 
       final proto = await _send(ObdPids.autoProtocol);
       if (_isDeadResponse(proto)) return false;
 
-      for (var attempt = 0; attempt < 3; attempt++) {
+      final at = await _send('ATAT1');
+      if (_isDeadResponse(at)) debugPrint('[ObdService] ATAT1 unsupported');
+      final st = await _send('ATST32');
+      if (_isDeadResponse(st)) debugPrint('[ObdService] ATST32 unsupported');
+
+      for (var attempt = 0; attempt < 2; attempt++) {
         final probe = await _send('0100');
-        if (!_isDeadResponse(probe) && !probe.toUpperCase().contains('SEARCHING')) {
-          break;
-        }
+        if (!_isDeadResponse(probe) && !probe.toUpperCase().contains('SEARCHING')) break;
         await Future.delayed(const Duration(milliseconds: 300));
       }
 
       final dpn = await _send('ATDPN');
-      if (_isDeadResponse(dpn)) return false;
-
-      debugPrint('[ObdService] ELM327 initialised (ATH1/ATS1/ATCAF0)');
+      debugPrint('[ObdService] protocol (ATDPN): "$dpn"');
+      debugPrint('[ObdService] init OK — live baseline ATH0/ATS0');
       return true;
     } catch (e) {
       debugPrint('[ObdService] Init sequence exception: $e');
@@ -436,7 +462,19 @@ class ObdService extends ChangeNotifier {
   // COMMAND SEND — routes to correct transport
   // ══════════════════════════════════════════════════════════════════════════
   Future<String> _send(String cmd, {Duration? delay}) async {
+    if (!_linkSynced) {
+      // A blocked write must still count toward the dead-link detector.
+      // Without this, _consecutiveTimeouts freezes and _pollLoop's
+      // >= 6 check can never fire, leaving the UI stuck on "Connected".
+      _consecutiveTimeouts++;
+      debugPrint('[ObdService] BLOCKED write "$cmd" — link not synced');
+      return 'TIMEOUT';
+    }
     if (delay != null) await Future.delayed(delay);
+    return await _sendRaw(cmd);
+  }
+
+  Future<String> _sendRaw(String cmd) async {
     try {
       if (_transport == ConnectionType.wifi) {
         return await _sendWifi(cmd);
@@ -444,9 +482,79 @@ class ObdService extends ChangeNotifier {
         return await _sendBt(cmd);
       }
     } catch (e) {
-      debugPrint('[ObdService] _send exception for "$cmd": $e');
       return 'ERROR';
     }
+  }
+
+  Future<bool> _recoverAdapter() async {
+    debugPrint('[ObdService] attempting adapter recovery…');
+    _linkSynced = true;
+    await Future.delayed(const Duration(milliseconds: 600));
+
+    final saved = _cmdTimeout;
+    _cmdTimeout = const Duration(seconds: 2);
+    try {
+      for (var attempt = 0; attempt < 2; attempt++) {
+        final r = await _sendRaw('');
+        if (!_isDeadResponse(r)) {
+          debugPrint('[ObdService] adapter responded to CR — resynced');
+          _adapterWedged = false;
+          _linkSynced = true;
+          return true;
+        }
+        await Future.delayed(const Duration(milliseconds: 400));
+      }
+
+      _cmdTimeout = const Duration(seconds: 5);
+      final z = await _sendRaw(ObdPids.reset);
+      await Future.delayed(const Duration(milliseconds: 900));
+      if (!_isDeadResponse(z)) {
+        debugPrint('[ObdService] adapter reset — re-running init');
+        final ok = await _runInitSequence();
+        _adapterWedged = !ok;
+        _linkSynced = ok;
+        return ok;
+      }
+
+      debugPrint('[ObdService] adapter unresponsive — power cycle required');
+      _adapterWedged = true;
+      _linkSynced = false;
+      _handleTransportDrop('Adapter stopped responding. Unplug it, wait 5 seconds, plug it back in and reconnect.');
+      return false;
+    } finally {
+      _cmdTimeout = saved;
+    }
+  }
+
+  Future<bool> _enableDtcHeaders() async {
+    if (!_linkSynced) return false;
+    final s = await _send('ATS1');
+    if (_isDeadResponse(s)) return false;
+    final h = await _send('ATH1');
+    if (_isDeadResponse(h)) {
+      await _send(ObdPids.spacesOff);
+      return false;
+    }
+    return true;
+  }
+
+  Future<void> _restoreLiveHeaders() async {
+    if (!_linkSynced) return;
+    await _send(ObdPids.headersOff);
+    await _send(ObdPids.spacesOff);
+  }
+
+  Future<void> _repairLiveMode() async {
+    final now = DateTime.now();
+    if (_lastHeaderRepairAt != null && now.difference(_lastHeaderRepairAt!) < const Duration(seconds: 20)) return;
+    _lastHeaderRepairAt = now;
+    _consecutiveParseFailures = 0;
+    if (!_linkSynced) {
+      await _recoverAdapter();
+      return;
+    }
+    await _send(ObdPids.headersOff);
+    await _send(ObdPids.spacesOff);
   }
 
   Future<String> _sendWifi(String cmd) async {
@@ -456,6 +564,7 @@ class ObdService extends ChangeNotifier {
     _wifiPendingCmd = Completer<String>();
 
     try {
+      _logWire('TX>', cmd);
       _wifiSocket!.write('$cmd\r');
       await _wifiSocket!.flush();
     } catch (e) {
@@ -466,11 +575,14 @@ class ObdService extends ChangeNotifier {
     final completer = _wifiPendingCmd!;
     return completer.future.timeout(_cmdTimeout, onTimeout: () {
       _consecutiveTimeouts++;
+      _linkSynced = false;
       if (_wifiPendingCmd == completer) _wifiPendingCmd = null;
       return 'TIMEOUT';
     }).then((value) {
       if (value != 'TIMEOUT' && value != 'ERROR' && value.isNotEmpty) {
         _consecutiveTimeouts = 0;
+        _linkSynced = true;
+        _adapterWedged = false;
         _lastGoodResponseAt = DateTime.now();
       }
       return value;
@@ -483,6 +595,7 @@ class ObdService extends ChangeNotifier {
     _btBuffer.clear();
     _btPendingCmd = Completer<String>();
 
+    _logWire('TX>', cmd);
     final ok = await _btService.write(cmd);
     if (!ok) {
       _btPendingCmd = null;
@@ -492,11 +605,14 @@ class ObdService extends ChangeNotifier {
     final completer = _btPendingCmd!;
     return completer.future.timeout(_cmdTimeout, onTimeout: () {
       _consecutiveTimeouts++;
+      _linkSynced = false;
       if (_btPendingCmd == completer) _btPendingCmd = null;
       return 'TIMEOUT';
     }).then((value) {
       if (value != 'TIMEOUT' && value != 'ERROR' && value.isNotEmpty) {
         _consecutiveTimeouts = 0;
+        _linkSynced = true;
+        _adapterWedged = false;
         _lastGoodResponseAt = DateTime.now();
       }
       return value;
@@ -526,6 +642,24 @@ class ObdService extends ChangeNotifier {
         continue;
       }
 
+      // The link gate closed on a previous timeout. Try to reopen it before
+      // writing anything — otherwise every send below is silently discarded
+      // and the dashboard freezes while still reporting "Connected".
+      if (!_linkSynced) {
+        // Bound the retries. A half-wedged adapter can answer a bare CR
+        // while never servicing a PID, which would otherwise loop forever
+        // with a frozen dashboard still showing "Connected".
+        if (_recoveryAttempts >= 3) {
+          _handleTransportDrop('Adapter stopped responding');
+          return;
+        }
+        _recoveryAttempts++;
+        final recovered = await _recoverAdapter();
+        // _recoverAdapter already calls _handleTransportDrop when it gives up.
+        if (!recovered) return;
+        continue;
+      }
+
       final pid = _pids[_pidIndex % _pids.length];
       _pidIndex++;
 
@@ -536,9 +670,15 @@ class ObdService extends ChangeNotifier {
           final response = await _send(pid.command);
 
           if (_isUsableResponse(response)) {
-            final value = ObdParser.parsePid(
-                pid.command, _stripCanHeaderForLivePid(response));
-            if (value != null) _updateData(pid.command, value);
+            final value = ObdParser.parsePid(pid.command, _stripCanHeaderForLivePid(response));
+            if (value != null) {
+              _updateData(pid.command, value);
+              _consecutiveParseFailures = 0;
+              _recoveryAttempts = 0;
+            } else {
+              _consecutiveParseFailures++;
+              if (_consecutiveParseFailures >= 5) await _repairLiveMode();
+            }
           }
         }
 
@@ -704,24 +844,44 @@ class ObdService extends ChangeNotifier {
     await _waitForLinkIdle();
 
     final previousTimeout = _cmdTimeout;
+    var headersOn = false;
+    var stWidened = false;
     try {
-      if (_cmdTimeout < _readDtcsMinTimeout) {
-        _cmdTimeout = _readDtcsMinTimeout;
+      if (!_linkSynced) {
+        final recovered = await _recoverAdapter();
+        if (!recovered) return _dtcCodes;
       }
 
-      await _send('ATAT0');
-      await _send('ATST7D');
+      if (_cmdTimeout < _readDtcsMinTimeout) _cmdTimeout = _readDtcsMinTimeout;
 
-      final response = await _send(ObdPids.readDtcs);
+      headersOn = await _enableDtcHeaders();
+      final stResp = await _send('ATST7D');
+      stWidened = !_isDeadResponse(stResp);
 
-      if (!_isUsableDtcResponse(response)) {
-        debugPrint('[ObdService] readDtcs unusable response: "$response" — keeping previous codes');
+      var response = await _send(ObdPids.readDtcs);
+
+      if (response == 'TIMEOUT') {
+        await _recoverAdapter();
         return _dtcCodes;
       }
 
-      final codes = ObdParser.parseDtcs(response);
+      if (!_isUsableDtcResponse(response)) return _dtcCodes;
 
-      _dtcCodes = codes.map((code) {
+      var parsed = ObdParser.parseDetailed(response);
+
+      if (parsed.countMismatch) {
+        await Future.delayed(const Duration(milliseconds: 300));
+        final retryResp = await _send(ObdPids.readDtcs);
+        if (retryResp != 'TIMEOUT' && _isUsableDtcResponse(retryResp)) {
+          final retry = ObdParser.parseDetailed(retryResp);
+          if (!retry.countMismatch || retry.allCodes.length > parsed.allCodes.length) {
+            parsed = retry;
+            response = retryResp;
+          }
+        }
+      }
+
+      _dtcCodes = parsed.powertrainCodes.map((code) {
         final info = _dtcInfo(code);
         return DtcCode(
           code: code,
@@ -738,8 +898,8 @@ class ObdService extends ChangeNotifier {
       debugPrint('[ObdService] readDtcs exception: $e');
       return _dtcCodes;
     } finally {
-      await _send('ATST32');
-      await _send('ATAT1');
+      if (stWidened && _linkSynced) await _send('ATST32');
+      if (headersOn) await _restoreLiveHeaders();
       _cmdTimeout = previousTimeout;
       _releasePollLock();
       _dtcReadInFlight = false;
@@ -793,11 +953,31 @@ class ObdService extends ChangeNotifier {
     await _waitForLinkIdle();
 
     try {
-      final dtcResponse = await _send(ObdPids.freezeFrameDtc);
-      final rpmResponse = await _send(ObdPids.freezeFrameRpm);
-      final speedResponse = await _send(ObdPids.freezeFrameSpeed);
-      final coolantResponse = await _send(ObdPids.freezeFrameCoolantTemp);
-      final loadResponse = await _send(ObdPids.freezeFrameEngineLoad);
+      if (!_linkSynced) {
+        final recovered = await _recoverAdapter();
+        if (!recovered) return null;
+      }
+
+      final responses = <String>[];
+      for (final cmd in const [
+        ObdPids.freezeFrameDtc,
+        ObdPids.freezeFrameRpm,
+        ObdPids.freezeFrameSpeed,
+        ObdPids.freezeFrameCoolantTemp,
+        ObdPids.freezeFrameEngineLoad,
+      ]) {
+        final r = await _send(cmd);
+        if (r == 'TIMEOUT') {
+          await _recoverAdapter();
+          return null;
+        }
+        responses.add(r);
+      }
+      final dtcResponse = responses[0];
+      final rpmResponse = responses[1];
+      final speedResponse = responses[2];
+      final coolantResponse = responses[3];
+      final loadResponse = responses[4];
 
       final dtc = _isUsableResponse(dtcResponse)
           ? ObdParser.parseFreezeFrameDtc(_stripCanHeaderForLivePid(dtcResponse))
@@ -896,8 +1076,15 @@ class ObdService extends ChangeNotifier {
   // ══════════════════════════════════════════════════════════════════════════
   void _resetDiagnostics() {
     _consecutiveTimeouts = 0;
+    _recoveryAttempts = 0;
     _lastGoodResponseAt = null;
     _cmdTimeout = _cmdTimeoutMin;
+    // A fresh session must never inherit a closed link gate from a previous
+    // one. Without this, a single timeout permanently blocks all future
+    // connection attempts, because _send() refuses to write while
+    // _linkSynced is false and nothing else reopens it.
+    _linkSynced = true;
+    _adapterWedged = false;
   }
 
   void _setStatus(ConnectionStatus s, String msg) {

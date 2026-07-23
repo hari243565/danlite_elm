@@ -41,7 +41,12 @@
       "Bash(git commit *)",
       "Bash(git remote *)",
       "Bash(git push *)",
-      "Bash(python -c ' *)"
+      "Bash(python -c ' *)",
+      "Bash(grep -rn \"^[[:space:]]*//.*[;=\\(\\){}]\" --include=\"*.dart\" lib/services lib/screens lib/widgets lib/providers lib/app.dart lib/main.dart)",
+      "Bash(grep -viE \"───|═══|^\\\\S+:\\\\d+:\\\\s*//\\\\s*\\(if|for|the|this|when|so|and|only|not|never|use|held|poll|ecu|clone|noise|sanity\\)\")",
+      "Bash(grep -rn \"/\\\\*\" --include=\"*.dart\" lib)",
+      "Bash(python3 -c \"print\\(1\\)\")",
+      "Bash(perl -v)"
     ]
   }
 }
