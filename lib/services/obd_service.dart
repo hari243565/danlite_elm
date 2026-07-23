@@ -87,6 +87,7 @@ class ObdService extends ChangeNotifier {
 
   // ── Polling ───────────────────────────────────────────────────────────────
   bool _isPolling = false;
+  bool _dtcReadInFlight = false;
   int _pidIndex = 0;
   // Poll every known PID (not just the 7-PID dashboard subset) so screens
   // like Live Data can surface MAF, MAP, timing advance, fuel trims, etc.
@@ -95,7 +96,12 @@ class ObdService extends ChangeNotifier {
   // Held while a foreground command (e.g. clearDtcs) needs exclusive access
   // to the serial link, so _pollLoop() never writes a PID request to the
   // socket while that command is in flight and collides with it on the wire.
-  bool _pollLocked = false;
+  int _pollLockDepth = 0;
+  bool get _pollLocked => _pollLockDepth > 0;
+  void _acquirePollLock() => _pollLockDepth++;
+  void _releasePollLock() {
+    if (_pollLockDepth > 0) _pollLockDepth--;
+  }
 
   // ECU flash-memory erasure (04) needs more time to respond than a live
   // PID read does.
@@ -261,12 +267,63 @@ class ObdService extends ChangeNotifier {
   /// Strip echoes, CR/LF, excess whitespace. Never throw.
   String _sanitizeResponse(String raw) {
     try {
-      var s = raw.replaceAll('\r', ' ').replaceAll('\n', ' ').trim();
-      // Collapse multiple spaces
-      s = s.replaceAll(RegExp(r'\s+'), ' ');
-      return s;
+      final lines = raw.replaceAll('\r', '\n').split('\n');
+      final out = <String>[];
+      for (final line in lines) {
+        final t = line.replaceAll(RegExp(r'[ \t]+'), ' ').trim();
+        if (t.isNotEmpty) out.add(t);
+      }
+      return out.join('\n');
     } catch (_) {
       return '';
+    }
+  }
+
+  String _stripCanHeaderForLivePid(String response) {
+    try {
+      if (response.isEmpty) return response;
+      final hexToken = RegExp(r'^[0-9A-Fa-f]+$');
+
+      for (final rawLine in response.split(RegExp(r'[\r\n]+'))) {
+        final line = rawLine.trim();
+        if (line.isEmpty) continue;
+
+        var tokens = line.split(RegExp(r'\s+')).where((t) => t.isNotEmpty).toList();
+
+        if (tokens.length == 1 && hexToken.hasMatch(tokens.first)) {
+          final h = tokens.first.toUpperCase();
+          if (h.length.isOdd && h.length >= 5) {
+            tokens = [h.substring(0, 3)];
+            for (var i = 3; i + 2 <= h.length; i += 2) {
+              tokens.add(h.substring(i, i + 2));
+            }
+          } else {
+            tokens = [for (var i = 0; i + 2 <= h.length; i += 2) h.substring(i, i + 2)];
+          }
+        }
+
+        if (tokens.length >= 2 && (tokens.first.length == 3 || tokens.first.length == 8) && hexToken.hasMatch(tokens.first)) {
+          tokens = tokens.sublist(1);
+        }
+
+        if (tokens.length >= 2) {
+          final b0 = int.tryParse(tokens.first, radix: 16);
+          final b1 = int.tryParse(tokens[1], radix: 16);
+          if (b0 != null && b1 != null && (b0 >> 4) == 0x0 && (b1 == 0x41 || b1 == 0x42 || b1 == 0x49)) {
+            tokens = tokens.sublist(1);
+          }
+        }
+
+        if (tokens.isEmpty) continue;
+        final head = int.tryParse(tokens.first, radix: 16);
+        if (head == null) continue;
+        if (head == 0x41 || head == 0x42 || head == 0x49 || head == 0x7F) {
+          return tokens.join(' ');
+        }
+      }
+      return response;
+    } catch (_) {
+      return response;
     }
   }
 
@@ -332,29 +389,34 @@ class ObdService extends ChangeNotifier {
 
   Future<bool> _runInitSequence() async {
     try {
-      // Reset — always attempt, ignore its own response quality
       await _send(ObdPids.reset, delay: const Duration(milliseconds: 300));
+      await Future.delayed(const Duration(milliseconds: 500));
 
       final echo = await _send(ObdPids.echoOff);
       if (_isDeadResponse(echo)) return false;
 
       await _send(ObdPids.linefeedsOff);
-      await _send(ObdPids.spacesOff);
-      await _send(ObdPids.headersOff);
+      await _send('ATS1');    // Spaces ON
+      await _send('ATH1');    // Headers ON
+      await _send('ATCAF0');  // Raw ISO-TP frames
+      await _send('ATAT1');   // Adaptive timing
+      await _send('ATST32');  // 200ms normal window
 
       final proto = await _send(ObdPids.autoProtocol);
       if (_isDeadResponse(proto)) return false;
 
-      // Confirm the ELM327 actually talks to the ECU: try one real PID read.
-      final testRead = await _send(ObdPids.rpm.command);
-      if (_isDeadResponse(testRead)) {
-        // Not necessarily fatal — some vehicles need the ignition ON.
-        // We still accept the connection but flag it.
-        debugPrint('[ObdService] Warning: no ECU response on RPM test read. '
-            'Adapter is alive but vehicle may be off.');
+      for (var attempt = 0; attempt < 3; attempt++) {
+        final probe = await _send('0100');
+        if (!_isDeadResponse(probe) && !probe.toUpperCase().contains('SEARCHING')) {
+          break;
+        }
+        await Future.delayed(const Duration(milliseconds: 300));
       }
 
-      debugPrint('[ObdService] ELM327 initialised successfully');
+      final dpn = await _send('ATDPN');
+      if (_isDeadResponse(dpn)) return false;
+
+      debugPrint('[ObdService] ELM327 initialised (ATH1/ATS1/ATCAF0)');
       return true;
     } catch (e) {
       debugPrint('[ObdService] Init sequence exception: $e');
@@ -474,7 +536,8 @@ class ObdService extends ChangeNotifier {
           final response = await _send(pid.command);
 
           if (_isUsableResponse(response)) {
-            final value = ObdParser.parsePid(pid.command, response);
+            final value = ObdParser.parsePid(
+                pid.command, _stripCanHeaderForLivePid(response));
             if (value != null) _updateData(pid.command, value);
           }
         }
@@ -503,7 +566,8 @@ class ObdService extends ChangeNotifier {
   Future<void> _pollBatteryVoltage() async {
     final pidResponse = await _send(ObdPids.voltage.command);
     if (_isUsableResponse(pidResponse)) {
-      final pidValue = ObdParser.parsePid(ObdPids.voltage.command, pidResponse);
+      final pidValue = ObdParser.parsePid(
+          ObdPids.voltage.command, _stripCanHeaderForLivePid(pidResponse));
       // Sanity band, not a narrow "expected normal" band: PID 0142 is
       // ECU-reported, so a low-but-plausible value here is real fault data
       // (dying battery/alternator), not adapter noise — it must not be
@@ -555,6 +619,24 @@ class ObdService extends ChangeNotifier {
     if (upper.contains('SEARCHING')) return false;
     if (upper.contains('BUS INIT')) return false;
     return true;
+  }
+
+  bool _isUsableDtcResponse(String r) {
+    if (r.isEmpty) return false;
+    final upper = r.toUpperCase();
+
+    if (upper.contains('TIMEOUT') || upper.contains('DISCONNECTED') ||
+        upper.contains('UNABLE TO CONNECT') || upper.contains('BUS INIT: ERROR') ||
+        upper.contains('CAN ERROR')) {
+      return false;
+    }
+
+    final lines = upper.split(RegExp(r'[\r\n]+'));
+    final hasNoData = lines.any((l) => l.trim() == 'NO DATA');
+    if (hasNoData && lines.length <= 2) return true;
+
+    final serviceLine = RegExp(r'\b4[37A]\b|4[37A][0-9A-F]{2}');
+    return lines.any((l) => serviceLine.hasMatch(l.replaceAll(' ', '')) || serviceLine.hasMatch(l));
   }
 
   void _updateData(String command, double value) {
@@ -615,16 +697,10 @@ class ObdService extends ChangeNotifier {
   // ══════════════════════════════════════════════════════════════════════════
   Future<List<DtcCode>> readDtcs() async {
     if (!isConnected) return [];
+    if (_dtcReadInFlight) return _dtcCodes;
+    _dtcReadInFlight = true;
 
-    // Take exclusive ownership of the serial link for the whole Mode 03
-    // exchange. A multi-frame CAN DTC response arrives as several ISO-TP
-    // frames terminated by a single '>' prompt; if the poll loop were allowed
-    // to fire a live PID request in the middle, its buffer-clear + pending-
-    // completer swap would race the read and either drop the DTC response
-    // (0 codes) or splice a stray PID frame into it (phantom code). Lock the
-    // loop out and drain any in-flight request first — the same discipline
-    // clearDtcs() and fetchFreezeFrame() already use.
-    _pollLocked = true;
+    _acquirePollLock();
     await _waitForLinkIdle();
 
     final previousTimeout = _cmdTimeout;
@@ -633,14 +709,13 @@ class ObdService extends ChangeNotifier {
         _cmdTimeout = _readDtcsMinTimeout;
       }
 
+      await _send('ATAT0');
+      await _send('ATST7D');
+
       final response = await _send(ObdPids.readDtcs);
 
-      // Strict sanitization: NEVER let TIMEOUT/ERROR/NO DATA reach the parser.
-      // On an unusable/partial read, keep the previously known codes rather
-      // than overwriting them with a corrupt/empty array (clean retry state).
-      if (!_isUsableResponse(response)) {
-        debugPrint(
-            '[ObdService] readDtcs got unusable response: "$response" — keeping previous codes');
+      if (!_isUsableDtcResponse(response)) {
+        debugPrint('[ObdService] readDtcs unusable response: "$response" — keeping previous codes');
         return _dtcCodes;
       }
 
@@ -663,8 +738,11 @@ class ObdService extends ChangeNotifier {
       debugPrint('[ObdService] readDtcs exception: $e');
       return _dtcCodes;
     } finally {
+      await _send('ATST32');
+      await _send('ATAT1');
       _cmdTimeout = previousTimeout;
-      _pollLocked = false;
+      _releasePollLock();
+      _dtcReadInFlight = false;
     }
   }
 
@@ -675,7 +753,7 @@ class ObdService extends ChangeNotifier {
     // request it may already have in flight to finish, so 04 never lands
     // on the wire concurrently with a live poll (the serial collision that
     // caused "Connection Failed" on real vehicles).
-    _pollLocked = true;
+    _acquirePollLock();
     await _waitForLinkIdle();
 
     final previousTimeout = _cmdTimeout;
@@ -696,7 +774,7 @@ class ObdService extends ChangeNotifier {
       return false;
     } finally {
       _cmdTimeout = previousTimeout;
-      _pollLocked = false;
+      _releasePollLock();
     }
   }
 
@@ -711,7 +789,7 @@ class ObdService extends ChangeNotifier {
   Future<FreezeFrameData?> fetchFreezeFrame() async {
     if (!isConnected) return null;
 
-    _pollLocked = true;
+    _acquirePollLock();
     await _waitForLinkIdle();
 
     try {
@@ -722,19 +800,23 @@ class ObdService extends ChangeNotifier {
       final loadResponse = await _send(ObdPids.freezeFrameEngineLoad);
 
       final dtc = _isUsableResponse(dtcResponse)
-          ? ObdParser.parseFreezeFrameDtc(dtcResponse)
+          ? ObdParser.parseFreezeFrameDtc(_stripCanHeaderForLivePid(dtcResponse))
           : null;
       final rpm = _isUsableResponse(rpmResponse)
-          ? ObdParser.parseFreezeFramePid(ObdPids.freezeFrameRpm, rpmResponse)
+          ? ObdParser.parseFreezeFramePid(
+              ObdPids.freezeFrameRpm, _stripCanHeaderForLivePid(rpmResponse))
           : null;
       final speed = _isUsableResponse(speedResponse)
-          ? ObdParser.parseFreezeFramePid(ObdPids.freezeFrameSpeed, speedResponse)
+          ? ObdParser.parseFreezeFramePid(
+              ObdPids.freezeFrameSpeed, _stripCanHeaderForLivePid(speedResponse))
           : null;
       final coolantTemp = _isUsableResponse(coolantResponse)
-          ? ObdParser.parseFreezeFramePid(ObdPids.freezeFrameCoolantTemp, coolantResponse)
+          ? ObdParser.parseFreezeFramePid(ObdPids.freezeFrameCoolantTemp,
+              _stripCanHeaderForLivePid(coolantResponse))
           : null;
       final engineLoad = _isUsableResponse(loadResponse)
-          ? ObdParser.parseFreezeFramePid(ObdPids.freezeFrameEngineLoad, loadResponse)
+          ? ObdParser.parseFreezeFramePid(
+              ObdPids.freezeFrameEngineLoad, _stripCanHeaderForLivePid(loadResponse))
           : null;
 
       final snapshot = FreezeFrameData(
@@ -751,7 +833,7 @@ class ObdService extends ChangeNotifier {
       debugPrint('[ObdService] fetchFreezeFrame exception: $e');
       return null;
     } finally {
-      _pollLocked = false;
+      _releasePollLock();
     }
   }
 
