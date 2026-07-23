@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--
+      Android 12+ (API 31+) DARK-MODE boot splash.
+
+      Mirrors values-v31/styles.xml but swaps the splash background to the app's
+      darkest brand surface (#0A0D12 — the gauge bezel/face-edge tone) so the
+      boot splash dissolves smoothly into the dark UI instead of flashing white.
+
+      The DANLITE wordmark in the logo is dark navy and would vanish on a dark
+      background, so the padded logo is floated on a white icon circle
+      (windowSplashScreenIconBackgroundColor) to keep it fully legible. The same
+      padded @drawable/android12splash is reused, so nothing is cropped.
+    -->
+    <style name="LaunchTheme" parent="@android:style/Theme.Black.NoTitleBar">
+        <item name="android:windowBackground">@drawable/launch_background</item>
+        <item name="android:windowSplashScreenBackground">#FF0A0D12</item>
+        <item name="android:windowSplashScreenAnimatedIcon">@drawable/android12splash</item>
+        <item name="android:windowSplashScreenIconBackgroundColor">@color/ic_launcher_background</item>
+    </style>
+    <style name="NormalTheme" parent="@android:style/Theme.Black.NoTitleBar">
+        <item name="android:windowBackground">?android:colorBackground</item>
+    </style>
+</resources>

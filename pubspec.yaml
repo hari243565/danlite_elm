@@ -1,0 +1,48 @@
+name: danlite_elm
+description: OBD Danlite – Professional OBD2 Vehicle Diagnostics for Android & iOS
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.2.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+
+  provider: ^6.1.2
+  shared_preferences: ^2.2.3
+  fl_chart: ^0.68.0
+  google_fonts: ^6.2.1
+  permission_handler: ^11.3.1
+  network_info_plus: ^5.0.3
+  lottie: ^3.1.0
+  intl: ^0.20.2
+  cupertino_icons: ^1.0.6
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.1
+  flutter_launcher_icons: ^0.13.1
+
+flutter:
+  uses-material-design: true
+  generate: true
+
+  assets:
+    - assets/images/
+    - assets/icons/
+    - assets/dtc_translations.json
+flutter_launcher_icons:
+  android: "ic_launcher"
+  ios: false
+  image_path: "assets/images/logo.png"
+  # Adaptive icons let the Android launcher mask the icon to the device shape
+  # (circle on most launchers). White background fills the logo's transparency
+  # so the circular crop stays clean, and the wordmark is not hard-chopped.
+  min_sdk_android: 21
+  adaptive_icon_background: "#FFFFFF"
+  adaptive_icon_foreground: "assets/images/logo.png"

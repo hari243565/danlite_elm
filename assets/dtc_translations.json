@@ -1,0 +1,3998 @@
+{
+  "P0010": {
+    "en": "'A' Camshaft Position Actuator Circuit (Bank 1)",
+    "hi": "'A' कैमशाफ्ट पोजिशन एक्ट्यूएटर सर्किट (बैंक 1)"
+  },
+  "P0011": {
+    "en": "'A' Camshaft Position - Timing Over-Advanced or System Performance (Bank 1)",
+    "hi": "'A' कैमशाफ्ट पोजिशन - टाइमिंग अत्यधिक एडवांस या सिस्टम परफॉरमेंस (बैंक 1)"
+  },
+  "P0012": {
+    "en": "'A' Camshaft Position - Timing Over-Retarded (Bank 1)",
+    "hi": "'A' कैमशाफ्ट पोजिशन - टाइमिंग अत्यधिक रिटार्ड (बैंक 1)"
+  },
+  "P0013": {
+    "en": "'B' Camshaft Position - Actuator Circuit (Bank 1)",
+    "hi": "'B' कैमशाफ्ट पोजिशन - एक्ट्यूएटर सर्किट (बैंक 1)"
+  },
+  "P0014": {
+    "en": "'B' Camshaft Position - Timing Over-Advanced or System Performance (Bank 1)",
+    "hi": "'B' कैमशाफ्ट पोजिशन - टाइमिंग अत्यधिक एडवांस या सिस्टम परफॉरमेंस (बैंक 1)"
+  },
+  "P0015": {
+    "en": "'B' Camshaft Position - Timing Over-Retarded (Bank 1)",
+    "hi": "'B' कैमशाफ्ट पोजिशन - टाइमिंग अत्यधिक रिटार्ड (बैंक 1)"
+  },
+  "P0016": {
+    "en": "Crankshaft Position - Camshaft Position Correlation (Bank 1 Sensor A)",
+    "hi": "क्रैंकशाफ्ट पोजिशन - कैमशाफ्ट पोजिशन सहसंबंध (बैंक 1 सेंसर A)"
+  },
+  "P0020": {
+    "en": "'A' Camshaft Position Actuator Circuit (Bank 2)",
+    "hi": "'A' कैमशाफ्ट पोजिशन एक्ट्यूएटर सर्किट (बैंक 2)"
+  },
+  "P0021": {
+    "en": "'A' Camshaft Position - Timing Over-Advanced or System Performance (Bank 2)",
+    "hi": "'A' कैमशाफ्ट पोजिशन - टाइमिंग अत्यधिक एडवांस या सिस्टम परफॉरमेंस (बैंक 2)"
+  },
+  "P0022": {
+    "en": "'A' Camshaft Position - Timing Over-Retarded (Bank 2)",
+    "hi": "'A' कैमशाफ्ट पोजिशन - टाइमिंग अत्यधिक रिटार्ड (बैंक 2)"
+  },
+  "P0023": {
+    "en": "'B' Camshaft Position - Actuator Circuit (Bank 2)",
+    "hi": "'B' कैमशाफ्ट पोजिशन - एक्ट्यूएटर सर्किट (बैंक 2)"
+  },
+  "P0024": {
+    "en": "'B' Camshaft Position - Timing Over-Advanced or System Performance (Bank 2)",
+    "hi": "'B' कैमशाफ्ट पोजिशन - टाइमिंग अत्यधिक एडवांस या सिस्टम परफॉरमेंस (बैंक 2)"
+  },
+  "P0025": {
+    "en": "'B' Camshaft Position - Timing Over-Retarded (Bank 2)",
+    "hi": "'B' कैमशाफ्ट पोजिशन - टाइमिंग अत्यधिक रिटार्ड (बैंक 2)"
+  },
+  "P0030": {
+    "en": "O2 Sensor Heater Control Circuit (Bank 1 Sensor 1)",
+    "hi": "O2 सेंसर हीटर कंट्रोल सर्किट (बैंक 1 सेंसर 1)"
+  },
+  "P0031": {
+    "en": "O2 Sensor Heater Control Circuit Low (Bank 1 Sensor 1)",
+    "hi": "O2 सेंसर हीटर कंट्रोल सर्किट लो (बैंक 1 सेंसर 1)"
+  },
+  "P0032": {
+    "en": "O2 Sensor Heater Control Circuit High (Bank 1 Sensor 1)",
+    "hi": "O2 सेंसर हीटर कंट्रोल सर्किट हाई (बैंक 1 सेंसर 1)"
+  },
+  "P0033": {
+    "en": "Turbocharger Bypass Valve Control Circuit",
+    "hi": "टर्बोचार्जर बायपास वाल्व कंट्रोल सर्किट"
+  },
+  "P0034": {
+    "en": "Turbocharger Bypass Valve Control Circuit Low",
+    "hi": "टर्बोचार्जर बायपास वाल्व कंट्रोल सर्किट लो"
+  },
+  "P0035": {
+    "en": "Turbocharger Bypass Valve Control Circuit High",
+    "hi": "टर्बोचार्जर बायपास वाल्व कंट्रोल सर्किट हाई"
+  },
+  "P0036": {
+    "en": "O2 Sensor Heater Control Circuit (Bank 1 Sensor 2)",
+    "hi": "O2 सेंसर हीटर कंट्रोल सर्किट (बैंक 1 सेंसर 2)"
+  },
+  "P0037": {
+    "en": "O2 Sensor Heater Control Circuit Low (Bank 1 Sensor 2)",
+    "hi": "O2 सेंसर हीटर कंट्रोल सर्किट लो (बैंक 1 सेंसर 2)"
+  },
+  "P0038": {
+    "en": "O2 Sensor Heater Control Circuit High (Bank 1 Sensor 2)",
+    "hi": "O2 सेंसर हीटर कंट्रोल सर्किट हाई (बैंक 1 सेंसर 2)"
+  },
+  "P0042": {
+    "en": "O2 Sensor Heater Control Circuit (Bank 1 Sensor 3)",
+    "hi": "O2 सेंसर हीटर कंट्रोल सर्किट (बैंक 1 सेंसर 3)"
+  },
+  "P0043": {
+    "en": "O2 Sensor Heater Control Circuit Low (Bank 1 Sensor 3)",
+    "hi": "O2 सेंसर हीटर कंट्रोल सर्किट लो (बैंक 1 सेंसर 3)"
+  },
+  "P0044": {
+    "en": "O2 Sensor Heater Control Circuit High (Bank 1 Sensor 3)",
+    "hi": "O2 सेंसर हीटर कंट्रोल सर्किट हाई (बैंक 1 सेंसर 3)"
+  },
+  "P0050": {
+    "en": "O2 Sensor Heater Control Circuit (Bank 2 Sensor 1)",
+    "hi": "O2 सेंसर हीटर कंट्रोल सर्किट (बैंक 2 सेंसर 1)"
+  },
+  "P0051": {
+    "en": "O2 Sensor Heater Control Circuit Low (Bank 2 Sensor 1)",
+    "hi": "O2 सेंसर हीटर कंट्रोल सर्किट लो (बैंक 2 सेंसर 1)"
+  },
+  "P0052": {
+    "en": "O2 Sensor Heater Control Circuit High (Bank 2 Sensor 1)",
+    "hi": "O2 सेंसर हीटर कंट्रोल सर्किट हाई (बैंक 2 सेंसर 1)"
+  },
+  "P0056": {
+    "en": "O2 Sensor Heater Control Circuit (Bank 2 Sensor 2)",
+    "hi": "O2 सेंसर हीटर कंट्रोल सर्किट (बैंक 2 सेंसर 2)"
+  },
+  "P0057": {
+    "en": "O2 Sensor Heater Control Circuit Low (Bank 2 Sensor 2)",
+    "hi": "O2 सेंसर हीटर कंट्रोल सर्किट लो (बैंक 2 सेंसर 2)"
+  },
+  "P0058": {
+    "en": "O2 Sensor Heater Control Circuit High (Bank 2 Sensor 2)",
+    "hi": "O2 सेंसर हीटर कंट्रोल सर्किट हाई (बैंक 2 सेंसर 2)"
+  },
+  "P0062": {
+    "en": "O2 Sensor Heater Control Circuit (Bank 2 Sensor 3)",
+    "hi": "O2 सेंसर हीटर कंट्रोल सर्किट (बैंक 2 सेंसर 3)"
+  },
+  "P0063": {
+    "en": "O2 Sensor Heater Control Circuit Low (Bank 2 Sensor 3)",
+    "hi": "O2 सेंसर हीटर कंट्रोल सर्किट लो (बैंक 2 सेंसर 3)"
+  },
+  "P0064": {
+    "en": "O2 Sensor Heater Control Circuit High (Bank 2 Sensor 3)",
+    "hi": "O2 सेंसर हीटर कंट्रोल सर्किट हाई (बैंक 2 सेंसर 3)"
+  },
+  "P0065": {
+    "en": "Air Assisted Injector Control Range/Performance",
+    "hi": "एयर असिस्टेड इंजेक्टर कंट्रोल रेंज/परफॉरमेंस"
+  },
+  "P0066": {
+    "en": "Air Assisted Injector Control Circuit or Circuit Low",
+    "hi": "एयर असिस्टेड इंजेक्टर कंट्रोल सर्किट या सर्किट लो"
+  },
+  "P0067": {
+    "en": "Air Assisted Injector Control Circuit High",
+    "hi": "एयर असिस्टेड इंजेक्टर कंट्रोल सर्किट हाई"
+  },
+  "P0068": {
+    "en": "Throttle Body Airflow Performance",
+    "hi": "थ्रॉटल बॉडी एयरफ्लो परफॉरमेंस"
+  },
+  "P0070": {
+    "en": "Ambient Air Temperature Sensor Circuit",
+    "hi": "एम्बिएंट एयर टेम्परेचर सेंसर सर्किट"
+  },
+  "P0071": {
+    "en": "Ambient Air Temperature Sensor Range/Performance",
+    "hi": "एम्बिएंट एयर टेम्परेचर सेंसर रेंज/परफॉरमेंस"
+  },
+  "P0072": {
+    "en": "Ambient Air Temperature Sensor Circuit Low Input",
+    "hi": "एम्बिएंट एयर टेम्परेचर सेंसर सर्किट लो इनपुट"
+  },
+  "P0073": {
+    "en": "Ambient Air Temperature Sensor Circuit High Input",
+    "hi": "एम्बिएंट एयर टेम्परेचर सेंसर सर्किट हाई इनपुट"
+  },
+  "P0074": {
+    "en": "Ambient Air Temperature Sensor Circuit Intermittent",
+    "hi": "एम्बिएंट एयर टेम्परेचर सेंसर सर्किट रुक-रुक कर"
+  },
+  "P0075": {
+    "en": "Intake Valve Control Solenoid Circuit (Bank 1)",
+    "hi": "इनटेक वाल्व कंट्रोल सोलेनॉइड सर्किट (बैंक 1)"
+  },
+  "P0076": {
+    "en": "Intake Valve Control Solenoid Circuit Low (Bank 1)",
+    "hi": "इनटेक वाल्व कंट्रोल सोलेनॉइड सर्किट लो (बैंक 1)"
+  },
+  "P0077": {
+    "en": "Intake Valve Control Solenoid Circuit High (Bank 1)",
+    "hi": "इनटेक वाल्व कंट्रोल सोलेनॉइड सर्किट हाई (बैंक 1)"
+  },
+  "P0078": {
+    "en": "Exhaust Valve Control Solenoid Circuit (Bank 1)",
+    "hi": "एग्जॉस्ट वाल्व कंट्रोल सोलेनॉइड सर्किट (बैंक 1)"
+  },
+  "P0079": {
+    "en": "Exhaust Valve Control Solenoid Circuit Low (Bank 1)",
+    "hi": "एग्जॉस्ट वाल्व कंट्रोल सोलेनॉइड सर्किट लो (बैंक 1)"
+  },
+  "P0080": {
+    "en": "Exhaust Valve Control Solenoid Circuit High (Bank 1)",
+    "hi": "एग्जॉस्ट वाल्व कंट्रोल सोलेनॉइड सर्किट हाई (बैंक 1)"
+  },
+  "P0081": {
+    "en": "Intake Valve Control Solenoid Circuit (Bank 2)",
+    "hi": "इनटेक वाल्व कंट्रोल सोलेनॉइड सर्किट (बैंक 2)"
+  },
+  "P0082": {
+    "en": "Intake Valve Control Solenoid Circuit Low (Bank 2)",
+    "hi": "इनटेक वाल्व कंट्रोल सोलेनॉइड सर्किट लो (बैंक 2)"
+  },
+  "P0083": {
+    "en": "Intake Valve Control Solenoid Circuit High (Bank 2)",
+    "hi": "इनटेक वाल्व कंट्रोल सोलेनॉइड सर्किट हाई (बैंक 2)"
+  },
+  "P0084": {
+    "en": "Exhaust Valve Control Solenoid Circuit (Bank 2)",
+    "hi": "एग्जॉस्ट वाल्व कंट्रोल सोलेनॉइड सर्किट (बैंक 2)"
+  },
+  "P0085": {
+    "en": "Exhaust Valve Control Solenoid Circuit Low (Bank 2)",
+    "hi": "एग्जॉस्ट वाल्व कंट्रोल सोलेनॉइड सर्किट लो (बैंक 2)"
+  },
+  "P0086": {
+    "en": "Exhaust Valve Control Solenoid Circuit High (Bank 2)",
+    "hi": "एग्जॉस्ट वाल्व कंट्रोल सोलेनॉइड सर्किट हाई (बैंक 2)"
+  },
+  "P0100": {
+    "en": "Mass Air Flow (MAF) Sensor Circuit Insufficient Activity",
+    "hi": "मास एयर फ्लो (MAF) सेंसर सर्किट अपर्याप्त गतिविधि"
+  },
+  "P0101": {
+    "en": "Mass Air Flow (MAF) Sensor Performance",
+    "hi": "मास एयर फ्लो (MAF) सेंसर परफॉरमेंस"
+  },
+  "P0102": {
+    "en": "Mass Air Flow (MAF) Sensor Circuit Low Frequency",
+    "hi": "मास एयर फ्लो (MAF) सेंसर सर्किट लो फ्रीक्वेंसी"
+  },
+  "P0103": {
+    "en": "Mass Air Flow (MAF) Sensor Circuit High Frequency",
+    "hi": "मास एयर फ्लो (MAF) सेंसर सर्किट हाई फ्रीक्वेंसी"
+  },
+  "P0104": {
+    "en": "Mass Air Flow Circuit Intermittent",
+    "hi": "मास एयर फ्लो सर्किट रुक-रुक कर"
+  },
+  "P0105": {
+    "en": "Manifold Absolute Pressure (MAP) Sensor Circuit Insufficient Activity",
+    "hi": "मैनिफोल्ड एब्सोल्यूट प्रेशर (MAP) सेंसर सर्किट अपर्याप्त गतिविधि"
+  },
+  "P0106": {
+    "en": "Manifold Absolute Pressure (MAP) System Performance",
+    "hi": "मैनिफोल्ड एब्सोल्यूट प्रेशर (MAP) सिस्टम परफॉरमेंस"
+  },
+  "P0107": {
+    "en": "Manifold Absolute Pressure (MAP) Sensor Circuit Low Voltage",
+    "hi": "मैनिफोल्ड एब्सोल्यूट प्रेशर (MAP) सेंसर सर्किट लो वोल्टेज"
+  },
+  "P0108": {
+    "en": "Manifold Absolute Pressure (MAP) Sensor Circuit High Voltage",
+    "hi": "मैनिफोल्ड एब्सोल्यूट प्रेशर (MAP) सेंसर सर्किट हाई वोल्टेज"
+  },
+  "P0109": {
+    "en": "Manifold Absolute Pressure Sensor Circuit Intermittent",
+    "hi": "मैनिफोल्ड एब्सोल्यूट प्रेशर सेंसर सर्किट रुक-रुक कर"
+  },
+  "P0110": {
+    "en": "Intake Air Temperature (IAT) Sensor Circuit",
+    "hi": "इनटेक एयर टेम्परेचर (IAT) सेंसर सर्किट"
+  },
+  "P0111": {
+    "en": "Intake Air Temperature (IAT) Sensor Performance",
+    "hi": "इनटेक एयर टेम्परेचर (IAT) सेंसर परफॉरमेंस"
+  },
+  "P0112": {
+    "en": "Intake Air Temperature (IAT) Sensor Circuit Low Voltage",
+    "hi": "इनटेक एयर टेम्परेचर (IAT) सेंसर सर्किट लो वोल्टेज"
+  },
+  "P0113": {
+    "en": "Intake Air Temperature (IAT) Sensor Circuit High Voltage",
+    "hi": "इनटेक एयर टेम्परेचर (IAT) सेंसर सर्किट हाई वोल्टेज"
+  },
+  "P0114": {
+    "en": "Intake Air Temperature Sensor Circuit Intermittent",
+    "hi": "इनटेक एयर टेम्परेचर सेंसर सर्किट रुक-रुक कर"
+  },
+  "P0115": {
+    "en": "Engine Coolant Temperature (ECT) Sensor Circuit",
+    "hi": "इंजन कूलेंट टेम्परेचर (ECT) सेंसर सर्किट"
+  },
+  "P0116": {
+    "en": "Engine Coolant Temperature (ECT) Sensor Performance",
+    "hi": "इंजन कूलेंट टेम्परेचर (ECT) सेंसर परफॉरमेंस"
+  },
+  "P0117": {
+    "en": "Engine Coolant Temperature (ECT) Sensor Circuit Low Voltage",
+    "hi": "इंजन कूलेंट टेम्परेचर (ECT) सेंसर सर्किट लो वोल्टेज"
+  },
+  "P0118": {
+    "en": "Engine Coolant Temperature (ECT) Sensor Circuit High Voltage",
+    "hi": "इंजन कूलेंट टेम्परेचर (ECT) सेंसर सर्किट हाई वोल्टेज"
+  },
+  "P0119": {
+    "en": "Engine Coolant Temperature Sensor Circuit Intermittent",
+    "hi": "इंजन कूलेंट टेम्परेचर सेंसर सर्किट रुक-रुक कर"
+  },
+  "P0120": {
+    "en": "Throttle Position (TP) System Performance",
+    "hi": "थ्रॉटल पोजिशन (TP) सिस्टम परफॉरमेंस"
+  },
+  "P0121": {
+    "en": "Throttle Position (TP) Sensor Circuit Insufficient Activity",
+    "hi": "थ्रॉटल पोजिशन (TP) सेंसर सर्किट अपर्याप्त गतिविधि"
+  },
+  "P0122": {
+    "en": "Throttle Position (TP) Sensor Circuit Low Voltage",
+    "hi": "थ्रॉटल पोजिशन (TP) सेंसर सर्किट लो वोल्टेज"
+  },
+  "P0123": {
+    "en": "Throttle Position (TP) Sensor Circuit High Voltage",
+    "hi": "थ्रॉटल पोजिशन (TP) सेंसर सर्किट हाई वोल्टेज"
+  },
+  "P0124": {
+    "en": "Throttle Position Sensor 1 Circuit Intermittent",
+    "hi": "थ्रॉटल पोजिशन सेंसर 1 सर्किट रुक-रुक कर"
+  },
+  "P0125": {
+    "en": "Insufficient Coolant Temperature for Closed Loop Fuel Control",
+    "hi": "बंद-लूप फ्यूल कंट्रोल के लिए अपर्याप्त कूलेंट टेम्परेचर"
+  },
+  "P0126": {
+    "en": "Insufficient Coolant Temperature for Stable Operation",
+    "hi": "स्थिर संचालन के लिए अपर्याप्त कूलेंट टेम्परेचर"
+  },
+  "P0128": {
+    "en": "Coolant Thermostat Temperature Below Regulating Temperature",
+    "hi": "कूलेंट थर्मोस्टेट रेगुलेटिंग टेम्परेचर से नीचे"
+  },
+  "P0130": {
+    "en": "O2 Sensor Circuit Closed Loop Performance (Bank 1 Sensor 1)",
+    "hi": "O2 सेंसर सर्किट क्लोज्ड लूप परफॉरमेंस (बैंक 1 सेंसर 1)"
+  },
+  "P0131": {
+    "en": "O2 Sensor Circuit Low Voltage (Bank 1 Sensor 1)",
+    "hi": "O2 सेंसर सर्किट लो वोल्टेज (बैंक 1 सेंसर 1)"
+  },
+  "P0132": {
+    "en": "O2 Sensor Circuit High Voltage (Bank 1 Sensor 1)",
+    "hi": "O2 सेंसर सर्किट हाई वोल्टेज (बैंक 1 सेंसर 1)"
+  },
+  "P0133": {
+    "en": "O2 Sensor Circuit Slow Response (Bank 1 Sensor 1)",
+    "hi": "O2 सेंसर सर्किट धीमी प्रतिक्रिया (बैंक 1 सेंसर 1)"
+  },
+  "P0134": {
+    "en": "O2 Sensor Circuit Insufficient Activity (Bank 1 Sensor 1)",
+    "hi": "O2 सेंसर सर्किट अपर्याप्त गतिविधि (बैंक 1 सेंसर 1)"
+  },
+  "P0135": {
+    "en": "O2 Sensor Circuit Heater Performance (Bank 1 Sensor 1)",
+    "hi": "O2 सेंसर सर्किट हीटर परफॉरमेंस (बैंक 1 सेंसर 1)"
+  },
+  "P0136": {
+    "en": "O2 Sensor Circuit (Bank 1 Sensor 2)",
+    "hi": "O2 सेंसर सर्किट (बैंक 1 सेंसर 2)"
+  },
+  "P0137": {
+    "en": "O2 Sensor Circuit Low Voltage (Bank 1 Sensor 2)",
+    "hi": "O2 सेंसर सर्किट लो वोल्टेज (बैंक 1 सेंसर 2)"
+  },
+  "P0138": {
+    "en": "O2 Sensor Circuit High Voltage (Bank 1 Sensor 2)",
+    "hi": "O2 सेंसर सर्किट हाई वोल्टेज (बैंक 1 सेंसर 2)"
+  },
+  "P0139": {
+    "en": "O2 Sensor Circuit Slow Response (Bank 1 Sensor 2)",
+    "hi": "O2 सेंसर सर्किट धीमी प्रतिक्रिया (बैंक 1 सेंसर 2)"
+  },
+  "P0140": {
+    "en": "O2 Sensor Circuit Insufficient Activity (Bank 1 Sensor 2)",
+    "hi": "O2 सेंसर सर्किट अपर्याप्त गतिविधि (बैंक 1 सेंसर 2)"
+  },
+  "P0141": {
+    "en": "O2 Sensor Circuit Heater Performance (Bank 1 Sensor 2)",
+    "hi": "O2 सेंसर सर्किट हीटर परफॉरमेंस (बैंक 1 सेंसर 2)"
+  },
+  "P0142": {
+    "en": "O2 Sensor Circuit (Bank 1 Sensor 3)",
+    "hi": "O2 सेंसर सर्किट (बैंक 1 सेंसर 3)"
+  },
+  "P0143": {
+    "en": "O2 Sensor Circuit Low Voltage (Bank 1 Sensor 3)",
+    "hi": "O2 सेंसर सर्किट लो वोल्टेज (बैंक 1 सेंसर 3)"
+  },
+  "P0144": {
+    "en": "O2 Sensor Circuit High Voltage (Bank 1 Sensor 3)",
+    "hi": "O2 सेंसर सर्किट हाई वोल्टेज (बैंक 1 सेंसर 3)"
+  },
+  "P0145": {
+    "en": "O2 Sensor Circuit Slow Response (Bank 1 Sensor 3)",
+    "hi": "O2 सेंसर सर्किट धीमी प्रतिक्रिया (बैंक 1 सेंसर 3)"
+  },
+  "P0146": {
+    "en": "O2 Sensor Circuit Insufficient Activity (Bank 1 Sensor 3)",
+    "hi": "O2 सेंसर सर्किट अपर्याप्त गतिविधि (बैंक 1 सेंसर 3)"
+  },
+  "P0147": {
+    "en": "O2 Sensor Circuit Heater Performance (Bank 1 Sensor 3)",
+    "hi": "O2 सेंसर सर्किट हीटर परफॉरमेंस (बैंक 1 सेंसर 3)"
+  },
+  "P0150": {
+    "en": "O2 Sensor Circuit Closed Loop Performance (Bank 2 Sensor 1)",
+    "hi": "O2 सेंसर सर्किट क्लोज्ड लूप परफॉरमेंस (बैंक 2 सेंसर 1)"
+  },
+  "P0151": {
+    "en": "O2 Sensor Circuit Low Voltage (Bank 2 Sensor 1)",
+    "hi": "O2 सेंसर सर्किट लो वोल्टेज (बैंक 2 सेंसर 1)"
+  },
+  "P0152": {
+    "en": "O2 Sensor Circuit High Voltage (Bank 2 Sensor 1)",
+    "hi": "O2 सेंसर सर्किट हाई वोल्टेज (बैंक 2 सेंसर 1)"
+  },
+  "P0153": {
+    "en": "O2 Sensor Circuit Slow Response (Bank 2 Sensor 1)",
+    "hi": "O2 सेंसर सर्किट धीमी प्रतिक्रिया (बैंक 2 सेंसर 1)"
+  },
+  "P0154": {
+    "en": "O2 Sensor Circuit Insufficient Activity (Bank 2 Sensor 1)",
+    "hi": "O2 सेंसर सर्किट अपर्याप्त गतिविधि (बैंक 2 सेंसर 1)"
+  },
+  "P0155": {
+    "en": "O2 Sensor Circuit Heater Performance (Bank 2 Sensor 1)",
+    "hi": "O2 सेंसर सर्किट हीटर परफॉरमेंस (बैंक 2 सेंसर 1)"
+  },
+  "P0156": {
+    "en": "O2 Sensor Circuit (Bank 2 Sensor 2)",
+    "hi": "O2 सेंसर सर्किट (बैंक 2 सेंसर 2)"
+  },
+  "P0157": {
+    "en": "O2 Sensor Circuit Low Voltage (Bank 2 Sensor 2)",
+    "hi": "O2 सेंसर सर्किट लो वोल्टेज (बैंक 2 सेंसर 2)"
+  },
+  "P0158": {
+    "en": "O2 Sensor Circuit High Voltage (Bank 2 Sensor 2)",
+    "hi": "O2 सेंसर सर्किट हाई वोल्टेज (बैंक 2 सेंसर 2)"
+  },
+  "P0159": {
+    "en": "O2 Sensor Circuit Slow Response (Bank 2 Sensor 2)",
+    "hi": "O2 सेंसर सर्किट धीमी प्रतिक्रिया (बैंक 2 सेंसर 2)"
+  },
+  "P0160": {
+    "en": "O2 Sensor Circuit Insufficient Activity (Bank 2 Sensor 2)",
+    "hi": "O2 सेंसर सर्किट अपर्याप्त गतिविधि (बैंक 2 सेंसर 2)"
+  },
+  "P0161": {
+    "en": "O2 Sensor Circuit Heater Performance (Bank 2 Sensor 2)",
+    "hi": "O2 सेंसर सर्किट हीटर परफॉरमेंस (बैंक 2 सेंसर 2)"
+  },
+  "P0162": {
+    "en": "O2 Sensor Circuit (Bank 2 Sensor 3)",
+    "hi": "O2 सेंसर सर्किट (बैंक 2 सेंसर 3)"
+  },
+  "P0163": {
+    "en": "O2 Sensor Circuit Low Voltage (Bank 2 Sensor 3)",
+    "hi": "O2 सेंसर सर्किट लो वोल्टेज (बैंक 2 सेंसर 3)"
+  },
+  "P0164": {
+    "en": "O2 Sensor Circuit High Voltage (Bank 2 Sensor 3)",
+    "hi": "O2 सेंसर सर्किट हाई वोल्टेज (बैंक 2 सेंसर 3)"
+  },
+  "P0165": {
+    "en": "O2 Sensor Circuit Slow Response (Bank 2 Sensor 3)",
+    "hi": "O2 सेंसर सर्किट धीमी प्रतिक्रिया (बैंक 2 सेंसर 3)"
+  },
+  "P0166": {
+    "en": "O2 Sensor Circuit Insufficient Activity (Bank 2 Sensor 3)",
+    "hi": "O2 सेंसर सर्किट अपर्याप्त गतिविधि (बैंक 2 सेंसर 3)"
+  },
+  "P0167": {
+    "en": "O2 Sensor Circuit Heater Circuit (Bank 2 Sensor 3)",
+    "hi": "O2 सेंसर सर्किट हीटर सर्किट (बैंक 2 सेंसर 3)"
+  },
+  "P0169": {
+    "en": "Fuel Composition Sensor",
+    "hi": "फ्यूल कंपोजिशन सेंसर"
+  },
+  "P0170": {
+    "en": "Fuel Trim (Bank 1)",
+    "hi": "फ्यूल ट्रिम (बैंक 1)"
+  },
+  "P0171": {
+    "en": "Fuel Trim System Lean (Bank 1)",
+    "hi": "फ्यूल ट्रिम सिस्टम लीन (बैंक 1)"
+  },
+  "P0172": {
+    "en": "Fuel Trim System Rich (Bank 1)",
+    "hi": "फ्यूल ट्रिम सिस्टम रिच (बैंक 1)"
+  },
+  "P0173": {
+    "en": "Fuel Trim (Bank 2)",
+    "hi": "फ्यूल ट्रिम (बैंक 2)"
+  },
+  "P0174": {
+    "en": "Fuel Trim System Lean (Bank 2)",
+    "hi": "फ्यूल ट्रिम सिस्टम लीन (बैंक 2)"
+  },
+  "P0175": {
+    "en": "Fuel Trim System Rich (Bank 2)",
+    "hi": "फ्यूल ट्रिम सिस्टम रिच (बैंक 2)"
+  },
+  "P0176": {
+    "en": "Fuel Composition Sensor Circuit",
+    "hi": "फ्यूल कंपोजिशन सेंसर सर्किट"
+  },
+  "P0177": {
+    "en": "Fuel Composition Sensor Circuit Performance",
+    "hi": "फ्यूल कंपोजिशन सेंसर सर्किट परफॉरमेंस"
+  },
+  "P0178": {
+    "en": "Fuel Composition Sensor Circuit Low Voltage",
+    "hi": "फ्यूल कंपोजिशन सेंसर सर्किट लो वोल्टेज"
+  },
+  "P0179": {
+    "en": "Fuel Composition Sensor Circuit High Voltage",
+    "hi": "फ्यूल कंपोजिशन सेंसर सर्किट हाई वोल्टेज"
+  },
+  "P0180": {
+    "en": "Fuel Temperature Sensor 1 Circuit",
+    "hi": "फ्यूल टेम्परेचर सेंसर 1 सर्किट"
+  },
+  "P0181": {
+    "en": "Fuel Temperature Sensor 1 Circuit Performance",
+    "hi": "फ्यूल टेम्परेचर सेंसर 1 सर्किट परफॉरमेंस"
+  },
+  "P0182": {
+    "en": "Fuel Temperature Sensor 1 Circuit Low Voltage",
+    "hi": "फ्यूल टेम्परेचर सेंसर 1 सर्किट लो वोल्टेज"
+  },
+  "P0183": {
+    "en": "Fuel Temperature Sensor 1 Circuit High Voltage",
+    "hi": "फ्यूल टेम्परेचर सेंसर 1 सर्किट हाई वोल्टेज"
+  },
+  "P0184": {
+    "en": "Fuel Temperature Sensor 1 Circuit Intermittent",
+    "hi": "फ्यूल टेम्परेचर सेंसर 1 सर्किट रुक-रुक कर"
+  },
+  "P0185": {
+    "en": "Fuel Temperature Sensor 2 Circuit",
+    "hi": "फ्यूल टेम्परेचर सेंसर 2 सर्किट"
+  },
+  "P0186": {
+    "en": "Fuel Temperature Sensor 2 Circuit Performance",
+    "hi": "फ्यूल टेम्परेचर सेंसर 2 सर्किट परफॉरमेंस"
+  },
+  "P0187": {
+    "en": "Fuel Temperature Sensor 2 Circuit Low Voltage",
+    "hi": "फ्यूल टेम्परेचर सेंसर 2 सर्किट लो वोल्टेज"
+  },
+  "P0188": {
+    "en": "Fuel Temperature Sensor 2 Circuit High Voltage",
+    "hi": "फ्यूल टेम्परेचर सेंसर 2 सर्किट हाई वोल्टेज"
+  },
+  "P0189": {
+    "en": "Fuel Temperature Sensor 2 Circuit Intermittent",
+    "hi": "फ्यूल टेम्परेचर सेंसर 2 सर्किट रुक-रुक कर"
+  },
+  "P0190": {
+    "en": "Fuel Rail Pressure Sensor Circuit",
+    "hi": "फ्यूल रेल प्रेशर सेंसर सर्किट"
+  },
+  "P0191": {
+    "en": "Fuel Rail Pressure Sensor Circuit Performance",
+    "hi": "फ्यूल रेल प्रेशर सेंसर सर्किट परफॉरमेंस"
+  },
+  "P0192": {
+    "en": "Fuel Rail Pressure Sensor Circuit Low Voltage",
+    "hi": "फ्यूल रेल प्रेशर सेंसर सर्किट लो वोल्टेज"
+  },
+  "P0193": {
+    "en": "Fuel Rail Pressure Sensor Circuit High Voltage",
+    "hi": "फ्यूल रेल प्रेशर सेंसर सर्किट हाई वोल्टेज"
+  },
+  "P0194": {
+    "en": "Fuel Rail Pressure Sensor Circuit Intermittent",
+    "hi": "फ्यूल रेल प्रेशर सेंसर सर्किट रुक-रुक कर"
+  },
+  "P0195": {
+    "en": "Engine Oil Temperature Sensor",
+    "hi": "इंजन ऑयल टेम्परेचर सेंसर"
+  },
+  "P0196": {
+    "en": "Engine Oil Temperature Sensor Performance",
+    "hi": "इंजन ऑयल टेम्परेचर सेंसर परफॉरमेंस"
+  },
+  "P0197": {
+    "en": "Engine Oil Temperature Sensor Low Voltage",
+    "hi": "इंजन ऑयल टेम्परेचर सेंसर लो वोल्टेज"
+  },
+  "P0198": {
+    "en": "Engine Oil Temperature Sensor High Voltage",
+    "hi": "इंजन ऑयल टेम्परेचर सेंसर हाई वोल्टेज"
+  },
+  "P0199": {
+    "en": "Engine Oil Temperature Sensor Intermittent",
+    "hi": "इंजन ऑयल टेम्परेचर सेंसर रुक-रुक कर"
+  },
+  "P0200": {
+    "en": "Injector Control Circuit",
+    "hi": "इंजेक्टर कंट्रोल सर्किट"
+  },
+  "P0201": {
+    "en": "Injector 1 Control Circuit",
+    "hi": "इंजेक्टर 1 कंट्रोल सर्किट"
+  },
+  "P0202": {
+    "en": "Injector 2 Control Circuit",
+    "hi": "इंजेक्टर 2 कंट्रोल सर्किट"
+  },
+  "P0203": {
+    "en": "Injector 3 Control Circuit",
+    "hi": "इंजेक्टर 3 कंट्रोल सर्किट"
+  },
+  "P0204": {
+    "en": "Injector 4 Control Circuit",
+    "hi": "इंजेक्टर 4 कंट्रोल सर्किट"
+  },
+  "P0205": {
+    "en": "Injector 5 Control Circuit",
+    "hi": "इंजेक्टर 5 कंट्रोल सर्किट"
+  },
+  "P0206": {
+    "en": "Injector 6 Control Circuit",
+    "hi": "इंजेक्टर 6 कंट्रोल सर्किट"
+  },
+  "P0207": {
+    "en": "Injector 7 Control Circuit",
+    "hi": "इंजेक्टर 7 कंट्रोल सर्किट"
+  },
+  "P0208": {
+    "en": "Injector 8 Control Circuit",
+    "hi": "इंजेक्टर 8 कंट्रोल सर्किट"
+  },
+  "P0209": {
+    "en": "Injector 9 Control Circuit",
+    "hi": "इंजेक्टर 9 कंट्रोल सर्किट"
+  },
+  "P0210": {
+    "en": "Injector 10 Control Circuit",
+    "hi": "इंजेक्टर 10 कंट्रोल सर्किट"
+  },
+  "P0211": {
+    "en": "Injector 11 Control Circuit",
+    "hi": "इंजेक्टर 11 कंट्रोल सर्किट"
+  },
+  "P0212": {
+    "en": "Injector 12 Control Circuit",
+    "hi": "इंजेक्टर 12 कंट्रोल सर्किट"
+  },
+  "P0213": {
+    "en": "Cold Start Injector 1",
+    "hi": "कोल्ड स्टार्ट इंजेक्टर 1"
+  },
+  "P0214": {
+    "en": "Cold Start Injector 2",
+    "hi": "कोल्ड स्टार्ट इंजेक्टर 2"
+  },
+  "P0215": {
+    "en": "Engine Shutoff Control Circuit",
+    "hi": "इंजन शटऑफ कंट्रोल सर्किट"
+  },
+  "P0216": {
+    "en": "Injection Timing Control Circuit",
+    "hi": "इंजेक्शन टाइमिंग कंट्रोल सर्किट"
+  },
+  "P0217": {
+    "en": "Engine Overtemp Condition",
+    "hi": "इंजन ओवरटेम्प कंडीशन"
+  },
+  "P0218": {
+    "en": "Transmission Fluid Overtemperature",
+    "hi": "ट्रांसमिशन फ्लूइड ओवरटेम्परेचर"
+  },
+  "P0219": {
+    "en": "Engine Overspeed Condition",
+    "hi": "इंजन ओवरस्पीड कंडीशन"
+  },
+  "P0220": {
+    "en": "Throttle/Pedal Position Sensor 2 Circuit",
+    "hi": "थ्रॉटल/पेडल पोजिशन सेंसर 2 सर्किट"
+  },
+  "P0221": {
+    "en": "Throttle/Pedal Position Sensor 2 Circuit Performance",
+    "hi": "थ्रॉटल/पेडल पोजिशन सेंसर 2 सर्किट परफॉरमेंस"
+  },
+  "P0222": {
+    "en": "Throttle/Pedal Position Sensor 2 Circuit Low Voltage",
+    "hi": "थ्रॉटल/पेडल पोजिशन सेंसर 2 सर्किट लो वोल्टेज"
+  },
+  "P0223": {
+    "en": "Throttle/Pedal Position Sensor 2 Circuit High Voltage",
+    "hi": "थ्रॉटल/पेडल पोजिशन सेंसर 2 सर्किट हाई वोल्टेज"
+  },
+  "P0224": {
+    "en": "Throttle/Pedal Position Sensor 2 Circuit Intermittent",
+    "hi": "थ्रॉटल/पेडल पोजिशन सेंसर 2 सर्किट रुक-रुक कर"
+  },
+  "P0225": {
+    "en": "Throttle/Pedal Position Sensor 3 Circuit",
+    "hi": "थ्रॉटल/पेडल पोजिशन सेंसर 3 सर्किट"
+  },
+  "P0226": {
+    "en": "Throttle/Pedal Position Sensor 3 Circuit Performance",
+    "hi": "थ्रॉटल/पेडल पोजिशन सेंसर 3 सर्किट परफॉरमेंस"
+  },
+  "P0227": {
+    "en": "Throttle/Pedal Position Sensor 3 Circuit Low Voltage",
+    "hi": "थ्रॉटल/पेडल पोजिशन सेंसर 3 सर्किट लो वोल्टेज"
+  },
+  "P0228": {
+    "en": "Throttle/Pedal Position Sensor 3 Circuit High Voltage",
+    "hi": "थ्रॉटल/पेडल पोजिशन सेंसर 3 सर्किट हाई वोल्टेज"
+  },
+  "P0229": {
+    "en": "Throttle/Pedal Position Sensor 3 Circuit Intermittent",
+    "hi": "थ्रॉटल/पेडल पोजिशन सेंसर 3 सर्किट रुक-रुक कर"
+  },
+  "P0230": {
+    "en": "Fuel Pump Relay Control Circuit",
+    "hi": "फ्यूल पंप रिले कंट्रोल सर्किट"
+  },
+  "P0231": {
+    "en": "Fuel Pump Feedback Circuit Low Voltage",
+    "hi": "फ्यूल पंप फीडबैक सर्किट लो वोल्टेज"
+  },
+  "P0232": {
+    "en": "Fuel Pump Feedback Circuit High Voltage",
+    "hi": "फ्यूल पंप फीडबैक सर्किट हाई वोल्टेज"
+  },
+  "P0233": {
+    "en": "Fuel Pump Secondary Circuit Intermittent",
+    "hi": "फ्यूल पंप सेकेंडरी सर्किट रुक-रुक कर"
+  },
+  "P0234": {
+    "en": "Turbocharger Engine Overboost Condition",
+    "hi": "टर्बोचार्जर इंजन ओवरबूस्ट कंडीशन"
+  },
+  "P0235": {
+    "en": "Turbocharger Boost Sensor 1 Circuit",
+    "hi": "टर्बोचार्जर बूस्ट सेंसर 1 सर्किट"
+  },
+  "P0236": {
+    "en": "Turbocharger Boost System Performance",
+    "hi": "टर्बोचार्जर बूस्ट सिस्टम परफॉरमेंस"
+  },
+  "P0237": {
+    "en": "Turbocharger Boost Sensor Circuit Low Voltage",
+    "hi": "टर्बोचार्जर बूस्ट सेंसर सर्किट लो वोल्टेज"
+  },
+  "P0238": {
+    "en": "Turbocharger Boost Sensor Circuit High Voltage",
+    "hi": "टर्बोचार्जर बूस्ट सेंसर सर्किट हाई वोल्टेज"
+  },
+  "P0239": {
+    "en": "Turbocharger Boost Sensor 2 Circuit",
+    "hi": "टर्बोचार्जर बूस्ट सेंसर 2 सर्किट"
+  },
+  "P0240": {
+    "en": "Turbocharger Boost Sensor 2 Performance",
+    "hi": "टर्बोचार्जर बूस्ट सेंसर 2 परफॉरमेंस"
+  },
+  "P0241": {
+    "en": "Turbocharger Boost Sensor 2 Circuit Low Voltage",
+    "hi": "टर्बोचार्जर बूस्ट सेंसर 2 सर्किट लो वोल्टेज"
+  },
+  "P0242": {
+    "en": "Turbocharger Boost Sensor 2 Circuit High Voltage",
+    "hi": "टर्बोचार्जर बूस्ट सेंसर 2 सर्किट हाई वोल्टेज"
+  },
+  "P0243": {
+    "en": "Turbocharger Wastegate Solenoid 1",
+    "hi": "टर्बोचार्जर वेस्टगेट सोलेनॉइड 1"
+  },
+  "P0244": {
+    "en": "Turbocharger Wastegate Solenoid 1 Performance",
+    "hi": "टर्बोचार्जर वेस्टगेट सोलेनॉइड 1 परफॉरमेंस"
+  },
+  "P0245": {
+    "en": "Turbocharger Wastegate Solenoid 1 Low Voltage",
+    "hi": "टर्बोचार्जर वेस्टगेट सोलेनॉइड 1 लो वोल्टेज"
+  },
+  "P0246": {
+    "en": "Turbocharger Wastegate Solenoid 1 High Voltage",
+    "hi": "टर्बोचार्जर वेस्टगेट सोलेनॉइड 1 हाई वोल्टेज"
+  },
+  "P0247": {
+    "en": "Turbocharger Wastegate Solenoid 2",
+    "hi": "टर्बोचार्जर वेस्टगेट सोलेनॉइड 2"
+  },
+  "P0248": {
+    "en": "Turbocharger Wastegate Solenoid 2 Performance",
+    "hi": "टर्बोचार्जर वेस्टगेट सोलेनॉइड 2 परफॉरमेंस"
+  },
+  "P0249": {
+    "en": "Turbocharger Wastegate Solenoid 2 Low Voltage",
+    "hi": "टर्बोचार्जर वेस्टगेट सोलेनॉइड 2 लो वोल्टेज"
+  },
+  "P0250": {
+    "en": "Turbocharger Wastegate Solenoid 2 High Voltage",
+    "hi": "टर्बोचार्जर वेस्टगेट सोलेनॉइड 2 हाई वोल्टेज"
+  },
+  "P0251": {
+    "en": "Injection Pump Fuel Metering Control 'A' Malfunction (Cam/Rotor/Injector)",
+    "hi": "इंजेक्शन पंप फ्यूल मीटरिंग कंट्रोल 'A' खराबी (कैम/रोटर/इंजेक्टर)"
+  },
+  "P0252": {
+    "en": "Injection Pump Fuel Metering Control 'A' Range/Performance (Cam/Rotor/Injector)",
+    "hi": "इंजेक्शन पंप फ्यूल मीटरिंग कंट्रोल 'A' रेंज/परफॉरमेंस (कैम/रोटर/इंजेक्टर)"
+  },
+  "P0253": {
+    "en": "Injection Pump Fuel Metering Control 'A' Low (Cam/Rotor/Injector)",
+    "hi": "इंजेक्शन पंप फ्यूल मीटरिंग कंट्रोल 'A' लो (कैम/रोटर/इंजेक्टर)"
+  },
+  "P0254": {
+    "en": "Injection Pump Fuel Metering Control 'A' High (Cam/Rotor/Injector)",
+    "hi": "इंजेक्शन पंप फ्यूल मीटरिंग कंट्रोल 'A' हाई (कैम/रोटर/इंजेक्टर)"
+  },
+  "P0255": {
+    "en": "Injection Pump Fuel Metering Control 'A' Intermittent (Cam/Rotor/Injector)",
+    "hi": "इंजेक्शन पंप फ्यूल मीटरिंग कंट्रोल 'A' रुक-रुक कर (कैम/रोटर/इंजेक्टर)"
+  },
+  "P0256": {
+    "en": "Injection Pump Fuel Metering Control 'B' Malfunction (Cam/Rotor/Injector)",
+    "hi": "इंजेक्शन पंप फ्यूल मीटरिंग कंट्रोल 'B' खराबी (कैम/रोटर/इंजेक्टर)"
+  },
+  "P0257": {
+    "en": "Injection Pump Fuel Metering Control 'B' Range/Performance (Cam/Rotor/Injector)",
+    "hi": "इंजेक्शन पंप फ्यूल मीटरिंग कंट्रोल 'B' रेंज/परफॉरमेंस (कैम/रोटर/इंजेक्टर)"
+  },
+  "P0258": {
+    "en": "Injection Pump Fuel Metering Control 'B' Low (Cam/Rotor/Injector)",
+    "hi": "इंजेक्शन पंप फ्यूल मीटरिंग कंट्रोल 'B' लो (कैम/रोटर/इंजेक्टर)"
+  },
+  "P0259": {
+    "en": "Injection Pump Fuel Metering Control 'B' High (Cam/Rotor/Injector)",
+    "hi": "इंजेक्शन पंप फ्यूल मीटरिंग कंट्रोल 'B' हाई (कैम/रोटर/इंजेक्टर)"
+  },
+  "P0260": {
+    "en": "Injection Pump Fuel Metering Control 'B' Intermittent (Cam/Rotor/Injector)",
+    "hi": "इंजेक्शन पंप फ्यूल मीटरिंग कंट्रोल 'B' रुक-रुक कर (कैम/रोटर/इंजेक्टर)"
+  },
+  "P0261": {
+    "en": "Cylinder 1 Injector Circuit Low",
+    "hi": "सिलेंडर 1 इंजेक्टर सर्किट लो"
+  },
+  "P0262": {
+    "en": "Cylinder 1 Injector Circuit High",
+    "hi": "सिलेंडर 1 इंजेक्टर सर्किट हाई"
+  },
+  "P0263": {
+    "en": "Cylinder 1 Contribution/Balance Fault",
+    "hi": "सिलेंडर 1 योगदान/संतुलन दोष"
+  },
+  "P0264": {
+    "en": "Cylinder 2 Injector Circuit Low",
+    "hi": "सिलेंडर 2 इंजेक्टर सर्किट लो"
+  },
+  "P0265": {
+    "en": "Cylinder 2 Injector Circuit High",
+    "hi": "सिलेंडर 2 इंजेक्टर सर्किट हाई"
+  },
+  "P0266": {
+    "en": "Cylinder 2 Contribution/Balance Fault",
+    "hi": "सिलेंडर 2 योगदान/संतुलन दोष"
+  },
+  "P0267": {
+    "en": "Cylinder 3 Injector Circuit Low",
+    "hi": "सिलेंडर 3 इंजेक्टर सर्किट लो"
+  },
+  "P0268": {
+    "en": "Cylinder 3 Injector Circuit High",
+    "hi": "सिलेंडर 3 इंजेक्टर सर्किट हाई"
+  },
+  "P0269": {
+    "en": "Cylinder 3 Contribution/Balance Fault",
+    "hi": "सिलेंडर 3 योगदान/संतुलन दोष"
+  },
+  "P0270": {
+    "en": "Cylinder 4 Injector Circuit Low",
+    "hi": "सिलेंडर 4 इंजेक्टर सर्किट लो"
+  },
+  "P0271": {
+    "en": "Cylinder 4 Injector Circuit High",
+    "hi": "सिलेंडर 4 इंजेक्टर सर्किट हाई"
+  },
+  "P0272": {
+    "en": "Cylinder 4 Contribution/Balance Fault",
+    "hi": "सिलेंडर 4 योगदान/संतुलन दोष"
+  },
+  "P0273": {
+    "en": "Cylinder 5 Injector Circuit Low",
+    "hi": "सिलेंडर 5 इंजेक्टर सर्किट लो"
+  },
+  "P0274": {
+    "en": "Cylinder 5 Injector Circuit High",
+    "hi": "सिलेंडर 5 इंजेक्टर सर्किट हाई"
+  },
+  "P0275": {
+    "en": "Cylinder 5 Contribution/Balance Fault",
+    "hi": "सिलेंडर 5 योगदान/संतुलन दोष"
+  },
+  "P0276": {
+    "en": "Cylinder 6 Injector Circuit Low",
+    "hi": "सिलेंडर 6 इंजेक्टर सर्किट लो"
+  },
+  "P0277": {
+    "en": "Cylinder 6 Injector Circuit High",
+    "hi": "सिलेंडर 6 इंजेक्टर सर्किट हाई"
+  },
+  "P0278": {
+    "en": "Cylinder 6 Contribution/Balance Fault",
+    "hi": "सिलेंडर 6 योगदान/संतुलन दोष"
+  },
+  "P0279": {
+    "en": "Cylinder 7 Injector Circuit Low",
+    "hi": "सिलेंडर 7 इंजेक्टर सर्किट लो"
+  },
+  "P0280": {
+    "en": "Cylinder 7 Injector Circuit High",
+    "hi": "सिलेंडर 7 इंजेक्टर सर्किट हाई"
+  },
+  "P0281": {
+    "en": "Cylinder 7 Contribution/Balance Fault",
+    "hi": "सिलेंडर 7 योगदान/संतुलन दोष"
+  },
+  "P0282": {
+    "en": "Cylinder 8 Injector Circuit Low",
+    "hi": "सिलेंडर 8 इंजेक्टर सर्किट लो"
+  },
+  "P0283": {
+    "en": "Cylinder 8 Injector Circuit High",
+    "hi": "सिलेंडर 8 इंजेक्टर सर्किट हाई"
+  },
+  "P0284": {
+    "en": "Cylinder 8 Contribution/Balance Fault",
+    "hi": "सिलेंडर 8 योगदान/संतुलन दोष"
+  },
+  "P0285": {
+    "en": "Cylinder 9 Injector Circuit Low",
+    "hi": "सिलेंडर 9 इंजेक्टर सर्किट लो"
+  },
+  "P0286": {
+    "en": "Cylinder 9 Injector Circuit High",
+    "hi": "सिलेंडर 9 इंजेक्टर सर्किट हाई"
+  },
+  "P0287": {
+    "en": "Cylinder 9 Contribution/Balance Fault",
+    "hi": "सिलेंडर 9 योगदान/संतुलन दोष"
+  },
+  "P0288": {
+    "en": "Cylinder 10 Injector Circuit Low",
+    "hi": "सिलेंडर 10 इंजेक्टर सर्किट लो"
+  },
+  "P0289": {
+    "en": "Cylinder 10 Injector Circuit High",
+    "hi": "सिलेंडर 10 इंजेक्टर सर्किट हाई"
+  },
+  "P0290": {
+    "en": "Cylinder 10 Contribution/Balance Fault",
+    "hi": "सिलेंडर 10 योगदान/संतुलन दोष"
+  },
+  "P0291": {
+    "en": "Cylinder 11 Injector Circuit Low",
+    "hi": "सिलेंडर 11 इंजेक्टर सर्किट लो"
+  },
+  "P0292": {
+    "en": "Cylinder 11 Injector Circuit High",
+    "hi": "सिलेंडर 11 इंजेक्टर सर्किट हाई"
+  },
+  "P0293": {
+    "en": "Cylinder 11 Contribution/Balance Fault",
+    "hi": "सिलेंडर 11 योगदान/संतुलन दोष"
+  },
+  "P0294": {
+    "en": "Cylinder 12 Injector Circuit Low",
+    "hi": "सिलेंडर 12 इंजेक्टर सर्किट लो"
+  },
+  "P0295": {
+    "en": "Cylinder 12 Injector Circuit High",
+    "hi": "सिलेंडर 12 इंजेक्टर सर्किट हाई"
+  },
+  "P0296": {
+    "en": "Cylinder 12 Contribution/Balance Fault",
+    "hi": "सिलेंडर 12 योगदान/संतुलन दोष"
+  },
+  "P0300": {
+    "en": "Engine Misfire Detected",
+    "hi": "इंजन मिसफायर का पता चला"
+  },
+  "P0301": {
+    "en": "Cylinder 1 Misfire Detected",
+    "hi": "सिलेंडर 1 मिसफायर का पता चला"
+  },
+  "P0302": {
+    "en": "Cylinder 2 Misfire Detected",
+    "hi": "सिलेंडर 2 मिसफायर का पता चला"
+  },
+  "P0303": {
+    "en": "Cylinder 3 Misfire Detected",
+    "hi": "सिलेंडर 3 मिसफायर का पता चला"
+  },
+  "P0304": {
+    "en": "Cylinder 4 Misfire Detected",
+    "hi": "सिलेंडर 4 मिसफायर का पता चला"
+  },
+  "P0305": {
+    "en": "Cylinder 5 Misfire Detected",
+    "hi": "सिलेंडर 5 मिसफायर का पता चला"
+  },
+  "P0306": {
+    "en": "Cylinder 6 Misfire Detected",
+    "hi": "सिलेंडर 6 मिसफायर का पता चला"
+  },
+  "P0307": {
+    "en": "Cylinder 7 Misfire Detected",
+    "hi": "सिलेंडर 7 मिसफायर का पता चला"
+  },
+  "P0308": {
+    "en": "Cylinder 8 Misfire Detected",
+    "hi": "सिलेंडर 8 मिसफायर का पता चला"
+  },
+  "P0309": {
+    "en": "Cylinder 9 Misfire Detected",
+    "hi": "सिलेंडर 9 मिसफायर का पता चला"
+  },
+  "P0310": {
+    "en": "Cylinder 10 Misfire Detected",
+    "hi": "सिलेंडर 10 मिसफायर का पता चला"
+  },
+  "P0311": {
+    "en": "Cylinder 11 Misfire Detected",
+    "hi": "सिलेंडर 11 मिसफायर का पता चला"
+  },
+  "P0312": {
+    "en": "Cylinder 12 Misfire Detected",
+    "hi": "सिलेंडर 12 मिसफायर का पता चला"
+  },
+  "P0313": {
+    "en": "Misfire Detected with Low Fuel Level",
+    "hi": "कम फ्यूल लेवल के साथ मिसफायर का पता चला"
+  },
+  "P0315": {
+    "en": "Crankshaft Position (CKP) System Variation Not Learned",
+    "hi": "क्रैंकशाफ्ट पोजिशन (CKP) सिस्टम वेरिएशन नहीं सीखा गया"
+  },
+  "P0318": {
+    "en": "Rough Road Sensor Circuit",
+    "hi": "रफ रोड सेंसर सर्किट"
+  },
+  "P0320": {
+    "en": "Ignition/Distributor Engine Speed Input Circuit Malfunction",
+    "hi": "इग्निशन/डिस्ट्रीब्यूटर इंजन स्पीड इनपुट सर्किट खराबी"
+  },
+  "P0321": {
+    "en": "Ignition/Distributor Engine Speed Input Circuit Range/Performance",
+    "hi": "इग्निशन/डिस्ट्रीब्यूटर इंजन स्पीड इनपुट सर्किट रेंज/परफॉरमेंस"
+  },
+  "P0322": {
+    "en": "IC Module 4X Reference Circuit No Frequency",
+    "hi": "IC मॉड्यूल 4X रेफरेंस सर्किट कोई फ्रीक्वेंसी नहीं"
+  },
+  "P0323": {
+    "en": "Ignition/Distributor Engine Speed Input Circuit Intermittent",
+    "hi": "इग्निशन/डिस्ट्रीब्यूटर इंजन स्पीड इनपुट सर्किट रुक-रुक कर"
+  },
+  "P0324": {
+    "en": "Knock Sensor (KS) Module Performance",
+    "hi": "नॉक सेंसर (KS) मॉड्यूल परफॉरमेंस"
+  },
+  "P0325": {
+    "en": "Knock Sensor 1 Circuit (Bank 1 or Single Sensor)",
+    "hi": "नॉक सेंसर 1 सर्किट (बैंक 1 या सिंगल सेंसर)"
+  },
+  "P0326": {
+    "en": "Knock Sensor 1 Circuit Range/Performance",
+    "hi": "नॉक सेंसर 1 सर्किट रेंज/परफॉरमेंस"
+  },
+  "P0327": {
+    "en": "Knock Sensor 1 Circuit Low Voltage",
+    "hi": "नॉक सेंसर 1 सर्किट लो वोल्टेज"
+  },
+  "P0328": {
+    "en": "Knock Sensor 1 Circuit High Input (Bank 1 or Single Sensor)",
+    "hi": "नॉक सेंसर 1 सर्किट हाई इनपुट (बैंक 1 या सिंगल सेंसर)"
+  },
+  "P0329": {
+    "en": "Knock Sensor 1 Circuit Intermittent (Bank 1 or Single Sensor)",
+    "hi": "नॉक सेंसर 1 सर्किट रुक-रुक कर (बैंक 1 या सिंगल सेंसर)"
+  },
+  "P0330": {
+    "en": "Knock Sensor 2 Circuit (Bank 2)",
+    "hi": "नॉक सेंसर 2 सर्किट (बैंक 2)"
+  },
+  "P0331": {
+    "en": "Knock Sensor 2 Circuit Range/Performance (Bank 2)",
+    "hi": "नॉक सेंसर 2 सर्किट रेंज/परफॉरमेंस (बैंक 2)"
+  },
+  "P0332": {
+    "en": "Knock Sensor 2 Circuit Low Input (Bank 2)",
+    "hi": "नॉक सेंसर 2 सर्किट लो इनपुट (बैंक 2)"
+  },
+  "P0333": {
+    "en": "Knock Sensor 2 Circuit High Input (Bank 2)",
+    "hi": "नॉक सेंसर 2 सर्किट हाई इनपुट (बैंक 2)"
+  },
+  "P0334": {
+    "en": "Knock Sensor 2 Circuit Intermittent (Bank 2)",
+    "hi": "नॉक सेंसर 2 सर्किट रुक-रुक कर (बैंक 2)"
+  },
+  "P0335": {
+    "en": "Crankshaft Position (CKP) Sensor A Circuit Performance",
+    "hi": "क्रैंकशाफ्ट पोजिशन (CKP) सेंसर A सर्किट परफॉरमेंस"
+  },
+  "P0336": {
+    "en": "Crankshaft Position (CKP) Sensor A Performance",
+    "hi": "क्रैंकशाफ्ट पोजिशन (CKP) सेंसर A परफॉरमेंस"
+  },
+  "P0337": {
+    "en": "Crankshaft Position (CKP) Sensor Circuit Low Duty Cycle",
+    "hi": "क्रैंकशाफ्ट पोजिशन (CKP) सेंसर सर्किट लो ड्यूटी साइकल"
+  },
+  "P0338": {
+    "en": "Crankshaft Position (CKP) Sensor Circuit High Duty Cycle",
+    "hi": "क्रैंकशाफ्ट पोजिशन (CKP) सेंसर सर्किट हाई ड्यूटी साइकल"
+  },
+  "P0339": {
+    "en": "Crankshaft Position (CKP) Sensor Circuit Intermittent",
+    "hi": "क्रैंकशाफ्ट पोजिशन (CKP) सेंसर सर्किट रुक-रुक कर"
+  },
+  "P0340": {
+    "en": "Camshaft Position (CMP) Sensor Circuit",
+    "hi": "कैमशाफ्ट पोजिशन (CMP) सेंसर सर्किट"
+  },
+  "P0341": {
+    "en": "Camshaft Position (CMP) Sensor Performance",
+    "hi": "कैमशाफ्ट पोजिशन (CMP) सेंसर परफॉरमेंस"
+  },
+  "P0342": {
+    "en": "Camshaft Position Sensor Circuit Low Input",
+    "hi": "कैमशाफ्ट पोजिशन सेंसर सर्किट लो इनपुट"
+  },
+  "P0343": {
+    "en": "Camshaft Position Sensor Circuit High Input",
+    "hi": "कैमशाफ्ट पोजिशन सेंसर सर्किट हाई इनपुट"
+  },
+  "P0344": {
+    "en": "Camshaft Position Sensor Circuit Intermittent",
+    "hi": "कैमशाफ्ट पोजिशन सेंसर सर्किट रुक-रुक कर"
+  },
+  "P0350": {
+    "en": "Ignition Coil Primary/Secondary Circuit Malfunction",
+    "hi": "इग्निशन कॉइल प्राइमरी/सेकेंडरी सर्किट खराबी"
+  },
+  "P0351": {
+    "en": "Ignition Coil 1 Control Circuit",
+    "hi": "इग्निशन कॉइल 1 कंट्रोल सर्किट"
+  },
+  "P0352": {
+    "en": "Ignition Coil 2 Control Circuit",
+    "hi": "इग्निशन कॉइल 2 कंट्रोल सर्किट"
+  },
+  "P0353": {
+    "en": "Ignition Coil 3 Control Circuit",
+    "hi": "इग्निशन कॉइल 3 कंट्रोल सर्किट"
+  },
+  "P0354": {
+    "en": "Ignition Coil 4 Control Circuit",
+    "hi": "इग्निशन कॉइल 4 कंट्रोल सर्किट"
+  },
+  "P0355": {
+    "en": "Ignition Coil 5 Control Circuit",
+    "hi": "इग्निशन कॉइल 5 कंट्रोल सर्किट"
+  },
+  "P0356": {
+    "en": "Ignition Coil 6 Control Circuit",
+    "hi": "इग्निशन कॉइल 6 कंट्रोल सर्किट"
+  },
+  "P0357": {
+    "en": "Ignition Coil 7 Control Circuit",
+    "hi": "इग्निशन कॉइल 7 कंट्रोल सर्किट"
+  },
+  "P0358": {
+    "en": "Ignition Coil 8 Control Circuit",
+    "hi": "इग्निशन कॉइल 8 कंट्रोल सर्किट"
+  },
+  "P0359": {
+    "en": "Ignition Coil I Primary/Secondary Circuit Malfunction",
+    "hi": "इग्निशन कॉइल I प्राइमरी/सेकेंडरी सर्किट खराबी"
+  },
+  "P0360": {
+    "en": "Ignition Coil J Primary/Secondary Circuit Malfunction",
+    "hi": "इग्निशन कॉइल J प्राइमरी/सेकेंडरी सर्किट खराबी"
+  },
+  "P0361": {
+    "en": "Ignition Coil K Primary/Secondary Circuit Malfunction",
+    "hi": "इग्निशन कॉइल K प्राइमरी/सेकेंडरी सर्किट खराबी"
+  },
+  "P0362": {
+    "en": "Ignition Coil L Primary/Secondary Circuit Malfunction",
+    "hi": "इग्निशन कॉइल L प्राइमरी/सेकेंडरी सर्किट खराबी"
+  },
+  "P0370": {
+    "en": "Timing Reference High Resolution Signal A Malfunction",
+    "hi": "टाइमिंग रेफरेंस हाई रिजॉल्यूशन सिग्नल A खराबी"
+  },
+  "P0371": {
+    "en": "Timing Reference High Resolution Signal A Too Many Pulses",
+    "hi": "टाइमिंग रेफरेंस हाई रिजॉल्यूशन सिग्नल A बहुत अधिक पल्स"
+  },
+  "P0372": {
+    "en": "Timing Reference High Resolution Signal A Too Few Pulses",
+    "hi": "टाइमिंग रेफरेंस हाई रिजॉल्यूशन सिग्नल A बहुत कम पल्स"
+  },
+  "P0373": {
+    "en": "Timing Reference High Resolution Signal A Intermittent/Erratic Pulses",
+    "hi": "टाइमिंग रेफरेंस हाई रिजॉल्यूशन सिग्नल A रुक-रुक कर/अनियमित पल्स"
+  },
+  "P0374": {
+    "en": "Timing Reference High Resolution Signal A No Pulses",
+    "hi": "टाइमिंग रेफरेंस हाई रिजॉल्यूशन सिग्नल A कोई पल्स नहीं"
+  },
+  "P0375": {
+    "en": "Timing Reference High Resolution Signal B Malfunction",
+    "hi": "टाइमिंग रेफरेंस हाई रिजॉल्यूशन सिग्नल B खराबी"
+  },
+  "P0376": {
+    "en": "Timing Reference High Resolution Signal B Too Many Pulses",
+    "hi": "टाइमिंग रेफरेंस हाई रिजॉल्यूशन सिग्नल B बहुत अधिक पल्स"
+  },
+  "P0377": {
+    "en": "Timing Reference High Resolution Signal B Too Few Pulses",
+    "hi": "टाइमिंग रेफरेंस हाई रिजॉल्यूशन सिग्नल B बहुत कम पल्स"
+  },
+  "P0378": {
+    "en": "Timing Reference High Resolution Signal B Intermittent/Erratic Pulses",
+    "hi": "टाइमिंग रेफरेंस हाई रिजॉल्यूशन सिग्नल B रुक-रुक कर/अनियमित पल्स"
+  },
+  "P0379": {
+    "en": "Timing Reference High Resolution Signal B No Pulses",
+    "hi": "टाइमिंग रेफरेंस हाई रिजॉल्यूशन सिग्नल B कोई पल्स नहीं"
+  },
+  "P0380": {
+    "en": "Glow Plug/Heater Circuit 'A' Malfunction",
+    "hi": "ग्लो प्लग/हीटर सर्किट 'A' खराबी"
+  },
+  "P0381": {
+    "en": "Glow Plug/Heater Indicator Circuit Malfunction",
+    "hi": "ग्लो प्लग/हीटर इंडिकेटर सर्किट खराबी"
+  },
+  "P0382": {
+    "en": "Exhaust Gas Recirculation Flow Malfunction",
+    "hi": "एग्जॉस्ट गैस रीसर्कुलेशन फ्लो खराबी"
+  },
+  "P0385": {
+    "en": "Crankshaft Position (CKP) Sensor B Circuit",
+    "hi": "क्रैंकशाफ्ट पोजिशन (CKP) सेंसर B सर्किट"
+  },
+  "P0386": {
+    "en": "Crankshaft Position (CKP) Sensor B Performance",
+    "hi": "क्रैंकशाफ्ट पोजिशन (CKP) सेंसर B परफॉरमेंस"
+  },
+  "P0387": {
+    "en": "Crankshaft Position Sensor B Circuit Low Input",
+    "hi": "क्रैंकशाफ्ट पोजिशन सेंसर B सर्किट लो इनपुट"
+  },
+  "P0388": {
+    "en": "Crankshaft Position Sensor B Circuit High Input",
+    "hi": "क्रैंकशाफ्ट पोजिशन सेंसर B सर्किट हाई इनपुट"
+  },
+  "P0389": {
+    "en": "Crankshaft Position Sensor B Circuit Intermittent",
+    "hi": "क्रैंकशाफ्ट पोजिशन सेंसर B सर्किट रुक-रुक कर"
+  },
+  "P0400": {
+    "en": "Exhaust Gas Recirculation Flow Malfunction",
+    "hi": "एग्जॉस्ट गैस रीसर्कुलेशन फ्लो खराबी"
+  },
+  "P0401": {
+    "en": "Exhaust Gas Recirculation (EGR) Flow Insufficient Detected",
+    "hi": "एग्जॉस्ट गैस रीसर्कुलेशन (EGR) फ्लो अपर्याप्त"
+  },
+  "P0402": {
+    "en": "Exhaust Gas Recirculation Flow Excessive Detected",
+    "hi": "एग्जॉस्ट गैस रीसर्कुलेशन फ्लो अत्यधिक"
+  },
+  "P0403": {
+    "en": "Exhaust Gas Recirculation (EGR) Solenoid Control Circuit",
+    "hi": "एग्जॉस्ट गैस रीसर्कुलेशन (EGR) सोलेनॉइड कंट्रोल सर्किट"
+  },
+  "P0404": {
+    "en": "Exhaust Gas Recirculation (EGR) Open Position Performance",
+    "hi": "एग्जॉस्ट गैस रीसर्कुलेशन (EGR) ओपन पोजिशन परफॉरमेंस"
+  },
+  "P0405": {
+    "en": "Exhaust Gas Recirculation (EGR) Position Sensor Circuit Low Voltage",
+    "hi": "एग्जॉस्ट गैस रीसर्कुलेशन (EGR) पोजिशन सेंसर सर्किट लो वोल्टेज"
+  },
+  "P0406": {
+    "en": "Exhaust Gas Recirculation Sensor A Circuit High",
+    "hi": "एग्जॉस्ट गैस रीसर्कुलेशन सेंसर A सर्किट हाई"
+  },
+  "P0407": {
+    "en": "Exhaust Gas Recirculation Sensor B Circuit Low",
+    "hi": "एग्जॉस्ट गैस रीसर्कुलेशन सेंसर B सर्किट लो"
+  },
+  "P0408": {
+    "en": "Exhaust Gas Recirculation Sensor B Circuit High",
+    "hi": "एग्जॉस्ट गैस रीसर्कुलेशन सेंसर B सर्किट हाई"
+  },
+  "P0410": {
+    "en": "Secondary Air Injection (AIR) System",
+    "hi": "सेकेंडरी एयर इंजेक्शन (AIR) सिस्टम"
+  },
+  "P0411": {
+    "en": "Secondary Air Injection (AIR) System Incorrect Flow Detected",
+    "hi": "सेकेंडरी एयर इंजेक्शन (AIR) सिस्टम गलत फ्लो"
+  },
+  "P0412": {
+    "en": "Secondary Air Injection (AIR) Solenoid Relay Control Circuit Bank 1",
+    "hi": "सेकेंडरी एयर इंजेक्शन (AIR) सोलेनॉइड रिले कंट्रोल सर्किट बैंक 1"
+  },
+  "P0413": {
+    "en": "Secondary Air Injection System Switching Valve A Circuit Open",
+    "hi": "सेकेंडरी एयर इंजेक्शन सिस्टम स्विचिंग वाल्व A सर्किट खुला"
+  },
+  "P0414": {
+    "en": "Secondary Air Injection System Switching Valve A Circuit Shorted",
+    "hi": "सेकेंडरी एयर इंजेक्शन सिस्टम स्विचिंग वाल्व A सर्किट शॉर्ट"
+  },
+  "P0415": {
+    "en": "Secondary Air Injection System Switching Valve B Circuit Malfunction",
+    "hi": "सेकेंडरी एयर इंजेक्शन सिस्टम स्विचिंग वाल्व B सर्किट खराबी"
+  },
+  "P0416": {
+    "en": "Secondary Air Injection System Switching Valve B Circuit Open",
+    "hi": "सेकेंडरी एयर इंजेक्शन सिस्टम स्विचिंग वाल्व B सर्किट खुला"
+  },
+  "P0417": {
+    "en": "Secondary Air Injection System Switching Valve B Circuit Shorted",
+    "hi": "सेकेंडरी एयर इंजेक्शन सिस्टम स्विचिंग वाल्व B सर्किट शॉर्ट"
+  },
+  "P0418": {
+    "en": "Secondary Air Injection (AIR) Pump Relay Control Circuit Bank 1",
+    "hi": "सेकेंडरी एयर इंजेक्शन (AIR) पंप रिले कंट्रोल सर्किट बैंक 1"
+  },
+  "P0419": {
+    "en": "Secondary Air Injection (AIR) Pump Relay Control Circuit Bank 2",
+    "hi": "सेकेंडरी एयर इंजेक्शन (AIR) पंप रिले कंट्रोल सर्किट बैंक 2"
+  },
+  "P0420": {
+    "en": "Catalyst System Low Efficiency (Bank 1)",
+    "hi": "कैटेलिस्ट सिस्टम कम दक्षता (बैंक 1)"
+  },
+  "P0421": {
+    "en": "Warm Up Catalyst Efficiency Below Threshold (Bank 1)",
+    "hi": "वार्म अप कैटेलिस्ट दक्षता सीमा से नीचे (बैंक 1)"
+  },
+  "P0422": {
+    "en": "Catalyst System Low Efficiency (Bank 1)",
+    "hi": "कैटेलिस्ट सिस्टम कम दक्षता (बैंक 1)"
+  },
+  "P0423": {
+    "en": "Heated Catalyst Efficiency Below Threshold (Bank 1)",
+    "hi": "हीटेड कैटेलिस्ट दक्षता सीमा से नीचे (बैंक 1)"
+  },
+  "P0424": {
+    "en": "Heated Catalyst Temperature Below Threshold (Bank 1)",
+    "hi": "हीटेड कैटेलिस्ट टेम्परेचर सीमा से नीचे (बैंक 1)"
+  },
+  "P0430": {
+    "en": "Catalyst System Low Efficiency (Bank 2)",
+    "hi": "कैटेलिस्ट सिस्टम कम दक्षता (बैंक 2)"
+  },
+  "P0431": {
+    "en": "Warm Up Catalyst Efficiency Below Threshold (Bank 2)",
+    "hi": "वार्म अप कैटेलिस्ट दक्षता सीमा से नीचे (बैंक 2)"
+  },
+  "P0432": {
+    "en": "Catalyst System Low Efficiency (Bank 2)",
+    "hi": "कैटेलिस्ट सिस्टम कम दक्षता (बैंक 2)"
+  },
+  "P0433": {
+    "en": "Heated Catalyst Efficiency Below Threshold (Bank 2)",
+    "hi": "हीटेड कैटेलिस्ट दक्षता सीमा से नीचे (बैंक 2)"
+  },
+  "P0434": {
+    "en": "Heated Catalyst Temperature Below Threshold (Bank 2)",
+    "hi": "हीटेड कैटेलिस्ट टेम्परेचर सीमा से नीचे (बैंक 2)"
+  },
+  "P0440": {
+    "en": "Evaporative Emission (EVAP) System",
+    "hi": "इवैपोरेटिव एमिशन (EVAP) सिस्टम"
+  },
+  "P0441": {
+    "en": "Evaporative Emission Control System Incorrect Purge Flow",
+    "hi": "इवैपोरेटिव एमिशन कंट्रोल सिस्टम गलत पर्ज फ्लो"
+  },
+  "P0442": {
+    "en": "Evaporative Emission (EVAP) System Small Leak Detected",
+    "hi": "इवैपोरेटिव एमिशन (EVAP) सिस्टम छोटा लीक पाया गया"
+  },
+  "P0443": {
+    "en": "EVAP Purge Solenoid Valve 1 Control Circuit",
+    "hi": "EVAP पर्ज सोलेनॉइड वाल्व 1 कंट्रोल सर्किट"
+  },
+  "P0444": {
+    "en": "Evaporative Emission Control System Purge Control Valve Circuit Open",
+    "hi": "इवैपोरेटिव एमिशन कंट्रोल सिस्टम पर्ज कंट्रोल वाल्व सर्किट खुला"
+  },
+  "P0445": {
+    "en": "Evaporative Emission Control System Purge Control Valve Circuit Shorted",
+    "hi": "इवैपोरेटिव एमिशन कंट्रोल सिस्टम पर्ज कंट्रोल वाल्व सर्किट शॉर्ट"
+  },
+  "P0446": {
+    "en": "EVAP Vent Solenoid Valve Control System",
+    "hi": "EVAP वेंट सोलेनॉइड वाल्व कंट्रोल सिस्टम"
+  },
+  "P0447": {
+    "en": "Evaporative Emission Control System Vent Control Circuit Open",
+    "hi": "इवैपोरेटिव एमिशन कंट्रोल सिस्टम वेंट कंट्रोल सर्किट खुला"
+  },
+  "P0448": {
+    "en": "Evaporative Emission Control System Vent Control Circuit Shorted",
+    "hi": "इवैपोरेटिव एमिशन कंट्रोल सिस्टम वेंट कंट्रोल सर्किट शॉर्ट"
+  },
+  "P0449": {
+    "en": "Evaporative Emission (EVAP) Vent Solenoid Control Circuit",
+    "hi": "इवैपोरेटिव एमिशन (EVAP) वेंट सोलेनॉइड कंट्रोल सर्किट"
+  },
+  "P0450": {
+    "en": "Fuel Tank Pressure Sensor Circuit",
+    "hi": "फ्यूल टैंक प्रेशर सेंसर सर्किट"
+  },
+  "P0451": {
+    "en": "Evaporative Emission Control System Pressure Sensor Range/Performance",
+    "hi": "इवैपोरेटिव एमिशन कंट्रोल सिस्टम प्रेशर सेंसर रेंज/परफॉरमेंस"
+  },
+  "P0452": {
+    "en": "Fuel Tank Pressure Sensor Circuit Low Voltage",
+    "hi": "फ्यूल टैंक प्रेशर सेंसर सर्किट लो वोल्टेज"
+  },
+  "P0453": {
+    "en": "Fuel Tank Pressure Sensor Circuit High Voltage",
+    "hi": "फ्यूल टैंक प्रेशर सेंसर सर्किट हाई वोल्टेज"
+  },
+  "P0454": {
+    "en": "Evaporative Emission Control System Pressure Sensor Intermittent",
+    "hi": "इवैपोरेटिव एमिशन कंट्रोल सिस्टम प्रेशर सेंसर रुक-रुक कर"
+  },
+  "P0455": {
+    "en": "Evaporative Emission (EVAP) System Leak Detected",
+    "hi": "इवैपोरेटिव एमिशन (EVAP) सिस्टम लीक का पता चला"
+  },
+  "P0460": {
+    "en": "Fuel Level Sensor Circuit",
+    "hi": "फ्यूल लेवल सेंसर सर्किट"
+  },
+  "P0461": {
+    "en": "Fuel Level Sensor Performance",
+    "hi": "फ्यूल लेवल सेंसर परफॉरमेंस"
+  },
+  "P0462": {
+    "en": "Fuel Level Sensor Circuit Low Voltage",
+    "hi": "फ्यूल लेवल सेंसर सर्किट लो वोल्टेज"
+  },
+  "P0463": {
+    "en": "Fuel Level Sensor Circuit High Voltage",
+    "hi": "फ्यूल लेवल सेंसर सर्किट हाई वोल्टेज"
+  },
+  "P0464": {
+    "en": "Fuel Level Sensor Circuit Intermittent",
+    "hi": "फ्यूल लेवल सेंसर सर्किट रुक-रुक कर"
+  },
+  "P0465": {
+    "en": "Purge Flow Sensor Circuit Malfunction",
+    "hi": "पर्ज फ्लो सेंसर सर्किट खराबी"
+  },
+  "P0466": {
+    "en": "Purge Flow Sensor Circuit Range/Performance",
+    "hi": "पर्ज फ्लो सेंसर सर्किट रेंज/परफॉरमेंस"
+  },
+  "P0467": {
+    "en": "Purge Flow Sensor Circuit Low Input",
+    "hi": "पर्ज फ्लो सेंसर सर्किट लो इनपुट"
+  },
+  "P0468": {
+    "en": "Purge Flow Sensor Circuit High Input",
+    "hi": "पर्ज फ्लो सेंसर सर्किट हाई इनपुट"
+  },
+  "P0469": {
+    "en": "Purge Flow Sensor Circuit Intermittent",
+    "hi": "पर्ज फ्लो सेंसर सर्किट रुक-रुक कर"
+  },
+  "P0470": {
+    "en": "Exhaust Pressure Sensor Malfunction",
+    "hi": "एग्जॉस्ट प्रेशर सेंसर खराबी"
+  },
+  "P0471": {
+    "en": "Exhaust Pressure Sensor Range/Performance",
+    "hi": "एग्जॉस्ट प्रेशर सेंसर रेंज/परफॉरमेंस"
+  },
+  "P0472": {
+    "en": "Exhaust Pressure Sensor Low",
+    "hi": "एग्जॉस्ट प्रेशर सेंसर लो"
+  },
+  "P0473": {
+    "en": "Exhaust Pressure Sensor High",
+    "hi": "एग्जॉस्ट प्रेशर सेंसर हाई"
+  },
+  "P0474": {
+    "en": "Exhaust Pressure Sensor Intermittent",
+    "hi": "एग्जॉस्ट प्रेशर सेंसर रुक-रुक कर"
+  },
+  "P0475": {
+    "en": "Exhaust Pressure Control Valve Malfunction",
+    "hi": "एग्जॉस्ट प्रेशर कंट्रोल वाल्व खराबी"
+  },
+  "P0476": {
+    "en": "Exhaust Pressure Control Valve Range/Performance",
+    "hi": "एग्जॉस्ट प्रेशर कंट्रोल वाल्व रेंज/परफॉरमेंस"
+  },
+  "P0477": {
+    "en": "Exhaust Pressure Control Valve Low",
+    "hi": "एग्जॉस्ट प्रेशर कंट्रोल वाल्व लो"
+  },
+  "P0478": {
+    "en": "Exhaust Pressure Control Valve High",
+    "hi": "एग्जॉस्ट प्रेशर कंट्रोल वाल्व हाई"
+  },
+  "P0479": {
+    "en": "Exhaust Pressure Control Valve Intermittent",
+    "hi": "एग्जॉस्ट प्रेशर कंट्रोल वाल्व रुक-रुक कर"
+  },
+  "P0480": {
+    "en": "Cooling Fan Relay 1 Control Circuit",
+    "hi": "कूलिंग फैन रिले 1 कंट्रोल सर्किट"
+  },
+  "P0481": {
+    "en": "Cooling Fan Relay 2 Control Circuit",
+    "hi": "कूलिंग फैन रिले 2 कंट्रोल सर्किट"
+  },
+  "P0482": {
+    "en": "Cooling Fan 3 Control Circuit Malfunction",
+    "hi": "कूलिंग फैन 3 कंट्रोल सर्किट खराबी"
+  },
+  "P0483": {
+    "en": "Cooling Fan Rationality Check Malfunction",
+    "hi": "कूलिंग फैन रेशनैलिटी जाँच खराबी"
+  },
+  "P0484": {
+    "en": "Cooling Fan Circuit Over Current",
+    "hi": "कूलिंग फैन सर्किट ओवर करंट"
+  },
+  "P0485": {
+    "en": "Cooling Fan Power/Ground Circuit Malfunction",
+    "hi": "कूलिंग फैन पावर/ग्राउंड सर्किट खराबी"
+  },
+  "P0496": {
+    "en": "Evaporative Emission (EVAP) System Flow During Non-Purge",
+    "hi": "नॉन-पर्ज के दौरान इवैपोरेटिव एमिशन (EVAP) सिस्टम फ्लो"
+  },
+  "P0500": {
+    "en": "Vehicle Speed Sensor (VSS) Circuit",
+    "hi": "व्हीकल स्पीड सेंसर (VSS) सर्किट"
+  },
+  "P0501": {
+    "en": "Vehicle Speed Sensor Range/Performance",
+    "hi": "व्हीकल स्पीड सेंसर रेंज/परफॉरमेंस"
+  },
+  "P0502": {
+    "en": "Vehicle Speed Sensor (VSS) Circuit Low Input",
+    "hi": "व्हीकल स्पीड सेंसर (VSS) सर्किट लो इनपुट"
+  },
+  "P0503": {
+    "en": "Vehicle Speed Sensor (VSS) Circuit Intermittent",
+    "hi": "व्हीकल स्पीड सेंसर (VSS) सर्किट रुक-रुक कर"
+  },
+  "P0505": {
+    "en": "Idle Control System Malfunction",
+    "hi": "आइडल कंट्रोल सिस्टम खराबी"
+  },
+  "P0506": {
+    "en": "Idle Speed Low",
+    "hi": "आइडल स्पीड कम"
+  },
+  "P0507": {
+    "en": "Idle Speed High",
+    "hi": "आइडल स्पीड अधिक"
+  },
+  "P0510": {
+    "en": "Closed Throttle Position Switch Malfunction",
+    "hi": "बंद थ्रॉटल पोजिशन स्विच खराबी"
+  },
+  "P0512": {
+    "en": "Starter Switch Circuit",
+    "hi": "स्टार्टर स्विच सर्किट"
+  },
+  "P0520": {
+    "en": "Engine Oil Pressure Sensor/Switch Circuit Malfunction",
+    "hi": "इंजन ऑयल प्रेशर सेंसर/स्विच सर्किट खराबी"
+  },
+  "P0521": {
+    "en": "Engine Oil Pressure Sensor/Switch Circuit Range/Performance",
+    "hi": "इंजन ऑयल प्रेशर सेंसर/स्विच सर्किट रेंज/परफॉरमेंस"
+  },
+  "P0522": {
+    "en": "Engine Oil Pressure Sensor/Switch Circuit Low Voltage",
+    "hi": "इंजन ऑयल प्रेशर सेंसर/स्विच सर्किट लो वोल्टेज"
+  },
+  "P0523": {
+    "en": "Engine Oil Pressure Sensor/Switch Circuit High Voltage",
+    "hi": "इंजन ऑयल प्रेशर सेंसर/स्विच सर्किट हाई वोल्टेज"
+  },
+  "P0526": {
+    "en": "Cooling Fan Speed Sensor Circuit",
+    "hi": "कूलिंग फैन स्पीड सेंसर सर्किट"
+  },
+  "P0530": {
+    "en": "A/C Refrigerant Pressure Sensor Circuit Malfunction",
+    "hi": "A/C रेफ्रिजरेंट प्रेशर सेंसर सर्किट खराबी"
+  },
+  "P0531": {
+    "en": "A/C Refrigerant Pressure Sensor Circuit Range/Performance",
+    "hi": "A/C रेफ्रिजरेंट प्रेशर सेंसर सर्किट रेंज/परफॉरमेंस"
+  },
+  "P0532": {
+    "en": "Air Conditioning (A/C) Refrigerant Pressure Sensor Circuit Low Voltage",
+    "hi": "एयर कंडीशनिंग (A/C) रेफ्रिजरेंट प्रेशर सेंसर सर्किट लो वोल्टेज"
+  },
+  "P0533": {
+    "en": "Air Conditioning (A/C) Refrigerant Pressure Sensor Circuit High Voltage",
+    "hi": "एयर कंडीशनिंग (A/C) रेफ्रिजरेंट प्रेशर सेंसर सर्किट हाई वोल्टेज"
+  },
+  "P0534": {
+    "en": "Air Conditioner Refrigerant Charge Loss",
+    "hi": "एयर कंडीशनर रेफ्रिजरेंट चार्ज लॉस"
+  },
+  "P0550": {
+    "en": "Power Steering Pressure (PSP) Switch Circuit",
+    "hi": "पावर स्टीयरिंग प्रेशर (PSP) स्विच सर्किट"
+  },
+  "P0551": {
+    "en": "Power Steering Pressure Sensor Circuit Range/Performance",
+    "hi": "पावर स्टीयरिंग प्रेशर सेंसर सर्किट रेंज/परफॉरमेंस"
+  },
+  "P0552": {
+    "en": "Power Steering Pressure Sensor Circuit Low Input",
+    "hi": "पावर स्टीयरिंग प्रेशर सेंसर सर्किट लो इनपुट"
+  },
+  "P0553": {
+    "en": "Power Steering Pressure Sensor Circuit High Input",
+    "hi": "पावर स्टीयरिंग प्रेशर सेंसर सर्किट हाई इनपुट"
+  },
+  "P0554": {
+    "en": "Power Steering Pressure Sensor Circuit Intermittent",
+    "hi": "पावर स्टीयरिंग प्रेशर सेंसर सर्किट रुक-रुक कर"
+  },
+  "P0560": {
+    "en": "System Voltage",
+    "hi": "सिस्टम वोल्टेज"
+  },
+  "P0561": {
+    "en": "System Voltage Unstable",
+    "hi": "सिस्टम वोल्टेज अस्थिर"
+  },
+  "P0562": {
+    "en": "System Voltage Low",
+    "hi": "सिस्टम वोल्टेज कम"
+  },
+  "P0563": {
+    "en": "System Voltage High",
+    "hi": "सिस्टम वोल्टेज उच्च"
+  },
+  "P0564": {
+    "en": "Cruise Control Multi-Function Switch Circuit",
+    "hi": "क्रूज कंट्रोल मल्टी-फंक्शन स्विच सर्किट"
+  },
+  "P0565": {
+    "en": "Cruise Control On Signal Malfunction",
+    "hi": "क्रूज कंट्रोल ऑन सिग्नल खराबी"
+  },
+  "P0566": {
+    "en": "Cruise Control Off Signal Malfunction",
+    "hi": "क्रूज कंट्रोल ऑफ सिग्नल खराबी"
+  },
+  "P0567": {
+    "en": "Cruise Control Resume Signal Malfunction",
+    "hi": "क्रूज कंट्रोल रिज्यूम सिग्नल खराबी"
+  },
+  "P0568": {
+    "en": "Cruise Control Set Signal Malfunction",
+    "hi": "क्रूज कंट्रोल सेट सिग्नल खराबी"
+  },
+  "P0569": {
+    "en": "Cruise Control Coast Signal Malfunction",
+    "hi": "क्रूज कंट्रोल कोस्ट सिग्नल खराबी"
+  },
+  "P0570": {
+    "en": "Cruise Control Accel Signal Malfunction",
+    "hi": "क्रूज कंट्रोल एक्सेल सिग्नल खराबी"
+  },
+  "P0571": {
+    "en": "Cruise Control Brake Switch Circuit",
+    "hi": "क्रूज कंट्रोल ब्रेक स्विच सर्किट"
+  },
+  "P0573": {
+    "en": "Cruise Control/Brake Switch A Circuit High",
+    "hi": "क्रूज कंट्रोल/ब्रेक स्विच A सर्किट हाई"
+  },
+  "P0574": {
+    "en": "Vehicle Speed Too High - Above 110 mph - Cruise Control Disabled",
+    "hi": "वाहन की गति बहुत अधिक - 110 मील प्रति घंटे से अधिक - क्रूज कंट्रोल अक्षम"
+  },
+  "P0575": {
+    "en": "Cruise Control Related Malfunction",
+    "hi": "क्रूज कंट्रोल से संबंधित खराबी"
+  },
+  "P0576": {
+    "en": "Cruise Control Related Malfunction",
+    "hi": "क्रूज कंट्रोल से संबंधित खराबी"
+  },
+  "P0578": {
+    "en": "Cruise Control Related Malfunction",
+    "hi": "क्रूज कंट्रोल से संबंधित खराबी"
+  },
+  "P0579": {
+    "en": "Cruise Control Related Malfunction",
+    "hi": "क्रूज कंट्रोल से संबंधित खराबी"
+  },
+  "P0580": {
+    "en": "Cruise Control Related Malfunction",
+    "hi": "क्रूज कंट्रोल से संबंधित खराबी"
+  },
+  "P0600": {
+    "en": "Serial Communication Link Malfunction",
+    "hi": "सीरियल कम्युनिकेशन लिंक खराबी"
+  },
+  "P0601": {
+    "en": "Control Module Read Only Memory (ROM)",
+    "hi": "कंट्रोल मॉड्यूल रीड ओनली मेमोरी (ROM)"
+  },
+  "P0602": {
+    "en": "Control Module Not Programmed",
+    "hi": "कंट्रोल मॉड्यूल प्रोग्राम नहीं किया गया"
+  },
+  "P0603": {
+    "en": "Control Module Long Term Memory Reset",
+    "hi": "कंट्रोल मॉड्यूल लॉन्ग टर्म मेमोरी रीसेट"
+  },
+  "P0604": {
+    "en": "Control Module Random Access Memory (RAM)",
+    "hi": "कंट्रोल मॉड्यूल रैंडम एक्सेस मेमोरी (RAM)"
+  },
+  "P0605": {
+    "en": "Control Module Programming Read Only Memory (ROM)",
+    "hi": "कंट्रोल मॉड्यूल प्रोग्रामिंग रीड ओनली मेमोरी (ROM)"
+  },
+  "P0606": {
+    "en": "Control Module Internal Performance",
+    "hi": "कंट्रोल मॉड्यूल आंतरिक परफॉरमेंस"
+  },
+  "P0607": {
+    "en": "ECU Malfunction",
+    "hi": "ECU खराबी"
+  },
+  "P0608": {
+    "en": "Control Module VSS Output 'A' Malfunction",
+    "hi": "कंट्रोल मॉड्यूल VSS आउटपुट 'A' खराबी"
+  },
+  "P0609": {
+    "en": "Control Module VSS Output 'B' Malfunction",
+    "hi": "कंट्रोल मॉड्यूल VSS आउटपुट 'B' खराबी"
+  },
+  "P0610": {
+    "en": "Control Module Vehicle Options Incorrect",
+    "hi": "कंट्रोल मॉड्यूल वाहन विकल्प गलत"
+  },
+  "P0615": {
+    "en": "Starter Relay Control Circuit",
+    "hi": "स्टार्टर रिले कंट्रोल सर्किट"
+  },
+  "P0616": {
+    "en": "Starter Relay Control Circuit Low Voltage",
+    "hi": "स्टार्टर रिले कंट्रोल सर्किट लो वोल्टेज"
+  },
+  "P0617": {
+    "en": "Starter Relay Control Circuit High Voltage",
+    "hi": "स्टार्टर रिले कंट्रोल सर्किट हाई वोल्टेज"
+  },
+  "P0620": {
+    "en": "Generator Control Circuit Malfunction",
+    "hi": "जेनरेटर कंट्रोल सर्किट खराबी"
+  },
+  "P0621": {
+    "en": "Generator L-Terminal Circuit",
+    "hi": "जेनरेटर L-टर्मिनल सर्किट"
+  },
+  "P0622": {
+    "en": "Generator F-Terminal Circuit",
+    "hi": "जेनरेटर F-टर्मिनल सर्किट"
+  },
+  "P0625": {
+    "en": "Generator F-Terminal Circuit Low Voltage",
+    "hi": "जेनरेटर F-टर्मिनल सर्किट लो वोल्टेज"
+  },
+  "P0626": {
+    "en": "Generator F-Terminal Circuit High Voltage",
+    "hi": "जेनरेटर F-टर्मिनल सर्किट हाई वोल्टेज"
+  },
+  "P0628": {
+    "en": "Fuel Pump Relay Control Circuit Low Voltage",
+    "hi": "फ्यूल पंप रिले कंट्रोल सर्किट लो वोल्टेज"
+  },
+  "P0629": {
+    "en": "Fuel Pump Relay Control Circuit High Voltage",
+    "hi": "फ्यूल पंप रिले कंट्रोल सर्किट हाई वोल्टेज"
+  },
+  "P0638": {
+    "en": "Throttle Actuator Control (TAC) Command Performance",
+    "hi": "थ्रॉटल एक्ट्यूएटर कंट्रोल (TAC) कमांड परफॉरमेंस"
+  },
+  "P0641": {
+    "en": "5-Volt Reference Circuit PCM Voltage Out of Tolerance",
+    "hi": "5-वोल्ट रेफरेंस सर्किट पर PCM वोल्टेज सहनशीलता से बाहर"
+  },
+  "P0645": {
+    "en": "Air Conditioning (A/C) Clutch Relay Control Circuit",
+    "hi": "एयर कंडीशनिंग (A/C) क्लच रिले कंट्रोल सर्किट"
+  },
+  "P0646": {
+    "en": "Air Conditioning (A/C) Clutch Relay Control Circuit Low",
+    "hi": "एयर कंडीशनिंग (A/C) क्लच रिले कंट्रोल सर्किट लो"
+  },
+  "P0647": {
+    "en": "Air Conditioning (A/C) Clutch Relay Control Circuit High",
+    "hi": "एयर कंडीशनिंग (A/C) क्लच रिले कंट्रोल सर्किट हाई"
+  },
+  "P0650": {
+    "en": "Malfunction Indicator Lamp (MIL) Control Circuit",
+    "hi": "मालफंक्शन इंडिकेटर लैंप (MIL) कंट्रोल सर्किट"
+  },
+  "P0651": {
+    "en": "5-Volt Reference Circuit PCM Voltage Out of Tolerance",
+    "hi": "5-वोल्ट रेफरेंस सर्किट पर PCM वोल्टेज सहनशीलता से बाहर"
+  },
+  "P0654": {
+    "en": "Engine RPM Output Circuit Malfunction",
+    "hi": "इंजन RPM आउटपुट सर्किट खराबी"
+  },
+  "P0655": {
+    "en": "Engine Hot Lamp Output Control Circuit Malfunction",
+    "hi": "इंजन हॉट लैंप आउटपुट कंट्रोल सर्किट खराबी"
+  },
+  "P0656": {
+    "en": "Fuel Level Output Circuit Malfunction",
+    "hi": "फ्यूल लेवल आउटपुट सर्किट खराबी"
+  },
+  "P0660": {
+    "en": "Intake Manifold Tuning (IMT) Valve Solenoid Control Circuit",
+    "hi": "इनटेक मैनिफोल्ड ट्यूनिंग (IMT) वाल्व सोलेनॉइड कंट्रोल सर्किट"
+  },
+  "P0661": {
+    "en": "Intake Manifold Tuning (IMT) Valve Solenoid Control Circuit Low Voltage",
+    "hi": "इनटेक मैनिफोल्ड ट्यूनिंग (IMT) वाल्व सोलेनॉइड कंट्रोल सर्किट लो वोल्टेज"
+  },
+  "P0662": {
+    "en": "Intake Manifold Tuning (IMT) Valve Solenoid Control Circuit High Voltage",
+    "hi": "इनटेक मैनिफोल्ड ट्यूनिंग (IMT) वाल्व सोलेनॉइड कंट्रोल सर्किट हाई वोल्टेज"
+  },
+  "P0685": {
+    "en": "Engine Controls Ignition Relay Control Circuit",
+    "hi": "इंजन कंट्रोल इग्निशन रिले कंट्रोल सर्किट"
+  },
+  "P0691": {
+    "en": "Cooling Fan Relay 1 Control Circuit Low Voltage",
+    "hi": "कूलिंग फैन रिले 1 कंट्रोल सर्किट लो वोल्टेज"
+  },
+  "P0692": {
+    "en": "Cooling Fan Relay 1 Control Circuit High Voltage",
+    "hi": "कूलिंग फैन रिले 1 कंट्रोल सर्किट हाई वोल्टेज"
+  },
+  "P0693": {
+    "en": "Cooling Fan Relay 2 Control Circuit Low Voltage",
+    "hi": "कूलिंग फैन रिले 2 कंट्रोल सर्किट लो वोल्टेज"
+  },
+  "P0694": {
+    "en": "Cooling Fan Relay 2 Control Circuit High Voltage",
+    "hi": "कूलिंग फैन रिले 2 कंट्रोल सर्किट हाई वोल्टेज"
+  },
+  "P0700": {
+    "en": "Transmission Control System Malfunction",
+    "hi": "ट्रांसमिशन कंट्रोल सिस्टम खराबी"
+  },
+  "P0701": {
+    "en": "Transmission Control System Range/Performance",
+    "hi": "ट्रांसमिशन कंट्रोल सिस्टम रेंज/परफॉरमेंस"
+  },
+  "P0702": {
+    "en": "Transmission Control System Electrical",
+    "hi": "ट्रांसमिशन कंट्रोल सिस्टम इलेक्ट्रिकल"
+  },
+  "P0703": {
+    "en": "Brake Switch Circuit Malfunction",
+    "hi": "ब्रेक स्विच सर्किट खराबी"
+  },
+  "P0704": {
+    "en": "Clutch Switch Input Circuit Malfunction",
+    "hi": "क्लच स्विच इनपुट सर्किट खराबी"
+  },
+  "P0705": {
+    "en": "Transmission Range Switch Circuit",
+    "hi": "ट्रांसमिशन रेंज स्विच सर्किट"
+  },
+  "P0706": {
+    "en": "Transmission Range Switch Performance",
+    "hi": "ट्रांसमिशन रेंज स्विच परफॉरमेंस"
+  },
+  "P0707": {
+    "en": "Transmission Range Sensor Circuit Low Input",
+    "hi": "ट्रांसमिशन रेंज सेंसर सर्किट लो इनपुट"
+  },
+  "P0708": {
+    "en": "Transmission Range Sensor Circuit High Input",
+    "hi": "ट्रांसमिशन रेंज सेंसर सर्किट हाई इनपुट"
+  },
+  "P0709": {
+    "en": "Transmission Range Sensor Circuit Intermittent",
+    "hi": "ट्रांसमिशन रेंज सेंसर सर्किट रुक-रुक कर"
+  },
+  "P0710": {
+    "en": "Transmission Fluid Temperature Sensor Circuit Malfunction",
+    "hi": "ट्रांसमिशन फ्लूइड टेम्परेचर सेंसर सर्किट खराबी"
+  },
+  "P0711": {
+    "en": "Transmission Fluid Temperature (TFT) Sensor Circuit Range/Performance",
+    "hi": "ट्रांसमिशन फ्लूइड टेम्परेचर (TFT) सेंसर सर्किट रेंज/परफॉरमेंस"
+  },
+  "P0712": {
+    "en": "Transmission Fluid Temperature (TFT) Sensor Circuit Low Input",
+    "hi": "ट्रांसमिशन फ्लूइड टेम्परेचर (TFT) सेंसर सर्किट लो इनपुट"
+  },
+  "P0713": {
+    "en": "Transmission Fluid Temperature (TFT) Sensor Circuit High Input",
+    "hi": "ट्रांसमिशन फ्लूइड टेम्परेचर (TFT) सेंसर सर्किट हाई इनपुट"
+  },
+  "P0714": {
+    "en": "Transmission Fluid Temperature Sensor Circuit Intermittent",
+    "hi": "ट्रांसमिशन फ्लूइड टेम्परेचर सेंसर सर्किट रुक-रुक कर"
+  },
+  "P0715": {
+    "en": "Input/Turbine Speed Sensor Circuit Malfunction",
+    "hi": "इनपुट/टरबाइन स्पीड सेंसर सर्किट खराबी"
+  },
+  "P0716": {
+    "en": "Input Speed Sensor Circuit Intermittent",
+    "hi": "इनपुट स्पीड सेंसर सर्किट रुक-रुक कर"
+  },
+  "P0717": {
+    "en": "Input Speed Sensor Circuit Low Input",
+    "hi": "इनपुट स्पीड सेंसर सर्किट लो इनपुट"
+  },
+  "P0718": {
+    "en": "Input/Turbine Speed Sensor Circuit Intermittent",
+    "hi": "इनपुट/टरबाइन स्पीड सेंसर सर्किट रुक-रुक कर"
+  },
+  "P0719": {
+    "en": "Brake Switch Circuit Low Input",
+    "hi": "ब्रेक स्विच सर्किट लो इनपुट"
+  },
+  "P0720": {
+    "en": "Output Speed Sensor Circuit Malfunction",
+    "hi": "आउटपुट स्पीड सेंसर सर्किट खराबी"
+  },
+  "P0721": {
+    "en": "Output Speed Sensor Range/Performance",
+    "hi": "आउटपुट स्पीड सेंसर रेंज/परफॉरमेंस"
+  },
+  "P0722": {
+    "en": "Output Speed Sensor Circuit Low Input",
+    "hi": "आउटपुट स्पीड सेंसर सर्किट लो इनपुट"
+  },
+  "P0723": {
+    "en": "Output Speed Sensor Intermittent",
+    "hi": "आउटपुट स्पीड सेंसर रुक-रुक कर"
+  },
+  "P0724": {
+    "en": "Brake Switch Circuit High Input",
+    "hi": "ब्रेक स्विच सर्किट हाई इनपुट"
+  },
+  "P0725": {
+    "en": "Engine Speed Input Circuit",
+    "hi": "इंजन स्पीड इनपुट सर्किट"
+  },
+  "P0726": {
+    "en": "Engine Speed Input Circuit Range/Performance",
+    "hi": "इंजन स्पीड इनपुट सर्किट रेंज/परफॉरमेंस"
+  },
+  "P0727": {
+    "en": "Engine Speed Input Circuit No Signal",
+    "hi": "इंजन स्पीड इनपुट सर्किट कोई सिग्नल नहीं"
+  },
+  "P0728": {
+    "en": "Engine Speed Input Circuit Intermittent",
+    "hi": "इंजन स्पीड इनपुट सर्किट रुक-रुक कर"
+  },
+  "P0730": {
+    "en": "Incorrect Gear Ratio",
+    "hi": "गलत गियर अनुपात"
+  },
+  "P0731": {
+    "en": "Gear 1 Incorrect Ratio",
+    "hi": "गियर 1 गलत अनुपात"
+  },
+  "P0732": {
+    "en": "Gear 2 Incorrect Ratio",
+    "hi": "गियर 2 गलत अनुपात"
+  },
+  "P0733": {
+    "en": "Gear 3 Incorrect Ratio",
+    "hi": "गियर 3 गलत अनुपात"
+  },
+  "P0734": {
+    "en": "Gear 4 Incorrect Ratio",
+    "hi": "गियर 4 गलत अनुपात"
+  },
+  "P0735": {
+    "en": "Gear 5 Incorrect Ratio",
+    "hi": "गियर 5 गलत अनुपात"
+  },
+  "P0736": {
+    "en": "Reverse Incorrect Gear Ratio",
+    "hi": "रिवर्स गलत गियर अनुपात"
+  },
+  "P0740": {
+    "en": "Torque Converter Clutch (TCC) Enable Solenoid Circuit Electrical",
+    "hi": "टॉर्क कन्वर्टर क्लच (TCC) इनेबल सोलेनॉइड सर्किट इलेक्ट्रिकल"
+  },
+  "P0741": {
+    "en": "Torque Converter Clutch (TCC) System Stuck Off",
+    "hi": "टॉर्क कन्वर्टर क्लच (TCC) सिस्टम अटका (ऑफ)"
+  },
+  "P0742": {
+    "en": "Torque Converter Clutch (TCC) System Stuck On",
+    "hi": "टॉर्क कन्वर्टर क्लच (TCC) सिस्टम अटका (ऑन)"
+  },
+  "P0743": {
+    "en": "Torque Converter Clutch (TCC) Enable Solenoid Circuit Electrical",
+    "hi": "टॉर्क कन्वर्टर क्लच (TCC) इनेबल सोलेनॉइड सर्किट इलेक्ट्रिकल"
+  },
+  "P0744": {
+    "en": "Torque Converter Clutch Circuit Intermittent",
+    "hi": "टॉर्क कन्वर्टर क्लच सर्किट रुक-रुक कर"
+  },
+  "P0745": {
+    "en": "Pressure Control Solenoid Malfunction",
+    "hi": "प्रेशर कंट्रोल सोलेनॉइड खराबी"
+  },
+  "P0746": {
+    "en": "Pressure Control Solenoid Performance or Stuck Off",
+    "hi": "प्रेशर कंट्रोल सोलेनॉइड परफॉरमेंस या अटका हुआ"
+  },
+  "P0747": {
+    "en": "Pressure Control Solenoid Stuck On",
+    "hi": "प्रेशर कंट्रोल सोलेनॉइड अटका हुआ (ऑन)"
+  },
+  "P0748": {
+    "en": "Pressure Control Solenoid Circuit Electrical",
+    "hi": "प्रेशर कंट्रोल सोलेनॉइड सर्किट इलेक्ट्रिकल"
+  },
+  "P0749": {
+    "en": "Pressure Control Solenoid Intermittent",
+    "hi": "प्रेशर कंट्रोल सोलेनॉइड रुक-रुक कर"
+  },
+  "P0750": {
+    "en": "Shift Solenoid A Malfunction",
+    "hi": "शिफ्ट सोलेनॉइड A खराबी"
+  },
+  "P0751": {
+    "en": "1-2 Shift Solenoid Valve Performance - No 1st or 4th Gear",
+    "hi": "1-2 शिफ्ट सोलेनॉइड वाल्व परफॉरमेंस - कोई पहला या चौथा गियर नहीं"
+  },
+  "P0752": {
+    "en": "1-2 Shift Solenoid Valve Performance - No 2nd or 3rd Gear",
+    "hi": "1-2 शिफ्ट सोलेनॉइड वाल्व परफॉरमेंस - कोई दूसरा या तीसरा गियर नहीं"
+  },
+  "P0753": {
+    "en": "1-2 Shift Solenoid Circuit Electrical",
+    "hi": "1-2 शिफ्ट सोलेनॉइड सर्किट इलेक्ट्रिकल"
+  },
+  "P0754": {
+    "en": "Shift Solenoid A Intermittent",
+    "hi": "शिफ्ट सोलेनॉइड A रुक-रुक कर"
+  },
+  "P0755": {
+    "en": "Shift Solenoid B Malfunction",
+    "hi": "शिफ्ट सोलेनॉइड B खराबी"
+  },
+  "P0756": {
+    "en": "2-3 Shift Solenoid Valve Performance - No 1st or 2nd Gear",
+    "hi": "2-3 शिफ्ट सोलेनॉइड वाल्व परफॉरमेंस - कोई पहला या दूसरा गियर नहीं"
+  },
+  "P0757": {
+    "en": "2-3 Shift Solenoid Valve Performance - No 3rd or 4th Gear",
+    "hi": "2-3 शिफ्ट सोलेनॉइड वाल्व परफॉरमेंस - कोई तीसरा या चौथा गियर नहीं"
+  },
+  "P0758": {
+    "en": "2-3 Shift Solenoid Circuit Electrical",
+    "hi": "2-3 शिफ्ट सोलेनॉइड सर्किट इलेक्ट्रिकल"
+  },
+  "P0759": {
+    "en": "Shift Solenoid B Intermittent",
+    "hi": "शिफ्ट सोलेनॉइड B रुक-रुक कर"
+  },
+  "P0760": {
+    "en": "Shift Solenoid C Malfunction",
+    "hi": "शिफ्ट सोलेनॉइड C खराबी"
+  },
+  "P0761": {
+    "en": "Shift Solenoid C Performance or Stuck Off",
+    "hi": "शिफ्ट सोलेनॉइड C परफॉरमेंस या अटका हुआ"
+  },
+  "P0762": {
+    "en": "Shift Solenoid C Stuck On",
+    "hi": "शिफ्ट सोलेनॉइड C अटका हुआ (ऑन)"
+  },
+  "P0763": {
+    "en": "Shift Solenoid C Electrical",
+    "hi": "शिफ्ट सोलेनॉइड C इलेक्ट्रिकल"
+  },
+  "P0764": {
+    "en": "Shift Solenoid C Intermittent",
+    "hi": "शिफ्ट सोलेनॉइड C रुक-रुक कर"
+  },
+  "P0765": {
+    "en": "Shift Solenoid D Malfunction",
+    "hi": "शिफ्ट सोलेनॉइड D खराबी"
+  },
+  "P0766": {
+    "en": "Shift Solenoid D Performance or Stuck Off",
+    "hi": "शिफ्ट सोलेनॉइड D परफॉरमेंस या अटका हुआ"
+  },
+  "P0767": {
+    "en": "Shift Solenoid D Stuck On",
+    "hi": "शिफ्ट सोलेनॉइड D अटका हुआ (ऑन)"
+  },
+  "P0768": {
+    "en": "Shift Solenoid D Electrical",
+    "hi": "शिफ्ट सोलेनॉइड D इलेक्ट्रिकल"
+  },
+  "P0769": {
+    "en": "Shift Solenoid D Intermittent",
+    "hi": "शिफ्ट सोलेनॉइड D रुक-रुक कर"
+  },
+  "P0770": {
+    "en": "Shift Solenoid E Malfunction",
+    "hi": "शिफ्ट सोलेनॉइड E खराबी"
+  },
+  "P0771": {
+    "en": "Shift Solenoid E Performance or Stuck Off",
+    "hi": "शिफ्ट सोलेनॉइड E परफॉरमेंस या अटका हुआ"
+  },
+  "P0772": {
+    "en": "Shift Solenoid E Stuck On",
+    "hi": "शिफ्ट सोलेनॉइड E अटका हुआ (ऑन)"
+  },
+  "P0773": {
+    "en": "Shift Solenoid E Electrical",
+    "hi": "शिफ्ट सोलेनॉइड E इलेक्ट्रिकल"
+  },
+  "P0774": {
+    "en": "Shift Solenoid E Intermittent",
+    "hi": "शिफ्ट सोलेनॉइड E रुक-रुक कर"
+  },
+  "P0780": {
+    "en": "Shift Malfunction",
+    "hi": "शिफ्ट खराबी"
+  },
+  "P0781": {
+    "en": "1-2 Shift Malfunction",
+    "hi": "1-2 शिफ्ट खराबी"
+  },
+  "P0782": {
+    "en": "2-3 Shift Malfunction",
+    "hi": "2-3 शिफ्ट खराबी"
+  },
+  "P0783": {
+    "en": "3-4 Shift Malfunction",
+    "hi": "3-4 शिफ्ट खराबी"
+  },
+  "P0784": {
+    "en": "4-5 Shift Malfunction",
+    "hi": "4-5 शिफ्ट खराबी"
+  },
+  "P0785": {
+    "en": "3-2 Shift Solenoid Circuit Electrical",
+    "hi": "3-2 शिफ्ट सोलेनॉइड सर्किट इलेक्ट्रिकल"
+  },
+  "P0786": {
+    "en": "Shift/Timing Solenoid Range/Performance",
+    "hi": "शिफ्ट/टाइमिंग सोलेनॉइड रेंज/परफॉरमेंस"
+  },
+  "P0787": {
+    "en": "Shift/Timing Solenoid Low",
+    "hi": "शिफ्ट/टाइमिंग सोलेनॉइड लो"
+  },
+  "P0788": {
+    "en": "Shift/Timing Solenoid High",
+    "hi": "शिफ्ट/टाइमिंग सोलेनॉइड हाई"
+  },
+  "P0789": {
+    "en": "Shift/Timing Solenoid Intermittent",
+    "hi": "शिफ्ट/टाइमिंग सोलेनॉइड रुक-रुक कर"
+  },
+  "P0790": {
+    "en": "Normal/Performance Switch Circuit Malfunction",
+    "hi": "नॉर्मल/परफॉरमेंस स्विच सर्किट खराबी"
+  },
+  "P0801": {
+    "en": "Reverse Inhibit Control Circuit Malfunction",
+    "hi": "रिवर्स इनहिबिट कंट्रोल सर्किट खराबी"
+  },
+  "P0803": {
+    "en": "1-4 Upshift (Skip Shift) Solenoid Control Circuit Malfunction",
+    "hi": "1-4 अपशिफ्ट (स्किप शिफ्ट) सोलेनॉइड कंट्रोल सर्किट खराबी"
+  },
+  "P0804": {
+    "en": "1-4 Upshift (Skip Shift) Lamp Control Circuit Malfunction",
+    "hi": "1-4 अपशिफ्ट (स्किप शिफ्ट) लैंप कंट्रोल सर्किट खराबी"
+  },
+  "P0850": {
+    "en": "Park/Neutral Position (PNP) Switch Circuit",
+    "hi": "पार्क/न्यूट्रल पोजिशन (PNP) स्विच सर्किट"
+  },
+  "P0856": {
+    "en": "Traction Control Input Signal Malfunction",
+    "hi": "ट्रैक्शन कंट्रोल इनपुट सिग्नल खराबी"
+  },
+  "P0894": {
+    "en": "Transmission Component Slipping",
+    "hi": "ट्रांसमिशन कंपोनेंट स्लिपिंग"
+  },
+  "P0897": {
+    "en": "Transmission Fluid Deteriorated (10% or Less Life)",
+    "hi": "ट्रांसमिशन फ्लूइड जीवन 10% या उससे कम"
+  },
+  "P0962": {
+    "en": "Line Pressure Control (PC) Solenoid Control Circuit Low Voltage",
+    "hi": "लाइन प्रेशर कंट्रोल (PC) सोलेनॉइड कंट्रोल सर्किट लो वोल्टेज"
+  },
+  "P0963": {
+    "en": "Line Pressure Control (PC) Solenoid Control Circuit High Voltage",
+    "hi": "लाइन प्रेशर कंट्रोल (PC) सोलेनॉइड कंट्रोल सर्किट हाई वोल्टेज"
+  },
+  "P0966": {
+    "en": "Clutch Pressure Control (PC) Solenoid Control Circuit Low Voltage",
+    "hi": "क्लच प्रेशर कंट्रोल (PC) सोलेनॉइड कंट्रोल सर्किट लो वोल्टेज"
+  },
+  "P0967": {
+    "en": "Clutch Pressure Control (PC) Solenoid Control Circuit High Voltage",
+    "hi": "क्लच प्रेशर कंट्रोल (PC) सोलेनॉइड कंट्रोल सर्किट हाई वोल्टेज"
+  },
+  "P0970": {
+    "en": "Shift Pressure Control (PC) Solenoid Control Circuit Low Voltage",
+    "hi": "शिफ्ट प्रेशर कंट्रोल (PC) सोलेनॉइड कंट्रोल सर्किट लो वोल्टेज"
+  },
+  "P0971": {
+    "en": "Shift Pressure Control (PC) Solenoid Control Circuit High Voltage",
+    "hi": "शिफ्ट प्रेशर कंट्रोल (PC) सोलेनॉइड कंट्रोल सर्किट हाई वोल्टेज"
+  },
+  "P0973": {
+    "en": "Shift Solenoid (SS) 1 Control Circuit Low (Open or Short to Ground)",
+    "hi": "शिफ्ट सोलेनॉइड (SS) 1 कंट्रोल सर्किट लो (ग्राउंड से ओपन या शॉर्ट)"
+  },
+  "P0974": {
+    "en": "Shift Solenoid (SS) 1 Control Circuit High (Short to Voltage)",
+    "hi": "शिफ्ट सोलेनॉइड (SS) 1 कंट्रोल सर्किट हाई (वोल्टेज से शॉर्ट)"
+  },
+  "P0976": {
+    "en": "Shift Solenoid (SS) 2 Control Circuit Low (Open or Short to Ground)",
+    "hi": "शिफ्ट सोलेनॉइड (SS) 2 कंट्रोल सर्किट लो (ग्राउंड से ओपन या शॉर्ट)"
+  },
+  "P0977": {
+    "en": "Shift Solenoid (SS) 2 Control Circuit High (Short to Voltage)",
+    "hi": "शिफ्ट सोलेनॉइड (SS) 2 कंट्रोल सर्किट हाई (वोल्टेज से शॉर्ट)"
+  },
+  "P0979": {
+    "en": "Shift Solenoid (SS) 3 Control Circuit Low Voltage",
+    "hi": "शिफ्ट सोलेनॉइड (SS) 3 कंट्रोल सर्किट लो वोल्टेज"
+  },
+  "P0980": {
+    "en": "Shift Solenoid (SS) 3 Control Circuit High Voltage",
+    "hi": "शिफ्ट सोलेनॉइड (SS) 3 कंट्रोल सर्किट हाई वोल्टेज"
+  },
+  "P0982": {
+    "en": "Shift Solenoid (SS) 4 Control Circuit Low Voltage",
+    "hi": "शिफ्ट सोलेनॉइड (SS) 4 कंट्रोल सर्किट लो वोल्टेज"
+  },
+  "P0983": {
+    "en": "Shift Solenoid (SS) 4 Control Circuit High Voltage",
+    "hi": "शिफ्ट सोलेनॉइड (SS) 4 कंट्रोल सर्किट हाई वोल्टेज"
+  },
+  "P0985": {
+    "en": "Shift Solenoid (SS) 5 Control Circuit Low Voltage",
+    "hi": "शिफ्ट सोलेनॉइड (SS) 5 कंट्रोल सर्किट लो वोल्टेज"
+  },
+  "P0986": {
+    "en": "Shift Solenoid (SS) 5 Control Circuit High Voltage",
+    "hi": "शिफ्ट सोलेनॉइड (SS) 5 कंट्रोल सर्किट हाई वोल्टेज"
+  },
+  "P1031": {
+    "en": "HO2S Heater Current Monitor Control Circuit Bank 1 & 2 Sensor 1",
+    "hi": "HO2S हीटर करंट मॉनिटर कंट्रोल सर्किट बैंक 1 और 2 सेंसर 1"
+  },
+  "P1032": {
+    "en": "HO2S Heater Warm Up Control Circuit Bank 1 & 2 Sensor 1",
+    "hi": "HO2S हीटर वार्म अप कंट्रोल सर्किट बैंक 1 और 2 सेंसर 1"
+  },
+  "P1101": {
+    "en": "Intake Air Flow System Performance",
+    "hi": "MAF, MAP, EGR और TP से मापा गया वायु प्रवाह गणना की गई सीमा के भीतर नहीं"
+  },
+  "P1105": {
+    "en": "Secondary Vacuum Sensor Circuit",
+    "hi": "सेकेंडरी वैक्यूम सेंसर सर्किट"
+  },
+  "P1106": {
+    "en": "Manifold Absolute Pressure (MAP) Sensor Circuit Intermittent High Voltage",
+    "hi": "मैनिफोल्ड एब्सोल्यूट प्रेशर (MAP) सेंसर सर्किट रुक-रुक कर हाई वोल्टेज"
+  },
+  "P1107": {
+    "en": "Manifold Absolute Pressure (MAP) Sensor Circuit Intermittent Low Voltage",
+    "hi": "मैनिफोल्ड एब्सोल्यूट प्रेशर (MAP) सेंसर सर्किट रुक-रुक कर लो वोल्टेज"
+  },
+  "P1108": {
+    "en": "BARO to MAP Sensor Comparison Too High",
+    "hi": "BARO से MAP सेंसर तुलना बहुत अधिक"
+  },
+  "P1109": {
+    "en": "Secondary Port Throttle System",
+    "hi": "सेकेंडरी पोर्ट थ्रॉटल सिस्टम"
+  },
+  "P1111": {
+    "en": "Intake Air Temperature (IAT) Sensor Circuit Intermittent High Voltage",
+    "hi": "इनटेक एयर टेम्परेचर (IAT) सेंसर सर्किट रुक-रुक कर हाई वोल्टेज"
+  },
+  "P1112": {
+    "en": "Intake Air Temperature (IAT) Sensor Circuit Intermittent Low Voltage",
+    "hi": "इनटेक एयर टेम्परेचर (IAT) सेंसर सर्किट रुक-रुक कर लो वोल्टेज"
+  },
+  "P1113": {
+    "en": "Intake Resonance Switchover Solenoid Control Circuit",
+    "hi": "इनटेक रेजोनेंस स्विचओवर सोलेनॉइड कंट्रोल सर्किट"
+  },
+  "P1114": {
+    "en": "Engine Coolant Temperature (ECT) Sensor Circuit Intermittent Low Voltage",
+    "hi": "इंजन कूलेंट टेम्परेचर (ECT) सेंसर सर्किट रुक-रुक कर लो वोल्टेज"
+  },
+  "P1115": {
+    "en": "Engine Coolant Temperature (ECT) Sensor Circuit Intermittent High Voltage",
+    "hi": "इंजन कूलेंट टेम्परेचर (ECT) सेंसर सर्किट रुक-रुक कर हाई वोल्टेज"
+  },
+  "P1116": {
+    "en": "ECT Signal Unstable or Intermittent",
+    "hi": "ECT सिग्नल अस्थिर या रुक-रुक कर"
+  },
+  "P1117": {
+    "en": "Engine Coolant Temperature Signal Out-of-Range Low",
+    "hi": "इंजन कूलेंट टेम्परेचर सिग्नल आउट-ऑफ-रेंज लो"
+  },
+  "P1118": {
+    "en": "Engine Coolant Temperature Signal Out-of-Range High",
+    "hi": "इंजन कूलेंट टेम्परेचर सिग्नल आउट-ऑफ-रेंज हाई"
+  },
+  "P1119": {
+    "en": "ECT Signal Out-of-Range with TFT Sensor",
+    "hi": "ECT सिग्नल TFT सेंसर के साथ आउट-ऑफ-रेंज"
+  },
+  "P1120": {
+    "en": "Throttle Position (TP) Sensor 1 Circuit",
+    "hi": "थ्रॉटल पोजिशन (TP) सेंसर 1 सर्किट"
+  },
+  "P1121": {
+    "en": "Throttle Position (TP) Sensor Circuit Intermittent High Voltage",
+    "hi": "थ्रॉटल पोजिशन (TP) सेंसर सर्किट रुक-रुक कर हाई वोल्टेज"
+  },
+  "P1122": {
+    "en": "Throttle Position (TP) Sensor Circuit Intermittent Low Voltage",
+    "hi": "थ्रॉटल पोजिशन (TP) सेंसर सर्किट रुक-रुक कर लो वोल्टेज"
+  },
+  "P1125": {
+    "en": "Accelerator Pedal Position (APP) System",
+    "hi": "एक्सेलेरेटर पेडल पोजिशन (APP) सिस्टम"
+  },
+  "P1130": {
+    "en": "O2 Sensor Circuit Low Variance Bank 1 Sensor 1",
+    "hi": "O2 सेंसर सर्किट लो वैरिएंस बैंक 1 सेंसर 1"
+  },
+  "P1131": {
+    "en": "O2 Sensor Circuit Low Variance Bank 1 Sensor 2",
+    "hi": "O2 सेंसर सर्किट लो वैरिएंस बैंक 1 सेंसर 2"
+  },
+  "P1132": {
+    "en": "O2 Sensor Circuit Low Variance Bank 2 Sensor 1",
+    "hi": "O2 सेंसर सर्किट लो वैरिएंस बैंक 2 सेंसर 1"
+  },
+  "P1133": {
+    "en": "O2 Sensor Insufficient Switching Bank 1 Sensor 1",
+    "hi": "O2 सेंसर अपर्याप्त स्विचिंग बैंक 1 सेंसर 1"
+  },
+  "P1134": {
+    "en": "O2 Sensor Transition Time Ratio Bank 1 Sensor 1",
+    "hi": "O2 सेंसर संक्रमण समय अनुपात बैंक 1 सेंसर 1"
+  },
+  "P1135": {
+    "en": "O2 Sensor Lean Mean Bank 1 Sensor 1",
+    "hi": "O2 सेंसर लीन मीन बैंक 1 सेंसर 1"
+  },
+  "P1136": {
+    "en": "O2 Sensor Rich Mean Bank 1 Sensor 1",
+    "hi": "O2 सेंसर रिच मीन बैंक 1 सेंसर 1"
+  },
+  "P1137": {
+    "en": "O2 Sensor Bank 1 Sensor 2 Lean System or Low Voltage",
+    "hi": "O2 सेंसर बैंक 1 सेंसर 2 लीन सिस्टम या लो वोल्टेज"
+  },
+  "P1138": {
+    "en": "O2 Sensor Bank 1 Sensor 2 Rich or High Voltage",
+    "hi": "O2 सेंसर बैंक 1 सेंसर 2 रिच या हाई वोल्टेज"
+  },
+  "P1139": {
+    "en": "O2 Sensor Insufficient Switching Bank 1 Sensor 2",
+    "hi": "O2 सेंसर अपर्याप्त स्विचिंग बैंक 1 सेंसर 2"
+  },
+  "P1140": {
+    "en": "O2 Sensor Transition Time Ratio Bank 1 Sensor 2",
+    "hi": "O2 सेंसर संक्रमण समय अनुपात बैंक 1 सेंसर 2"
+  },
+  "P1141": {
+    "en": "O2 Sensor Heater Control Circuit Bank 1 Sensor 2",
+    "hi": "O2 सेंसर हीटर कंट्रोल सर्किट बैंक 1 सेंसर 2"
+  },
+  "P1143": {
+    "en": "O2 Sensor Bank 1 Sensor 3 Lean System or Low Voltage",
+    "hi": "O2 सेंसर बैंक 1 सेंसर 3 लीन सिस्टम या लो वोल्टेज"
+  },
+  "P1144": {
+    "en": "O2 Sensor Bank 1 Sensor 3 Rich or High Voltage",
+    "hi": "O2 सेंसर बैंक 1 सेंसर 3 रिच या हाई वोल्टेज"
+  },
+  "P1145": {
+    "en": "O2 Sensor Cross Count Bank 1 Sensor 3",
+    "hi": "O2 सेंसर क्रॉस काउंट बैंक 1 सेंसर 3"
+  },
+  "P1153": {
+    "en": "O2 Sensor Insufficient Switching Bank 2 Sensor 1",
+    "hi": "O2 सेंसर अपर्याप्त स्विचिंग बैंक 2 सेंसर 1"
+  },
+  "P1154": {
+    "en": "O2 Sensor Transition Time Ratio Bank 2 Sensor 1",
+    "hi": "O2 सेंसर संक्रमण समय अनुपात बैंक 2 सेंसर 1"
+  },
+  "P1155": {
+    "en": "O2 Sensor Lean Mean Bank 2 Sensor 1",
+    "hi": "O2 सेंसर लीन मीन बैंक 2 सेंसर 1"
+  },
+  "P1156": {
+    "en": "O2 Sensor Rich Mean Bank 2 Sensor 1",
+    "hi": "O2 सेंसर रिच मीन बैंक 2 सेंसर 1"
+  },
+  "P1157": {
+    "en": "O2 Sensor Bank 2 Sensor 2 Lean System or Low Voltage",
+    "hi": "O2 सेंसर बैंक 2 सेंसर 2 लीन सिस्टम या लो वोल्टेज"
+  },
+  "P1158": {
+    "en": "O2 Sensor Bank 2 Sensor 2 Rich or High Voltage",
+    "hi": "O2 सेंसर बैंक 2 सेंसर 2 रिच या हाई वोल्टेज"
+  },
+  "P1159": {
+    "en": "O2 Sensor Cross Count Bank 2 Sensor 2",
+    "hi": "O2 सेंसर क्रॉस काउंट बैंक 2 सेंसर 2"
+  },
+  "P1161": {
+    "en": "O2 Sensor Heater Control Circuit Bank 2 Sensor 2",
+    "hi": "O2 सेंसर हीटर कंट्रोल सर्किट बैंक 2 सेंसर 2"
+  },
+  "P1163": {
+    "en": "O2 Sensor Bank 2 Sensor 3 Lean System or Low Voltage",
+    "hi": "O2 सेंसर बैंक 2 सेंसर 3 लीन सिस्टम या लो वोल्टेज"
+  },
+  "P1164": {
+    "en": "O2 Sensor Bank 2 Sensor 3 Rich or High Voltage",
+    "hi": "O2 सेंसर बैंक 2 सेंसर 3 रिच या हाई वोल्टेज"
+  },
+  "P1165": {
+    "en": "O2 Sensor Cross Count Bank 2 Sensor 3",
+    "hi": "O2 सेंसर क्रॉस काउंट बैंक 2 सेंसर 3"
+  },
+  "P1170": {
+    "en": "Bank to Bank Fuel Trim Offset",
+    "hi": "बैंक टू बैंक फ्यूल ट्रिम ऑफसेट"
+  },
+  "P1171": {
+    "en": "Fuel System Lean During Acceleration",
+    "hi": "त्वरण के दौरान फ्यूल सिस्टम लीन"
+  },
+  "P1172": {
+    "en": "Fuel Transfer Pump Flow Insufficient",
+    "hi": "फ्यूल ट्रांसफर पंप फ्लो अपर्याप्त"
+  },
+  "P1185": {
+    "en": "Engine Oil Temperature Circuit",
+    "hi": "इंजन ऑयल टेम्परेचर सर्किट"
+  },
+  "P1186": {
+    "en": "Engine Oil Temperature (EOT) Circuit Performance",
+    "hi": "इंजन ऑयल टेम्परेचर (EOT) सर्किट परफॉरमेंस"
+  },
+  "P1187": {
+    "en": "Engine Oil Temperature (EOT) Sensor Circuit Low Voltage",
+    "hi": "इंजन ऑयल टेम्परेचर (EOT) सेंसर सर्किट लो वोल्टेज"
+  },
+  "P1188": {
+    "en": "Engine Oil Temperature (EOT) Sensor Circuit High Voltage",
+    "hi": "इंजन ऑयल टेम्परेचर (EOT) सेंसर सर्किट हाई वोल्टेज"
+  },
+  "P1189": {
+    "en": "Engine Oil Pressure (EOP) Switch Circuit",
+    "hi": "इंजन ऑयल प्रेशर (EOP) स्विच सर्किट"
+  },
+  "P1190": {
+    "en": "Engine Vacuum Leak",
+    "hi": "इंजन वैक्यूम लीक"
+  },
+  "P1191": {
+    "en": "Intake Air Duct Air Leak",
+    "hi": "इनटेक एयर डक्ट एयर लीक"
+  },
+  "P1200": {
+    "en": "Injector Control Circuit",
+    "hi": "इंजेक्टर कंट्रोल सर्किट"
+  },
+  "P1201": {
+    "en": "(Alt. Fuel) Gas Mass Sensor Circuit Range/Performance",
+    "hi": "(वैकल्पिक फ्यूल) गैस मास सेंसर सर्किट रेंज/परफॉरमेंस"
+  },
+  "P1202": {
+    "en": "(Alt. Fuel) Gas Mass Sensor Circuit Low Frequency",
+    "hi": "(वैकल्पिक फ्यूल) गैस मास सेंसर सर्किट लो फ्रीक्वेंसी"
+  },
+  "P1203": {
+    "en": "(Alt. Fuel) Gas Mass Sensor Circuit High Frequency",
+    "hi": "(वैकल्पिक फ्यूल) गैस मास सेंसर सर्किट हाई फ्रीक्वेंसी"
+  },
+  "P1211": {
+    "en": "Mass Air Flow Circuit Intermittent High",
+    "hi": "मास एयर फ्लो सर्किट रुक-रुक कर हाई"
+  },
+  "P1212": {
+    "en": "Mass Air Flow Circuit Intermittent Low",
+    "hi": "मास एयर फ्लो सर्किट रुक-रुक कर लो"
+  },
+  "P1214": {
+    "en": "Injection Pump Timing Offset",
+    "hi": "इंजेक्शन पंप टाइमिंग ऑफसेट"
+  },
+  "P1215": {
+    "en": "Ground Fault Detection Indicated",
+    "hi": "ग्राउंड फॉल्ट डिटेक्शन संकेतित"
+  },
+  "P1216": {
+    "en": "Fuel Solenoid Response Time Too Short",
+    "hi": "फ्यूल सोलेनॉइड प्रतिक्रिया समय बहुत कम"
+  },
+  "P1217": {
+    "en": "Fuel Solenoid Response Time Too Long",
+    "hi": "फ्यूल सोलेनॉइड प्रतिक्रिया समय बहुत लंबा"
+  },
+  "P1218": {
+    "en": "Injection Pump Calibration Circuit",
+    "hi": "इंजेक्शन पंप कैलिब्रेशन सर्किट"
+  },
+  "P1219": {
+    "en": "Throttle Position Sensor Reference Voltage",
+    "hi": "थ्रॉटल पोजिशन सेंसर रेफरेंस वोल्टेज"
+  },
+  "P1220": {
+    "en": "Throttle Position (TP) Sensor 2 Circuit",
+    "hi": "थ्रॉटल पोजिशन (TP) सेंसर 2 सर्किट"
+  },
+  "P1221": {
+    "en": "Fuel Pump Secondary Circuit Low",
+    "hi": "फ्यूल पंप सेकेंडरी सर्किट लो"
+  },
+  "P1222": {
+    "en": "Injector Control Circuit Intermittent",
+    "hi": "इंजेक्टर कंट्रोल सर्किट रुक-रुक कर"
+  },
+  "P1225": {
+    "en": "Injector Circuit Cylinder 2 Intermittent",
+    "hi": "इंजेक्टर सर्किट सिलेंडर 2 रुक-रुक कर"
+  },
+  "P1228": {
+    "en": "Injector Circuit Cylinder 3 Intermittent",
+    "hi": "इंजेक्टर सर्किट सिलेंडर 3 रुक-रुक कर"
+  },
+  "P1231": {
+    "en": "Injector Circuit Cylinder 4 Intermittent",
+    "hi": "इंजेक्टर सर्किट सिलेंडर 4 रुक-रुक कर"
+  },
+  "P1234": {
+    "en": "Injector Circuit Cylinder 5 Intermittent",
+    "hi": "इंजेक्टर सर्किट सिलेंडर 5 रुक-रुक कर"
+  },
+  "P1237": {
+    "en": "Injector Circuit Cylinder 6 Intermittent",
+    "hi": "इंजेक्टर सर्किट सिलेंडर 6 रुक-रुक कर"
+  },
+  "P1240": {
+    "en": "Injector Circuit Cylinder 7 Intermittent",
+    "hi": "इंजेक्टर सर्किट सिलेंडर 7 रुक-रुक कर"
+  },
+  "P1243": {
+    "en": "Injector Circuit Cylinder 8 Intermittent",
+    "hi": "इंजेक्टर सर्किट सिलेंडर 8 रुक-रुक कर"
+  },
+  "P1245": {
+    "en": "Intake Plenum Switchover Valve",
+    "hi": "इनटेक प्लेनम स्विचओवर वाल्व"
+  },
+  "P1250": {
+    "en": "Early Fuel Evaporation Heater Circuit",
+    "hi": "अर्ली फ्यूल इवैपोरेशन हीटर सर्किट"
+  },
+  "P1257": {
+    "en": "Supercharger System Overboost",
+    "hi": "सुपरचार्जर सिस्टम ओवरबूस्ट"
+  },
+  "P1258": {
+    "en": "Engine Coolant Overtemperature - Above 268°F - Protection Mode Active",
+    "hi": "इंजन कूलेंट ओवरटेम्परेचर - 268°F से ऊपर - प्रोटेक्शन मोड सक्रिय"
+  },
+  "P1260": {
+    "en": "Theft Deterrent - Fuel Disable Signal Received",
+    "hi": "अंतिम परीक्षण विफल - अतिरिक्त जानकारी के लिए (SCC)"
+  },
+  "P1270": {
+    "en": "Accelerator Pedal Position Sensor A/D Converter Error",
+    "hi": "एक्सेलेरेटर पेडल पोजिशन सेंसर A/D कनवर्टर त्रुटि"
+  },
+  "P1271": {
+    "en": "Accelerator Pedal Position (APP) Sensor 1-2 Correlation",
+    "hi": "एक्सेलेरेटर पेडल पोजिशन (APP) सेंसर 1-2 सहसंबंध"
+  },
+  "P1272": {
+    "en": "Accelerator Pedal Position Sensor 2",
+    "hi": "एक्सेलेरेटर पेडल पोजिशन सेंसर 2"
+  },
+  "P1273": {
+    "en": "Accelerator Pedal Position Sensor 1",
+    "hi": "एक्सेलेरेटर पेडल पोजिशन सेंसर 1"
+  },
+  "P1274": {
+    "en": "Injectors Wired Incorrectly",
+    "hi": "इंजेक्टर गलत तरीके से वायर्ड"
+  },
+  "P1275": {
+    "en": "Accelerator Pedal Position (APP) Sensor 1 Circuit",
+    "hi": "एक्सेलेरेटर पेडल पोजिशन (APP) सेंसर 1 सर्किट"
+  },
+  "P1276": {
+    "en": "Accelerator Pedal Position Sensor 1 Circuit Performance",
+    "hi": "एक्सेलेरेटर पेडल पोजिशन सेंसर 1 सर्किट परफॉरमेंस"
+  },
+  "P1277": {
+    "en": "Accelerator Pedal Position Sensor 1 Circuit Low Voltage",
+    "hi": "एक्सेलेरेटर पेडल पोजिशन सेंसर 1 सर्किट लो वोल्टेज"
+  },
+  "P1278": {
+    "en": "Accelerator Pedal Position Sensor 1 Circuit High Voltage",
+    "hi": "एक्सेलेरेटर पेडल पोजिशन सेंसर 1 सर्किट हाई वोल्टेज"
+  },
+  "P1280": {
+    "en": "Accelerator Pedal Position (APP) Sensor 2 Circuit",
+    "hi": "एक्सेलेरेटर पेडल पोजिशन (APP) सेंसर 2 सर्किट"
+  },
+  "P1281": {
+    "en": "Accelerator Pedal Position Sensor 2 Circuit Performance",
+    "hi": "एक्सेलेरेटर पेडल पोजिशन सेंसर 2 सर्किट परफॉरमेंस"
+  },
+  "P1282": {
+    "en": "Accelerator Pedal Position Sensor 2 Circuit Low Voltage",
+    "hi": "एक्सेलेरेटर पेडल पोजिशन सेंसर 2 सर्किट लो वोल्टेज"
+  },
+  "P1283": {
+    "en": "Accelerator Pedal Position Sensor 2 Circuit High Voltage",
+    "hi": "एक्सेलेरेटर पेडल पोजिशन सेंसर 2 सर्किट हाई वोल्टेज"
+  },
+  "P1285": {
+    "en": "Accelerator Pedal Position Sensor 3 Circuit",
+    "hi": "एक्सेलेरेटर पेडल पोजिशन सेंसर 3 सर्किट"
+  },
+  "P1286": {
+    "en": "Accelerator Pedal Position Sensor 3 Circuit Performance",
+    "hi": "एक्सेलेरेटर पेडल पोजिशन सेंसर 3 सर्किट परफॉरमेंस"
+  },
+  "P1287": {
+    "en": "Accelerator Pedal Position Sensor 3 Circuit Low Voltage",
+    "hi": "एक्सेलेरेटर पेडल पोजिशन सेंसर 3 सर्किट लो वोल्टेज"
+  },
+  "P1288": {
+    "en": "Accelerator Pedal Position Sensor 3 Circuit High Voltage",
+    "hi": "एक्सेलेरेटर पेडल पोजिशन सेंसर 3 सर्किट हाई वोल्टेज"
+  },
+  "P1300": {
+    "en": "Igniter Circuit",
+    "hi": "इग्नाइटर सर्किट"
+  },
+  "P1305": {
+    "en": "Ignition Coil 2 Primary Feedback Circuit",
+    "hi": "इग्निशन कॉइल 2 प्राइमरी फीडबैक सर्किट"
+  },
+  "P1310": {
+    "en": "Ignition Coil 3 Primary Feedback Circuit",
+    "hi": "इग्निशन कॉइल 3 प्राइमरी फीडबैक सर्किट"
+  },
+  "P1315": {
+    "en": "Ignition Coil 4 Primary Feedback Circuit",
+    "hi": "इग्निशन कॉइल 4 प्राइमरी फीडबैक सर्किट"
+  },
+  "P1320": {
+    "en": "IC 4X Reference Circuit Intermittent",
+    "hi": "IC 4X रेफरेंस सर्किट रुक-रुक कर"
+  },
+  "P1321": {
+    "en": "Electronic Ignition System Fault Line",
+    "hi": "इलेक्ट्रॉनिक इग्निशन सिस्टम फॉल्ट लाइन"
+  },
+  "P1322": {
+    "en": "EI System or Ignition Control Extra or Missing",
+    "hi": "EI सिस्टम या इग्निशन कंट्रोल अतिरिक्त या गायब"
+  },
+  "P1323": {
+    "en": "IC 24X Reference Circuit Low Frequency",
+    "hi": "IC 24X रेफरेंस सर्किट लो फ्रीक्वेंसी"
+  },
+  "P1324": {
+    "en": "Crank RPM Too Low",
+    "hi": "क्रैंक RPM बहुत कम"
+  },
+  "P1335": {
+    "en": "Crankshaft Position (CKP) Circuit",
+    "hi": "क्रैंकशाफ्ट पोजिशन (CKP) सर्किट"
+  },
+  "P1336": {
+    "en": "Crankshaft Position (CKP) System Variation Not Learned",
+    "hi": "क्रैंकशाफ्ट पोजिशन (CKP) सिस्टम वेरिएशन नहीं सीखा गया"
+  },
+  "P1345": {
+    "en": "Crankshaft Position (CKP)-Camshaft Position (CMP) Correlation",
+    "hi": "क्रैंकशाफ्ट पोजिशन (CKP)-कैमशाफ्ट पोजिशन (CMP) सहसंबंध"
+  },
+  "P1346": {
+    "en": "Intake Camshaft Position (CMP) Sensor System Performance",
+    "hi": "इनटेक कैमशाफ्ट पोजिशन (CMP) सेंसर सिस्टम परफॉरमेंस"
+  },
+  "P1350": {
+    "en": "Ignition Control System",
+    "hi": "इग्निशन कंट्रोल सिस्टम"
+  },
+  "P1351": {
+    "en": "Ignition Coil Control Circuit High Voltage",
+    "hi": "इग्निशन कॉइल कंट्रोल सर्किट हाई वोल्टेज"
+  },
+  "P1352": {
+    "en": "IC Output High/Pulse Detected When Grounded, Cylinder 2",
+    "hi": "IC आउटपुट हाई/पल्स का पता चला जब ग्राउंडेड, सिलेंडर 2"
+  },
+  "P1353": {
+    "en": "IC Output High/Pulse Detected When Grounded, Cylinder 3",
+    "hi": "IC आउटपुट हाई/पल्स का पता चला जब ग्राउंडेड, सिलेंडर 3"
+  },
+  "P1354": {
+    "en": "IC Output High/Pulse Detected When Grounded, Cylinder 4",
+    "hi": "IC आउटपुट हाई/पल्स का पता चला जब ग्राउंडेड, सिलेंडर 4"
+  },
+  "P1355": {
+    "en": "IC Output High/Pulse Detected When Grounded, Cylinder 5",
+    "hi": "IC आउटपुट हाई/पल्स का पता चला जब ग्राउंडेड, सिलेंडर 5"
+  },
+  "P1356": {
+    "en": "IC Output High/Pulse Detected When Grounded, Cylinder 6",
+    "hi": "IC आउटपुट हाई/पल्स का पता चला जब ग्राउंडेड, सिलेंडर 6"
+  },
+  "P1357": {
+    "en": "IC Output High/Pulse Detected When Grounded, Cylinder 7",
+    "hi": "IC आउटपुट हाई/पल्स का पता चला जब ग्राउंडेड, सिलेंडर 7"
+  },
+  "P1358": {
+    "en": "IC Output High/Pulse Detected When Grounded, Cylinder 8",
+    "hi": "IC आउटपुट हाई/पल्स का पता चला जब ग्राउंडेड, सिलेंडर 8"
+  },
+  "P1359": {
+    "en": "Ignition Coil Group 1 Control Circuit",
+    "hi": "इग्निशन कॉइल ग्रुप 1 कंट्रोल सर्किट"
+  },
+  "P1360": {
+    "en": "Ignition Coil Group 2 Control Circuit",
+    "hi": "इग्निशन कॉइल ग्रुप 2 कंट्रोल सर्किट"
+  },
+  "P1361": {
+    "en": "Ignition Coil Control Circuit Low Voltage",
+    "hi": "इग्निशन कॉइल कंट्रोल सर्किट लो वोल्टेज"
+  },
+  "P1362": {
+    "en": "IC Cylinder 2 Not Toggling After Enable",
+    "hi": "IC सिलेंडर 2 सक्षम करने के बाद टॉगल नहीं हो रहा"
+  },
+  "P1363": {
+    "en": "IC Cylinder 3 Not Toggling After Enable",
+    "hi": "IC सिलेंडर 3 सक्षम करने के बाद टॉगल नहीं हो रहा"
+  },
+  "P1364": {
+    "en": "IC Cylinder 4 Not Toggling After Enable",
+    "hi": "IC सिलेंडर 4 सक्षम करने के बाद टॉगल नहीं हो रहा"
+  },
+  "P1365": {
+    "en": "IC Cylinder 5 Not Toggling After Enable",
+    "hi": "IC सिलेंडर 5 सक्षम करने के बाद टॉगल नहीं हो रहा"
+  },
+  "P1366": {
+    "en": "IC Cylinder 6 Not Toggling After Enable",
+    "hi": "IC सिलेंडर 6 सक्षम करने के बाद टॉगल नहीं हो रहा"
+  },
+  "P1367": {
+    "en": "IC Cylinder 7 Not Toggling After Enable",
+    "hi": "IC सिलेंडर 7 सक्षम करने के बाद टॉगल नहीं हो रहा"
+  },
+  "P1368": {
+    "en": "IC Cylinder 8 Not Toggling After Enable",
+    "hi": "IC सिलेंडर 8 सक्षम करने के बाद टॉगल नहीं हो रहा"
+  },
+  "P1370": {
+    "en": "IC 4X Reference Circuit Too Many Pulses",
+    "hi": "IC 4X रेफरेंस सर्किट बहुत अधिक पल्स"
+  },
+  "P1371": {
+    "en": "IC 4X Reference Circuit Too Few Pulses",
+    "hi": "IC 4X रेफरेंस सर्किट बहुत कम पल्स"
+  },
+  "P1372": {
+    "en": "Crankshaft Position (CKP) Sensor A-B Correlation",
+    "hi": "क्रैंकशाफ्ट पोजिशन (CKP) सेंसर A-B सहसंबंध"
+  },
+  "P1374": {
+    "en": "3X Reference Circuit",
+    "hi": "3X रेफरेंस सर्किट"
+  },
+  "P1375": {
+    "en": "IC 24X Reference Circuit High Voltage",
+    "hi": "IC 24X रेफरेंस सर्किट हाई वोल्टेज"
+  },
+  "P1376": {
+    "en": "Ignition Ground Circuit",
+    "hi": "इग्निशन ग्राउंड सर्किट"
+  },
+  "P1377": {
+    "en": "IC Cam Pulse to 4X Reference Pulse",
+    "hi": "IC कैम पल्स से 4X रेफरेंस पल्स"
+  },
+  "P1380": {
+    "en": "Misfire Detected - Rough Road Data Not Available",
+    "hi": "मिसफायर का पता चला - रफ रोड डेटा उपलब्ध नहीं"
+  },
+  "P1381": {
+    "en": "Misfire Detected - No Communication with Brake Control Module",
+    "hi": "मिसफायर का पता चला - ब्रेक कंट्रोल मॉड्यूल के साथ कोई संचार नहीं"
+  },
+  "P1390": {
+    "en": "Wheel Speed Sensor 1 - G - Sensor Circuit",
+    "hi": "व्हील स्पीड सेंसर 1 - G - सेंसर सर्किट"
+  },
+  "P1391": {
+    "en": "Wheel Speed Sensor 1 - G - Sensor Circuit Performance",
+    "hi": "व्हील स्पीड सेंसर 1 - G - सेंसर सर्किट परफॉरमेंस"
+  },
+  "P1392": {
+    "en": "Wheel Speed Sensor 1 - G - Sensor Circuit Low Voltage",
+    "hi": "व्हील स्पीड सेंसर 1 - G - सेंसर सर्किट लो वोल्टेज"
+  },
+  "P1393": {
+    "en": "Wheel Speed Sensor 1 - G - Sensor Circuit High Voltage",
+    "hi": "व्हील स्पीड सेंसर 1 - G - सेंसर सर्किट हाई वोल्टेज"
+  },
+  "P1394": {
+    "en": "Wheel Speed Sensor 1 - G - Sensor Circuit Intermittent",
+    "hi": "व्हील स्पीड सेंसर 1 - G - सेंसर सर्किट रुक-रुक कर"
+  },
+  "P1395": {
+    "en": "Wheel Speed Sensor 2 - G - Sensor Circuit",
+    "hi": "व्हील स्पीड सेंसर 2 - G - सेंसर सर्किट"
+  },
+  "P1396": {
+    "en": "Wheel Speed Sensor 2 - G - Sensor Circuit Performance",
+    "hi": "व्हील स्पीड सेंसर 2 - G - सेंसर सर्किट परफॉरमेंस"
+  },
+  "P1397": {
+    "en": "Wheel Speed Sensor 2 - G - Sensor Circuit Low Voltage",
+    "hi": "व्हील स्पीड सेंसर 2 - G - सेंसर सर्किट लो वोल्टेज"
+  },
+  "P1398": {
+    "en": "Wheel Speed Sensor 2 - G - Sensor Circuit High Voltage",
+    "hi": "व्हील स्पीड सेंसर 2 - G - सेंसर सर्किट हाई वोल्टेज"
+  },
+  "P1399": {
+    "en": "Wheel Speed Sensor 2 - G - Sensor Circuit Intermittent",
+    "hi": "व्हील स्पीड सेंसर 2 - G - सेंसर सर्किट रुक-रुक कर"
+  },
+  "P1403": {
+    "en": "Exhaust Gas Recirculation System Valve 1",
+    "hi": "एग्जॉस्ट गैस रीसर्कुलेशन सिस्टम वाल्व 1"
+  },
+  "P1404": {
+    "en": "Exhaust Gas Recirculation (EGR) Closed Position Performance",
+    "hi": "एग्जॉस्ट गैस रीसर्कुलेशन (EGR) बंद पोजिशन परफॉरमेंस"
+  },
+  "P1405": {
+    "en": "Exhaust Gas Recirculation System Valve 3",
+    "hi": "एग्जॉस्ट गैस रीसर्कुलेशन सिस्टम वाल्व 3"
+  },
+  "P1406": {
+    "en": "EGR Valve Pintle Position Circuit",
+    "hi": "EGR वाल्व पिंटल पोजिशन सर्किट"
+  },
+  "P1407": {
+    "en": "EGR Air Intrusion in Exhaust Supply to EGR Valve",
+    "hi": "EGR वाल्व की एग्जॉस्ट सप्लाई में EGR एयर घुसपैठ"
+  },
+  "P1408": {
+    "en": "Intake Manifold Pressure Sensor Circuit",
+    "hi": "इनटेक मैनिफोल्ड प्रेशर सेंसर सर्किट"
+  },
+  "P1409": {
+    "en": "EGR Vacuum System Leak",
+    "hi": "EGR वैक्यूम सिस्टम लीक"
+  },
+  "P1410": {
+    "en": "Fuel Tank Pressure System",
+    "hi": "फ्यूल टैंक प्रेशर सिस्टम"
+  },
+  "P1415": {
+    "en": "Secondary Air Injection (AIR) System Bank 1",
+    "hi": "सेकेंडरी एयर इंजेक्शन (AIR) सिस्टम बैंक 1"
+  },
+  "P1416": {
+    "en": "Secondary Air Injection (AIR) System Bank 2",
+    "hi": "सेकेंडरी एयर इंजेक्शन (AIR) सिस्टम बैंक 2"
+  },
+  "P1418": {
+    "en": "Secondary Air Injection System Relay A Control Circuit High",
+    "hi": "सेकेंडरी एयर इंजेक्शन सिस्टम रिले A कंट्रोल सर्किट हाई"
+  },
+  "P1420": {
+    "en": "Intake Air Low Pressure Switch Circuit Low Voltage",
+    "hi": "इनटेक एयर लो प्रेशर स्विच सर्किट लो वोल्टेज"
+  },
+  "P1421": {
+    "en": "Intake Air Low Pressure Switch Circuit High Voltage",
+    "hi": "इनटेक एयर लो प्रेशर स्विच सर्किट हाई वोल्टेज"
+  },
+  "P1423": {
+    "en": "Intake Air High Pressure Switch Circuit High Voltage",
+    "hi": "इनटेक एयर हाई प्रेशर स्विच सर्किट हाई वोल्टेज"
+  },
+  "P1431": {
+    "en": "Fuel Level Sensor 2 Circuit Performance",
+    "hi": "फ्यूल लेवल सेंसर 2 सर्किट परफॉरमेंस"
+  },
+  "P1432": {
+    "en": "Fuel Level Sensor 2 Circuit Low Voltage",
+    "hi": "फ्यूल लेवल सेंसर 2 सर्किट लो वोल्टेज"
+  },
+  "P1433": {
+    "en": "Fuel Level Sensor 2 Circuit High Voltage",
+    "hi": "फ्यूल लेवल सेंसर 2 सर्किट हाई वोल्टेज"
+  },
+  "P1441": {
+    "en": "Evaporative Emission (EVAP) System Flow During Non-Purge",
+    "hi": "नॉन-पर्ज के दौरान इवैपोरेटिव एमिशन (EVAP) सिस्टम फ्लो"
+  },
+  "P1442": {
+    "en": "EVAP Vacuum Switch High Voltage During Ignition On",
+    "hi": "इग्निशन ऑन के दौरान EVAP वैक्यूम स्विच हाई वोल्टेज"
+  },
+  "P1450": {
+    "en": "Barometric Pressure Sensor Circuit",
+    "hi": "बैरोमेट्रिक प्रेशर सेंसर सर्किट"
+  },
+  "P1451": {
+    "en": "Barometric Pressure Sensor Performance",
+    "hi": "बैरोमेट्रिक प्रेशर सेंसर परफॉरमेंस"
+  },
+  "P1460": {
+    "en": "Cooling Fan Control System",
+    "hi": "कूलिंग फैन कंट्रोल सिस्टम"
+  },
+  "P1480": {
+    "en": "Cooling Fan 1 Control Circuit High",
+    "hi": "कूलिंग फैन 1 कंट्रोल सर्किट हाई"
+  },
+  "P1481": {
+    "en": "Cooling Fan Speed Sensor Circuit",
+    "hi": "कूलिंग फैन स्पीड सेंसर सर्किट"
+  },
+  "P1482": {
+    "en": "Cooling Fan Speed Output Circuit",
+    "hi": "कूलिंग फैन स्पीड आउटपुट सर्किट"
+  },
+  "P1483": {
+    "en": "Engine Cooling System Performance",
+    "hi": "इंजन कूलिंग सिस्टम परफॉरमेंस"
+  },
+  "P1484": {
+    "en": "Cooling Fan System Performance",
+    "hi": "कूलिंग फैन सिस्टम परफॉरमेंस"
+  },
+  "P1500": {
+    "en": "Starter Signal Circuit",
+    "hi": "स्टार्टर सिग्नल सर्किट"
+  },
+  "P1501": {
+    "en": "Vehicle Speed Sensor Circuit Intermittent",
+    "hi": "व्हीकल स्पीड सेंसर सर्किट रुक-रुक कर"
+  },
+  "P1502": {
+    "en": "Theft Deterrent - Fuel Enable Signal Not Received",
+    "hi": "चोरी निवारक - फ्यूल इनेबल सिग्नल प्राप्त नहीं हुआ"
+  },
+  "P1503": {
+    "en": "Theft Deterrent - Fuel Enable Signal Not Correct",
+    "hi": "चोरी निवारक - फ्यूल इनेबल सिग्नल सही नहीं"
+  },
+  "P1504": {
+    "en": "Vehicle Speed Output Circuit",
+    "hi": "व्हीकल स्पीड आउटपुट सर्किट"
+  },
+  "P1508": {
+    "en": "Idle Speed Low - Idle Air Control (IAC) System Not Responding",
+    "hi": "आइडल स्पीड कम - आइडल एयर कंट्रोल (IAC) सिस्टम प्रतिक्रिया नहीं दे रहा"
+  },
+  "P1509": {
+    "en": "Idle Speed High - Idle Air Control (IAC) System Not Responding",
+    "hi": "आइडल स्पीड अधिक - आइडल एयर कंट्रोल (IAC) सिस्टम प्रतिक्रिया नहीं दे रहा"
+  },
+  "P1510": {
+    "en": "Throttle Control System Performance - Throttle Limitation Active",
+    "hi": "थ्रॉटल कंट्रोल सिस्टम परफॉरमेंस - थ्रॉटल लिमिटेशन सक्रिय"
+  },
+  "P1511": {
+    "en": "Throttle Control System - Backup System Performance",
+    "hi": "थ्रॉटल कंट्रोल सिस्टम - बैकअप सिस्टम परफॉरमेंस"
+  },
+  "P1514": {
+    "en": "Airflow to TP Sensor Correlation High",
+    "hi": "एयरफ्लो टू TP सेंसर सहसंबंध हाई"
+  },
+  "P1515": {
+    "en": "Electronic Throttle System Throttle Position",
+    "hi": "इलेक्ट्रॉनिक थ्रॉटल सिस्टम थ्रॉटल पोजिशन"
+  },
+  "P1516": {
+    "en": "Throttle Actuator Control (TAC) Module Throttle Actuator Position Performance",
+    "hi": "थ्रॉटल एक्ट्यूएटर कंट्रोल (TAC) मॉड्यूल थ्रॉटल एक्ट्यूएटर पोजिशन परफॉरमेंस"
+  },
+  "P1517": {
+    "en": "Electronic Throttle Module",
+    "hi": "इलेक्ट्रॉनिक थ्रॉटल मॉड्यूल"
+  },
+  "P1518": {
+    "en": "Electronic Throttle Module to PCM Communication",
+    "hi": "इलेक्ट्रॉनिक थ्रॉटल मॉड्यूल से PCM संचार"
+  },
+  "P1519": {
+    "en": "Throttle Actuator Control (TAC) Module Internal Circuit",
+    "hi": "थ्रॉटल एक्ट्यूएटर कंट्रोल (TAC) मॉड्यूल आंतरिक सर्किट"
+  },
+  "P1520": {
+    "en": "Transmission Range Switch Circuit",
+    "hi": "ट्रांसमिशन रेंज स्विच सर्किट"
+  },
+  "P1521": {
+    "en": "Transmission Engaged at High Throttle Angle",
+    "hi": "उच्च थ्रॉटल कोण पर ट्रांसमिशन चालू"
+  },
+  "P1522": {
+    "en": "Park/Neutral to Drive/Reverse at High RPM",
+    "hi": "उच्च RPM पर पार्क/न्यूट्रल से ड्राइव/रिवर्स"
+  },
+  "P1523": {
+    "en": "Throttle Closed Position Performance",
+    "hi": "थ्रॉटल बंद पोजिशन परफॉरमेंस"
+  },
+  "P1524": {
+    "en": "Throttle Closed Position Performance",
+    "hi": "थ्रॉटल बंद पोजिशन परफॉरमेंस"
+  },
+  "P1525": {
+    "en": "Throttle Body Service Required",
+    "hi": "थ्रॉटल बॉडी सर्विस की आवश्यकता"
+  },
+  "P1526": {
+    "en": "Minimum Throttle Position Not Learned",
+    "hi": "न्यूनतम थ्रॉटल पोजिशन नहीं सीखी गई"
+  },
+  "P1527": {
+    "en": "Transmission Range to Pressure Switch Correlation",
+    "hi": "ट्रांसमिशन रेंज से प्रेशर स्विच सहसंबंध"
+  },
+  "P1528": {
+    "en": "Governor",
+    "hi": "गवर्नर"
+  },
+  "P1529": {
+    "en": "Heated Windshield Request Problem",
+    "hi": "गर्म विंडशील्ड अनुरोध समस्या"
+  },
+  "P1530": {
+    "en": "Throttle Actuator Control (TAC) Module Internal Circuit",
+    "hi": "थ्रॉटल एक्ट्यूएटर कंट्रोल (TAC) मॉड्यूल आंतरिक सर्किट"
+  },
+  "P1531": {
+    "en": "A/C Low Side Temperature Sensor Fault",
+    "hi": "A/C लो साइड टेम्परेचर सेंसर दोष"
+  },
+  "P1532": {
+    "en": "A/C Evaporator Temperature Sensing Circuit Low Voltage",
+    "hi": "A/C इवैपोरेटर टेम्परेचर सेंसिंग सर्किट लो वोल्टेज"
+  },
+  "P1533": {
+    "en": "A/C Evaporator Temperature Sensing Circuit High Voltage",
+    "hi": "A/C इवैपोरेटर टेम्परेचर सेंसिंग सर्किट हाई वोल्टेज"
+  },
+  "P1534": {
+    "en": "A/C High Side Temperature Sensor Low Voltage",
+    "hi": "A/C हाई साइड टेम्परेचर सेंसर लो वोल्टेज"
+  },
+  "P1535": {
+    "en": "A/C High Side Temperature Sensor Circuit",
+    "hi": "A/C हाई साइड टेम्परेचर सेंसर सर्किट"
+  },
+  "P1536": {
+    "en": "Engine Coolant Over Temperature - Air Conditioning (A/C) Disabled",
+    "hi": "इंजन कूलेंट अधिक टेम्परेचर - एयर कंडीशनिंग (A/C) अक्षम"
+  },
+  "P1537": {
+    "en": "A/C Request Circuit Low Voltage",
+    "hi": "A/C अनुरोध सर्किट लो वोल्टेज"
+  },
+  "P1538": {
+    "en": "A/C Request Circuit High Voltage",
+    "hi": "A/C अनुरोध सर्किट हाई वोल्टेज"
+  },
+  "P1539": {
+    "en": "A/C Clutch Status Circuit High Voltage",
+    "hi": "A/C क्लच स्टेटस सर्किट हाई वोल्टेज"
+  },
+  "P1540": {
+    "en": "Air Conditioning (A/C) Refrigerant Overpressure - A/C Disabled",
+    "hi": "एयर कंडीशनिंग (A/C) रेफ्रिजरेंट ओवरप्रेशर - A/C अक्षम"
+  },
+  "P1541": {
+    "en": "A/C High Side Over Temperature",
+    "hi": "A/C हाई साइड ओवर टेम्परेचर"
+  },
+  "P1542": {
+    "en": "A/C System High Pressure High Temperature",
+    "hi": "A/C सिस्टम उच्च दबाव उच्च टेम्परेचर"
+  },
+  "P1543": {
+    "en": "A/C System Performance",
+    "hi": "A/C सिस्टम परफॉरमेंस"
+  },
+  "P1544": {
+    "en": "A/C Refrigerant Condition Too Low",
+    "hi": "A/C रेफ्रिजरेंट की स्थिति बहुत कम"
+  },
+  "P1545": {
+    "en": "Air Conditioning (A/C) Clutch Relay Control Circuit",
+    "hi": "एयर कंडीशनिंग (A/C) क्लच रिले कंट्रोल सर्किट"
+  },
+  "P1546": {
+    "en": "A/C Clutch Status Circuit Low Voltage",
+    "hi": "A/C क्लच स्टेटस सर्किट लो वोल्टेज"
+  },
+  "P1547": {
+    "en": "A/C System Performance Degraded",
+    "hi": "A/C सिस्टम परफॉरमेंस खराब"
+  },
+  "P1548": {
+    "en": "A/C Recirculation Circuit",
+    "hi": "A/C रीसर्कुलेशन सर्किट"
+  },
+  "P1551": {
+    "en": "Throttle Valve Rest Position Not Reached During Learn",
+    "hi": "सीखने के दौरान थ्रॉटल वाल्व रेस्ट पोजिशन तक नहीं पहुंचा"
+  },
+  "P1554": {
+    "en": "Cruise Control Feedback Circuit",
+    "hi": "क्रूज कंट्रोल फीडबैक सर्किट"
+  },
+  "P1555": {
+    "en": "Electronic Variable Orifice Output",
+    "hi": "इलेक्ट्रॉनिक वेरिएबल ऑरिफिस आउटपुट"
+  },
+  "P1558": {
+    "en": "Cruise Control Servo Indicates Low",
+    "hi": "क्रूज कंट्रोल सर्वो कम संकेत देता है"
+  },
+  "P1559": {
+    "en": "Cruise Control Power Management Mode",
+    "hi": "क्रूज कंट्रोल पावर मैनेजमेंट मोड"
+  },
+  "P1560": {
+    "en": "Transaxle Not in Drive - Cruise Control Disabled",
+    "hi": "ट्रांसएक्सल ड्राइव में नहीं - क्रूज कंट्रोल अक्षम"
+  },
+  "P1561": {
+    "en": "Cruise Vent Solenoid",
+    "hi": "क्रूज वेंट सोलेनॉइड"
+  },
+  "P1562": {
+    "en": "Cruise Vacuum Solenoid",
+    "hi": "क्रूज वैक्यूम सोलेनॉइड"
+  },
+  "P1563": {
+    "en": "Cruise Vehicle Speed/Set Speed Difference Too High",
+    "hi": "क्रूज वाहन गति/सेट गति का अंतर बहुत अधिक"
+  },
+  "P1564": {
+    "en": "Vehicle Acceleration Too High - Cruise Control Disabled",
+    "hi": "वाहन का त्वरण बहुत अधिक - क्रूज कंट्रोल अक्षम"
+  },
+  "P1565": {
+    "en": "Cruise Servo Position Sensor",
+    "hi": "क्रूज सर्वो पोजिशन सेंसर"
+  },
+  "P1566": {
+    "en": "Engine RPM Too High - Cruise Control Disabled",
+    "hi": "इंजन RPM बहुत अधिक - क्रूज कंट्रोल अक्षम"
+  },
+  "P1567": {
+    "en": "Active Banking Control Active - Cruise Control Disabled",
+    "hi": "सक्रिय बैंकिंग कंट्रोल सक्रिय - क्रूज कंट्रोल अक्षम"
+  },
+  "P1568": {
+    "en": "Cruise Commanded Cruise Servo Stroke Greater Than Actual",
+    "hi": "क्रूज में कमांड किए गए क्रूज सर्वो स्ट्रोक से अधिक"
+  },
+  "P1569": {
+    "en": "Cruise Servo Stroke High When Not in Cruise",
+    "hi": "क्रूज में न होने पर क्रूज सर्वो स्ट्रोक उच्च"
+  },
+  "P1570": {
+    "en": "Traction Control Active - Cruise Control Disabled",
+    "hi": "ट्रैक्शन कंट्रोल सक्रिय - क्रूज कंट्रोल अक्षम"
+  },
+  "P1571": {
+    "en": "Traction Control Torque Request Circuit",
+    "hi": "ट्रैक्शन कंट्रोल टॉर्क अनुरोध सर्किट"
+  },
+  "P1572": {
+    "en": "ASR Active Circuit Low Too Long",
+    "hi": "ASR सक्रिय सर्किट बहुत लंबे समय तक कम"
+  },
+  "P1573": {
+    "en": "PCM/EBTCM Serial Data Circuit",
+    "hi": "PCM/EBTCM सीरियल डेटा सर्किट"
+  },
+  "P1574": {
+    "en": "Stoplamp Switch Circuit",
+    "hi": "स्टॉपलैंप स्विच सर्किट"
+  },
+  "P1575": {
+    "en": "Extended Travel Brake Switch Circuit",
+    "hi": "विस्तारित यात्रा ब्रेक स्विच सर्किट"
+  },
+  "P1576": {
+    "en": "BBV Sensor Circuit High Voltage",
+    "hi": "BBV सेंसर सर्किट हाई वोल्टेज"
+  },
+  "P1577": {
+    "en": "BBV Sensor Circuit Low Voltage",
+    "hi": "BBV सेंसर सर्किट लो वोल्टेज"
+  },
+  "P1578": {
+    "en": "BBV Sensor Circuit Low Vacuum",
+    "hi": "BBV सेंसर सर्किट लो वैक्यूम"
+  },
+  "P1579": {
+    "en": "P/N to D/R at High Throttle Angle - Power Reduction Mode Active",
+    "hi": "उच्च थ्रॉटल कोण पर P/N से D/R - पावर रिडक्शन मोड सक्रिय"
+  },
+  "P1580": {
+    "en": "Cruise Move Circuit Low Voltage",
+    "hi": "क्रूज मूव सर्किट लो वोल्टेज"
+  },
+  "P1581": {
+    "en": "Cruise Move Circuit High Voltage",
+    "hi": "क्रूज मूव सर्किट हाई वोल्टेज"
+  },
+  "P1582": {
+    "en": "Cruise Direction Circuit Low Voltage",
+    "hi": "क्रूज डायरेक्शन सर्किट लो वोल्टेज"
+  },
+  "P1583": {
+    "en": "Cruise Direction Circuit High Voltage",
+    "hi": "क्रूज डायरेक्शन सर्किट हाई वोल्टेज"
+  },
+  "P1584": {
+    "en": "Cruise Control Disabled",
+    "hi": "क्रूज कंट्रोल अक्षम"
+  },
+  "P1585": {
+    "en": "Cruise Control Inhibit Output Circuit",
+    "hi": "क्रूज कंट्रोल इनहिबिट आउटपुट सर्किट"
+  },
+  "P1586": {
+    "en": "Cruise Control Brake Switch 2 Circuit",
+    "hi": "क्रूज कंट्रोल ब्रेक स्विच 2 सर्किट"
+  },
+  "P1587": {
+    "en": "Cruise Control Clutch Control Circuit Low",
+    "hi": "क्रूज कंट्रोल क्लच कंट्रोल सर्किट लो"
+  },
+  "P1588": {
+    "en": "Cruise Control Clutch Control Circuit High",
+    "hi": "क्रूज कंट्रोल क्लच कंट्रोल सर्किट हाई"
+  },
+  "P1599": {
+    "en": "Engine Stall or Near Stall Detected",
+    "hi": "इंजन स्टॉल या स्टॉल के निकट पाया गया"
+  },
+  "P1600": {
+    "en": "TCM Internal Watchdog Operation",
+    "hi": "TCM आंतरिक वॉचडॉग ऑपरेशन"
+  },
+  "P1601": {
+    "en": "Serial Communication Problem with Device 1",
+    "hi": "डिवाइस 1 के साथ सीरियल संचार समस्या"
+  },
+  "P1602": {
+    "en": "Knock Sensor (KS) Module Performance",
+    "hi": "नॉक सेंसर (KS) मॉड्यूल परफॉरमेंस"
+  },
+  "P1603": {
+    "en": "Loss of SDM Serial Data",
+    "hi": "SDM सीरियल डेटा की हानि"
+  },
+  "P1604": {
+    "en": "Loss of IPC Serial Data",
+    "hi": "IPC सीरियल डेटा की हानि"
+  },
+  "P1605": {
+    "en": "Loss of HVAC Serial Data",
+    "hi": "HVAC सीरियल डेटा की हानि"
+  },
+  "P1606": {
+    "en": "Serial Communication Problem with Device 6",
+    "hi": "डिवाइस 6 के साथ सीरियल संचार समस्या"
+  },
+  "P1607": {
+    "en": "Serial Communication Problem with Device 7",
+    "hi": "डिवाइस 7 के साथ सीरियल संचार समस्या"
+  },
+  "P1608": {
+    "en": "Serial Communication Problem with Device 8",
+    "hi": "डिवाइस 8 के साथ सीरियल संचार समस्या"
+  },
+  "P1609": {
+    "en": "Loss of TCS Serial Data",
+    "hi": "TCS सीरियल डेटा की हानि"
+  },
+  "P1610": {
+    "en": "Loss of PZM Serial Data",
+    "hi": "PZM सीरियल डेटा की हानि"
+  },
+  "P1611": {
+    "en": "Loss of CVRTD Serial Data",
+    "hi": "CVRTD सीरियल डेटा की हानि"
+  },
+  "P1612": {
+    "en": "Loss of IPM Serial Data",
+    "hi": "IPM सीरियल डेटा की हानि"
+  },
+  "P1613": {
+    "en": "Loss of DIM Serial Data",
+    "hi": "DIM सीरियल डेटा की हानि"
+  },
+  "P1614": {
+    "en": "Loss of RIM Serial Data",
+    "hi": "RIM सीरियल डेटा की हानि"
+  },
+  "P1615": {
+    "en": "Loss of VTD Serial Data",
+    "hi": "VTD सीरियल डेटा की हानि"
+  },
+  "P1617": {
+    "en": "Engine Oil Level Switch Circuit",
+    "hi": "इंजन ऑयल लेवल स्विच सर्किट"
+  },
+  "P1619": {
+    "en": "Engine Oil Life Monitor Reset Circuit",
+    "hi": "इंजन ऑयल लाइफ मॉनिटर रीसेट सर्किट"
+  },
+  "P1620": {
+    "en": "Low Coolant Circuit",
+    "hi": "लो कूलेंट सर्किट"
+  },
+  "P1621": {
+    "en": "Control Module Long Term Memory Performance",
+    "hi": "कंट्रोल मॉड्यूल लॉन्ग टर्म मेमोरी परफॉरमेंस"
+  },
+  "P1622": {
+    "en": "Cylinder Select",
+    "hi": "सिलेंडर चयन"
+  },
+  "P1623": {
+    "en": "Transmission Temp Pull-Up Resistor",
+    "hi": "ट्रांसमिशन टेम्प पुल-अप रेजिस्टर"
+  },
+  "P1624": {
+    "en": "Customer Snapshot Requested - Data Available",
+    "hi": "ग्राहक स्नैपशॉट अनुरोधित - डेटा उपलब्ध"
+  },
+  "P1625": {
+    "en": "TCM System Reset",
+    "hi": "TCM सिस्टम रीसेट"
+  },
+  "P1626": {
+    "en": "Theft Deterrent Fuel Enable Signal Not Received",
+    "hi": "चोरी निवारक फ्यूल इनेबल सिग्नल प्राप्त नहीं हुआ"
+  },
+  "P1627": {
+    "en": "A/D Performance",
+    "hi": "A/D परफॉरमेंस"
+  },
+  "P1628": {
+    "en": "ECT Pull-Up Resistor",
+    "hi": "ECT पुल-अप रेजिस्टर"
+  },
+  "P1629": {
+    "en": "Theft Deterrent System - Cranking Signal",
+    "hi": "चोरी निवारक प्रणाली - क्रैंकिंग सिग्नल"
+  },
+  "P1630": {
+    "en": "Theft Deterrent Learn Mode Active",
+    "hi": "चोरी निवारक सीखने का मोड सक्रिय"
+  },
+  "P1631": {
+    "en": "Theft Deterrent Start Enable Signal Not Correct",
+    "hi": "चोरी निवारक प्रारंभ सक्षम सिग्नल सही नहीं"
+  },
+  "P1632": {
+    "en": "Theft Deterrent Fuel Disable Signal Received",
+    "hi": "चोरी निवारक फ्यूल अक्षम सिग्नल प्राप्त हुआ"
+  },
+  "P1633": {
+    "en": "Ignition 0 Switch Circuit",
+    "hi": "इग्निशन 0 स्विच सर्किट"
+  },
+  "P1634": {
+    "en": "Ignition 1 Switch Circuit",
+    "hi": "इग्निशन 1 स्विच सर्किट"
+  },
+  "P1635": {
+    "en": "5 Volt Reference Circuit",
+    "hi": "5 वोल्ट रेफरेंस सर्किट"
+  },
+  "P1636": {
+    "en": "PCM Stack Overrun",
+    "hi": "PCM स्टैक ओवररन"
+  },
+  "P1637": {
+    "en": "Generator L-Terminal Circuit",
+    "hi": "जेनरेटर L-टर्मिनल सर्किट"
+  },
+  "P1638": {
+    "en": "Generator F-Terminal Circuit",
+    "hi": "जेनरेटर F-टर्मिनल सर्किट"
+  },
+  "P1639": {
+    "en": "5 Volt Reference 2 Circuit",
+    "hi": "5 वोल्ट रेफरेंस 2 सर्किट"
+  },
+  "P1640": {
+    "en": "Driver 1 Input High Voltage",
+    "hi": "ड्राइवर 1 इनपुट हाई वोल्टेज"
+  },
+  "P1641": {
+    "en": "Malfunction Indicator Lamp (MIL) Control Circuit",
+    "hi": "मालफंक्शन इंडिकेटर लैंप (MIL) कंट्रोल सर्किट"
+  },
+  "P1642": {
+    "en": "Vehicle Speed Output Circuit",
+    "hi": "व्हीकल स्पीड आउटपुट सर्किट"
+  },
+  "P1643": {
+    "en": "Engine Speed Output Circuit",
+    "hi": "इंजन स्पीड आउटपुट सर्किट"
+  },
+  "P1644": {
+    "en": "Traction Control Delivered Torque Output Circuit",
+    "hi": "ट्रैक्शन कंट्रोल डिलीवर टॉर्क आउटपुट सर्किट"
+  },
+  "P1645": {
+    "en": "Evaporative Emission (EVAP) Vent Solenoid Control Circuit",
+    "hi": "इवैपोरेटिव एमिशन (EVAP) वेंट सोलेनॉइड कंट्रोल सर्किट"
+  },
+  "P1646": {
+    "en": "Evaporative Emission (EVAP) Vent Solenoid Control Circuit",
+    "hi": "इवैपोरेटिव एमिशन (EVAP) वेंट सोलेनॉइड कंट्रोल सर्किट"
+  },
+  "P1647": {
+    "en": "Driver 1 Line 7",
+    "hi": "ड्राइवर 1 लाइन 7"
+  },
+  "P1650": {
+    "en": "Control Module Output B Circuit",
+    "hi": "कंट्रोल मॉड्यूल आउटपुट B सर्किट"
+  },
+  "P1651": {
+    "en": "Fan 1 Relay Control Circuit",
+    "hi": "फैन 1 रिले कंट्रोल सर्किट"
+  },
+  "P1652": {
+    "en": "Powertrain Induced Chassis Pitch Output Circuit",
+    "hi": "पावरट्रेन प्रेरित चेसिस पिच आउटपुट सर्किट"
+  },
+  "P1653": {
+    "en": "Oil Level Lamp Control Circuit",
+    "hi": "ऑयल लेवल लैंप कंट्रोल सर्किट"
+  },
+  "P1654": {
+    "en": "Cruise Control Inhibit Output Circuit",
+    "hi": "क्रूज कंट्रोल अवरोध आउटपुट सर्किट"
+  },
+  "P1655": {
+    "en": "EVAP Purge Solenoid Control Circuit",
+    "hi": "EVAP पर्ज सोलेनॉइड कंट्रोल सर्किट"
+  },
+  "P1656": {
+    "en": "Driver 2 Line 6",
+    "hi": "ड्राइवर 2 लाइन 6"
+  },
+  "P1657": {
+    "en": "1-4 Upshift Solenoid Control Circuit",
+    "hi": "1-4 अपशिफ्ट सोलेनॉइड कंट्रोल सर्किट"
+  },
+  "P1658": {
+    "en": "Starter Enable Relay Control Circuit",
+    "hi": "स्टार्टर सक्षम रिले कंट्रोल सर्किट"
+  },
+  "P1660": {
+    "en": "Cooling Fan Control Circuit",
+    "hi": "कूलिंग फैन कंट्रोल सर्किट"
+  },
+  "P1661": {
+    "en": "MIL Control Circuit",
+    "hi": "MIL कंट्रोल सर्किट"
+  },
+  "P1662": {
+    "en": "Cruise Lamp Control Circuit",
+    "hi": "क्रूज लैंप कंट्रोल सर्किट"
+  },
+  "P1663": {
+    "en": "Oil Change Lamp Control Circuit",
+    "hi": "ऑयल चेंज लैंप कंट्रोल सर्किट"
+  },
+  "P1664": {
+    "en": "1-4 Upshift Lamp Control Circuit",
+    "hi": "1-4 अपशिफ्ट लैंप कंट्रोल सर्किट"
+  },
+  "P1665": {
+    "en": "Driver 3 Line 5",
+    "hi": "ड्राइवर 3 लाइन 5"
+  },
+  "P1666": {
+    "en": "Driver 3 Line 6",
+    "hi": "ड्राइवर 3 लाइन 6"
+  },
+  "P1667": {
+    "en": "Reverse Inhibit Solenoid Control Circuit",
+    "hi": "रिवर्स इनहिबिट सोलेनॉइड कंट्रोल सर्किट"
+  },
+  "P1669": {
+    "en": "ABS Unit Expected",
+    "hi": "ABS यूनिट अपेक्षित"
+  },
+  "P1670": {
+    "en": "Driver 4",
+    "hi": "ड्राइवर 4"
+  },
+  "P1671": {
+    "en": "Driver 4 Line 1",
+    "hi": "ड्राइवर 4 लाइन 1"
+  },
+  "P1672": {
+    "en": "Low Engine Oil Level Lamp Control Circuit",
+    "hi": "लो इंजन ऑयल लेवल लैंप कंट्रोल सर्किट"
+  },
+  "P1673": {
+    "en": "Engine Hot Lamp Control Circuit",
+    "hi": "इंजन हॉट लैंप कंट्रोल सर्किट"
+  },
+  "P1674": {
+    "en": "Tachometer Control Circuit",
+    "hi": "टैकोमीटर कंट्रोल सर्किट"
+  },
+  "P1675": {
+    "en": "EVAP Vent Solenoid Control Circuit",
+    "hi": "EVAP वेंट सोलेनॉइड कंट्रोल सर्किट"
+  },
+  "P1676": {
+    "en": "Driver 4 Line 6",
+    "hi": "ड्राइवर 4 लाइन 6"
+  },
+  "P1677": {
+    "en": "Driver 4 Line 7",
+    "hi": "ड्राइवर 4 लाइन 7"
+  },
+  "P1680": {
+    "en": "Driver 5 (ECU Malfunction)",
+    "hi": "ड्राइवर 5 (ECU खराबी)"
+  },
+  "P1681": {
+    "en": "Driver 5 Line 1",
+    "hi": "ड्राइवर 5 लाइन 1"
+  },
+  "P1682": {
+    "en": "Driver 5 Line 2",
+    "hi": "ड्राइवर 5 लाइन 2"
+  },
+  "P1683": {
+    "en": "Driver 5 Line 3",
+    "hi": "ड्राइवर 5 लाइन 3"
+  },
+  "P1684": {
+    "en": "Driver 5 Line 4",
+    "hi": "ड्राइवर 5 लाइन 4"
+  },
+  "P1685": {
+    "en": "Driver 5 Line 5",
+    "hi": "ड्राइवर 5 लाइन 5"
+  },
+  "P1686": {
+    "en": "Driver 5 Line 6",
+    "hi": "ड्राइवर 5 लाइन 6"
+  },
+  "P1687": {
+    "en": "Driver 5 Line 7",
+    "hi": "ड्राइवर 5 लाइन 7"
+  },
+  "P1689": {
+    "en": "Delivered Torque Circuit Fault",
+    "hi": "डिलीवर टॉर्क सर्किट फॉल्ट"
+  },
+  "P1690": {
+    "en": "ECM Loop Overrun",
+    "hi": "ECM लूप ओवररन"
+  },
+  "P1691": {
+    "en": "Coolant Gauge Circuit Low Voltage",
+    "hi": "कूलेंट गेज सर्किट लो वोल्टेज"
+  },
+  "P1692": {
+    "en": "Coolant Gauge Circuit High Voltage",
+    "hi": "कूलेंट गेज सर्किट हाई वोल्टेज"
+  },
+  "P1693": {
+    "en": "Tachometer Circuit Low Voltage",
+    "hi": "टैकोमीटर सर्किट लो वोल्टेज"
+  },
+  "P1694": {
+    "en": "Tachometer Circuit High Voltage",
+    "hi": "टैकोमीटर सर्किट हाई वोल्टेज"
+  },
+  "P1695": {
+    "en": "Remote Keyless Entry Circuit Low",
+    "hi": "रिमोट कीलेस एंट्री सर्किट लो"
+  },
+  "P1696": {
+    "en": "Remote Keyless Entry Voltage High",
+    "hi": "रिमोट कीलेस एंट्री वोल्टेज हाई"
+  },
+  "P1700": {
+    "en": "Transmission Control Module (TCM) Requested MIL Illumination",
+    "hi": "ट्रांसमिशन कंट्रोल मॉड्यूल (TCM) अनुरोधित MIL रोशनी"
+  },
+  "P1701": {
+    "en": "Transmission MIL Request Circuit",
+    "hi": "ट्रांसमिशन MIL अनुरोध सर्किट"
+  },
+  "P1705": {
+    "en": "P/N Signal Output Circuit",
+    "hi": "P/N सिग्नल आउटपुट सर्किट"
+  },
+  "P1719": {
+    "en": "Incorrect Shifting Detected (TCM)",
+    "hi": "गलत शिफ्टिंग का पता चला (TCM)"
+  },
+  "P1740": {
+    "en": "Torque Reduction Signal Circuit",
+    "hi": "टॉर्क रिडक्शन सिग्नल सर्किट"
+  },
+  "P1743": {
+    "en": "TP Signal from ECM",
+    "hi": "ECM से TP सिग्नल"
+  },
+  "P1760": {
+    "en": "TCM Supply Voltage Interrupted",
+    "hi": "TCM आपूर्ति वोल्टेज बाधित"
+  },
+  "P1779": {
+    "en": "Engine Torque Delivered to TCM Signal",
+    "hi": "इंजन टॉर्क TCM सिग्नल को डिलीवर किया गया"
+  },
+  "P1826": {
+    "en": "Internal Mode Switch Circuit C - High",
+    "hi": "आंतरिक मोड स्विच सर्किट C - उच्च"
+  },
+  "P1831": {
+    "en": "Pressure Control (PC) Solenoid Power Circuit - Low Voltage",
+    "hi": "दबाव नियंत्रण (PC) सोलेनॉइड पावर सर्किट - लो वोल्टेज"
+  },
+  "P1832": {
+    "en": "Pressure Control (PC)/Shift Lock Solenoid Control Circuit High Voltage",
+    "hi": "दबाव नियंत्रण (PC)/शिफ्ट लॉक सोलेनॉइड कंट्रोल सर्किट हाई वोल्टेज"
+  },
+  "P1833": {
+    "en": "A/T Solenoid Power Circuit - Low Voltage",
+    "hi": "A/T सोलेनॉइड पावर सर्किट - लो वोल्टेज"
+  },
+  "P1834": {
+    "en": "Torque Converter Clutch (TCC)/Shift Solenoid (SS) Control Circuit High Voltage",
+    "hi": "टॉर्क कन्वर्टर क्लच (TCC)/शिफ्ट सोलेनॉइड (SS) कंट्रोल सर्किट हाई वोल्टेज"
+  },
+  "P1835": {
+    "en": "Kick-Down Switch Circuit",
+    "hi": "किक-डाउन स्विच सर्किट"
+  },
+  "P1836": {
+    "en": "Kick-Down Switch Failed Open",
+    "hi": "किक-डाउन स्विच विफल खुला"
+  },
+  "P1837": {
+    "en": "Kick-Down Switch Failed Short",
+    "hi": "किक-डाउन स्विच विफल शॉर्ट"
+  },
+  "P1842": {
+    "en": "1-2 Shift Solenoid Circuit Low Voltage",
+    "hi": "1-2 शिफ्ट सोलेनॉइड सर्किट लो वोल्टेज"
+  },
+  "P1843": {
+    "en": "1-2 Shift Solenoid Circuit High Voltage",
+    "hi": "1-2 शिफ्ट सोलेनॉइड सर्किट हाई वोल्टेज"
+  },
+  "P1844": {
+    "en": "Torque Reduction Signal Circuit Desired by TCM",
+    "hi": "TCM द्वारा वांछित टॉर्क रिडक्शन सिग्नल सर्किट"
+  },
+  "P1845": {
+    "en": "2-3 Shift Solenoid Circuit Low Voltage",
+    "hi": "2-3 शिफ्ट सोलेनॉइड सर्किट लो वोल्टेज"
+  },
+  "P1847": {
+    "en": "2-3 Shift Solenoid Circuit High Voltage",
+    "hi": "2-3 शिफ्ट सोलेनॉइड सर्किट हाई वोल्टेज"
+  },
+  "P1850": {
+    "en": "Brake Band Apply Solenoid Circuit",
+    "hi": "ब्रेक बैंड अप्लाई सोलेनॉइड सर्किट"
+  },
+  "P1851": {
+    "en": "Brake Band Apply Solenoid Performance",
+    "hi": "ब्रेक बैंड अप्लाई सोलेनॉइड परफॉरमेंस"
+  },
+  "P1852": {
+    "en": "Brake Band Apply Solenoid Low Voltage",
+    "hi": "ब्रेक बैंड अप्लाई सोलेनॉइड लो वोल्टेज"
+  },
+  "P1853": {
+    "en": "Brake Band Apply Solenoid High Voltage",
+    "hi": "ब्रेक बैंड अप्लाई सोलेनॉइड हाई वोल्टेज"
+  },
+  "P1860": {
+    "en": "TCC PWM Solenoid Circuit Electrical",
+    "hi": "TCC PWM सोलेनॉइड सर्किट इलेक्ट्रिकल"
+  },
+  "P1864": {
+    "en": "Torque Converter Clutch Circuit",
+    "hi": "टॉर्क कन्वर्टर क्लच सर्किट"
+  },
+  "P1865": {
+    "en": "4-5 Shift Solenoid (SS) Valve Control Circuit High Voltage",
+    "hi": "4-5 शिफ्ट सोलेनॉइड (SS) वाल्व कंट्रोल सर्किट हाई वोल्टेज"
+  },
+  "P1866": {
+    "en": "Torque Converter Clutch (TCC) PWM Solenoid Control Circuit Low Voltage",
+    "hi": "टॉर्क कन्वर्टर क्लच (TCC) PWM सोलेनॉइड कंट्रोल सर्किट लो वोल्टेज"
+  },
+  "P1867": {
+    "en": "Torque Converter Clutch (TCC) PWM Solenoid Control Circuit High Voltage",
+    "hi": "टॉर्क कन्वर्टर क्लच (TCC) PWM सोलेनॉइड कंट्रोल सर्किट हाई वोल्टेज"
+  },
+  "P1868": {
+    "en": "Transmission Fluid Life",
+    "hi": "ट्रांसमिशन फ्लूइड जीवन"
+  },
+  "P1870": {
+    "en": "Transmission Component Slipping",
+    "hi": "ट्रांसमिशन कंपोनेंट स्लिपिंग"
+  },
+  "P1871": {
+    "en": "Undefined Gear Ratio",
+    "hi": "अपरिभाषित गियर अनुपात"
+  },
+  "P1873": {
+    "en": "TCC Stator Temperature Switch Circuit Low",
+    "hi": "TCC स्टेटर टेम्परेचर स्विच सर्किट लो"
+  },
+  "P1874": {
+    "en": "TCC Stator Temperature Switch Circuit High",
+    "hi": "TCC स्टेटर टेम्परेचर स्विच सर्किट हाई"
+  },
+  "P1875": {
+    "en": "4WD Low Switch Circuit Electrical",
+    "hi": "4WD लो स्विच सर्किट इलेक्ट्रिकल"
+  },
+  "P1884": {
+    "en": "TCC Enable/Shift Light Circuit",
+    "hi": "TCC इनेबल/शिफ्ट लाइट सर्किट"
+  },
+  "P1886": {
+    "en": "Shift Timing Solenoid",
+    "hi": "शिफ्ट टाइमिंग सोलेनॉइड"
+  },
+  "P1887": {
+    "en": "TCC Release Switch Circuit",
+    "hi": "TCC रिलीज स्विच सर्किट"
+  },
+  "P1890": {
+    "en": "Throttle Position Signal Input",
+    "hi": "थ्रॉटल पोजिशन सिग्नल इनपुट"
+  },
+  "P1891": {
+    "en": "Throttle Position Sensor PWM Signal Low",
+    "hi": "थ्रॉटल पोजिशन सेंसर PWM सिग्नल लो"
+  },
+  "P1892": {
+    "en": "Throttle Position Sensor PWM Signal High",
+    "hi": "थ्रॉटल पोजिशन सेंसर PWM सिग्नल हाई"
+  },
+  "P1893": {
+    "en": "Engine Torque Signal Low Voltage",
+    "hi": "इंजन टॉर्क सिग्नल लो वोल्टेज"
+  },
+  "P1894": {
+    "en": "Engine Torque Signal High Voltage",
+    "hi": "इंजन टॉर्क सिग्नल हाई वोल्टेज"
+  },
+  "P1895": {
+    "en": "TCM to ECM Torque Reduction Circuit",
+    "hi": "TCM से ECM टॉर्क रिडक्शन सर्किट"
+  },
+  "P2008": {
+    "en": "Intake Manifold Runner Control (IMRC) Solenoid Control Circuit",
+    "hi": "इनटेक मैनिफोल्ड रनर कंट्रोल (IMRC) सोलेनॉइड कंट्रोल सर्किट"
+  },
+  "P2009": {
+    "en": "Intake Manifold Runner Control (IMRC) Solenoid Control Circuit Low Voltage",
+    "hi": "इनटेक मैनिफोल्ड रनर कंट्रोल (IMRC) सोलेनॉइड कंट्रोल सर्किट लो वोल्टेज"
+  },
+  "P2010": {
+    "en": "Intake Manifold Runner Control (IMRC) Solenoid Control Circuit High Voltage",
+    "hi": "इनटेक मैनिफोल्ड रनर कंट्रोल (IMRC) सोलेनॉइड कंट्रोल सर्किट हाई वोल्टेज"
+  },
+  "P2066": {
+    "en": "Fuel Level Sensor 2 Performance",
+    "hi": "फ्यूल लेवल सेंसर 2 परफॉरमेंस"
+  },
+  "P2067": {
+    "en": "Fuel Level Sensor 2 Circuit Low Voltage",
+    "hi": "फ्यूल लेवल सेंसर 2 सर्किट लो वोल्टेज"
+  },
+  "P2068": {
+    "en": "Fuel Level Sensor 2 Circuit High Voltage",
+    "hi": "फ्यूल लेवल सेंसर 2 सर्किट हाई वोल्टेज"
+  },
+  "P2096": {
+    "en": "Post Catalyst Fuel Trim System Low Limit (Bank 1)",
+    "hi": "पोस्ट कैटेलिस्ट फ्यूल ट्रिम सिस्टम लो लिमिट (बैंक 1)"
+  },
+  "P2097": {
+    "en": "Post Catalyst Fuel Trim System High Limit (Bank 1)",
+    "hi": "पोस्ट कैटेलिस्ट फ्यूल ट्रिम सिस्टम हाई लिमिट (बैंक 1)"
+  },
+  "P2098": {
+    "en": "Post Catalyst Fuel Trim System Low Limit (Bank 2)",
+    "hi": "पोस्ट कैटेलिस्ट फ्यूल ट्रिम सिस्टम लो लिमिट (बैंक 2)"
+  },
+  "P2099": {
+    "en": "Post Catalyst Fuel Trim System High Limit (Bank 2)",
+    "hi": "पोस्ट कैटेलिस्ट फ्यूल ट्रिम सिस्टम हाई लिमिट (बैंक 2)"
+  },
+  "P2100": {
+    "en": "Throttle Actuator Control (TAC) Motor Control Circuit",
+    "hi": "थ्रॉटल एक्ट्यूएटर कंट्रोल (TAC) मोटर कंट्रोल सर्किट"
+  },
+  "P2101": {
+    "en": "Control Module Throttle Actuator Position Performance",
+    "hi": "कंट्रोल मॉड्यूल थ्रॉटल एक्ट्यूएटर पोजिशन परफॉरमेंस"
+  },
+  "P2105": {
+    "en": "Throttle Actuator Control (TAC) System - Forced Engine Shutdown",
+    "hi": "थ्रॉटल एक्ट्यूएटर कंट्रोल (TAC) सिस्टम - जबरन इंजन शटडाउन"
+  },
+  "P2107": {
+    "en": "Throttle Actuator Control (TAC) Module Internal Circuit",
+    "hi": "थ्रॉटल एक्ट्यूएटर कंट्रोल (TAC) मॉड्यूल आंतरिक सर्किट"
+  },
+  "P2108": {
+    "en": "Throttle Actuator Control (TAC) Module Performance",
+    "hi": "थ्रॉटल एक्ट्यूएटर कंट्रोल (TAC) मॉड्यूल परफॉरमेंस"
+  },
+  "P2119": {
+    "en": "Throttle Closed Position Performance",
+    "hi": "थ्रॉटल बंद पोजिशन परफॉरमेंस"
+  },
+  "P2120": {
+    "en": "Accelerator Pedal Position (APP) Sensor 1 Circuit",
+    "hi": "एक्सेलेरेटर पेडल पोजिशन (APP) सेंसर 1 सर्किट"
+  },
+  "P2121": {
+    "en": "Accelerator Pedal Position (APP) Sensor 1 Performance",
+    "hi": "एक्सेलेरेटर पेडल पोजिशन (APP) सेंसर 1 परफॉरमेंस"
+  },
+  "P2122": {
+    "en": "Accelerator Pedal Position (APP) Sensor 1 Circuit Low Voltage",
+    "hi": "एक्सेलेरेटर पेडल पोजिशन (APP) सेंसर 1 सर्किट लो वोल्टेज"
+  },
+  "P2123": {
+    "en": "Accelerator Pedal Position (APP) Sensor 1 Circuit High Voltage",
+    "hi": "एक्सेलेरेटर पेडल पोजिशन (APP) सेंसर 1 सर्किट हाई वोल्टेज"
+  },
+  "P2125": {
+    "en": "Accelerator Pedal Position (APP) Sensor 2 Circuit",
+    "hi": "एक्सेलेरेटर पेडल पोजिशन (APP) सेंसर 2 सर्किट"
+  },
+  "P2127": {
+    "en": "Accelerator Pedal Position (APP) Sensor 2 Circuit Low Voltage",
+    "hi": "एक्सेलेरेटर पेडल पोजिशन (APP) सेंसर 2 सर्किट लो वोल्टेज"
+  },
+  "P2128": {
+    "en": "Accelerator Pedal Position (APP) Sensor 2 Circuit High Voltage",
+    "hi": "एक्सेलेरेटर पेडल पोजिशन (APP) सेंसर 2 सर्किट हाई वोल्टेज"
+  },
+  "P2135": {
+    "en": "Throttle Position (TP) Sensor 1-2 Correlation",
+    "hi": "थ्रॉटल पोजिशन (TP) सेंसर 1-2 सहसंबंध"
+  },
+  "P2138": {
+    "en": "Accelerator Pedal Position (APP) Sensor 1-2 Correlation",
+    "hi": "एक्सेलेरेटर पेडल पोजिशन (APP) सेंसर 1-2 सहसंबंध"
+  },
+  "P2176": {
+    "en": "Minimum Throttle Position Not Learned",
+    "hi": "न्यूनतम थ्रॉटल पोजिशन नहीं सीखी गई"
+  },
+  "P2500": {
+    "en": "Generator L-Terminal Circuit Low Voltage",
+    "hi": "जेनरेटर L-टर्मिनल सर्किट लो वोल्टेज"
+  },
+  "P2501": {
+    "en": "Generator L-Terminal Circuit High Voltage",
+    "hi": "जेनरेटर L-टर्मिनल सर्किट हाई वोल्टेज"
+  },
+  "P2535": {
+    "en": "Ignition 1 Switch Circuit High Voltage",
+    "hi": "इग्निशन 1 स्विच सर्किट हाई वोल्टेज"
+  },
+  "P2610": {
+    "en": "ECU / PCM Internal Engine Off Timer Performance",
+    "hi": "ECU / PCM आंतरिक इंजन ऑफ टाइमर परफॉरमेंस"
+  }
+}

@@ -1,0 +1,43 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(flutter analyze *)",
+      "Bash(flutter --version)",
+      "Bash(grep -E '^\\(sa|kok|ks|sd|mni|brx|doi|mai|sat\\)$')",
+      "Bash(echo \"exit: $?\")",
+      "Bash(flutter devices *)",
+      "Bash(flutter run *)",
+      "Bash(tee /c/Users/a/AppData/Local/Temp/claude/C--Users-a-Downloads-danlite-elm-complete-danlite-elm/62cab907-62f0-4c47-b2f9-4ad38d2b3485/scratchpad/run.log)",
+      "Bash(adb -s emulator-5554 shell pidof com.danlite.elm)",
+      "Bash(adb -s emulator-5554 shell pm list packages)",
+      "Bash(adb -s emulator-5554 shell dumpsys activity activities)",
+      "Bash(flutter doctor *)",
+      "Bash(flutter test *)",
+      "Bash(powershell -Command 'Get-Process | Where-Object {$_.Path -like '\\\\''*flutter*'\\\\'' -or $_.ProcessName -eq '\\\\''dart'\\\\''} | Select-Object Id,ProcessName')",
+      "Bash(dart analyze *)",
+      "Bash(dart --version)",
+      "Bash(dart run *)",
+      "Bash(flutter gen-l10n *)",
+      "Bash(flutter build *)",
+      "Bash(tee /c/Users/a/AppData/Local/Temp/claude/C--Users-a-Downloads-danlite-elm-complete-danlite-elm/1efd0742-9b96-4404-b91e-60935eb2f0eb/scratchpad/flutter_run.log)",
+      "Bash(adb *)",
+      "Bash($ADB *)",
+      "Bash(/c/Users/a/AppData/Local/Android/Sdk/platform-tools/adb.exe -s emulator-5554 shell screencap -p /sdcard/before.png)",
+      "Bash(/c/Users/a/AppData/Local/Android/Sdk/platform-tools/adb.exe -s emulator-5554 pull /sdcard/before.png /c/Users/a/AppData/Local/Temp/claude/C--Users-a-Downloads-danlite-elm-complete-danlite-elm/1efd0742-9b96-4404-b91e-60935eb2f0eb/scratchpad/before.png)",
+      "Bash(tee /c/Users/a/AppData/Local/Temp/claude/C--Users-a-Downloads-danlite-elm-complete-danlite-elm/1efd0742-9b96-4404-b91e-60935eb2f0eb/scratchpad/flutter_run2.log)",
+      "PowerShell(flutter analyze *)",
+      "Bash(grep -nE \"'[A-Za-z][A-Za-z0-9 \\(\\)°·%/,.:+\\\\-]{1,60}'\" lib/screens/dashboard_screen.dart)",
+      "Bash(grep -nE \"'[A-Za-z][A-Za-z0-9 \\(\\)°·%/,.:+'\\\\-]{1,60}'\" lib/screens/home_screen.dart)",
+      "Bash(awk \"/^    'bn': \\\\{/,/^    \\\\},/\" lib/constants/app_strings.dart)",
+      "Bash(awk \"/^    'te': \\\\{/,/^    \\\\},/\" lib/constants/app_strings.dart)",
+      "Bash(awk \"/^    'ta': \\\\{/,/^    \\\\},/\" lib/constants/app_strings.dart)",
+      "Bash(awk \"/^    'gu': \\\\{/,/^    \\\\},/\" lib/constants/app_strings.dart)",
+      "PowerShell(dart analyze *)",
+      "PowerShell(dart run *)",
+      "Bash(xxd)",
+      "Bash(python3 -c ' *)",
+      "Bash(git init *)",
+      "Bash(git add *)"
+    ]
+  }
+}
