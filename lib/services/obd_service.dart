@@ -1028,16 +1028,56 @@ class ObdService extends ChangeNotifier {
     }
   }
 
-  /// ELM327 replies to 04 with "44", "44 00", "OK", or "NO DATA" (already
-  /// clean) — all of those mean the wipe succeeded.
+  /// Decide whether a Mode 04 (clear DTCs) reply indicates success.
+  ///
+  /// Deliberately permissive: the clear is treated as successful unless the
+  /// reply carries a genuine failure signal. Motorcycles and single-ECU
+  /// vehicles frequently acknowledge a successful wipe without emitting the
+  /// literal "44" positive-response byte a car sends — a bare prompt, an
+  /// echoed request, or an empty line are all valid acknowledgements.
+  /// Matching only "44"/"OK"/"NO DATA" caused a false "Connection Failed"
+  /// on bikes even though the codes were cleared.
+  ///
+  /// Still returns false for genuine failures:
+  ///   - adapter/bus errors: TIMEOUT, ERROR, UNABLE, DISCONNECTED, STOPPED,
+  ///     BUS INIT, BUS BUSY, BUFFER FULL
+  ///   - ECU negative response "7F 04" — the ECU actively refused the clear
+  ///     (engine running, security lockout); the codes were NOT cleared
+  ///   - a reply consisting only of "SEARCHING" chatter, which means no ECU
+  ///     acknowledgement was ever received
   bool _isClearDtcsSuccess(String r) {
-    if (r.isEmpty) return false;
     final upper = r.toUpperCase();
+
     if (upper.contains('TIMEOUT')) return false;
     if (upper.contains('ERROR')) return false;
     if (upper.contains('UNABLE')) return false;
     if (upper.contains('DISCONNECTED')) return false;
-    return upper.contains('44') || upper.contains('OK') || upper.contains('NO DATA');
+    if (upper.contains('STOPPED')) return false;
+    if (upper.contains('BUS INIT')) return false;
+    if (upper.contains('BUS BUSY')) return false;
+    if (upper.contains('BUFFER FULL')) return false;
+
+    // Scan per line so a byte-pair boundary cannot create a phantom "7F04"
+    // match (e.g. "A7 F0 44"), and so a line that is only protocol chatter
+    // is not mistaken for an acknowledgement.
+    var sawRealLine = false;
+    for (final rawLine in upper.split(RegExp(r'[\r\n]+'))) {
+      final line = rawLine.trim();
+      if (line.isEmpty) continue;
+      if (line.contains('SEARCHING')) continue; // chatter, not an ack
+      sawRealLine = true;
+
+      // ECU negative response frame "7F 04", checked on byte-pair boundaries.
+      final compact = line.replaceAll(RegExp(r'[^0-9A-F]'), '');
+      for (var i = 0; i + 4 <= compact.length; i += 2) {
+        if (compact.substring(i, i + 4) == '7F04') return false;
+      }
+    }
+
+    // Nothing but SEARCHING chatter — no acknowledgement was received.
+    if (!sawRealLine && upper.contains('SEARCHING')) return false;
+
+    return true;
   }
 
   // ══════════════════════════════════════════════════════════════════════════
