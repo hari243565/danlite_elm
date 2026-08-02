@@ -41,7 +41,7 @@ class BluetoothSppPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
     private var outputStream: OutputStream? = null
     private var context: Context? = null
 
-    private val pluginScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+    private var pluginScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
     private var readJob: Job? = null
 
     private var bondCallback: ((String, Int) -> Unit)? = null
@@ -86,6 +86,12 @@ class BluetoothSppPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
     }
 
     override fun onAttachedToEngine(binding: FlutterPlugin.FlutterPluginBinding) {
+        // A process-death -> restart cycle reuses this plugin object with a
+        // cancelled scope. Recreate it so Bluetooth coroutines can run again.
+        if (!pluginScope.isActive) {
+            pluginScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+        }
+
         context = binding.applicationContext
         val btManager = context?.getSystemService(Context.BLUETOOTH_SERVICE) as? BluetoothManager
         btAdapter = btManager?.adapter
@@ -113,6 +119,7 @@ class BluetoothSppPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
         try { context?.unregisterReceiver(broadcastReceiver) } catch (_: Exception) {}
         pluginScope.cancel()
         closeSocket()
+        readJob = null
     }
 
     private fun registerReceiver() {
