@@ -1144,5 +1144,3 @@ class ObdService extends ChangeNotifier {
     super.dispose();
   }
 }
-
-void unawaited(Future<void> future) {}

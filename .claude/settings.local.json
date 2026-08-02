@@ -48,7 +48,8 @@
       "Bash(python3 -c \"print\\(1\\)\")",
       "Bash(perl -v)",
       "Bash(./gradlew :app:compileDebugKotlin)",
-      "Bash(JAVA_HOME=\"/c/Program Files/Android/Android Studio/jbr\" ./gradlew :app:compileDebugKotlin)"
+      "Bash(JAVA_HOME=\"/c/Program Files/Android/Android Studio/jbr\" ./gradlew :app:compileDebugKotlin)",
+      "Bash(echo \"exit=$? \\(1 = no matches, as expected\\)\")"
     ]
   }
 }
