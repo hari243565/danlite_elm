@@ -33,7 +33,7 @@ class DanliteELMApp extends StatelessWidget {
       theme: AppTheme.lightTheme,
       builder: (context, child) => MediaQuery(
         data: MediaQuery.of(context)
-            .copyWith(textScaler: const TextScaler.linear(1.08)),
+            .copyWith(textScaler: const TextScaler.linear(1.18)),
         child: child!,
       ),
       // `locale` reflects the user's full 23-language selection (drives our
