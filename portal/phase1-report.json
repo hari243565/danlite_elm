@@ -1,0 +1,21 @@
+{
+  "phase": "1",
+  "name": "Supabase schema + RLS",
+  "generated": "2026-08-12T14:22:24Z",
+  "region": "ap-south-1 (Mumbai)",
+  "tables": ["profiles","licences","payments","devices","sessions",
+             "webhook_events","consent_records","audit_log"],
+  "rls_enabled_on": 8,
+  "client_write_paths_to_licences": 0,
+  "client_write_paths_to_payments": 0,
+  "tests": [
+    { "id": 1, "name": "user A sees only own licence",        "result": "pass" },
+    { "id": 2, "name": "user A cannot read B licence",        "result": "pass" },
+    { "id": 3, "name": "licence insert blocked",              "result": "pass" },
+    { "id": 4, "name": "licence status update blocked",       "result": "pass" },
+    { "id": 5, "name": "payments isolated",                   "result": "pass" },
+    { "id": 6, "name": "webhook_events unreadable by client", "result": "pass" },
+    { "id": 7, "name": "country_code protected",              "result": "pass" },
+    { "id": 8, "name": "anon has no licence grant",           "result": "pass" }
+  ]
+}

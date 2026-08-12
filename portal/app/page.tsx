@@ -56,6 +56,35 @@ function readPhases(): { data: PhasesFile | null; error: string | null } {
   }
 }
 
+type Phase1Test = {
+  id: number;
+  name: string;
+  result: string;
+};
+
+type Phase1Report = {
+  phase: string;
+  name: string;
+  generated: string;
+  region: string;
+  tables: string[];
+  rls_enabled_on: number;
+  client_write_paths_to_licences: number;
+  client_write_paths_to_payments: number;
+  tests: Phase1Test[];
+};
+
+function readPhase1(): Phase1Report | null {
+  try {
+    const file = path.join(process.cwd(), 'phase1-report.json');
+    const raw = fs.readFileSync(file, 'utf8');
+    return JSON.parse(raw) as Phase1Report;
+  } catch {
+    // Absent until the phase has been run — the panel renders a muted card.
+    return null;
+  }
+}
+
 function statusPill(status: string) {
   const map: Record<string, { fg: string; label: string }> = {
     done: { fg: C.green, label: 'done' },
@@ -85,6 +114,7 @@ function statusPill(status: string) {
 
 export default function MissionControl() {
   const { data, error } = readPhases();
+  const p1 = readPhase1();
 
   const shell = (children: React.ReactNode) => (
     <main
@@ -322,6 +352,121 @@ export default function MissionControl() {
             );
           })}
         </ul>
+      </section>
+
+      {/* ---------------- Phase 1 — Database Security ---------------- */}
+      <section
+        style={{
+          backgroundColor: C.surface,
+          border: `1px solid ${C.border}`,
+          borderRadius: 12,
+          padding: 20,
+          marginBottom: 28,
+        }}
+      >
+        <h2 style={{ fontSize: 15, fontWeight: 700, margin: '0 0 4px' }}>
+          Phase 1 — Database Security
+        </h2>
+
+        {!p1 ? (
+          <p style={{ color: C.muted, fontSize: 12.5, margin: '8px 0 0', lineHeight: 1.5 }}>
+            Not yet run. <code>phase1-report.json</code> will appear here once the Supabase schema
+            and RLS verification have been executed.
+          </p>
+        ) : (
+          <>
+            <p style={{ color: C.muted, fontSize: 12.5, margin: '0 0 16px', lineHeight: 1.5 }}>
+              Row Level Security verified against the live project on {p1.generated}.
+            </p>
+
+            {/* Region + table-count badges */}
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, marginBottom: 14 }}>
+              {[
+                { label: 'Region', value: p1.region },
+                { label: 'Tables', value: `${p1.tables.length}` },
+                { label: 'RLS enabled on', value: `${p1.rls_enabled_on} of ${p1.tables.length}` },
+              ].map((b) => (
+                <span
+                  key={b.label}
+                  style={{
+                    display: 'inline-block',
+                    padding: '5px 11px',
+                    borderRadius: 8,
+                    border: `1px solid ${C.border}`,
+                    backgroundColor: C.card,
+                    fontSize: 12,
+                    color: C.muted,
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  {b.label}{' '}
+                  <span style={{ color: C.text, fontWeight: 700 }}>{b.value}</span>
+                </span>
+              ))}
+            </div>
+
+            {/* The anti-fraud invariant: no client can write money or entitlement */}
+            {[
+              { label: 'licences', n: p1.client_write_paths_to_licences },
+              { label: 'payments', n: p1.client_write_paths_to_payments },
+            ].map((w) => (
+              <p
+                key={w.label}
+                style={{
+                  margin: '0 0 6px',
+                  fontSize: 13,
+                  fontWeight: 600,
+                  color: w.n === 0 ? C.green : C.red,
+                  fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace',
+                }}
+              >
+                Client write paths to {w.label}: {w.n}
+              </p>
+            ))}
+
+            {/* Eight RLS assertions */}
+            <ul style={{ listStyle: 'none', margin: '16px 0 0', padding: 0 }}>
+              {p1.tests.map((t) => {
+                const ok = t.result === 'pass';
+                return (
+                  <li
+                    key={t.id}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 12,
+                      padding: '9px 0',
+                      borderTop: `1px solid ${C.border}`,
+                      fontSize: 13,
+                    }}
+                  >
+                    <span
+                      style={{
+                        width: 16,
+                        textAlign: 'center',
+                        color: ok ? C.green : C.red,
+                        fontWeight: 700,
+                      }}
+                    >
+                      {ok ? '✓' : '✗'}
+                    </span>
+                    <span
+                      style={{
+                        color: C.muted,
+                        fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace',
+                        fontSize: 12,
+                        minWidth: 18,
+                      }}
+                    >
+                      {t.id}
+                    </span>
+                    <span style={{ color: ok ? C.text : C.red }}>{t.name}</span>
+                  </li>
+                );
+              })}
+            </ul>
+          </>
+        )}
       </section>
 
       {/* ---------------- Footer ---------------- */}

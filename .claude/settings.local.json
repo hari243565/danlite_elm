@@ -58,7 +58,27 @@
       "PowerShell(Get-ChildItem portal/app -Force | Select-Object Name; \"--- layout.tsx ---\"; Get-Content portal/app/layout.tsx)",
       "PowerShell(Get-Process *)",
       "PowerShell(\"=== git tag ===\")",
-      "PowerShell(\"`n=== git status --short ===\")"
+      "PowerShell(\"`n=== git status --short ===\")",
+      "PowerShell(npx supabase --version; git status --short)",
+      "PowerShell(npx supabase init 2>&1)",
+      "PowerShell(npx supabase migration new initial_schema_and_rls 2>&1; Get-ChildItem -Recurse supabase | Select-Object FullName)",
+      "PowerShell(npx supabase db --help 2>&1)",
+      "PowerShell(npx supabase db query --help 2>&1)",
+      "PowerShell(npx supabase link --project-ref uomelinvbqabczhrzhnb 2>&1)",
+      "PowerShell(npx supabase db push --yes 2>&1)",
+      "PowerShell(npx supabase db diff --schema public 2>&1)",
+      "PowerShell(npx supabase db diff --linked --schema public 2>&1)",
+      "PowerShell(npx supabase migration list --linked 2>&1)",
+      "PowerShell(npx supabase db query --linked -f supabase/tests/rls_verification.sql 2>&1)",
+      "PowerShell(npx supabase migration new fix_profiles_update_grant 2>&1)",
+      "PowerShell(npx supabase db query --linked \"begin; select 42 as answer, 'visible' as note; rollback;\" 2>&1)",
+      "PowerShell(npx supabase db query --linked $sql 2>&1)",
+      "PowerShell($s = \"C:\\\\Users\\\\a\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\C--Users-a-Downloads-danlite-elm-complete-danlite-elm\\\\642023a4-0d73-4b8e-9057-0e5ed2c07285\\\\scratchpad\"; npx supabase db query --linked -f \"$s\\\\residue.sql\" 2>&1)",
+      "PowerShell($s = \"C:\\\\Users\\\\a\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\C--Users-a-Downloads-danlite-elm-complete-danlite-elm\\\\642023a4-0d73-4b8e-9057-0e5ed2c07285\\\\scratchpad\"; npx supabase db query --linked -f \"$s\\\\tables.sql\" 2>&1)",
+      "PowerShell($s = \"C:\\\\Users\\\\a\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\C--Users-a-Downloads-danlite-elm-complete-danlite-elm\\\\642023a4-0d73-4b8e-9057-0e5ed2c07285\\\\scratchpad\"; npx supabase db query --linked -f \"$s\\\\grants.sql\" 2>&1)",
+      "PowerShell($s = \"C:\\\\Users\\\\a\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\C--Users-a-Downloads-danlite-elm-complete-danlite-elm\\\\642023a4-0d73-4b8e-9057-0e5ed2c07285\\\\scratchpad\"; npx supabase db query --linked -f \"$s\\\\policies.sql\" 2>&1)",
+      "PowerShell(Test-Path *)",
+      "PowerShell(\\(Get-Date\\).ToUniversalTime\\(\\).ToString\\(\"yyyy-MM-ddTHH:mm:ssZ\"\\))"
     ]
   }
 }
