@@ -18,6 +18,10 @@ import 'screens/settings_screen.dart';
 import 'screens/vehicle_profile_screen.dart';
 import 'screens/trip_history_screen.dart';
 import 'screens/about_screen.dart';
+import 'screens/auth/auth_gate.dart';
+import 'screens/auth/login_screen.dart';
+import 'screens/auth/signup_screen.dart';
+import 'screens/auth/otp_verify_screen.dart';
 
 class DanliteELMApp extends StatelessWidget {
   const DanliteELMApp({super.key});
@@ -55,8 +59,15 @@ class DanliteELMApp extends StatelessWidget {
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
       ],
-      initialRoute: '/splash',
+      // The gate shows the existing SplashScreen while auth state resolves,
+      // then sends the user to /home, /login or /otp. '/splash' itself is
+      // unchanged and still routable.
+      initialRoute: '/auth',
       routes: {
+        '/auth': (_) => const AuthGate(),
+        '/login': (_) => const LoginScreen(),
+        '/signup': (_) => const SignupScreen(),
+        '/otp': (_) => const OtpVerifyScreen(),
         '/splash': (_) => const SplashScreen(),
         '/home': (_) => const HomeScreen(),
         '/connect': (_) => const ConnectionScreen(),

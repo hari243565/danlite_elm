@@ -342,6 +342,46 @@ class AppStrings {
       'apply': 'Apply',
       'retry': 'Retry',
       'close': 'Close',
+
+      // Authentication (Phase 2)
+      'auth_signup_title': 'Create your account',
+      'auth_signup_subtitle':
+          'One quick verification. Your account keeps your licence safe.',
+      'auth_login_title': 'Log in',
+      'auth_login_subtitle': 'We will send you a one-time code.',
+      'auth_country_label': 'Country',
+      'auth_country_in': 'India',
+      'auth_email_hint': 'Email address',
+      'auth_phone_hint': 'Mobile number',
+      'auth_identifier_hint': 'Email or mobile number',
+      'auth_email_invalid': 'Enter a valid email address',
+      'auth_phone_invalid': 'Enter a valid 10-digit mobile number',
+      'auth_identifier_invalid': 'Enter a valid email or mobile number',
+      'auth_create_account_cta': 'Create account',
+      'auth_login_cta': 'Log in',
+      'auth_have_account': 'Already have an account?',
+      'auth_no_account': 'New here?',
+      'auth_login_link': 'Log in',
+      'auth_signup_link': 'Create account',
+      'auth_otp_title': 'Enter the code',
+      'auth_otp_sent': 'Code sent',
+      'auth_otp_sent_to': 'We sent a 6-digit code to {id}',
+      'auth_otp_hint': '6-digit code',
+      'auth_otp_invalid_len': 'Enter the 6-digit code',
+      'auth_verify_cta': 'Verify',
+      'auth_resend': 'Resend code',
+      'auth_resend_in': 'Resend code in {s}s',
+      'auth_change_identifier': 'Use a different email or number',
+      'auth_privacy_note':
+          'Your email or number is used only to secure your account.',
+      'auth_err_generic': 'Something went wrong. Please try again.',
+      'auth_err_network':
+          'No connection. Check your internet and try again.',
+      'auth_err_rate_limited':
+          'Too many attempts. Please wait a minute and try again.',
+      'auth_err_invalid_otp': 'That code is not valid or has expired.',
+      'auth_err_not_configured':
+          'Sign-in is not available in this build yet.',
     },
 
     // ══════════════════════════════════════════════════════════════════════════
@@ -596,6 +636,45 @@ class AppStrings {
       'apply': 'लागू करें',
       'retry': 'पुनः प्रयास करें',
       'close': 'बंद करें',
+
+      // प्रमाणीकरण (चरण 2)
+      'auth_signup_title': 'अपना खाता बनाएं',
+      'auth_signup_subtitle':
+          'एक बार सत्यापन करें। आपका खाता आपके लाइसेंस को सुरक्षित रखता है।',
+      'auth_login_title': 'लॉग इन करें',
+      'auth_login_subtitle': 'हम आपको एक बार का कोड भेजेंगे।',
+      'auth_country_label': 'देश',
+      'auth_country_in': 'भारत',
+      'auth_email_hint': 'ईमेल पता',
+      'auth_phone_hint': 'मोबाइल नंबर',
+      'auth_identifier_hint': 'ईमेल या मोबाइल नंबर',
+      'auth_email_invalid': 'मान्य ईमेल पता दर्ज करें',
+      'auth_phone_invalid': 'मान्य 10 अंकों का मोबाइल नंबर दर्ज करें',
+      'auth_identifier_invalid': 'मान्य ईमेल या मोबाइल नंबर दर्ज करें',
+      'auth_create_account_cta': 'खाता बनाएं',
+      'auth_login_cta': 'लॉग इन करें',
+      'auth_have_account': 'पहले से खाता है?',
+      'auth_no_account': 'नए हैं?',
+      'auth_login_link': 'लॉग इन करें',
+      'auth_signup_link': 'खाता बनाएं',
+      'auth_otp_title': 'कोड दर्ज करें',
+      'auth_otp_sent': 'कोड भेजा गया',
+      'auth_otp_sent_to': 'हमने {id} पर 6 अंकों का कोड भेजा है',
+      'auth_otp_hint': '6 अंकों का कोड',
+      'auth_otp_invalid_len': '6 अंकों का कोड दर्ज करें',
+      'auth_verify_cta': 'सत्यापित करें',
+      'auth_resend': 'कोड फिर भेजें',
+      'auth_resend_in': '{s} सेकंड में कोड फिर भेजें',
+      'auth_change_identifier': 'दूसरा ईमेल या नंबर उपयोग करें',
+      'auth_privacy_note':
+          'आपका ईमेल या नंबर केवल आपके खाते की सुरक्षा के लिए उपयोग होता है।',
+      'auth_err_generic': 'कुछ गलत हो गया। कृपया पुनः प्रयास करें।',
+      'auth_err_network':
+          'कनेक्शन नहीं है। अपना इंटरनेट जांचें और पुनः प्रयास करें।',
+      'auth_err_rate_limited':
+          'बहुत अधिक प्रयास। कृपया एक मिनट रुककर पुनः प्रयास करें।',
+      'auth_err_invalid_otp': 'यह कोड मान्य नहीं है या समाप्त हो चुका है।',
+      'auth_err_not_configured': 'इस बिल्ड में साइन-इन अभी उपलब्ध नहीं है।',
     },
 
     // ══════════════════════════════════════════════════════════════════════════

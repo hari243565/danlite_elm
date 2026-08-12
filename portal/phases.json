@@ -5,7 +5,7 @@
     { "id": "0",   "name": "Release signing keystore",              "status": "done",    "tag": "v2.0-signed",        "verify": "apksigner: Signer DN = CN=Danlite India; SHA-256 matches keystore" },
     { "id": "0.5", "name": "Local Mission Control dashboard",       "status": "done",    "tag": "v2.05-dashboard",    "verify": "localhost:3000 renders this page" },
     { "id": "1",   "name": "Supabase schema + RLS",                 "status": "done",    "tag": "v2.1-schema",        "verify": "anon client cannot read another user's licence" },
-    { "id": "2",   "name": "App auth screens + secure storage",     "status": "pending", "tag": "v2.2-auth",          "verify": "token in Android Keystore, absent from shared_preferences" },
+    { "id": "2",   "name": "App auth screens + secure storage",     "status": "done",    "tag": "v2.2-auth",          "verify": "token in Android Keystore, absent from shared_preferences" },
     { "id": "3",   "name": "Entitlement token + 14d offline grace", "status": "pending", "tag": "v2.3-entitlement",   "verify": "airplane mode 3 days works; tampered token rejected" },
     { "id": "4",   "name": "Billing portal P1-P4 + noindex",        "status": "pending", "tag": "v2.4-portal",        "verify": "curl -I shows X-Robots-Tag; /checkout redirects unauthenticated" },
     { "id": "5",   "name": "Razorpay domestic Rs109 + idempotency", "status": "pending", "tag": "v2.5-razorpay-in",   "verify": "replayed webhook creates no second licence" },

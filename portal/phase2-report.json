@@ -1,0 +1,33 @@
+{
+  "phase": "2",
+  "name": "App auth screens + secure storage",
+  "generated": "2026-08-13",
+  "token_storage_backend": "flutter_secure_storage / Android Keystore",
+  "shared_preferences_for_tokens": false,
+  "pkce_verifier_storage": "flutter_secure_storage / Android Keystore",
+  "otp_routing": "country_code == 'IN' -> phone OTP; otherwise email OTP",
+  "build_note": "url_launcher_android pinned to 6.3.14 in dependency_overrides: newer releases need AGP >= 8.9.1, this project is on AGP 8.7.0 / Gradle 8.9. Permanent fix is an AGP + Gradle wrapper bump.",
+  "analyze": {
+    "new_errors": 0,
+    "new_warnings": 0,
+    "pre_existing_issues": 7
+  },
+  "screens": [
+    { "id": 1, "name": "signup_screen.dart", "route": "/signup", "result": "created" },
+    { "id": 2, "name": "login_screen.dart", "route": "/login", "result": "created" },
+    { "id": 3, "name": "otp_verify_screen.dart", "route": "/otp", "result": "created" },
+    { "id": 4, "name": "auth_gate.dart", "route": "/auth", "result": "created" }
+  ],
+  "checks": [
+    { "id": 1, "name": "tokens in Android Keystore-backed store", "result": "pass" },
+    { "id": 2, "name": "no token path through plain preferences", "result": "pass" },
+    { "id": 3, "name": "PKCE verifier also in secure storage", "result": "pass" },
+    { "id": 4, "name": "identical response for known / unknown address", "result": "pass" },
+    { "id": 5, "name": "no raw exception reaches the UI", "result": "pass" },
+    { "id": 6, "name": "anon key read from gitignored .env", "result": "pass" },
+    { "id": 7, "name": "flutter analyze: no new errors", "result": "pass" },
+    { "id": 8, "name": "OBD / Bluetooth / DTC services untouched", "result": "pass" },
+    { "id": 9, "name": "no paywall or price added (Phase 8 owns gating)", "result": "pass" },
+    { "id": 10, "name": "debug APK builds with new native plugins", "result": "pass" }
+  ]
+}

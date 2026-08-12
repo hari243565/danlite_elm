@@ -3,10 +3,12 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'providers/auth_provider.dart';
 import 'providers/settings_provider.dart';
 import 'providers/vehicle_provider.dart';
 import 'services/bluetooth_classic_service.dart';
 import 'services/obd_service.dart';
+import 'services/supabase_service.dart';
 import 'services/trip_logger.dart';
 import 'services/dtc_service.dart';
 import 'app.dart';
@@ -84,6 +86,13 @@ void main() {
     // ObdService receives BT service via constructor injection
     final obdService = ObdService(btService);
 
+    // Backend auth (Phase 2). Both calls swallow their own failures: a missing
+    // or unreachable Supabase config must never stop the diagnostics app from
+    // starting, since nothing is gated behind a licence until Phase 8.
+    await SupabaseService.instance.init();
+    final auth = AuthProvider();
+    await auth.init();
+
     runApp(
       MultiProvider(
         providers: [
@@ -92,6 +101,7 @@ void main() {
           ChangeNotifierProvider<TripLogger>.value(value: tripLog),
           ChangeNotifierProvider<BluetoothClassicService>.value(value: btService),
           ChangeNotifierProvider<ObdService>.value(value: obdService),
+          ChangeNotifierProvider<AuthProvider>.value(value: auth),
         ],
         child: const DanliteELMApp(),
       ),

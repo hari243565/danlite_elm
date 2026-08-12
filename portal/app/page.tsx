@@ -85,6 +85,44 @@ function readPhase1(): Phase1Report | null {
   }
 }
 
+type Phase2Check = {
+  id: number;
+  name: string;
+  result: string;
+};
+
+type Phase2Screen = {
+  id: number;
+  name: string;
+  route: string;
+  result: string;
+};
+
+type Phase2Report = {
+  phase: string;
+  name: string;
+  generated: string;
+  token_storage_backend: string;
+  shared_preferences_for_tokens: boolean;
+  pkce_verifier_storage: string;
+  otp_routing: string;
+  build_note?: string;
+  analyze: { new_errors: number; new_warnings: number; pre_existing_issues: number };
+  screens: Phase2Screen[];
+  checks: Phase2Check[];
+};
+
+function readPhase2(): Phase2Report | null {
+  try {
+    const file = path.join(process.cwd(), 'phase2-report.json');
+    const raw = fs.readFileSync(file, 'utf8');
+    return JSON.parse(raw) as Phase2Report;
+  } catch {
+    // Absent until the phase has been run — the panel renders a muted card.
+    return null;
+  }
+}
+
 function statusPill(status: string) {
   const map: Record<string, { fg: string; label: string }> = {
     done: { fg: C.green, label: 'done' },
@@ -115,6 +153,7 @@ function statusPill(status: string) {
 export default function MissionControl() {
   const { data, error } = readPhases();
   const p1 = readPhase1();
+  const p2 = readPhase2();
 
   const shell = (children: React.ReactNode) => (
     <main
@@ -427,6 +466,174 @@ export default function MissionControl() {
             {/* Eight RLS assertions */}
             <ul style={{ listStyle: 'none', margin: '16px 0 0', padding: 0 }}>
               {p1.tests.map((t) => {
+                const ok = t.result === 'pass';
+                return (
+                  <li
+                    key={t.id}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 12,
+                      padding: '9px 0',
+                      borderTop: `1px solid ${C.border}`,
+                      fontSize: 13,
+                    }}
+                  >
+                    <span
+                      style={{
+                        width: 16,
+                        textAlign: 'center',
+                        color: ok ? C.green : C.red,
+                        fontWeight: 700,
+                      }}
+                    >
+                      {ok ? '✓' : '✗'}
+                    </span>
+                    <span
+                      style={{
+                        color: C.muted,
+                        fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace',
+                        fontSize: 12,
+                        minWidth: 18,
+                      }}
+                    >
+                      {t.id}
+                    </span>
+                    <span style={{ color: ok ? C.text : C.red }}>{t.name}</span>
+                  </li>
+                );
+              })}
+            </ul>
+          </>
+        )}
+      </section>
+
+      {/* ---------------- Phase 2 — Authentication ---------------- */}
+      <section
+        style={{
+          backgroundColor: C.surface,
+          border: `1px solid ${C.border}`,
+          borderRadius: 12,
+          padding: 20,
+          marginBottom: 28,
+        }}
+      >
+        <h2 style={{ fontSize: 15, fontWeight: 700, margin: '0 0 4px' }}>
+          Phase 2 — Authentication
+        </h2>
+
+        {!p2 ? (
+          <p style={{ color: C.muted, fontSize: 12.5, margin: '8px 0 0', lineHeight: 1.5 }}>
+            Not yet run. <code>phase2-report.json</code> will appear here once the auth screens
+            and secure token storage have been built.
+          </p>
+        ) : (
+          <>
+            <p style={{ color: C.muted, fontSize: 12.5, margin: '0 0 16px', lineHeight: 1.5 }}>
+              Sign-up, log-in and OTP verification wired to Supabase on {p2.generated}.{' '}
+              {p2.otp_routing}.
+            </p>
+
+            {/* Storage + analyze badges */}
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, marginBottom: 14 }}>
+              {[
+                { label: 'Screens', value: `${p2.screens.length}` },
+                { label: 'Token store', value: p2.token_storage_backend },
+                { label: 'New analyze errors', value: `${p2.analyze.new_errors}` },
+              ].map((b) => (
+                <span
+                  key={b.label}
+                  style={{
+                    display: 'inline-block',
+                    padding: '5px 11px',
+                    borderRadius: 8,
+                    border: `1px solid ${C.border}`,
+                    backgroundColor: C.card,
+                    fontSize: 12,
+                    color: C.muted,
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  {b.label} <span style={{ color: C.text, fontWeight: 700 }}>{b.value}</span>
+                </span>
+              ))}
+            </div>
+
+            {/* The Phase 2 invariant: no auth token in plaintext preferences */}
+            <p
+              style={{
+                margin: '0 0 6px',
+                fontSize: 13,
+                fontWeight: 600,
+                color: p2.shared_preferences_for_tokens ? C.red : C.green,
+                fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace',
+              }}
+            >
+              Tokens in shared_preferences: {String(p2.shared_preferences_for_tokens)}
+            </p>
+            <p
+              style={{
+                margin: '0 0 6px',
+                fontSize: 13,
+                fontWeight: 600,
+                color: C.green,
+                fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace',
+              }}
+            >
+              PKCE verifier store: {p2.pkce_verifier_storage}
+            </p>
+
+            {p2.build_note && (
+              <p
+                style={{
+                  margin: '12px 0 0',
+                  padding: '10px 12px',
+                  borderRadius: 8,
+                  border: `1px solid ${C.amber}`,
+                  color: C.amber,
+                  fontSize: 12.5,
+                  lineHeight: 1.5,
+                }}
+              >
+                {p2.build_note}
+              </p>
+            )}
+
+            {/* Screens delivered */}
+            <ul style={{ listStyle: 'none', margin: '16px 0 0', padding: 0 }}>
+              {p2.screens.map((s) => (
+                <li
+                  key={s.id}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 12,
+                    padding: '9px 0',
+                    borderTop: `1px solid ${C.border}`,
+                    fontSize: 13,
+                  }}
+                >
+                  <span style={{ width: 16, textAlign: 'center', color: C.green, fontWeight: 700 }}>
+                    ✓
+                  </span>
+                  <span
+                    style={{
+                      color: C.cyan,
+                      fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace',
+                      fontSize: 12,
+                      minWidth: 62,
+                    }}
+                  >
+                    {s.route}
+                  </span>
+                  <span style={{ color: C.text }}>{s.name}</span>
+                </li>
+              ))}
+            </ul>
+
+            {/* Security assertions */}
+            <ul style={{ listStyle: 'none', margin: '16px 0 0', padding: 0 }}>
+              {p2.checks.map((t) => {
                 const ok = t.result === 'pass';
                 return (
                   <li
