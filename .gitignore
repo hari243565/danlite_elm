@@ -46,3 +46,9 @@ android/key.properties
 # Misc
 *.log
 coverage/
+
+# Portal (Next.js) — Phase 0.5
+portal/node_modules/
+portal/.next/
+portal/.env.local
+portal/out/

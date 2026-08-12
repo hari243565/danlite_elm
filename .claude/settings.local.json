@@ -50,7 +50,15 @@
       "Bash(./gradlew :app:compileDebugKotlin)",
       "Bash(JAVA_HOME=\"/c/Program Files/Android/Android Studio/jbr\" ./gradlew :app:compileDebugKotlin)",
       "Bash(echo \"exit=$? \\(1 = no matches, as expected\\)\")",
-      "PowerShell(git check-ignore *)"
+      "PowerShell(git check-ignore *)",
+      "PowerShell(npm *)",
+      "PowerShell(try { Get-ChildItem \"HKLM:\\\\SOFTWARE\\\\Microsoft\\\\Windows\\\\CurrentVersion\\\\Uninstall\",\"HKCU:\\\\SOFTWARE\\\\Microsoft\\\\Windows\\\\CurrentVersion\\\\Uninstall\" -ErrorAction Stop | ForEach-Object { $_.GetValue\\('DisplayName'\\) } | Where-Object { $_ -match 'node|npm' } } catch { \"registry probe failed: $_\" })",
+      "PowerShell($w = Get-Command winget -ErrorAction SilentlyContinue; if \\($w\\) { \"winget available: \" + $w.Source } else { \"winget: not found\" })",
+      "PowerShell(Get-ChildItem portal -Force -Exclude node_modules | Select-Object Name; \"---\"; Get-Content portal/package.json)",
+      "PowerShell(Get-ChildItem portal/app -Force | Select-Object Name; \"--- layout.tsx ---\"; Get-Content portal/app/layout.tsx)",
+      "PowerShell(Get-Process *)",
+      "PowerShell(\"=== git tag ===\")",
+      "PowerShell(\"`n=== git status --short ===\")"
     ]
   }
 }
