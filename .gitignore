@@ -40,6 +40,9 @@ ios/ServiceDefinitions.json
 .DS_Store
 Thumbs.db
 
+# Signing — never commit
+android/key.properties
+
 # Misc
 *.log
 coverage/
