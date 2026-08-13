@@ -1,0 +1,34 @@
+-- ════════════════════════════════════════════════════════════════════════
+-- FIX — grant DML on public.profiles to service_role
+--
+-- service_role (Edge Functions) must be able to write profiles.
+-- Required for: country_code updates, soft-delete (deleted_at), Phase 5+
+-- Edge Functions.
+--
+-- WHY THIS WAS MISSING: 20260812134908 ran
+--   revoke all on all tables in schema public from anon, authenticated;
+-- and then granted back per role. service_role was never explicitly granted
+-- DML on public.profiles, leaving it with only REFERENCES / TRIGGER /
+-- TRUNCATE / MAINTAIN — i.e. no read or write path at all. This is the same
+-- class of omission as 20260812140944 (missing UPDATE grant for
+-- authenticated), for service_role.
+--
+-- WHAT IT UNBLOCKS: `protect_profile_fields` reverts country_code,
+-- signup_platform and deleted_at for every caller whose JWT role is not
+-- service_role. That check is the intended escape hatch for server-side
+-- corrections, but with no DML grant the escape hatch was unreachable — a
+-- direct Edge Function UPDATE died with 42501 before the trigger ever ran.
+-- This grant is what makes that branch meaningful.
+--
+-- NOT A LOOSENING OF THE CLIENT SURFACE:
+--   • service_role is the Edge Function key. It is never shipped in the APK
+--     and never reaches a browser; it lives only in Edge Function secrets.
+--   • It already bypasses RLS by design, so this adds no policy exposure —
+--     it only restores the table-level grant those policies presuppose.
+--   • anon and authenticated are untouched. `authenticated` still holds only
+--     SELECT + UPDATE on profiles, still has NO insert grant and NO insert
+--     policy, and still cannot set country_code by any path. Profile rows are
+--     created solely by the `handle_new_user` trigger (20260813130250).
+-- ════════════════════════════════════════════════════════════════════════
+
+grant select, insert, update, delete on public.profiles to service_role;

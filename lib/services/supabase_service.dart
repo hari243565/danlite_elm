@@ -275,33 +275,79 @@ class SupabaseService {
   // Sign-up and log-in are deliberately the same request. With passwordless
   // OTP there is no observable difference between "created" and "logged in",
   // which is precisely what stops address enumeration.
+  //
+  // That is why [_signupMetadata] is attached to the log-in entry points too:
+  // sending it only on sign-up would make the two requests distinguishable on
+  // the wire and hand back the enumeration oracle. It costs nothing on log-in —
+  // GoTrue applies `data` when it creates the user, and `handle_new_user` fires
+  // on INSERT only, so an existing account's profile is never touched by it.
 
-  Future<AuthResult> signUpWithEmailOtp(String email) => _sendEmailOtp(email);
+  Future<AuthResult> signUpWithEmailOtp(String email, {String? countryCode}) =>
+      _sendEmailOtp(email, countryCode: countryCode);
 
-  Future<AuthResult> signInWithEmailOtp(String email) => _sendEmailOtp(email);
+  Future<AuthResult> signInWithEmailOtp(String email, {String? countryCode}) =>
+      _sendEmailOtp(email, countryCode: countryCode);
 
-  Future<AuthResult> signUpWithPhoneOtp(String phoneE164) =>
-      _sendPhoneOtp(phoneE164);
+  Future<AuthResult> signUpWithPhoneOtp(String phoneE164,
+          {String? countryCode}) =>
+      _sendPhoneOtp(phoneE164, countryCode: countryCode);
 
-  Future<AuthResult> signInWithPhoneOtp(String phoneE164) =>
-      _sendPhoneOtp(phoneE164);
+  Future<AuthResult> signInWithPhoneOtp(String phoneE164,
+          {String? countryCode}) =>
+      _sendPhoneOtp(phoneE164, countryCode: countryCode);
 
-  Future<AuthResult> _sendEmailOtp(String email) async {
+  /// Signup metadata for the `data:` payload of [GoTrueClient.signInWithOtp].
+  ///
+  /// GoTrue writes this to `auth.users.raw_user_meta_data` when the row is
+  /// created, which is the only channel by which the client can tell the server
+  /// anything at signup time. The `on_auth_user_created` trigger
+  /// (`handle_new_user`) reads exactly these two keys off that column when it
+  /// creates `public.profiles`.
+  ///
+  /// It is metadata, not authority: the trigger re-validates both keys and the
+  /// client has no insert or update path to `profiles.country_code` by any
+  /// other route, so a patched APK sending `country_code: 'US'` only changes
+  /// what the server was going to derive anyway — it never rewrites an existing
+  /// profile. Phase 3 should treat this as a hint and reconcile the pricing rail
+  /// against the payment gateway's own country at checkout.
+  ///
+  /// [countryCode] is omitted rather than guessed when absent or malformed, so
+  /// the row falls back to the column default ('IN') instead of carrying a
+  /// value this layer invented.
+  Map<String, dynamic> _signupMetadata(String? countryCode) {
+    final data = <String, dynamic>{'signup_platform': 'android'};
+    final code = countryCode?.trim().toUpperCase();
+    if (code != null && RegExp(r'^[A-Z]{2}$').hasMatch(code)) {
+      data['country_code'] = code;
+    }
+    return data;
+  }
+
+  Future<AuthResult> _sendEmailOtp(String email, {String? countryCode}) async {
     final blocked = _configGuard();
     if (blocked != null) return blocked;
     try {
-      await _auth.signInWithOtp(email: email, shouldCreateUser: true);
+      await _auth.signInWithOtp(
+        email: email,
+        shouldCreateUser: true,
+        data: _signupMetadata(countryCode),
+      );
       return const AuthResult.otpSent();
     } catch (e) {
       return AuthResult.failure(_sendErrorKey(e, isPhone: false));
     }
   }
 
-  Future<AuthResult> _sendPhoneOtp(String phoneE164) async {
+  Future<AuthResult> _sendPhoneOtp(String phoneE164,
+      {String? countryCode}) async {
     final blocked = _configGuard();
     if (blocked != null) return blocked;
     try {
-      await _auth.signInWithOtp(phone: phoneE164, shouldCreateUser: true);
+      await _auth.signInWithOtp(
+        phone: phoneE164,
+        shouldCreateUser: true,
+        data: _signupMetadata(countryCode),
+      );
       return const AuthResult.otpSent();
     } catch (e) {
       return AuthResult.failure(_sendErrorKey(e, isPhone: true));

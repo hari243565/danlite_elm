@@ -42,10 +42,17 @@ class AuthProvider extends ChangeNotifier {
   OtpChannel? _pendingChannel;
   OtpChannel? get pendingChannel => _pendingChannel;
 
-  /// ISO-3166 alpha-2, e.g. 'IN'. Chosen on the sign-up screen and written to
-  /// `profiles.country_code` once, on first sign-in. It decides pricing only
-  /// (₹109 India vs $1.10 international) and never the OTP channel; the server
-  /// owns it after that first write.
+  /// ISO-3166 alpha-2, e.g. 'IN'. Chosen on the sign-up screen. It decides
+  /// pricing only (₹109 India vs $1.10 international) and never the OTP
+  /// channel.
+  ///
+  /// The client does not write it: `profiles.country_code` is set by the
+  /// server-side `handle_new_user` trigger from the signup metadata, and
+  /// `profiles_protect_fields` reverts any later client attempt to change it.
+  /// This value reaches that trigger by being passed to the OTP send in
+  /// [_dispatch], which puts it in the `data` payload — it is a hint the
+  /// server re-validates, not an instruction. An unset or malformed code is
+  /// dropped there, leaving the row on the column default 'IN'.
   String _countryCode = 'IN';
   String get countryCode => _countryCode;
   set countryCode(String code) {
@@ -58,9 +65,6 @@ class AuthProvider extends ChangeNotifier {
   /// session) is what registers devices; nothing is sent anywhere in Phase 2.
   String? _deviceFingerprint;
   String? get deviceFingerprint => _deviceFingerprint;
-
-  /// User id whose profile row has already been checked this session.
-  String? _profileEnsuredFor;
 
   bool get isConfigured => _svc.isConfigured;
   User? get user => _svc.currentUser;
@@ -124,11 +128,6 @@ class AuthProvider extends ChangeNotifier {
           _pendingIdentifier = null;
           _pendingChannel = null;
           _set(AuthStatus.signedIn);
-          // Once per signed-in user, not on every hourly token refresh.
-          if (_profileEnsuredFor != session.user.id) {
-            _profileEnsuredFor = session.user.id;
-            unawaited(_ensureProfile(session.user));
-          }
         } else if (_status != AuthStatus.awaitingOtp) {
           _set(AuthStatus.signedOut);
         }
@@ -188,15 +187,19 @@ class AuthProvider extends ChangeNotifier {
     // Sign-up and log-in intentionally hit the same endpoint with the same
     // payload; `isSignup` only picks which service method name is used, so the
     // two flows are indistinguishable on the wire.
+    //
+    // `countryCode` rides along on all four, log-in included: omitting it on
+    // log-in would make the two requests differ on the wire. The server only
+    // reads it when it creates the auth user, so it is inert on a log-in.
     final AuthResult res;
     if (channel == OtpChannel.email) {
       res = isSignup
-          ? await _svc.signUpWithEmailOtp(identifier)
-          : await _svc.signInWithEmailOtp(identifier);
+          ? await _svc.signUpWithEmailOtp(identifier, countryCode: _countryCode)
+          : await _svc.signInWithEmailOtp(identifier, countryCode: _countryCode);
     } else {
       res = isSignup
-          ? await _svc.signUpWithPhoneOtp(identifier)
-          : await _svc.signInWithPhoneOtp(identifier);
+          ? await _svc.signUpWithPhoneOtp(identifier, countryCode: _countryCode)
+          : await _svc.signInWithPhoneOtp(identifier, countryCode: _countryCode);
     }
 
     if (res.ok && res.needsOtp) {
@@ -224,7 +227,7 @@ class AuthProvider extends ChangeNotifier {
 
   /// Verifies the 6-digit code. On success [status] becomes
   /// [AuthStatus.signedIn] immediately; the SDK's own `signedIn` event follows
-  /// and is what triggers the profile row.
+  /// moments later and is idempotent.
   Future<bool> verifyOtp(String code) async {
     final id = _pendingIdentifier;
     final channel = _pendingChannel;
@@ -268,7 +271,6 @@ class AuthProvider extends ChangeNotifier {
     await _svc.signOut();
     _pendingIdentifier = null;
     _pendingChannel = null;
-    _profileEnsuredFor = null;
     _errorKey = null;
     _busy = false;
     _set(AuthStatus.signedOut);
@@ -281,34 +283,18 @@ class AuthProvider extends ChangeNotifier {
   }
 
   // ── Profile row ───────────────────────────────────────────────────────────
-
-  /// Creates `public.profiles` on first sign-in. An existing row is left alone:
-  /// `country_code` is set once and is protected server-side by the Phase 1
-  /// trigger, so the client must never try to rewrite it.
-  Future<void> _ensureProfile(User user) async {
-    if (!_svc.isConfigured) return;
-    try {
-      final existing = await _svc.client
-          .from('profiles')
-          .select('id')
-          .eq('id', user.id)
-          .maybeSingle();
-      if (existing != null) return;
-
-      await _svc.client.from('profiles').insert({
-        'id': user.id,
-        'email': user.email,
-        'phone': user.phone,
-        'country_code': _countryCode,
-        'signup_platform': 'android',
-      });
-    } catch (e) {
-      // A profile that fails to write must not block a signed-in user. The row
-      // is re-attempted on the next sign-in, and Phase 1's server-side trigger
-      // is the real backstop.
-      debugPrint('[auth] profile upsert skipped: ${e.runtimeType}');
-    }
-  }
+  //
+  // Nothing here writes it. `public.profiles` is created by the
+  // `on_auth_user_created` trigger on `auth.users` the moment the auth user is
+  // created, so the row exists before this client ever learns it is signed in.
+  //
+  // This used to be a client insert on first sign-in. It never once succeeded:
+  // `authenticated` has no INSERT grant and no INSERT policy on profiles, so
+  // every attempt failed with 42501 — swallowed by a catch that only
+  // debugPrint'ed, leaving signup looking clean with an empty profiles table.
+  // Granting the client INSERT was the wrong fix: an INSERT policy's WITH
+  // CHECK can only pin `id`, so the client could still have chosen its own
+  // `country_code` and with it the pricing rail.
 
   // ── Device identity (Phase 7 groundwork) ──────────────────────────────────
 
