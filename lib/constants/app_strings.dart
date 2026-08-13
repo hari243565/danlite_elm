@@ -351,6 +351,11 @@ class AppStrings {
       'auth_login_subtitle': 'We will send you a one-time code.',
       'auth_country_label': 'Country',
       'auth_country_in': 'India',
+      'auth_channel_label': 'Verify with',
+      'auth_channel_email': 'Email',
+      'auth_channel_mobile': 'Mobile',
+      'auth_mobile_unavailable_hint':
+          'SMS verification is being enabled. Use email for now.',
       'auth_email_hint': 'Email address',
       'auth_phone_hint': 'Mobile number',
       'auth_identifier_hint': 'Email or mobile number',
@@ -382,6 +387,23 @@ class AppStrings {
       'auth_err_invalid_otp': 'That code is not valid or has expired.',
       'auth_err_not_configured':
           'Sign-in is not available in this build yet.',
+
+      // ── Auth failure classification ──────────────────────────────────────
+      // One key per distinct cause. The rule that matters: `auth_err_network`
+      // is reserved for a genuine transport failure and nothing else, so a
+      // configuration or backend fault is never blamed on the user's internet.
+      'auth_err_config':
+          'App setup incomplete. Please reinstall or contact support.',
+      'auth_err_credentials':
+          'Verification service rejected the request. Please contact support.',
+      'auth_err_otp_invalid': 'That code is incorrect or has expired.',
+      'auth_err_sms_unavailable':
+          "SMS verification isn't available yet. Please use email.",
+      'auth_err_unknown': 'Something went wrong. Please try again.',
+
+      // Label for the on-device setup strip. The detail beside it is generated
+      // by AppConfig and is deliberately untranslated technical text.
+      'auth_setup_diagnostic': 'Setup',
     },
 
     // ══════════════════════════════════════════════════════════════════════════
@@ -645,6 +667,11 @@ class AppStrings {
       'auth_login_subtitle': 'हम आपको एक बार का कोड भेजेंगे।',
       'auth_country_label': 'देश',
       'auth_country_in': 'भारत',
+      'auth_channel_label': 'सत्यापन का तरीका',
+      'auth_channel_email': 'ईमेल',
+      'auth_channel_mobile': 'मोबाइल',
+      'auth_mobile_unavailable_hint':
+          'SMS सत्यापन अभी सक्षम किया जा रहा है। फिलहाल ईमेल का उपयोग करें।',
       'auth_email_hint': 'ईमेल पता',
       'auth_phone_hint': 'मोबाइल नंबर',
       'auth_identifier_hint': 'ईमेल या मोबाइल नंबर',
@@ -675,6 +702,17 @@ class AppStrings {
           'बहुत अधिक प्रयास। कृपया एक मिनट रुककर पुनः प्रयास करें।',
       'auth_err_invalid_otp': 'यह कोड मान्य नहीं है या समाप्त हो चुका है।',
       'auth_err_not_configured': 'इस बिल्ड में साइन-इन अभी उपलब्ध नहीं है।',
+
+      // ── Auth failure classification ──────────────────────────────────────
+      'auth_err_config':
+          'ऐप सेटअप अधूरा है। कृपया ऐप दोबारा इंस्टॉल करें या सहायता से संपर्क करें।',
+      'auth_err_credentials':
+          'सत्यापन सेवा ने अनुरोध अस्वीकार कर दिया। कृपया सहायता से संपर्क करें।',
+      'auth_err_otp_invalid': 'यह कोड गलत है या समाप्त हो चुका है।',
+      'auth_err_sms_unavailable':
+          'SMS सत्यापन अभी उपलब्ध नहीं है। कृपया ईमेल का उपयोग करें।',
+      'auth_err_unknown': 'कुछ गलत हो गया। कृपया पुनः प्रयास करें।',
+      'auth_setup_diagnostic': 'सेटअप',
     },
 
     // ══════════════════════════════════════════════════════════════════════════

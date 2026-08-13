@@ -6,6 +6,8 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import 'app_config.dart';
+
 /// Danlite ELM — Supabase access layer (Phase 2)
 ///
 /// Everything auth-related that talks to the network lives behind this class.
@@ -34,11 +36,23 @@ class AuthMessages {
   AuthMessages._();
 
   static const String otpSent = 'auth_otp_sent';
-  static const String generic = 'auth_err_generic';
+
+  /// The app's own `.env` is missing, unbundled or malformed. This is a build
+  /// fault, never the user's connection — see [AppConfig].
+  static const String config = 'auth_err_config';
+
+  /// A genuine transport failure: no route to the host, DNS failure, timeout.
+  /// Nothing else may map here. See [_isTransportFailure].
   static const String network = 'auth_err_network';
+
+  /// The backend rejected the request itself (400/401/403) — a bad anon key or
+  /// a disabled provider, not a user error.
+  static const String credentials = 'auth_err_credentials';
+
+  static const String otpInvalid = 'auth_err_otp_invalid';
   static const String rateLimited = 'auth_err_rate_limited';
-  static const String invalidOtp = 'auth_err_invalid_otp';
-  static const String notConfigured = 'auth_err_not_configured';
+  static const String smsUnavailable = 'auth_err_sms_unavailable';
+  static const String unknown = 'auth_err_unknown';
 }
 
 /// The only thing the UI ever sees. [messageKey] is an AppStrings key that the
@@ -180,20 +194,28 @@ class SupabaseService {
     try {
       await dotenv.load(fileName: '.env');
     } catch (e) {
-      debugPrint('[auth] .env not loadable: $e');
+      // The asset is missing from the bundle, or unparseable. AppConfig reports
+      // this as ConfigStatus.missing rather than throwing, and the auth screens
+      // paint the diagnostic strip — so carry on and let that path speak.
+      debugPrint('[auth] .env not loadable: ${e.runtimeType}');
       _configured = false;
       return;
     }
 
-    final url = dotenv.env['SUPABASE_URL']?.trim() ?? '';
-    final anonKey = dotenv.env['SUPABASE_ANON_KEY']?.trim() ?? '';
-
-    final parsed = Uri.tryParse(url);
-    if (url.isEmpty || anonKey.isEmpty || parsed == null || parsed.host.isEmpty) {
-      debugPrint('[auth] SUPABASE_URL / SUPABASE_ANON_KEY not set — auth disabled.');
+    // Sanitisation (quotes, whitespace, trailing slash) and structural checks
+    // both live in AppConfig, so the client is never built from a value that
+    // this app would then have to blame on the user's internet.
+    final status = AppConfig.validate();
+    if (status != ConfigStatus.ok) {
+      debugPrint('[auth] config unusable ($status) — '
+          '${AppConfig.describeForDiagnostics()}');
       _configured = false;
       return;
     }
+
+    final url = AppConfig.supabaseUrl;
+    final anonKey = AppConfig.supabaseAnonKey;
+    final parsed = Uri.parse(url);
 
     try {
       await Supabase.initialize(
@@ -233,6 +255,22 @@ class SupabaseService {
   Stream<AuthState> get onAuthStateChange =>
       _configured ? _auth.onAuthStateChange : const Stream<AuthState>.empty();
 
+  /// Run before every auth request. Returns the failure to hand straight back
+  /// to the UI, or null when it is safe to hit the network.
+  ///
+  /// A misconfigured app must say so instead of attempting a call that can only
+  /// fail at the socket and then be mistaken for the user's connection. The
+  /// config is re-validated here rather than trusting [_configured] alone, so
+  /// the strip on screen and the message in the banner can never disagree.
+  AuthResult? _configGuard() {
+    if (!_configured || AppConfig.validate() != ConfigStatus.ok) {
+      debugPrint('[auth] request blocked — '
+          '${AppConfig.describeForDiagnostics()}');
+      return const AuthResult.failure(AuthMessages.config);
+    }
+    return null;
+  }
+
   // ── OTP dispatch ──────────────────────────────────────────────────────────
   // Sign-up and log-in are deliberately the same request. With passwordless
   // OTP there is no observable difference between "created" and "logged in",
@@ -249,22 +287,24 @@ class SupabaseService {
       _sendPhoneOtp(phoneE164);
 
   Future<AuthResult> _sendEmailOtp(String email) async {
-    if (!_configured) return const AuthResult.failure(AuthMessages.notConfigured);
+    final blocked = _configGuard();
+    if (blocked != null) return blocked;
     try {
       await _auth.signInWithOtp(email: email, shouldCreateUser: true);
       return const AuthResult.otpSent();
     } catch (e) {
-      return AuthResult.failure(_sendErrorKey(e));
+      return AuthResult.failure(_sendErrorKey(e, isPhone: false));
     }
   }
 
   Future<AuthResult> _sendPhoneOtp(String phoneE164) async {
-    if (!_configured) return const AuthResult.failure(AuthMessages.notConfigured);
+    final blocked = _configGuard();
+    if (blocked != null) return blocked;
     try {
       await _auth.signInWithOtp(phone: phoneE164, shouldCreateUser: true);
       return const AuthResult.otpSent();
     } catch (e) {
-      return AuthResult.failure(_sendErrorKey(e));
+      return AuthResult.failure(_sendErrorKey(e, isPhone: true));
     }
   }
 
@@ -274,7 +314,8 @@ class SupabaseService {
     required String email,
     required String token,
   }) async {
-    if (!_configured) return const AuthResult.failure(AuthMessages.notConfigured);
+    final blocked = _configGuard();
+    if (blocked != null) return blocked;
     try {
       final res = await _auth.verifyOTP(
         email: email,
@@ -283,9 +324,9 @@ class SupabaseService {
       );
       return res.session != null
           ? const AuthResult.success()
-          : const AuthResult.failure(AuthMessages.invalidOtp);
+          : const AuthResult.failure(AuthMessages.otpInvalid);
     } catch (e) {
-      return AuthResult.failure(_verifyErrorKey(e));
+      return AuthResult.failure(_verifyErrorKey(e, isPhone: false));
     }
   }
 
@@ -293,7 +334,8 @@ class SupabaseService {
     required String phoneE164,
     required String token,
   }) async {
-    if (!_configured) return const AuthResult.failure(AuthMessages.notConfigured);
+    final blocked = _configGuard();
+    if (blocked != null) return blocked;
     try {
       final res = await _auth.verifyOTP(
         phone: phoneE164,
@@ -302,9 +344,9 @@ class SupabaseService {
       );
       return res.session != null
           ? const AuthResult.success()
-          : const AuthResult.failure(AuthMessages.invalidOtp);
+          : const AuthResult.failure(AuthMessages.otpInvalid);
     } catch (e) {
-      return AuthResult.failure(_verifyErrorKey(e));
+      return AuthResult.failure(_verifyErrorKey(e, isPhone: true));
     }
   }
 
@@ -322,12 +364,37 @@ class SupabaseService {
   }
 
   // ── Error translation ─────────────────────────────────────────────────────
+  //
+  // Read this before touching anything below.
+  //
+  // gotrue-dart funnels two completely unrelated failures into the *same*
+  // exception type, [AuthRetryableFetchException] — "retryable" describes the
+  // SDK's own retry policy, not the cause:
+  //
+  //   * `fetch.dart` throws it with **no statusCode** when the HTTP call itself
+  //     threw — a real transport failure (DNS, no route, TLS, timeout).
+  //   * `fetch.dart` throws it **with a statusCode** for every response of 500
+  //     or above — a server-side fault, on a connection that plainly worked.
+  //
+  // Treating both as "no connection" is what made a working 5G phone report an
+  // internet problem: Supabase returns 500 when GoTrue's *mail sender* fails,
+  // so a perfectly healthy device was told to check its internet. The presence
+  // of `statusCode` is the discriminator, and it is the only thing separating
+  // those two branches.
 
-  bool _isNetwork(Object e) =>
-      e is AuthRetryableFetchException ||
-      e is SocketException ||
-      e is TimeoutException ||
-      e is HttpException;
+  /// A genuine transport failure — nothing reached the server. This is the only
+  /// condition allowed to produce [AuthMessages.network].
+  bool _isTransportFailure(Object e) {
+    if (e is SocketException || e is TimeoutException || e is HttpException) {
+      return true;
+    }
+    // No statusCode => gotrue never got a response at all.
+    return e is AuthRetryableFetchException && e.statusCode == null;
+  }
+
+  /// The connection worked; the server answered 5xx. Never a network fault.
+  bool _isServerFault(Object e) =>
+      e is AuthRetryableFetchException && e.statusCode != null;
 
   bool _isRateLimited(Object e) =>
       e is AuthException &&
@@ -335,26 +402,90 @@ class SupabaseService {
       // generic over_request_rate_limit.
       (e.statusCode == '429' || (e.code ?? '').contains('rate_limit'));
 
-  /// Send path: everything that is not a transport failure or an explicit rate
-  /// limit collapses to one generic key. "User exists" and "user does not
-  /// exist" must be indistinguishable here.
-  String _sendErrorKey(Object e) {
-    debugPrint('[auth] send failed: ${e.runtimeType}');
-    if (_isNetwork(e)) return AuthMessages.network;
+  /// The SMS channel is not provisioned. Twilio is selected on the project but
+  /// carries no credentials (DLT/TRAI registration pending), so GoTrue rejects
+  /// every phone send. Telling the user to use email is the only useful copy.
+  bool _isSmsUnavailable(Object e, bool isPhone) {
+    if (!isPhone) return false;
+    if (e is! AuthException) return false;
+    final code = e.code ?? '';
+    if (code == 'sms_send_failed' ||
+        code == 'phone_provider_disabled' ||
+        code == 'validation_failed' && e.message.toLowerCase().contains('phone')) {
+      return true;
+    }
+    // A 5xx on the phone channel is the provider failing to dispatch; on the
+    // email channel the same status means the mail sender, handled separately.
+    return _isServerFault(e);
+  }
+
+  /// 400/401/403 — the request itself was refused. A bad or revoked anon key, a
+  /// disabled provider, a malformed payload. Configuration, not connectivity.
+  bool _isRejected(Object e) =>
+      e is AuthException &&
+      (e.statusCode == '400' ||
+          e.statusCode == '401' ||
+          e.statusCode == '403');
+
+  /// Codes that would reveal whether an identifier is already registered. They
+  /// must never reach a distinct message — see [_sendErrorKey].
+  static const Set<String> _enumerationCodes = {
+    'email_exists',
+    'phone_exists',
+    'user_already_exists',
+  };
+
+  /// Send path. Sign-up and log-in share this classifier and classify purely on
+  /// the shape of the exception, never on which entry point was called, so the
+  /// two flows return byte-identical copy. Any code that would betray an
+  /// existing account is folded into the generic bucket first.
+  String _sendErrorKey(Object e, {required bool isPhone}) {
+    _log('send', e);
+
+    if (e is AuthException && _enumerationCodes.contains(e.code)) {
+      return AuthMessages.unknown;
+    }
+
+    if (AppConfig.validate() != ConfigStatus.ok) return AuthMessages.config;
+    if (_isTransportFailure(e)) return AuthMessages.network;
     if (_isRateLimited(e)) return AuthMessages.rateLimited;
-    return AuthMessages.generic;
+    if (_isSmsUnavailable(e, isPhone)) return AuthMessages.smsUnavailable;
+    if (_isRejected(e)) return AuthMessages.credentials;
+
+    // Everything left over, including a 5xx on the email channel. That one is
+    // almost always GoTrue's mail sender refusing the send; it is a backend
+    // problem, so the honest copy is the generic one — never "no connection".
+    return AuthMessages.unknown;
   }
 
   /// Verify path: the identifier is already known to the caller at this point,
   /// so telling the user their code was wrong or expired leaks nothing.
-  String _verifyErrorKey(Object e) {
-    debugPrint('[auth] verify failed: ${e.runtimeType}');
-    if (_isNetwork(e)) return AuthMessages.network;
+  String _verifyErrorKey(Object e, {required bool isPhone}) {
+    _log('verify', e);
+
+    if (AppConfig.validate() != ConfigStatus.ok) return AuthMessages.config;
+    if (_isTransportFailure(e)) return AuthMessages.network;
     if (_isRateLimited(e)) return AuthMessages.rateLimited;
-    // Every remaining GoTrue rejection on this endpoint means the same thing
-    // to the user: that code did not work. Expired and wrong are not worth
-    // distinguishing, and doing so would only add copy to translate.
-    if (e is AuthException) return AuthMessages.invalidOtp;
-    return AuthMessages.generic;
+    if (_isSmsUnavailable(e, isPhone)) return AuthMessages.smsUnavailable;
+
+    // On this endpoint a 4xx means the code itself did not work — wrong or
+    // expired, which are not worth distinguishing to the user. This is checked
+    // before [_isRejected] precisely because a bad OTP also arrives as a 400,
+    // and "that code is wrong" is the far more useful reading here.
+    if (e is AuthException && (_isRejected(e) || e.code == 'otp_expired')) {
+      return AuthMessages.otpInvalid;
+    }
+    return AuthMessages.unknown;
+  }
+
+  /// Type, status and GoTrue error code only. The message body can echo a
+  /// server string or an address, so it never goes to the log.
+  void _log(String stage, Object e) {
+    if (e is AuthException) {
+      debugPrint('[auth] $stage failed: ${e.runtimeType} '
+          'status=${e.statusCode ?? "-"} code=${e.code ?? "-"}');
+    } else {
+      debugPrint('[auth] $stage failed: ${e.runtimeType}');
+    }
   }
 }

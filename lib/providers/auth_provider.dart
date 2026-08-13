@@ -4,15 +4,18 @@ import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../services/app_config.dart';
 import '../services/supabase_service.dart';
 
 /// Where the user is in the auth flow. [unknown] only lasts until the Supabase
 /// SDK reports its first state — the auth gate shows the splash meanwhile.
 enum AuthStatus { unknown, signedOut, awaitingOtp, signedIn }
 
-/// Which channel the pending OTP was sent over. Country decides this:
-/// India → SMS, everywhere else → email (Phase 6 finalises the providers).
-enum OtpChannelKind { email, phone }
+/// How a one-time code is delivered. This is the user's own choice on the
+/// sign-up / log-in screens and is deliberately independent of [countryCode],
+/// which only drives pricing. SMS is not provisioned in India yet (DLT/TRAI
+/// registration pending), so the screens default everyone to email.
+enum OtpChannel { email, phone }
 
 class AuthProvider extends ChangeNotifier {
   AuthProvider({SupabaseService? service})
@@ -36,11 +39,13 @@ class AuthProvider extends ChangeNotifier {
   String? _pendingIdentifier;
   String? get pendingIdentifier => _pendingIdentifier;
 
-  OtpChannelKind? _pendingChannel;
-  OtpChannelKind? get pendingChannel => _pendingChannel;
+  OtpChannel? _pendingChannel;
+  OtpChannel? get pendingChannel => _pendingChannel;
 
   /// ISO-3166 alpha-2, e.g. 'IN'. Chosen on the sign-up screen and written to
-  /// `profiles.country_code` once, on first sign-in.
+  /// `profiles.country_code` once, on first sign-in. It decides pricing only
+  /// (₹109 India vs $1.10 international) and never the OTP channel; the server
+  /// owns it after that first write.
   String _countryCode = 'IN';
   String get countryCode => _countryCode;
   set countryCode(String code) {
@@ -60,8 +65,20 @@ class AuthProvider extends ChangeNotifier {
   bool get isConfigured => _svc.isConfigured;
   User? get user => _svc.currentUser;
 
-  /// True when the country routes OTP over SMS rather than email.
-  static bool usesPhoneOtp(String countryCode) => countryCode == 'IN';
+  // ── Backend configuration ─────────────────────────────────────────────────
+  //
+  // The auth screens read these to decide whether to paint the diagnostic
+  // strip. They are computed, not cached, so a rebuild always reflects reality.
+
+  /// Whether the `.env` that shipped in this build is usable.
+  ConfigStatus get configStatus => AppConfig.validate();
+
+  bool get configOk => configStatus == ConfigStatus.ok;
+
+  /// A one-line summary safe to render in a release build: presence and shape
+  /// only, never any part of the URL or the key. See
+  /// [AppConfig.describeForDiagnostics].
+  String get configDiagnostics => AppConfig.describeForDiagnostics();
 
   // ── Lifecycle ─────────────────────────────────────────────────────────────
 
@@ -132,36 +149,47 @@ class AuthProvider extends ChangeNotifier {
 
   // ── Actions ───────────────────────────────────────────────────────────────
 
-  /// Email path — used by every country except India.
-  Future<bool> startEmailSignup(String email) =>
-      _dispatch(email.trim(), OtpChannelKind.email, isSignup: true);
+  /// Signs up over the channel the user picked. [identifier] is an email
+  /// address for [OtpChannel.email], or an E.164 number (dial code already
+  /// attached) for [OtpChannel.phone]. The country selector is unrelated: it
+  /// is written through [countryCode] by the screen and only affects pricing.
+  Future<bool> startSignup({
+    required String identifier,
+    required OtpChannel channel,
+  }) =>
+      _dispatch(identifier.trim(), channel, isSignup: true);
 
-  /// Phone path — India. [phoneE164] must already carry the dial code.
-  Future<bool> startPhoneSignup(String phoneE164, String countryCode) {
-    _countryCode = countryCode;
-    return _dispatch(phoneE164.trim(), OtpChannelKind.phone, isSignup: true);
-  }
-
-  /// Log in with whichever identifier the user typed. An `@` means email;
-  /// anything else is treated as a phone number.
-  Future<bool> login(String identifier) {
-    final id = identifier.trim();
-    final channel =
-        id.contains('@') ? OtpChannelKind.email : OtpChannelKind.phone;
-    return _dispatch(id, channel, isSignup: false);
-  }
+  /// Logs in over the channel the user picked, same identifier rules as
+  /// [startSignup].
+  Future<bool> login({
+    required String identifier,
+    required OtpChannel channel,
+  }) =>
+      _dispatch(identifier.trim(), channel, isSignup: false);
 
   Future<bool> _dispatch(
     String identifier,
-    OtpChannelKind channel, {
+    OtpChannel channel, {
     required bool isSignup,
   }) async {
     _beginBusy();
+
+    // Fail fast and honestly. A build whose `.env` did not survive packaging
+    // cannot reach the backend at all, and the resulting socket error used to
+    // be reported as "no connection" — blaming the user's phone for a fault in
+    // this app. Say what is actually wrong instead, and skip the request.
+    if (!configOk) {
+      debugPrint('[auth] dispatch blocked — $configDiagnostics');
+      _errorKey = AuthMessages.config;
+      _busy = false;
+      notifyListeners();
+      return false;
+    }
     // Sign-up and log-in intentionally hit the same endpoint with the same
     // payload; `isSignup` only picks which service method name is used, so the
     // two flows are indistinguishable on the wire.
     final AuthResult res;
-    if (channel == OtpChannelKind.email) {
+    if (channel == OtpChannel.email) {
       res = isSignup
           ? await _svc.signUpWithEmailOtp(identifier)
           : await _svc.signInWithEmailOtp(identifier);
@@ -201,13 +229,20 @@ class AuthProvider extends ChangeNotifier {
     final id = _pendingIdentifier;
     final channel = _pendingChannel;
     if (id == null || channel == null) {
-      _errorKey = AuthMessages.generic;
+      _errorKey = AuthMessages.unknown;
+      notifyListeners();
+      return false;
+    }
+
+    if (!configOk) {
+      debugPrint('[auth] verify blocked — $configDiagnostics');
+      _errorKey = AuthMessages.config;
       notifyListeners();
       return false;
     }
 
     _beginBusy();
-    final res = channel == OtpChannelKind.email
+    final res = channel == OtpChannel.email
         ? await _svc.verifyEmailOtp(email: id, token: code.trim())
         : await _svc.verifyPhoneOtp(phoneE164: id, token: code.trim());
 

@@ -20,8 +20,10 @@ class _C {
   static const Color red = Color(0xFFFF3D3D);
 }
 
-/// The countries offered at sign-up. `code` drives OTP routing: 'IN' takes the
-/// SMS path, everything else takes email (Phase 6 finalises the providers).
+/// The countries offered at sign-up. `code` is written to
+/// `profiles.country_code` and drives PRICING only (₹109 India vs $1.10
+/// international). It has no bearing on how the OTP is delivered — that is the
+/// user's own choice, see [OtpChannel].
 class _Country {
   final String code;
   final String name;
@@ -52,13 +54,28 @@ class _SignupScreenState extends State<SignupScreen> {
   final _controller = TextEditingController();
   _Country _country = _kCountries.first;
 
+  /// Email for every country, India included: SMS is not provisioned yet
+  /// (DLT/TRAI registration pending), so email is the only channel that
+  /// actually delivers today. The user can still switch.
+  OtpChannel _channel = OtpChannel.email;
+
   @override
   void dispose() {
     _controller.dispose();
     super.dispose();
   }
 
-  bool get _usesPhone => AuthProvider.usesPhoneOtp(_country.code);
+  bool get _usesPhone => _channel == OtpChannel.phone;
+
+  void _selectChannel(OtpChannel channel) {
+    if (channel == _channel) return;
+    setState(() {
+      _channel = channel;
+      // Email and phone are different inputs — never carry one over.
+      _controller.clear();
+    });
+    context.read<AuthProvider>().clearError();
+  }
 
   /// `context.tr()` watches SettingsProvider, which is only legal inside
   /// build. Validators run outside it too, so they resolve strings by reading
@@ -71,8 +88,8 @@ class _SignupScreenState extends State<SignupScreen> {
     final value = (raw ?? '').trim();
     if (_usesPhone) {
       final digits = value.replaceAll(RegExp(r'\D'), '');
-      // India is the only phone-OTP country today, and its subscriber numbers
-      // are 10 digits starting 6-9.
+      // Indian subscriber numbers are 10 digits starting 6-9; elsewhere the
+      // national part varies, so only a loose length check is possible.
       final ok = _country.code == 'IN'
           ? RegExp(r'^[6-9]\d{9}$').hasMatch(digits)
           : digits.length >= 6 && digits.length <= 14;
@@ -89,14 +106,15 @@ class _SignupScreenState extends State<SignupScreen> {
     final auth = context.read<AuthProvider>();
     final value = _controller.text.trim();
 
-    final bool sent;
-    if (_usesPhone) {
-      final digits = value.replaceAll(RegExp(r'\D'), '');
-      sent = await auth.startPhoneSignup('${_country.dial}$digits', _country.code);
-    } else {
-      auth.countryCode = _country.code;
-      sent = await auth.startEmailSignup(value);
-    }
+    // The country selector is the sole source of `profiles.country_code`, on
+    // every channel — it is pricing data, not routing data.
+    auth.countryCode = _country.code;
+
+    final identifier = _usesPhone
+        ? '${_country.dial}${value.replaceAll(RegExp(r'\D'), '')}'
+        : value;
+    final sent =
+        await auth.startSignup(identifier: identifier, channel: _channel);
 
     if (!mounted || !sent) return;
     Navigator.of(context).pushNamed('/otp');
@@ -136,11 +154,24 @@ class _SignupScreenState extends State<SignupScreen> {
                 _countryField(),
                 const SizedBox(height: 20),
 
+                _label(context.tr('auth_channel_label')),
+                const SizedBox(height: 8),
+                _channelToggle(),
+                const SizedBox(height: 20),
+
                 _label(_usesPhone
                     ? context.tr('auth_phone_hint')
                     : context.tr('auth_email_hint')),
                 const SizedBox(height: 8),
                 _identifierField(),
+                if (_usesPhone) ...[
+                  const SizedBox(height: 8),
+                  Text(
+                    context.tr('auth_mobile_unavailable_hint'),
+                    style: const TextStyle(
+                        color: _C.muted, fontSize: 11.5, height: 1.45),
+                  ),
+                ],
                 const SizedBox(height: 20),
 
                 if (auth.errorKey != null) ...[
@@ -186,6 +217,7 @@ class _SignupScreenState extends State<SignupScreen> {
                   style: const TextStyle(
                       color: _C.muted, fontSize: 11, height: 1.5),
                 ),
+                _setupStrip(auth),
               ],
             ),
           ),
@@ -244,6 +276,60 @@ class _SignupScreenState extends State<SignupScreen> {
         ),
       );
 
+  /// Email / Mobile segmented control. Independent of the country selector
+  /// above it: country is pricing, this is delivery.
+  Widget _channelToggle() => Container(
+        padding: const EdgeInsets.all(4),
+        decoration: BoxDecoration(
+          color: _C.card,
+          border: Border.all(color: _C.border),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Row(
+          children: [
+            Expanded(
+              child: _channelTab(
+                  OtpChannel.email, context.tr('auth_channel_email')),
+            ),
+            const SizedBox(width: 4),
+            Expanded(
+              child: _channelTab(
+                  OtpChannel.phone, context.tr('auth_channel_mobile')),
+            ),
+          ],
+        ),
+      );
+
+  Widget _channelTab(OtpChannel channel, String label) {
+    final selected = _channel == channel;
+    return Material(
+      color: selected ? _C.cyan.withValues(alpha: 0.14) : Colors.transparent,
+      borderRadius: BorderRadius.circular(9),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(9),
+        onTap: () => _selectChannel(channel),
+        child: Container(
+          height: 40,
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(9),
+            border: Border.all(
+                color: selected ? _C.cyan.withValues(alpha: 0.55) : Colors.transparent),
+          ),
+          child: Text(
+            label,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              color: selected ? _C.cyan : _C.muted,
+              fontSize: 13.5,
+              fontWeight: selected ? FontWeight.w800 : FontWeight.w600,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _identifierField() => TextFormField(
         controller: _controller,
         validator: _validate,
@@ -295,6 +381,26 @@ class _SignupScreenState extends State<SignupScreen> {
           ),
         ),
       );
+
+  /// Bottom-of-screen setup strip, shown ONLY when the backend config that
+  /// shipped in this build is unusable.
+  ///
+  /// This is deliberately visible in release. The owner cannot read logcat from
+  /// a release APK on a phone, so without it a packaging fault surfaces as an
+  /// unactionable error banner. It reports presence and shape only — never any
+  /// part of the URL or the anon key — so it discloses nothing a screenshot
+  /// could leak. When the config is fine it renders nothing at all.
+  Widget _setupStrip(AuthProvider auth) {
+    if (auth.configOk) return const SizedBox.shrink();
+    return Padding(
+      padding: const EdgeInsets.only(top: 14),
+      child: Text(
+        '${context.tr('auth_setup_diagnostic')}: ${auth.configDiagnostics}',
+        textAlign: TextAlign.center,
+        style: const TextStyle(color: _C.muted, fontSize: 10, height: 1.45),
+      ),
+    );
+  }
 
   Widget _errorBanner(String message) => Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
