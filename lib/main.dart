@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'providers/auth_provider.dart';
+import 'providers/entitlement_provider.dart';
 import 'providers/settings_provider.dart';
 import 'providers/vehicle_provider.dart';
 import 'services/bluetooth_classic_service.dart';
@@ -93,6 +94,13 @@ void main() {
     final auth = AuthProvider();
     await auth.init();
 
+    // Entitlement token (Phase 3). After AuthProvider, because it needs the
+    // restored session to ask the server anything. Swallows its own failures
+    // for the same reason as the two calls above: nothing is gated behind a
+    // licence until Phase 8, so an unreachable backend must not stop the app.
+    final entitlement = EntitlementProvider();
+    await entitlement.init();
+
     runApp(
       MultiProvider(
         providers: [
@@ -102,6 +110,7 @@ void main() {
           ChangeNotifierProvider<BluetoothClassicService>.value(value: btService),
           ChangeNotifierProvider<ObdService>.value(value: obdService),
           ChangeNotifierProvider<AuthProvider>.value(value: auth),
+          ChangeNotifierProvider<EntitlementProvider>.value(value: entitlement),
         ],
         child: const DanliteELMApp(),
       ),

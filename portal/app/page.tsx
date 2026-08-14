@@ -123,6 +123,52 @@ function readPhase2(): Phase2Report | null {
   }
 }
 
+type Phase3Check = {
+  id: number;
+  name: string;
+  result: string;
+};
+
+type Phase3Report = {
+  phase: string;
+  name: string;
+  generated: string;
+  signature_algorithm: string;
+  public_key_base64: string;
+  private_key_location: string;
+  private_key_sha256_fingerprint: string;
+  signing_path_used: string;
+  signing_path_note: string;
+  function_url: string;
+  token_ttl_seconds: number;
+  canonical_signing_string: string;
+  canonical_note: string;
+  row_counts: {
+    auth_users: number;
+    profiles: number;
+    licences: number;
+    parity: boolean;
+    users_missing_licence: number;
+  };
+  offline_grace_explained: string;
+  clock_tamper_explained: string;
+  gating: string;
+  analyze: { new_errors: number; new_warnings: number; pre_existing_issues: number };
+  deviations: string[];
+  checks: Phase3Check[];
+};
+
+function readPhase3(): Phase3Report | null {
+  try {
+    const file = path.join(process.cwd(), 'phase3-report.json');
+    const raw = fs.readFileSync(file, 'utf8');
+    return JSON.parse(raw) as Phase3Report;
+  } catch {
+    // Absent until the phase has been run — the panel renders a muted card.
+    return null;
+  }
+}
+
 function statusPill(status: string) {
   const map: Record<string, { fg: string; label: string }> = {
     done: { fg: C.green, label: 'done' },
@@ -154,6 +200,7 @@ export default function MissionControl() {
   const { data, error } = readPhases();
   const p1 = readPhase1();
   const p2 = readPhase2();
+  const p3 = readPhase3();
 
   const shell = (children: React.ReactNode) => (
     <main
@@ -634,6 +681,217 @@ export default function MissionControl() {
             {/* Security assertions */}
             <ul style={{ listStyle: 'none', margin: '16px 0 0', padding: 0 }}>
               {p2.checks.map((t) => {
+                const ok = t.result === 'pass';
+                return (
+                  <li
+                    key={t.id}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 12,
+                      padding: '9px 0',
+                      borderTop: `1px solid ${C.border}`,
+                      fontSize: 13,
+                    }}
+                  >
+                    <span
+                      style={{
+                        width: 16,
+                        textAlign: 'center',
+                        color: ok ? C.green : C.red,
+                        fontWeight: 700,
+                      }}
+                    >
+                      {ok ? '✓' : '✗'}
+                    </span>
+                    <span
+                      style={{
+                        color: C.muted,
+                        fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace',
+                        fontSize: 12,
+                        minWidth: 18,
+                      }}
+                    >
+                      {t.id}
+                    </span>
+                    <span style={{ color: ok ? C.text : C.red }}>{t.name}</span>
+                  </li>
+                );
+              })}
+            </ul>
+          </>
+        )}
+      </section>
+
+      {/* ---------------- Phase 3 — Entitlement Token ---------------- */}
+      <section
+        style={{
+          backgroundColor: C.surface,
+          border: `1px solid ${C.border}`,
+          borderRadius: 12,
+          padding: 20,
+          marginBottom: 28,
+        }}
+      >
+        <h2 style={{ fontSize: 15, fontWeight: 700, margin: '0 0 4px' }}>
+          Phase 3 — Entitlement Token
+        </h2>
+
+        {!p3 ? (
+          <p style={{ color: C.muted, fontSize: 12.5, margin: '8px 0 0', lineHeight: 1.5 }}>
+            Not yet run. <code>phase3-report.json</code> will appear here once the signed
+            entitlement token and its offline grace window have been built.
+          </p>
+        ) : (
+          <>
+            <p style={{ color: C.muted, fontSize: 12.5, margin: '0 0 16px', lineHeight: 1.5 }}>
+              Signed licence statements issued and verified on {p3.generated}. {p3.gating}
+            </p>
+
+            {/* Algorithm + grace + signing-path badges */}
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, marginBottom: 14 }}>
+              {[
+                { label: 'Algorithm', value: p3.signature_algorithm },
+                {
+                  label: 'Offline grace',
+                  value: `${Math.round(p3.token_ttl_seconds / 86400)} days`,
+                },
+                { label: 'Signing path', value: p3.signing_path_used },
+                { label: 'New analyze errors', value: `${p3.analyze.new_errors}` },
+              ].map((b) => (
+                <span
+                  key={b.label}
+                  style={{
+                    display: 'inline-block',
+                    padding: '5px 11px',
+                    borderRadius: 8,
+                    border: `1px solid ${C.border}`,
+                    backgroundColor: C.card,
+                    fontSize: 12,
+                    color: C.muted,
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  {b.label} <span style={{ color: C.text, fontWeight: 700 }}>{b.value}</span>
+                </span>
+              ))}
+            </div>
+
+            {/* Key material. The public key is safe to show — that is its whole
+                purpose. The private key is represented ONLY by its fingerprint. */}
+            <div
+              style={{
+                border: `1px solid ${C.border}`,
+                backgroundColor: C.card,
+                borderRadius: 8,
+                padding: '12px 14px',
+                marginBottom: 14,
+              }}
+            >
+              {[
+                { k: 'Public key (safe to publish)', v: p3.public_key_base64, c: C.green },
+                { k: 'Private key SHA-256', v: p3.private_key_sha256_fingerprint, c: C.muted },
+                { k: 'Private key location', v: p3.private_key_location, c: C.muted },
+              ].map((row) => (
+                <div key={row.k} style={{ marginBottom: 8 }}>
+                  <div style={{ color: C.muted, fontSize: 11, marginBottom: 3 }}>{row.k}</div>
+                  <div
+                    style={{
+                      color: row.c,
+                      fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace',
+                      fontSize: 12,
+                      wordBreak: 'break-all',
+                      lineHeight: 1.5,
+                    }}
+                  >
+                    {row.v}
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Row-count parity: every user must own exactly one licence row */}
+            <p
+              style={{
+                margin: '0 0 6px',
+                fontSize: 13,
+                fontWeight: 600,
+                color: p3.row_counts.parity ? C.green : C.red,
+                fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace',
+              }}
+            >
+              profiles {p3.row_counts.profiles} = licences {p3.row_counts.licences}
+              {'  ·  '}users missing a licence: {p3.row_counts.users_missing_licence}
+            </p>
+            <p
+              style={{
+                margin: '0 0 6px',
+                fontSize: 13,
+                fontWeight: 600,
+                color: C.green,
+                fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace',
+              }}
+            >
+              Canonical signing string: {p3.canonical_signing_string}
+            </p>
+
+            {/* The two mechanisms the owner needs to be able to explain */}
+            {[
+              { title: 'Working offline', body: p3.offline_grace_explained },
+              { title: 'Turning the clock back', body: p3.clock_tamper_explained },
+              { title: 'Why not sign the JSON', body: p3.canonical_note },
+            ].map((b) => (
+              <div key={b.title} style={{ marginTop: 14 }}>
+                <div
+                  style={{
+                    color: C.cyan,
+                    fontSize: 11,
+                    fontWeight: 700,
+                    letterSpacing: 0.8,
+                    textTransform: 'uppercase',
+                    marginBottom: 5,
+                  }}
+                >
+                  {b.title}
+                </div>
+                <p
+                  style={{
+                    color: C.muted,
+                    fontSize: 12.5,
+                    lineHeight: 1.6,
+                    margin: 0,
+                  }}
+                >
+                  {b.body}
+                </p>
+              </div>
+            ))}
+
+            {/* Anything that did not go exactly to plan */}
+            {p3.deviations.length > 0 && (
+              <div style={{ marginTop: 16 }}>
+                {p3.deviations.map((d, i) => (
+                  <p
+                    key={i}
+                    style={{
+                      margin: '0 0 8px',
+                      padding: '10px 12px',
+                      borderRadius: 8,
+                      border: `1px solid ${C.amber}`,
+                      color: C.amber,
+                      fontSize: 12.5,
+                      lineHeight: 1.5,
+                    }}
+                  >
+                    {d}
+                  </p>
+                ))}
+              </div>
+            )}
+
+            {/* Verification assertions */}
+            <ul style={{ listStyle: 'none', margin: '16px 0 0', padding: 0 }}>
+              {p3.checks.map((t) => {
                 const ok = t.result === 'pass';
                 return (
                   <li

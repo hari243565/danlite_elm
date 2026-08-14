@@ -1,0 +1,56 @@
+{
+  "phase": "3",
+  "name": "Entitlement token + 14d offline grace",
+  "generated": "2026-08-15",
+  "signature_algorithm": "Ed25519",
+  "public_key_base64": "ajoKi94K7lTgYpUous4agdQGNfxurcjoxvOeNH/bMhU=",
+  "private_key_location": "Supabase Edge Function secret ED25519_PRIVATE_KEY — never in the repo, never in the APK",
+  "private_key_sha256_fingerprint": "8b9027aec82a101a6dee1a8c32fc778f5ee0853fb5cdad969945463c6ddcf517",
+  "signing_path_used": "crypto.subtle",
+  "signing_path_note": "Deno's native WebCrypto Ed25519 was available in the deployed Supabase Edge Runtime, so the npm:@noble/ed25519 fallback was never exercised. The fallback remains in the code and consumes the same secret (the raw 32-byte seed is the last 32 bytes of the stored PKCS#8 DER), so no re-keying would be needed if a future runtime drops native support.",
+  "function_url": "https://uomelinvbqabczhrzhnb.supabase.co/functions/v1/entitlement",
+  "token_ttl_seconds": 1209600,
+  "canonical_signing_string": "sub|lic|sid|did|iat|exp",
+  "canonical_note": "A fixed pipe-delimited string is signed, NOT the JSON. JSON key order, whitespace and unicode escaping differ between TypeScript and Dart, which would break signature verification intermittently and near-undebuggably. Null fields (sid/did until Phase 7) are the empty string.",
+  "row_counts": {
+    "auth_users": 2,
+    "profiles": 2,
+    "licences": 2,
+    "parity": true,
+    "users_missing_licence": 0
+  },
+  "offline_grace_explained": "When the app fetches a token it verifies the signature with the embedded public key and stores the token in the Android Keystore-backed secure store. If the phone has no signal, the app re-reads that stored token and re-checks its signature every time — a token on disk is only trusted as long as its signature still holds, so editing the file cannot upgrade a licence. The token stays usable for 14 days from the moment the server issued it, which is what lets a mechanic work all fortnight in a garage with no network.",
+  "clock_tamper_explained": "Alongside the token the app stores 'last_known_server_time' — the newest issue-time it has ever seen on a verified token. That value only ever moves forward, and only from a server-signed timestamp, never from the phone's own clock. If the phone later claims a time earlier than a moment the server has already vouched for, the clock has been wound back, so the token is treated as expired no matter what its expiry says and only going online can restore it. This is what stops 'set the clock back to before it expired'. A five-minute tolerance is allowed so an honestly drifting clock or an NTP resync is not mistaken for tampering.",
+  "gating": "none — no screen or feature is blocked by licence status in this phase. Phase 8 owns the paywall.",
+  "analyze": {
+    "new_errors": 0,
+    "new_warnings": 0,
+    "pre_existing_issues": 7
+  },
+  "deviations": [
+    "npx supabase status reports only local Docker containers, which this machine does not run (known Phase 1 constraint). The remote link was verified instead with npx supabase projects list (linked: true, ACTIVE_HEALTHY) and npx supabase db push --dry-run.",
+    "npx supabase db push could not complete: the direct database host db.<ref>.supabase.co is IPv6-only and, although TCP/5432 connects, the Postgres handshake times out from this network. The migration was applied instead through the Supabase Management API — the same transport the CLI uses for its other operations — inside a single transaction that also records the version in supabase_migrations.schema_migrations, so the CLI's migration ledger stays truthful and future pushes remain consistent.",
+    "The migration also grants SELECT on public.licences to service_role. This was not in the original plan but the Edge Function cannot read the table without it (service_role held only REFERENCES/TRIGGER/TRUNCATE — the same omission class as the Phase 2 profiles grant fix). SELECT only, deliberately: /entitlement never writes, and Phase 5/6 must add write grants as their own reviewable decision."
+  ],
+  "checks": [
+    { "id": 1, "name": "Ed25519 keypair generated; private key set as Edge Function secret", "result": "pass" },
+    { "id": 2, "name": "secrets list digest matches independently computed SHA-256 fingerprint", "result": "pass" },
+    { "id": 3, "name": "private key never printed; all local traces deleted and absence verified", "result": "pass" },
+    { "id": 4, "name": "signup trigger creates profiles AND licences rows in one transaction", "result": "pass" },
+    { "id": 5, "name": "new signup gets exactly one licences row with status='inactive'", "result": "pass" },
+    { "id": 6, "name": "backfill complete — licences count equals profiles count", "result": "pass" },
+    { "id": 7, "name": "deployed function returns 200 with a signed token for a real user JWT", "result": "pass" },
+    { "id": 8, "name": "signature verifies against the public key as committed in the Dart constant", "result": "pass" },
+    { "id": 9, "name": "tampered licence status ('inactive'->'active') fails verification", "result": "pass" },
+    { "id": 10, "name": "tampered expiry (+1 year) fails verification", "result": "pass" },
+    { "id": 11, "name": "request with no Authorization header rejected 401", "result": "pass" },
+    { "id": 12, "name": "request with malformed bearer token rejected 401", "result": "pass" },
+    { "id": 13, "name": "anon key used as bearer rejected 401 (valid JWT, but not a user)", "result": "pass" },
+    { "id": 14, "name": "token TTL is exactly 14 days (1209600s)", "result": "pass" },
+    { "id": 15, "name": "cached token re-verified on every read, not just on arrival", "result": "pass" },
+    { "id": 16, "name": "clock rollback below last known server time forces expiry", "result": "pass" },
+    { "id": 17, "name": "no screen gated; OBD / Bluetooth / DTC / native code untouched", "result": "pass" },
+    { "id": 18, "name": "flutter analyze: no new errors or warnings", "result": "pass" },
+    { "id": 19, "name": "test user created for verification was deleted; row counts back to baseline", "result": "pass" }
+  ]
+}

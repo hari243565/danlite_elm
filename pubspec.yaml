@@ -27,6 +27,12 @@ dependencies:
   flutter_dotenv: ^5.2.1
   device_info_plus: ^10.1.2
 
+  # ── Entitlement token verification (Phase 3) ───────────────────────────────
+  # Ed25519 signature verification only. The app never signs anything and never
+  # holds a private key — it verifies tokens minted by the /entitlement Edge
+  # Function against the public key in lib/constants/entitlement_public_key.dart.
+  cryptography: ^2.7.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
