@@ -236,6 +236,56 @@ function readPhase4(): Phase4Report | null {
   }
 }
 
+type Phase7Check = { id: number; name: string; result: string };
+
+type Phase7Report = {
+  phase: string;
+  name: string;
+  generated: string;
+  what_this_does: string;
+  gating: string;
+  atomicity: {
+    problem: string;
+    mechanism: string;
+    loser_behaviour: string;
+    lock_order: string;
+    lock_order_why: string;
+    same_device_guard: string;
+  };
+  the_only_logout_path: {
+    statement: string;
+    cannot_be_reached_by: string[];
+    reasoning: string;
+    fail_open_confirmed: boolean;
+  };
+  how_the_logout_reaches_the_screen: string;
+  portal_must_not_claim: {
+    constraint: string;
+    how_it_is_guaranteed: string;
+    verified_live: string;
+  };
+  fingerprint: Record<string, string>;
+  backward_compatibility: string;
+  canonical_string: string;
+  service_role_grants: Record<string, string>;
+  escape_hatch: string;
+  extra_false_positive_closed: string;
+  analyze: { new_errors: number; new_warnings: number; pre_existing_issues: number; note: string };
+  deviations: string[];
+  checks: Phase7Check[];
+};
+
+function readPhase7(): Phase7Report | null {
+  try {
+    const file = path.join(process.cwd(), 'phase7-report.json');
+    const raw = fs.readFileSync(file, 'utf8');
+    return JSON.parse(raw) as Phase7Report;
+  } catch {
+    // Absent until the phase has been run — the panel renders a muted card.
+    return null;
+  }
+}
+
 function statusPill(status: string) {
   const map: Record<string, { fg: string; label: string }> = {
     done: { fg: C.green, label: 'done' },
@@ -269,6 +319,7 @@ export default function MissionControl() {
   const p2 = readPhase2();
   const p3 = readPhase3();
   const p4 = readPhase4();
+  const p7 = readPhase7();
 
   const shell = (children: React.ReactNode) => (
     <main
@@ -1212,6 +1263,234 @@ export default function MissionControl() {
             {/* Verification assertions */}
             <ul style={{ listStyle: 'none', margin: '16px 0 0', padding: 0 }}>
               {p4.checks.map((t) => {
+                const ok = t.result === 'pass';
+                return (
+                  <li
+                    key={t.id}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 12,
+                      padding: '9px 0',
+                      borderTop: `1px solid ${C.border}`,
+                      fontSize: 13,
+                    }}
+                  >
+                    <span
+                      style={{
+                        width: 16,
+                        textAlign: 'center',
+                        color: ok ? C.green : C.red,
+                        fontWeight: 700,
+                      }}
+                    >
+                      {ok ? '✓' : '✗'}
+                    </span>
+                    <span
+                      style={{
+                        color: C.muted,
+                        fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace',
+                        fontSize: 12,
+                        minWidth: 18,
+                      }}
+                    >
+                      {t.id}
+                    </span>
+                    <span style={{ color: ok ? C.text : C.red }}>{t.name}</span>
+                  </li>
+                );
+              })}
+            </ul>
+          </>
+        )}
+      </section>
+
+      {/* ---------------- Phase 7 — Single Active Session ---------------- */}
+      <section
+        style={{
+          backgroundColor: C.surface,
+          border: `1px solid ${C.border}`,
+          borderRadius: 12,
+          padding: 20,
+          marginBottom: 28,
+        }}
+      >
+        <h2 style={{ fontSize: 15, fontWeight: 700, margin: '0 0 4px' }}>
+          Phase 7 — Single Active Session
+        </h2>
+
+        {!p7 ? (
+          <p style={{ color: C.muted, fontSize: 12.5, margin: '8px 0 0', lineHeight: 1.5 }}>
+            Not yet run. <code>phase7-report.json</code> will appear here once single-session
+            enforcement has been built.
+          </p>
+        ) : (
+          <>
+            <p style={{ color: C.muted, fontSize: 12.5, margin: '0 0 16px', lineHeight: 1.5 }}>
+              {p7.what_this_does} Verified on {p7.generated}.
+            </p>
+
+            {/* The concurrency argument — the reason this phase is not trivial */}
+            <div
+              style={{
+                border: `1px solid ${C.border}`,
+                borderRadius: 8,
+                padding: '12px 14px',
+                marginBottom: 14,
+              }}
+            >
+              <div
+                style={{
+                  color: C.cyan,
+                  fontSize: 11,
+                  fontWeight: 700,
+                  letterSpacing: 0.8,
+                  textTransform: 'uppercase',
+                  marginBottom: 6,
+                }}
+              >
+                Atomicity — two logins at the same instant
+              </div>
+              {[
+                p7.atomicity.mechanism,
+                p7.atomicity.loser_behaviour,
+                `Lock order: ${p7.atomicity.lock_order}. ${p7.atomicity.lock_order_why}`,
+                p7.atomicity.same_device_guard,
+              ].map((line, i) => (
+                <p
+                  key={i}
+                  style={{ color: C.muted, fontSize: 12.5, lineHeight: 1.6, margin: '0 0 6px' }}
+                >
+                  • {line}
+                </p>
+              ))}
+            </div>
+
+            {/* The single logout path */}
+            <div
+              style={{
+                border: `1px solid ${C.amber}`,
+                borderRadius: 8,
+                padding: '12px 14px',
+                marginBottom: 14,
+              }}
+            >
+              <div
+                style={{
+                  color: C.amber,
+                  fontSize: 11,
+                  fontWeight: 700,
+                  letterSpacing: 0.8,
+                  textTransform: 'uppercase',
+                  marginBottom: 6,
+                }}
+              >
+                The only path that can force a logout
+              </div>
+              <p style={{ color: C.text, fontSize: 12.5, lineHeight: 1.6, margin: '0 0 8px' }}>
+                {p7.the_only_logout_path.statement}
+              </p>
+              <p style={{ color: C.muted, fontSize: 12, lineHeight: 1.6, margin: '0 0 6px' }}>
+                It cannot be reached by:
+              </p>
+              {p7.the_only_logout_path.cannot_be_reached_by.map((d, i) => (
+                <p
+                  key={i}
+                  style={{ color: C.muted, fontSize: 12.5, lineHeight: 1.6, margin: '0 0 4px' }}
+                >
+                  • {d}
+                </p>
+              ))}
+              <p style={{ color: C.muted, fontSize: 12.5, lineHeight: 1.6, margin: '8px 0 0' }}>
+                {p7.the_only_logout_path.reasoning}
+              </p>
+            </div>
+
+            {/* The hard constraint */}
+            <div
+              style={{
+                border: `1px solid ${C.red}`,
+                borderRadius: 8,
+                padding: '12px 14px',
+                marginBottom: 14,
+              }}
+            >
+              <div
+                style={{
+                  color: C.red,
+                  fontSize: 11,
+                  fontWeight: 700,
+                  letterSpacing: 0.8,
+                  textTransform: 'uppercase',
+                  marginBottom: 6,
+                }}
+              >
+                Hard constraint — the portal must never claim a session
+              </div>
+              {[
+                p7.portal_must_not_claim.constraint,
+                p7.portal_must_not_claim.how_it_is_guaranteed,
+                p7.portal_must_not_claim.verified_live,
+              ].map((line, i) => (
+                <p
+                  key={i}
+                  style={{ color: C.muted, fontSize: 12.5, lineHeight: 1.6, margin: '0 0 6px' }}
+                >
+                  • {line}
+                </p>
+              ))}
+            </div>
+
+            {/* Compatibility, signing, grants */}
+            <div style={{ marginBottom: 14 }}>
+              {[
+                ['Backward compatibility', p7.backward_compatibility],
+                ['Canonical signing string', p7.canonical_string],
+                ['Forced logout reaches the screen', p7.how_the_logout_reaches_the_screen],
+                ['service_role grants', p7.service_role_grants.why_select_only],
+                ['Escape hatch', p7.escape_hatch],
+                ['False positive found and closed', p7.extra_false_positive_closed],
+                ['Gating', p7.gating],
+              ].map(([k, v]) => (
+                <p
+                  key={k}
+                  style={{ color: C.muted, fontSize: 12.5, lineHeight: 1.6, margin: '0 0 6px' }}
+                >
+                  <span style={{ color: C.text, fontWeight: 600 }}>{k}: </span>
+                  {v}
+                </p>
+              ))}
+            </div>
+
+            {/* Anything that did not go exactly to plan */}
+            {p7.deviations.length > 0 && (
+              <div style={{ marginTop: 16 }}>
+                <div
+                  style={{
+                    color: C.cyan,
+                    fontSize: 11,
+                    fontWeight: 700,
+                    letterSpacing: 0.8,
+                    textTransform: 'uppercase',
+                    marginBottom: 5,
+                  }}
+                >
+                  Deviations from the written plan
+                </div>
+                {p7.deviations.map((d, i) => (
+                  <p
+                    key={i}
+                    style={{ color: C.muted, fontSize: 12.5, lineHeight: 1.6, margin: '0 0 6px' }}
+                  >
+                    • {d}
+                  </p>
+                ))}
+              </div>
+            )}
+
+            {/* Verification assertions */}
+            <ul style={{ listStyle: 'none', margin: '16px 0 0', padding: 0 }}>
+              {p7.checks.map((t) => {
                 const ok = t.result === 'pass';
                 return (
                   <li

@@ -1,0 +1,115 @@
+{
+  "phase": "7",
+  "name": "Single active session",
+  "generated": "2026-08-15",
+
+  "what_this_does": "One phone at a time. Logging in on a new device makes it the active session and the previous device signs itself out the next time it refreshes its entitlement — normally within seconds of coming online. Last-login-wins is deliberate: it is what a person expects when they move to a new phone, and it means a customer can never lock themselves out by losing the old one.",
+
+  "gating": "none — no screen and no feature is blocked by licence status in this phase. Phase 8 owns the paywall. The only thing this phase can do to a user is return them to the login screen, and only when the server has explicitly said the account is in use elsewhere.",
+
+  "atomicity": {
+    "problem": "Two devices logging in at the same instant must not both believe they are the active session.",
+    "mechanism": "public.claim_session() takes SELECT ... FOR UPDATE on the user's licences row before it reads or writes active_session_id. Postgres serializes the two callers on that row lock; under READ COMMITTED the second caller re-reads the freshly committed row after the lock is granted, so it sees the first caller's session and supersedes it correctly rather than overwriting it blindly.",
+    "loser_behaviour": "The later login does not fail. It becomes the new active session and the earlier one is marked revoked with revoke_reason='superseded'.",
+    "lock_order": "licences -> devices -> sessions, held by every function in the migration.",
+    "lock_order_why": "Two real deadlock cycles were designed out rather than discovered later. (a) The device upsert was moved INSIDE the licence lock; taking devices first and licences second would deadlock against any statement doing the reverse, and holding the licence lock across the upsert also removes unique-index contention between two logins racing on the same fingerprint. (b) sign_out_all_devices takes the licence lock FIRST even though it has no logical need to read the licence there — without it, a claim holding the licence and reaching for a session row, against a sign-out holding that session row and reaching for the licence, is a textbook cycle that Postgres would resolve by aborting one caller with 40P01: a login that fails for no reason the user could ever understand.",
+    "same_device_guard": "Re-logging in on the SAME device is not a supersession. The device is keyed on (user_id, fingerprint) and an unchanged fingerprint resolves to the same device row, so superseded=false and the old session is retired quietly as 'reissued_same_device'. This is the single most likely false positive and it is tested directly."
+  },
+
+  "the_only_logout_path": {
+    "statement": "EXACTLY ONE code path in the app can sign a user out without them asking. It is EntitlementService.fetchAndVerify()'s `on FunctionsHttpException` branch, and it fires only when ALL of the following hold: the exception type is FunctionsHttpException (meaning the Edge Function itself answered), the status is exactly 409, the body parsed as a Map, and that Map's `error` equals the literal string 'SESSION_SUPERSEDED'. It then returns EntitlementStatus.supersededSession, which EntitlementProvider.refresh() acts on by calling AuthProvider.forceLogoutSuperseded().",
+    "cannot_be_reached_by": [
+      "a network error or timeout — FunctionsFetchException, status 0, different catch",
+      "a Supabase relay failure — FunctionsRelayException, which carries a status but did not come from our function; a relayed 409 would NOT be ours",
+      "any 5xx — falls through to the cached-token path",
+      "a 409 whose body is not SESSION_SUPERSEDED, or whose body did not parse as a Map",
+      "a malformed or unsigned payload — rejected before this point and discarded entirely",
+      "a failed signature check on a cached token",
+      "a failed /claim-session call — that returns false and is ignored by the login path",
+      "a malformed session_id — /entitlement answers 400, never 409 (verified live)"
+    ],
+    "reasoning": "This mirrors the Phase 2 lesson where a Supabase 500 was being reported as a network failure. An ambiguous signal must never produce a destructive action, and a forced logout of a working phone is destructive.",
+    "fail_open_confirmed": true
+  },
+
+  "how_the_logout_reaches_the_screen": "Through the EXISTING Phase 2 mechanism, with no screen modified and no navigation code added anywhere in this phase. AuthProvider.forceLogoutSuperseded() parks a message key and calls the ordinary SupabaseService.signOut(). That fires `signedOut` on the auth stream; the listening AuthProvider moves to AuthStatus.signedOut and collects the parked key into its existing _errorKey; the Phase 2 AuthGate redirects to the login screen on its own; and login_screen.dart's pre-existing error banner renders context.tr(auth.errorKey!) — so the localized explanation appears without lib/screens/ being touched at all.",
+
+  "portal_must_not_claim": {
+    "constraint": "Loading any portal page must never claim, supersede or revoke a session. If it did, a customer who paid on the web would be signed out of their phone at the exact moment their money left their account — the app would look broken precisely when they had just paid for it.",
+    "how_it_is_guaranteed": "Three independent reasons, not one. (1) The portal never calls /claim-session — nothing in portal/ references it. (2) portal/lib/entitlement.ts posts the literal body '{}', which carries no session_id, and /entitlement's supersession branch requires a caller-supplied session_id to do anything at all. (3) The device panel reads with the user's own RLS-scoped client using three plain SELECTs. The only state-changing thing on the page is the sign-out button, which is a POST-only Server Action behind a confirmation step.",
+    "verified_live": "A byte-for-byte portal-style call was made against the deployed function while a phone session was active: HTTP 200, licences.active_session_id unchanged, and the phone's session still unrevoked."
+  },
+
+  "fingerprint": {
+    "what_is_sent": "SHA-256 of a random 256-bit per-install secret, as 64 lowercase hex characters. Opaque, and it identifies an installation rather than a handset.",
+    "what_is_stored": "The secret itself, in flutter_secure_storage (AndroidX EncryptedSharedPreferences, master key in the hardware-backed Android Keystore). The raw secret is never transmitted.",
+    "why_not_the_android_id": "device_info_plus REMOVED androidId in v4 and this project is on 10.1.2, so the Step 4 preference is not reachable without a new dependency — which this phase is not permitted to add. The written fallback (a random value persisted in secure storage) therefore becomes the primary path, and it is the better one anyway: strictly more private than a device-wide hardware identifier, and strictly more accurate because it identifies an install.",
+    "why_no_build_details": "Folding in manufacturer/model/build id looks appealing but fails the wrong way: an ordinary Android OTA changes the build id, which would change the fingerprint, which would read as a DIFFERENT device and sign a user out of their own phone for installing a system update. Given the choice between occasionally failing to supersede and occasionally logging out an innocent user, this phase fails toward not-logging-anyone-out.",
+    "note_on_the_phase_2_value": "AuthProvider's existing in-memory fingerprint (manufacturer|model|device|hardware|id) is build-level, not per-install: two identical handsets on the same build produce the same string. It is left exactly as it is and is not used for session identity."
+  },
+
+  "backward_compatibility": "Required and verified. An installed pre-Phase-7 APK calls /entitlement with NO body at all; the portal sends '{}'. Both keep working unchanged and receive a normally-signed token with empty sid/did. An app that has not claimed a session yet is never locked out.",
+
+  "canonical_string": "UNCHANGED — sub|lic|sid|did|iat|exp. No format change, no algorithm change, no key change, no TTL change. The sid/did fields already existed and merely stopped being empty. Verified live: a token issued after a claim carries a populated sid/did and still verifies against the public key committed in lib/constants/entitlement_public_key.dart.",
+
+  "service_role_grants": {
+    "before": "devices: REFERENCES, TRIGGER, TRUNCATE only. sessions: REFERENCES, TRIGGER, TRUNCATE only. NO SELECT, NO INSERT, NO UPDATE on either.",
+    "would_have_been_fatal": "Any direct table access by the Edge Functions would have failed with 42501 — the same omission class found in Phase 2 (profiles) and Phase 3 (licences).",
+    "after": "SELECT added on both. INSERT/UPDATE deliberately NOT granted.",
+    "why_select_only": "The three functions are SECURITY DEFINER owned by postgres, which holds BYPASSRLS, so their writes need no service_role grant. The portal reads through the user's own RLS-scoped client, so it needs none either. Granting INSERT/UPDATE would widen what a leaked service-role key can do while no caller needs it, and would defeat the point of routing every write through a locked, auditable function. This narrowing is a deliberate deviation from the written grant line; Phase 8 must add write grants as its own reviewable decision if it ever needs them."
+  },
+
+  "escape_hatch": "public.sign_out_all_devices() via the /sign-out-devices Edge Function, reachable only from the explicit two-step button on /account. It revokes every live session and clears the licence's active session, so the next login on any device wins cleanly. A stale session id presented after it correctly gets a 200 rather than a 409 — with no active session there is nobody to supersede, so it must not evict anyone.",
+
+  "analyze": {
+    "new_errors": 0,
+    "new_warnings": 0,
+    "pre_existing_issues": 7,
+    "note": "All 7 are the same pre-existing issues as prior phases, every one of them in lib/screens/ — files this phase did not touch."
+  },
+
+  "deviations": [
+    "Step 4 asked for a SHA-256 of the Android ID from device_info_plus. That field does not exist: androidId was removed in device_info_plus v4 and this project is on 10.1.2 (verified by searching the package source). Rather than add a dependency — which the brief forbids without stopping first — the written fallback was used as the primary path: a random 256-bit per-install secret in flutter_secure_storage, transmitted only as its SHA-256. This is more private and more accurate than a hardware identifier would have been.",
+    "The migration grants SELECT only on devices and sessions to service_role, not the SELECT/INSERT/UPDATE written in the brief. Step 2 explicitly says to grant only what is actually missing and actually needed; nothing needs the write grants, because the functions are SECURITY DEFINER owned by postgres and the portal reads as the user. Granting them would only widen the blast radius of a leaked key.",
+    "Two lock-ordering changes were made to the supplied SQL, both to remove real deadlock cycles rather than for style. The device upsert moved INSIDE the licence lock, and sign_out_all_devices now takes the licence lock before touching sessions. Without the second one, a concurrent claim and sign-out-all can deadlock and Postgres aborts one of them with 40P01. See atomicity.lock_order_why.",
+    "AuthMessages (the class holding every other auth message key) lives in supabase_service.dart, which this phase may not modify. The new key is therefore declared as kSessionSupersededMessageKey in auth_provider.dart, following the same convention.",
+    "/entitlement rejects a malformed session_id with 400 rather than letting it fall through to the mismatch branch. A non-UUID string is a client bug, and allowing it to reach the mismatch comparison would turn a typo into a forced logout.",
+    "Verification found that functions_client 2.7.1 THROWS FunctionsHttpException on any non-2xx rather than returning the status, which makes the pre-existing `if (res.status != 200)` line in entitlement_service.dart unreachable. That line is left exactly as it is — it is correct-but-dead and outside this phase's scope — and the 409 detection was correctly placed in the catch clause instead, where it actually runs.",
+    "Check 6 was run BEFORE checks 3 and 4 rather than in the written order. 'An installed app that has not claimed yet' is only true of a licence with no active session, which stops being the case the moment check 3 claims one; running it in the written order would have asserted empty sid/did against a licence that legitimately had them, testing the wrong thing entirely."
+  ],
+
+  "test_hygiene": "Every live check ran against the real deployed stack with a throwaway auth user, which was deleted afterwards. FK cascade verified: 0 devices, 0 sessions, 0 licences left behind.",
+
+  "checks": [
+    { "id": 1, "name": "recon: live schema of devices/sessions/licences read before writing any SQL", "result": "pass" },
+    { "id": 2, "name": "recon: service_role held NO SELECT/INSERT/UPDATE on devices or sessions", "result": "pass" },
+    { "id": 3, "name": "migration applied; all 3 functions exist, SECURITY DEFINER, search_path pinned", "result": "pass" },
+    { "id": 4, "name": "EXECUTE granted to service_role only; revoked from public/anon/authenticated", "result": "pass" },
+    { "id": 5, "name": "atomicity: 2nd claim with a different fingerprint supersedes the 1st", "result": "pass" },
+    { "id": 6, "name": "atomicity: exactly 1 unrevoked session; licence points at it; 1st reason='superseded'", "result": "pass" },
+    { "id": 7, "name": "atomicity under real concurrency: 8 simultaneous claims, 8/8 succeeded, exactly 1 survivor", "result": "pass" },
+    { "id": 8, "name": "same-device re-login: superseded=false, one device row, same device_id", "result": "pass" },
+    { "id": 9, "name": "live: /entitlement with a wrong session_id returns 409 SESSION_SUPERSEDED and NO token", "result": "pass" },
+    { "id": 10, "name": "live: /entitlement with no session_id returns a signed token with empty sid/did", "result": "pass" },
+    { "id": 11, "name": "live: pre-Phase-7 APK shape (no body at all) still works — not locked out", "result": "pass" },
+    { "id": 12, "name": "live: after a claim, sid/did are populated and the signature still verifies", "result": "pass" },
+    { "id": 13, "name": "signature verified against the key committed in entitlement_public_key.dart", "result": "pass" },
+    { "id": 14, "name": "token TTL still exactly 14 days (1209600s); canonical format unchanged", "result": "pass" },
+    { "id": 15, "name": "touch_session heartbeat applied on a matching refresh", "result": "pass" },
+    { "id": 16, "name": "HARD CONSTRAINT: a portal-style call changed no session state, phone stayed live", "result": "pass" },
+    { "id": 17, "name": "/sign-out-devices revokes all and clears the licence; GET refused with 405", "result": "pass" },
+    { "id": 18, "name": "a stale session id after sign-out-all gets 200, not 409 — nobody is evicted", "result": "pass" },
+    { "id": 19, "name": "/claim-session rejects no-bearer and anon-key-as-bearer with 401", "result": "pass" },
+    { "id": 20, "name": "/claim-session rejects an implausible fingerprint and a bad platform with 400", "result": "pass" },
+    { "id": 21, "name": "/entitlement rejects a malformed session_id with 400, NOT 409", "result": "pass" },
+    { "id": 22, "name": "session id stored in flutter_secure_storage; no shared_preferences reference", "result": "pass" },
+    { "id": 23, "name": "flutter analyze: 7 pre-existing issues, 0 new errors, 0 new warnings", "result": "pass" },
+    { "id": 24, "name": "portal npm run build: zero errors", "result": "pass" },
+    { "id": 25, "name": "no changes under android/, lib/screens/, app.dart, main.dart, OBD/BT/DTC, or Phase 5", "result": "pass" },
+    { "id": 26, "name": "pubspec.yaml unchanged — no new dependency added", "result": "pass" },
+    { "id": 27, "name": "test user deleted; 0 devices / 0 sessions / 0 licences left behind", "result": "pass" },
+    { "id": 28, "name": "stored session id cleared on sign-out, so the next user cannot inherit it", "result": "pass" }
+  ],
+
+  "extra_false_positive_closed": "A cross-user false positive was found while tracing the sign-out path and fixed. EntitlementService.clear() now drops the stored session id along with the cached token. Previously the id survived a sign-out, so the NEXT user to sign in on the same phone would carry the previous user's session id on their first /entitlement call, before their own claim had landed. Harmless for a brand-new user, but a user who was already signed in on another phone would not match their own active session — the server would correctly answer 409 and this app would have signed them out moments after they successfully signed in. Neither the device secret nor last_known_server_time is cleared: both are statements about the DEVICE, not the user."
+}

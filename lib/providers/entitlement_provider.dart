@@ -5,6 +5,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../services/entitlement_service.dart';
 import '../services/supabase_service.dart';
+import 'auth_provider.dart';
 
 /// Danlite ELM — entitlement state (Phase 3)
 ///
@@ -146,6 +147,25 @@ class EntitlementProvider extends ChangeNotifier with WidgetsBindingObserver {
       // any network or verification failure, so there is no second call here.
       final res = await _service.fetchAndVerify();
       _set(res);
+
+      // ══════════════════════════════════════════════════════════════════
+      // (Phase 7) The ONE place in the app that acts on a supersession.
+      // ══════════════════════════════════════════════════════════════════
+      //
+      // Reaching this line requires EntitlementService to have received an
+      // explicit, successfully-parsed HTTP 409 SESSION_SUPERSEDED from the
+      // Edge Function. Every ambiguous outcome — offline, timeout, 5xx,
+      // unparseable body, bad signature, a 409 that did not say
+      // SESSION_SUPERSEDED — resolves to some OTHER status before it gets
+      // here and therefore cannot sign anybody out.
+      //
+      // The sign-out itself goes through the ordinary Supabase auth path, so
+      // the Phase 2 AuthGate does the redirect. There is no navigation code
+      // in this phase and no screen was modified.
+      if (res.status == EntitlementStatus.supersededSession) {
+        debugPrint('[entitlement] superseded — signing out via the auth gate');
+        await AuthProvider.forceLogoutSuperseded();
+      }
     } catch (e) {
       // Defensive: the service is documented not to throw, but a provider that
       // takes the app down on launch would be a far worse bug than a stale

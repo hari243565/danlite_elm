@@ -5,7 +5,16 @@ import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../services/app_config.dart';
+import '../services/session_service.dart';
 import '../services/supabase_service.dart';
+
+/// (Phase 7) AppStrings key shown on the login screen after a forced sign-out.
+///
+/// Declared here rather than alongside the other keys in [AuthMessages],
+/// because that class lives in `supabase_service.dart` — a file this phase is
+/// not permitted to touch. It follows the same convention: a key resolved with
+/// `context.tr(...)`, never a literal sentence and never server text.
+const String kSessionSupersededMessageKey = 'session_superseded_body';
 
 /// Where the user is in the auth flow. [unknown] only lasts until the Supabase
 /// SDK reports its first state — the auth gate shows the splash meanwhile.
@@ -18,11 +27,24 @@ enum AuthStatus { unknown, signedOut, awaitingOtp, signedIn }
 enum OtpChannel { email, phone }
 
 class AuthProvider extends ChangeNotifier {
-  AuthProvider({SupabaseService? service})
-      : _svc = service ?? SupabaseService.instance;
+  AuthProvider({SupabaseService? service, SessionService? sessions})
+      : _svc = service ?? SupabaseService.instance,
+        _sessions = sessions ?? SessionService();
 
   final SupabaseService _svc;
+  final SessionService _sessions;
   StreamSubscription<AuthState>? _sub;
+
+  /// (Phase 7) Why the user is about to find themselves at the login screen,
+  /// when it was not their own doing.
+  ///
+  /// Static, and deliberately so. [EntitlementProvider] is constructed
+  /// independently of this class in main.dart and holds no reference to it, so
+  /// there is no instance to hand a message to. Rather than introduce a
+  /// registry of live providers, the reason is parked here and collected by
+  /// whichever AuthProvider is listening when the `signedOut` event arrives —
+  /// which is the same stream that drives every other sign-out in the app.
+  static String? _pendingForcedLogoutKey;
 
   AuthStatus _status = AuthStatus.unknown;
   AuthStatus get status => _status;
@@ -134,6 +156,11 @@ class AuthProvider extends ChangeNotifier {
       case AuthChangeEvent.signedOut:
         _pendingIdentifier = null;
         _pendingChannel = null;
+        // Normally null, and then this is an ordinary sign-out. When Phase 7
+        // forced it, the login screen's existing error banner explains why —
+        // no screen had to change to say it.
+        _errorKey = _pendingForcedLogoutKey;
+        _pendingForcedLogoutKey = null;
         _set(AuthStatus.signedOut);
       default:
         break;
@@ -252,6 +279,17 @@ class AuthProvider extends ChangeNotifier {
     _busy = false;
     if (res.ok) {
       _errorKey = null;
+
+      // (Phase 7) Register this device as the active session.
+      //
+      // Awaited so that the very next /entitlement refresh already carries the
+      // new session id, but its result is deliberately ignored: a failed claim
+      // must NOT fail the login. The user has proved who they are; session
+      // bookkeeping is the app's problem, not theirs. On failure the
+      // entitlement layer simply runs in the backward-compatible no-session
+      // mode until the next successful claim.
+      await _sessions.claimSession();
+
       // Set the status here rather than waiting for the SDK's broadcast event:
       // the caller navigates straight back to the gate, and the gate must not
       // still see `awaitingOtp` on that rebuild or it would bounce the user
@@ -268,12 +306,35 @@ class AuthProvider extends ChangeNotifier {
 
   Future<void> logout() async {
     _beginBusy();
+    await _sessions.clearSession();
     await _svc.signOut();
     _pendingIdentifier = null;
     _pendingChannel = null;
     _errorKey = null;
     _busy = false;
     _set(AuthStatus.signedOut);
+  }
+
+  /// (Phase 7) Sign the user out because the SERVER said so — this account is
+  /// now in use on another device.
+  ///
+  /// Static because the caller ([EntitlementProvider]) has no reference to the
+  /// live instance; see [_pendingForcedLogoutKey].
+  ///
+  /// It deliberately does nothing except sign out through the ordinary
+  /// Supabase path. That fires `signedOut` on the auth stream, the listening
+  /// AuthProvider moves to [AuthStatus.signedOut], and the Phase 2 AuthGate
+  /// redirects to the login screen entirely on its own. No screen was touched
+  /// to make this work, and there is no navigation code anywhere in this
+  /// phase — the gate that already existed does the whole job.
+  static Future<void> forceLogoutSuperseded() async {
+    _pendingForcedLogoutKey = kSessionSupersededMessageKey;
+    final result = await SupabaseService.instance.signOut();
+    if (!result.ok) {
+      // The local session is cleared by the SDK even when the server call
+      // fails, so the gate still redirects. Nothing to recover here.
+      debugPrint('[auth] forced sign-out reported a failure; gate still applies');
+    }
   }
 
   void clearError() {

@@ -7,18 +7,143 @@
 // trigger (protect_profile_fields) that silently reverts any client attempt to
 // change country_code, precisely because country selects the price: a
 // client-editable country would be a 99% discount.
+//
+// ── PHASE 5: WHAT THIS PAGE MAY AND MAY NOT DO ──────────────────────────
+// It may open an order. It may hand Razorpay's Checkout the order id. It may
+// send the customer to /confirmation afterwards.
+//
+// It may NOT record a payment, and it may NOT activate a licence — and no
+// code path from this page to either exists to be misused. The browser's
+// "payment succeeded" callback is a UI event, not evidence: it is produced on
+// the customer's own machine and is trivially forgeable. Only
+// /razorpay-webhook, after verifying an HMAC-SHA256 signature over the raw
+// request body, may write payments or licences.
 // ══════════════════════════════════════════════════════════════════════════
 
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { NOINDEX } from '@/lib/seo';
 import { C, cardStyle, pageStyle, legalLinkStyle, MONO } from '@/lib/theme';
 import { createClient } from '@/lib/supabase/server';
 import { priceFor, formatMinor, GST_TREATMENT } from '@/lib/gst';
-import PayButton from './pay-button';
+import { rateLimit, clientIpFrom } from '@/lib/rate-limit';
+import PayButton, { type CreateOrderResult } from './pay-button';
 
 export const dynamic = 'force-dynamic';
+
+/** Deliberately tight. Nothing legitimate opens orders more than a few times. */
+const MAX_ORDER_ATTEMPTS = 10;
+const ORDER_WINDOW_MS = 60_000;
+
+// ══════════════════════════════════════════════════════════════════════════
+// The server action behind the Pay button.
+//
+// WHY A SERVER ACTION AND NOT A BROWSER FETCH: the Supabase session lives in
+// httpOnly cookies (Phase 4, deliberately — an XSS bug must not be able to
+// exfiltrate a refresh token). Page JavaScript therefore cannot read the
+// access token, and so cannot call the Edge Function directly. This action
+// runs on the server, where the cookie is readable, and forwards the caller's
+// own token. The portal still never holds a service-role key.
+// ══════════════════════════════════════════════════════════════════════════
+async function createOrderAction(): Promise<CreateOrderResult> {
+  'use server';
+
+  // Carried over from the Phase 4 stub rather than quietly dropped when the
+  // endpoint moved. Single-instance and in-process — honest about its scope,
+  // exactly as portal/lib/rate-limit.ts says.
+  const ip = clientIpFrom(await headers());
+  const limit = rateLimit(`create-order:${ip}`, MAX_ORDER_ATTEMPTS, ORDER_WINDOW_MS);
+  if (!limit.ok) {
+    return {
+      kind: 'error',
+      message: `Too many attempts. Please wait ${limit.retryAfterSeconds}s and try again.`,
+    };
+  }
+
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) {
+    return { kind: 'signed_out', message: 'Your session has expired. Please sign in again.' };
+  }
+
+  // getUser() above already revalidated the JWT against the auth server; this
+  // read is only to obtain the raw token to forward. The Edge Function
+  // independently validates it again on arrival.
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+  const accessToken = session?.access_token;
+  if (!accessToken) {
+    return { kind: 'signed_out', message: 'Your session has expired. Please sign in again.' };
+  }
+
+  const base = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  if (!base || !anonKey) {
+    console.error('NEXT_PUBLIC_SUPABASE_URL / ANON_KEY not set');
+    return { kind: 'error', message: 'Checkout is not configured. Please contact support.' };
+  }
+
+  try {
+    const res = await fetch(`${base}/functions/v1/create-order`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        apikey: anonKey,
+        'Content-Type': 'application/json',
+      },
+      cache: 'no-store',
+    });
+
+    const body = (await res.json().catch(() => ({}))) as Record<string, unknown>;
+
+    if (res.status === 409) {
+      return {
+        kind: 'already_licensed',
+        message:
+          (body.message as string) ??
+          'You already have a lifetime licence on this account.',
+      };
+    }
+
+    if (!res.ok) {
+      console.error(`create-order failed ${res.status}`);
+      return {
+        kind: 'error',
+        message: (body.error as string) ?? 'Could not start checkout. Please try again.',
+      };
+    }
+
+    if (body.available === false) {
+      return {
+        kind: 'unavailable',
+        message: (body.message as string) ?? 'International checkout is coming soon.',
+      };
+    }
+
+    return {
+      kind: 'ok',
+      orderId: body.order_id as string,
+      amount: body.amount as number,
+      currency: body.currency as string,
+      // Razorpay's own design exposes the Key ID to the browser; it identifies
+      // the account and authorises nothing without the secret, which never
+      // leaves Supabase. It reaches the page only through this response — it
+      // is not in .env.local.example, not in any committed file, and not in
+      // the repo at all.
+      keyId: body.key_id as string,
+      prefill: (body.prefill as { email?: string; contact?: string }) ?? {},
+    };
+  } catch (e) {
+    console.error('create-order request failed:', e instanceof Error ? e.message : String(e));
+    return { kind: 'error', message: 'Could not reach the payment service. Please try again.' };
+  }
+}
 
 export const metadata: Metadata = {
   title: 'Checkout — Danlite ELM',
@@ -113,7 +238,10 @@ export default async function CheckoutPage() {
             {price.note} Billed in {price.currency}.
           </p>
 
-          <PayButton label={`Pay ${price.symbol}${formatMinor(price.totalMinor)}`} />
+          <PayButton
+            label={`Pay ${price.symbol}${formatMinor(price.totalMinor)}`}
+            createOrder={createOrderAction}
+          />
 
           <p style={{ color: C.muted, fontSize: 12, lineHeight: 1.6, margin: '18px 0 0' }}>
             Signed in as{' '}

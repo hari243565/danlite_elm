@@ -4,8 +4,10 @@ import 'dart:convert';
 import 'package:cryptography/cryptography.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:supabase_flutter/supabase_flutter.dart' show FunctionsHttpException;
 
 import '../constants/entitlement_public_key.dart';
+import 'session_service.dart';
 import 'supabase_service.dart';
 
 /// Danlite ELM — entitlement token (Phase 3)
@@ -73,6 +75,16 @@ enum EntitlementStatus {
   /// Running on a cached, still-valid, signature-checked token because the
   /// network was unreachable. This is the normal state in a garage.
   offlineGraceActive,
+
+  /// (Phase 7) The server said, explicitly and unambiguously, that this
+  /// account is now signed in on a different device. This is the ONLY status
+  /// in this enum that causes the app to sign the user out.
+  ///
+  /// It is produced by exactly one thing: a successfully-parsed HTTP 409 whose
+  /// body is `{"error":"SESSION_SUPERSEDED"}`. Not a timeout, not a 5xx, not a
+  /// malformed reply, not a socket error — every one of those is ambiguous,
+  /// and an ambiguous signal must never trigger a destructive action.
+  supersededSession,
 }
 
 /// Where the answer came from — useful to Phase 8 and to support diagnostics.
@@ -97,6 +109,16 @@ class EntitlementResult {
         sub = null,
         iat = null,
         exp = null;
+
+  /// (Phase 7) The one result that means "sign this user out".
+  const EntitlementResult.superseded()
+      : status = EntitlementStatus.supersededSession,
+        source = EntitlementSource.network,
+        rawLic = null,
+        sub = null,
+        iat = null,
+        exp = null,
+        diagnostic = 'session superseded on another device';
 
   final EntitlementStatus status;
   final EntitlementSource source;
@@ -133,8 +155,12 @@ class EntitlementResult {
 }
 
 class EntitlementService {
-  EntitlementService({SupabaseService? service, FlutterSecureStorage? storage})
-      : _svc = service ?? SupabaseService.instance,
+  EntitlementService({
+    SupabaseService? service,
+    FlutterSecureStorage? storage,
+    SessionService? sessions,
+  })  : _svc = service ?? SupabaseService.instance,
+        _sessions = sessions ?? SessionService(),
         _storage = storage ??
             const FlutterSecureStorage(
               // Same options as the auth session store: an AndroidX
@@ -144,6 +170,7 @@ class EntitlementService {
             );
 
   final SupabaseService _svc;
+  final SessionService _sessions;
   final FlutterSecureStorage _storage;
 
   /// The Edge Function name, as deployed.
@@ -192,9 +219,18 @@ class EntitlementService {
       return const EntitlementResult.none('no session');
     }
 
+    // (Phase 7) Name the session this device believes it holds. Null on a
+    // fresh install or a build upgraded from Phase 3, and the server treats
+    // that as "no session check" — so an app that has not claimed yet keeps
+    // working exactly as before.
+    final sessionId = await _sessions.readSessionId();
+
     try {
       final res = await _svc.client.functions
-          .invoke(_functionName)
+          .invoke(
+            _functionName,
+            body: sessionId == null ? <String, dynamic>{} : {'session_id': sessionId},
+          )
           .timeout(_networkTimeout);
 
       if (res.status != 200) {
@@ -226,6 +262,52 @@ class EntitlementService {
         iat: verified.iat,
         exp: verified.exp,
       );
+    } on FunctionsHttpException catch (e) {
+      // ══════════════════════════════════════════════════════════════════
+      // THE ONLY CODE PATH IN THE APP THAT CAN CAUSE A FORCED LOGOUT.
+      // ══════════════════════════════════════════════════════════════════
+      //
+      // Note this is `on FunctionsHttpException`, not a bare catch on status.
+      // The client throws THREE different exception types and only this one
+      // means "the Edge Function itself answered":
+      //   • FunctionsFetchException — the request never left the phone
+      //     (status is 0). Ambiguous. Not this branch.
+      //   • FunctionsRelayException — Supabase's relay failed before
+      //     reaching our code. It carries a status too, and a relayed 409
+      //     would NOT be ours. Ambiguous. Not this branch.
+      //   • FunctionsHttpException — our function returned this status.
+      //
+      // Even then all three of these must hold: the status is exactly 409,
+      // the body parsed, and it says SESSION_SUPERSEDED. Anything else —
+      // a 409 with an unexpected body, a details field that is a raw string
+      // because the JSON did not parse — falls through to the cached path
+      // and signs nobody out.
+      //
+      // This is the Phase 2 lesson applied: a Supabase 500 was once being
+      // reported as a network failure, and the fix was to stop letting one
+      // ambiguous signal stand in for another. A destructive action needs an
+      // unambiguous instruction.
+      if (e.status == 409) {
+        final details = e.details;
+        final Map<String, dynamic>? body = details is Map
+            ? Map<String, dynamic>.from(details)
+            : null;
+
+        if (body != null && body['error'] == 'SESSION_SUPERSEDED') {
+          debugPrint('[entitlement] SESSION_SUPERSEDED — this device is no '
+              'longer the active session');
+          // Drop both the token and the session id. The token must go because
+          // it would otherwise stay valid for its full 14 days and let a
+          // superseded device carry on offline; the session id must go
+          // because it now names a revoked session.
+          await _clearToken();
+          await _sessions.clearSession();
+          return const EntitlementResult.superseded();
+        }
+        debugPrint('[entitlement] 409 with an unrecognised body — ignoring');
+      }
+      debugPrint('[entitlement] http ${e.status}');
+      return readCached(reason: 'http ${e.status}');
     } catch (e) {
       // Offline is the expected case here, not an exception worth shouting
       // about. Type only — never the message, which can echo server text.
@@ -330,13 +412,28 @@ class EntitlementService {
     );
   }
 
-  /// Drops the cached token. Called on sign-out so one user's token can never
-  /// be read as the next user's.
+  /// Drops the cached token AND the stored session id. Called on sign-out so
+  /// one user's state can never be read as the next user's.
+  ///
+  /// (Phase 7) The session id must go with the token, and this is not
+  /// housekeeping — it closes a real false-positive logout. The stored id
+  /// names a session belonging to the user who just left. If it survived, the
+  /// NEXT user to sign in on this phone would have that stranger's session id
+  /// attached to their first /entitlement call, before their own claim had
+  /// landed. For a new user with no active session that is harmless, but for
+  /// one who is already signed in on another phone it does not match their
+  /// active session — so the server would correctly answer 409 and this app
+  /// would sign them out moments after they successfully signed in.
   ///
   /// `last_known_server_time` deliberately SURVIVES this. It is a statement
   /// about this DEVICE's clock, not about the user, and clearing it would hand
   /// an attacker a trivial reset: sign out, roll the clock back, sign in again.
-  Future<void> clear() => _clearToken();
+  /// The device secret survives for the same kind of reason — see
+  /// [SessionService.clearSession].
+  Future<void> clear() async {
+    await _clearToken();
+    await _sessions.clearSession();
+  }
 
   // ── Internals ─────────────────────────────────────────────────────────────
 

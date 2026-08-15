@@ -404,6 +404,17 @@ class AppStrings {
       // Label for the on-device setup strip. The detail beside it is generated
       // by AppConfig and is deliberately untranslated technical text.
       'auth_setup_diagnostic': 'Setup',
+
+      // ── Single active session (Phase 7) ──────────────────────────────
+      // Shown on the login screen after the server signed this device out
+      // because the account was used elsewhere. The wording says what
+      // happened and what to do, and does not accuse the user of anything —
+      // the overwhelmingly common cause is the same person moving to a new
+      // phone, not somebody sharing an account.
+      'session_superseded_title': 'Signed out',
+      'session_superseded_body':
+          "You've been signed out because this account was used on another "
+          'device. Sign in again to use Danlite on this phone.',
     },
 
     // ══════════════════════════════════════════════════════════════════════════
@@ -713,6 +724,12 @@ class AppStrings {
           'SMS सत्यापन अभी उपलब्ध नहीं है। कृपया ईमेल का उपयोग करें।',
       'auth_err_unknown': 'कुछ गलत हो गया। कृपया पुनः प्रयास करें।',
       'auth_setup_diagnostic': 'सेटअप',
+
+      // ── Single active session (Phase 7) ──────────────────────────────────
+      'session_superseded_title': 'साइन आउट कर दिया गया',
+      'session_superseded_body':
+          'यह खाता किसी दूसरे डिवाइस पर उपयोग किया गया, इसलिए आपको साइन आउट कर '
+          'दिया गया है। इस फ़ोन पर Danlite चलाने के लिए फिर से साइन इन करें।',
     },
 
     // ══════════════════════════════════════════════════════════════════════════

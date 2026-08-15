@@ -1,20 +1,21 @@
 // ══════════════════════════════════════════════════════════════════════════
-// /confirmation — shown after a successful payment.
+// /confirmation — shown after a payment attempt.
 //
-// ── READ THIS BEFORE FILING A BUG ────────────────────────────────────────
-// Right now this page shows "No completed purchase found yet" for EVERY user,
-// including you. That is correct. Razorpay is not wired up until Phase 5/6, so
-// no row in public.payments can possibly have status='captured'. The page is
-// reporting the true state of the database.
+// ── THE RULE THIS PAGE EXISTS TO OBEY ────────────────────────────────────
+// This page NEVER fabricates a success state. It renders "Payment received"
+// only when it has read a real row out of public.payments with
+// status='captured', belonging to the signed-in user, under the Phase 1 RLS
+// policy payments_select_own. It does not trust the order_id in the URL, it
+// does not trust Razorpay's browser callback, and it has no write path of any
+// kind. The order_id query parameter is used ONLY to pick which of the user's
+// own payments to show — an attacker who edits it sees, at most, nothing.
 //
-// The conditional logic below is real and finished. It was NOT stubbed out
-// with sample data to make the page look complete in a screenshot — a
-// confirmation page that shows a fake purchase is the single most dangerous
-// page in a billing system to fake, because "it worked when we tested it" is
-// exactly what you would say afterwards.
-//
-// When Phase 5/6 lands and a captured payment exists, this page will start
-// showing it with no change to this file.
+// Before Phase 5 this page reported "no completed purchase found yet" for
+// everybody, which was the truth at the time. Now that the webhook can
+// genuinely capture payments, the same read starts returning rows, and the
+// only thing added is patience: a webhook may land a second or two after the
+// customer's browser gets here, so the page waits visibly instead of
+// reporting a false negative to somebody who has just paid.
 // ══════════════════════════════════════════════════════════════════════════
 
 import type { Metadata } from 'next';
@@ -24,6 +25,7 @@ import { NOINDEX } from '@/lib/seo';
 import { C, cardStyle, pageStyle, legalLinkStyle, MONO } from '@/lib/theme';
 import { createClient } from '@/lib/supabase/server';
 import { formatMinor } from '@/lib/gst';
+import StatusPoller from './status-poller';
 
 export const dynamic = 'force-dynamic';
 
@@ -32,26 +34,75 @@ export const metadata: Metadata = {
   robots: NOINDEX,
 };
 
-export default async function ConfirmationPage() {
+type CapturedPayment = {
+  gateway_payment_id: string;
+  gateway_order_id: string | null;
+  amount_minor: number;
+  currency: string;
+  status: string;
+  created_at: string;
+  gst_invoice_no: string | null;
+};
+
+/**
+ * The single read both the page and its poller use.
+ *
+ * RLS (payments_select_own) already restricts this to the caller's own rows.
+ * The explicit .eq('user_id', …) is a second, independent statement of intent
+ * rather than a reliance on the policy alone — the same belt-and-braces the
+ * page has used since Phase 4.
+ */
+async function readCapturedPayment(orderId: string | null): Promise<CapturedPayment | null> {
   const supabase = await createClient();
 
   const {
     data: { user },
   } = await supabase.auth.getUser();
+  if (!user) return null;
 
+  let q = supabase
+    .from('payments')
+    .select(
+      'gateway_payment_id, gateway_order_id, amount_minor, currency, status, created_at, gst_invoice_no',
+    )
+    .eq('user_id', user.id)
+    .eq('status', 'captured');
+
+  // Scope to the order the customer just paid for when we know it; otherwise
+  // fall back to their most recent capture (someone arriving at /confirmation
+  // directly, from a bookmark or the app).
+  if (orderId) q = q.eq('gateway_order_id', orderId);
+
+  const { data } = await q.order('created_at', { ascending: false }).limit(1).maybeSingle();
+
+  return (data as CapturedPayment | null) ?? null;
+}
+
+export default async function ConfirmationPage({
+  searchParams,
+}: {
+  // Next.js 16: searchParams is a Promise and must be awaited.
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   if (!user) redirect('/activate');
 
-  // RLS (payments_select_own) already restricts this to the caller's own rows;
-  // the explicit user_id filter is a second, independent statement of intent
-  // rather than a reliance on the policy alone.
-  const { data: payment } = await supabase
-    .from('payments')
-    .select('gateway_payment_id, amount_minor, currency, status, created_at, gst_invoice_no')
-    .eq('user_id', user.id)
-    .eq('status', 'captured')
-    .order('created_at', { ascending: false })
-    .limit(1)
-    .maybeSingle();
+  const params = await searchParams;
+  const raw = params.order_id;
+  const orderId = typeof raw === 'string' && raw.length > 0 ? raw : null;
+
+  const payment = await readCapturedPayment(orderId);
+
+  // The poller's read. Returns a boolean and nothing else: no payment detail
+  // crosses this boundary, so the client cannot be handed a receipt it might
+  // render before the server has confirmed one exists.
+  async function checkPurchase(): Promise<{ done: boolean }> {
+    'use server';
+    return { done: (await readCapturedPayment(orderId)) !== null };
+  }
 
   return (
     <main style={pageStyle}>
@@ -62,25 +113,21 @@ export default async function ConfirmationPage() {
         <div style={cardStyle}>
           {!payment ? (
             <>
-              <h2 style={{ fontSize: 15, fontWeight: 700, margin: '0 0 6px', color: C.amber }}>
-                No completed purchase found yet
-              </h2>
-              <p style={{ color: C.muted, fontSize: 13, lineHeight: 1.6, margin: '0 0 20px' }}>
-                We could not find a completed payment on your account. If you have just paid,
-                give it a moment and refresh — confirmations can take a few seconds to arrive
-                from the payment provider.
+              <StatusPoller check={checkPurchase} />
+
+              <p style={{ margin: '18px 0 0' }}>
+                <Link
+                  href="/checkout"
+                  style={{
+                    color: C.cyan,
+                    fontSize: 13.5,
+                    fontWeight: 600,
+                    textDecoration: 'none',
+                  }}
+                >
+                  Back to checkout →
+                </Link>
               </p>
-              <Link
-                href="/checkout"
-                style={{
-                  color: C.cyan,
-                  fontSize: 13.5,
-                  fontWeight: 600,
-                  textDecoration: 'none',
-                }}
-              >
-                Go to checkout →
-              </Link>
             </>
           ) : (
             <>
@@ -103,13 +150,13 @@ export default async function ConfirmationPage() {
                 {[
                   {
                     k: 'Amount',
-                    v: `${payment.currency} ${formatMinor(payment.amount_minor as number)}`,
+                    v: `${payment.currency} ${formatMinor(payment.amount_minor)}`,
                   },
-                  { k: 'Payment reference', v: payment.gateway_payment_id as string },
-                  { k: 'Invoice number', v: (payment.gst_invoice_no as string) ?? 'Pending' },
+                  { k: 'Payment reference', v: payment.gateway_payment_id },
+                  { k: 'Invoice number', v: payment.gst_invoice_no ?? 'Pending' },
                   {
                     k: 'Date',
-                    v: new Date(payment.created_at as string).toLocaleString('en-IN'),
+                    v: new Date(payment.created_at).toLocaleString('en-IN'),
                   },
                 ].map((row, i) => (
                   <div

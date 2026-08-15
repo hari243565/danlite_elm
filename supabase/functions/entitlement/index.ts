@@ -30,6 +30,13 @@ import {
 /** 14 days, in seconds — the offline grace window. */
 const TOKEN_TTL_SECONDS = 14 * 24 * 60 * 60; // 1_209_600
 
+/** Shape check for an optional caller-supplied session id (Phase 7). A value
+ *  that is not a UUID is a client bug, and it must NOT be allowed to fall
+ *  through to the mismatch branch below — that would turn a malformed string
+ *  into a forced logout. It is rejected as a 400 instead. */
+const UUID_RE =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
 const CORS_HEADERS: Record<string, string> = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
@@ -151,6 +158,31 @@ Deno.serve(async (req: Request): Promise<Response> => {
     }
     const userId = userData.user.id;
 
+    // 1b. (Phase 7) The caller MAY name the session it believes it holds.
+    //
+    // OPTIONAL, and that is load-bearing. An installed app from before Phase 7
+    // sends no body at all, and the portal sends `{}`. Both must keep working
+    // exactly as they did — an older build must never be locked out, and the
+    // portal must never be able to disturb a phone's session just by rendering
+    // /account. No session_id means no session check, full stop.
+    let callerSessionId: string | null = null;
+    try {
+      const raw = await req.text();
+      if (raw.trim().length > 0) {
+        const body = JSON.parse(raw) as Record<string, unknown>;
+        const sid = body.session_id;
+        if (typeof sid === "string" && sid.trim().length > 0) {
+          const trimmed = sid.trim();
+          if (!UUID_RE.test(trimmed)) {
+            return json({ error: "session_id is malformed" }, 400);
+          }
+          callerSessionId = trimmed;
+        }
+      }
+    } catch {
+      return json({ error: "malformed JSON body" }, 400);
+    }
+
     // 2. Read the licence as the authority (service role, bypasses RLS).
     const adminClient = createClient(supabaseUrl, serviceKey, {
       auth: { persistSession: false, autoRefreshToken: false },
@@ -170,6 +202,38 @@ Deno.serve(async (req: Request): Promise<Response> => {
     // No row should be impossible after the Phase 3 migration, but a missing
     // row must never crash or, worse, fail open. Absent == not entitled.
     const status = licence?.status ?? "inactive";
+
+    // 2b. (Phase 7) Is the caller still the active session?
+    //
+    // This is the ONLY place in the entire system that can tell a device to
+    // log itself out, so the condition is written to be as narrow as it can
+    // possibly be. All three must hold:
+    //   • the caller actually named a session (older builds and the portal
+    //     do not, and are therefore untouchable by this branch);
+    //   • the licence actually HAS an active session (a cleared one — after
+    //     "sign out all devices" — must not evict anybody; the next claim
+    //     will sort it out);
+    //   • the two genuinely differ.
+    // Anything else falls through and gets a token as normal.
+    if (
+      callerSessionId !== null &&
+      licence?.active_session_id != null &&
+      licence.active_session_id !== callerSessionId
+    ) {
+      // No token is issued on this path. A superseded device gets a signal,
+      // not a signed statement it could keep using for 14 days.
+      return json({ error: "SESSION_SUPERSEDED" }, 409);
+    }
+
+    // Still the active session — record the heartbeat so support can tell an
+    // idle device from a live one. Best-effort: a failed heartbeat is a
+    // bookkeeping loss, never a reason to withhold a token.
+    if (callerSessionId !== null) {
+      const { error: touchErr } = await adminClient.rpc("touch_session", {
+        p_session_id: callerSessionId,
+      });
+      if (touchErr) console.error("touch_session failed:", touchErr.message);
+    }
 
     // 3. Build the claims.
     const iat = Math.floor(Date.now() / 1000);
