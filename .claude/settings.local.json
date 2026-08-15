@@ -114,7 +114,21 @@
       "Read(//c/Users/a/AppData/Local/Pub/Cache/hosted/pub.dev/**)",
       "Read(//c//**)",
       "Bash(npx --no-install supabase db push --linked)",
-      "PowerShell(& \"C:\\\\Users\\\\a\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\C--Users-a-Downloads-danlite-elm-complete-danlite-elm\\\\36d467f3-3708-47ef-8573-f58c76cfaf3b\\\\scratchpad\\\\q.ps1\" -SqlFile \"C:\\\\Users\\\\a\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\C--Users-a-Downloads-danlite-elm-complete-danlite-elm\\\\36d467f3-3708-47ef-8573-f58c76cfaf3b\\\\scratchpad\\\\verify_grants.sql\")"
+      "PowerShell(& \"C:\\\\Users\\\\a\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\C--Users-a-Downloads-danlite-elm-complete-danlite-elm\\\\36d467f3-3708-47ef-8573-f58c76cfaf3b\\\\scratchpad\\\\q.ps1\" -SqlFile \"C:\\\\Users\\\\a\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\C--Users-a-Downloads-danlite-elm-complete-danlite-elm\\\\36d467f3-3708-47ef-8573-f58c76cfaf3b\\\\scratchpad\\\\verify_grants.sql\")",
+      "PowerShell(npx supabase projects list 2>&1 | Select-Object -First 20)",
+      "PowerShell($s='C:\\\\Users\\\\a\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\C--Users-a-Downloads-danlite-elm-complete-danlite-elm\\\\16e34621-481c-47bf-9e43-b5fd9e42b27a\\\\scratchpad'; pwsh -NoProfile -File \"$s\\\\sql.ps1\" -SqlFile \"$s\\\\probe1.sql\")",
+      "PowerShell($s='C:\\\\Users\\\\a\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\C--Users-a-Downloads-danlite-elm-complete-danlite-elm\\\\16e34621-481c-47bf-9e43-b5fd9e42b27a\\\\scratchpad'; pwsh -NoProfile -File \"$s\\\\sql.ps1\" -SqlFile \"$s\\\\probe2.sql\")",
+      "PowerShell(npx supabase secrets list 2>&1)",
+      "PowerShell($s='C:\\\\Users\\\\a\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\C--Users-a-Downloads-danlite-elm-complete-danlite-elm\\\\16e34621-481c-47bf-9e43-b5fd9e42b27a\\\\scratchpad'; pwsh -NoProfile -File \"$s\\\\sql.ps1\" -SqlFile \"$s\\\\probe3.sql\")",
+      "PowerShell($s='C:\\\\Users\\\\a\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\C--Users-a-Downloads-danlite-elm-complete-danlite-elm\\\\16e34621-481c-47bf-9e43-b5fd9e42b27a\\\\scratchpad'; pwsh -NoProfile -File \"$s\\\\sql.ps1\" -SqlFile \"$s\\\\ledger.sql\")",
+      "PowerShell($s='C:\\\\Users\\\\a\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\C--Users-a-Downloads-danlite-elm-complete-danlite-elm\\\\16e34621-481c-47bf-9e43-b5fd9e42b27a\\\\scratchpad'; pwsh -NoProfile -File \"$s\\\\sql.ps1\" -SqlFile \"$s\\\\users.sql\")",
+      "PowerShell($s='C:\\\\Users\\\\a\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\C--Users-a-Downloads-danlite-elm-complete-danlite-elm\\\\16e34621-481c-47bf-9e43-b5fd9e42b27a\\\\scratchpad'; pwsh -NoProfile -File \"$s\\\\sql.ps1\" -SqlFile \"$s\\\\checktok.sql\")",
+      "PowerShell($s='C:\\\\Users\\\\a\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\C--Users-a-Downloads-danlite-elm-complete-danlite-elm\\\\16e34621-481c-47bf-9e43-b5fd9e42b27a\\\\scratchpad'; pwsh -NoProfile -File \"$s\\\\logs.ps1\" 2>&1 | Select-Object -First 60)",
+      "PowerShell($s='C:\\\\Users\\\\a\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\C--Users-a-Downloads-danlite-elm-complete-danlite-elm\\\\16e34621-481c-47bf-9e43-b5fd9e42b27a\\\\scratchpad'; pwsh -NoProfile -File \"$s\\\\pathA.ps1\")",
+      "PowerShell($s='C:\\\\Users\\\\a\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\C--Users-a-Downloads-danlite-elm-complete-danlite-elm\\\\16e34621-481c-47bf-9e43-b5fd9e42b27a\\\\scratchpad'; pwsh -NoProfile -File \"$s\\\\verify.ps1\")",
+      "PowerShell($s='C:\\\\Users\\\\a\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\C--Users-a-Downloads-danlite-elm-complete-danlite-elm\\\\16e34621-481c-47bf-9e43-b5fd9e42b27a\\\\scratchpad'; pwsh -NoProfile -File \"$s\\\\e2e.ps1\")",
+      "PowerShell($s='C:\\\\Users\\\\a\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\C--Users-a-Downloads-danlite-elm-complete-danlite-elm\\\\16e34621-481c-47bf-9e43-b5fd9e42b27a\\\\scratchpad'; pwsh -NoProfile -File \"$s\\\\curl-e2e.ps1\")",
+      "PowerShell($s='C:\\\\Users\\\\a\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\C--Users-a-Downloads-danlite-elm-complete-danlite-elm\\\\16e34621-481c-47bf-9e43-b5fd9e42b27a\\\\scratchpad'; pwsh -NoProfile -File \"$s\\\\webhook-e2e.ps1\")"
     ]
   }
 }

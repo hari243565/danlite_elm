@@ -1,0 +1,103 @@
+{
+  "phase": "4",
+  "name": "Billing portal + activation links + search invisibility",
+  "generated": "2026-08-15",
+  "portal_framework": "Next.js 16.3.0 (App Router, Turbopack)",
+  "supabase_ssr_package": "@supabase/ssr 0.12.4 (getAll/setAll cookie contract)",
+
+  "pages": [
+    { "route": "/activate", "purpose": "Redeem an emailed link, or request a new one", "state": "built" },
+    { "route": "/checkout", "purpose": "Server-decided price and the Pay button", "state": "built" },
+    { "route": "/confirmation", "purpose": "Shows a captured payment, honestly empty until Phase 5/6", "state": "built" },
+    { "route": "/account", "purpose": "Live licence status from the existing /entitlement function", "state": "built" },
+    { "route": "/legal/privacy", "purpose": "DPDP Act 2023 privacy notice", "state": "draft" },
+    { "route": "/legal/terms", "purpose": "Lifetime licence terms", "state": "draft" },
+    { "route": "/legal/refund", "purpose": "Refund policy", "state": "draft" }
+  ],
+
+  "noindex_layers": {
+    "layer_1_robots_txt": "app/robots.ts (Metadata Files API) -> 'User-Agent: *  Disallow: /' — verified live",
+    "layer_2_meta_tag": "noindex, nofollow, noarchive, nocache on all 7 pages — verified live in served HTML",
+    "layer_3_http_header": "X-Robots-Tag: noindex, nofollow via proxy.ts on EVERY route — verified on 200, 307 and 501 responses",
+    "all_three_verified": true
+  },
+
+  "rate_limiting": {
+    "primary_db_backed": "public.activation_requests — 3 per identifier/hour, 10 per IP/hour, enforced in /send-activation",
+    "logs_blocked_attempts_too": true,
+    "identifier_storage": "peppered SHA-256, never the raw email or phone",
+    "secondary_in_process": "portal/lib/rate-limit.ts on /api/create-order (single-instance, honest about its scope)",
+    "independent_of_cloudflare": true
+  },
+
+  "gst": {
+    "treatment": "inclusive",
+    "rate_percent": 18,
+    "exports_zero_rated": true,
+    "WARNING": "PLACEHOLDER, NOT CONFIRMED BY AN ACCOUNTANT. 'inclusive' means Rs109 already contains GST; 'exclusive' would change the amount actually charged to Rs128.62. The export/zero-rating assumption for international sales is a SEPARATE unconfirmed question. Do not change portal/lib/gst.ts without an instruction citing the accountant."
+  },
+
+  "razorpay": "INTENTIONALLY STUBBED. /api/create-order returns HTTP 501 {\"status\":\"not_yet_available\"}. No real payment can be taken. Phase 5/6 replaces the handler body. /confirmation therefore correctly shows 'No completed purchase found yet' for every user — that is the true state of the database, not a bug and not faked data.",
+
+  "session_bridge": {
+    "mechanism": "custom 256-bit single-use token -> /verify-activation -> admin.generateLink({type:'magiclink'}) -> verifyOtp({token_hash, type:'email'}) -> httpOnly cookies",
+    "token_ttl_minutes": 15,
+    "token_storage": "SHA-256 hash only; a full dump of activation_tokens cannot produce a usable link",
+    "supabase_auth_emails_untouched": true,
+    "email_transport": "direct HTTPS call to api.resend.com, not Supabase Auth SMTP"
+  },
+
+  "app_untouched": {
+    "files_changed_under_lib": 0,
+    "files_changed_under_android": 0,
+    "statement": "The signup -> activation-email connection is made entirely server-side: auth.users INSERT -> handle_new_user() -> licences INSERT -> on_licence_created_send_activation trigger -> net.http_post -> /send-activation. Proven with a real throwaway signup."
+  },
+
+  "deviations": [
+    "middleware.ts -> proxy.ts. Next.js 16 renamed Middleware to Proxy and the installed docs mark middleware.js DEPRECATED. The X-Robots-Tag layer depends on this file loading, so the deprecated name was a real risk of silent failure.",
+    "robots.txt/route.ts -> app/robots.ts, the canonical Metadata Files API convention in the installed Next.js version.",
+    "ADDED explicit service_role grants to the migration. Verified against pg_default_acl that new tables here grant client roles only Dxtm — service_role gets NO SELECT/INSERT/UPDATE. Without the added grants both Edge Functions would have failed with 42501 on their first query, the same omission that already required three corrective migrations in Phases 1-3.",
+    "Database Webhook hand-rolled with pg_net + Vault. supabase_functions.http_request did not exist on this project and pg_net was not installed. The dashboard wizard stores the auth header as a literal in the trigger body, readable via pg_get_functiondef; reading it from Vault instead keeps the shared secret out of the catalog and out of git.",
+    "verifyOtp uses type:'email', not 'magiclink'. The installed SDK marks the magiclink verify type deprecated and documents token-hash redemption as {token_hash, type:'email'}. generateLink still uses type:'magiclink'.",
+    "ADDED app/api/activate/route.ts. A Next.js Server Component cannot write cookies, and setting the session cookie is the entire purpose of redeeming the token, so the redemption must live in a Route Handler. /activate?t= forwards to it. The redirect also strips the single-use token from the address bar.",
+    "ADDED small shared modules rather than duplicating constants across 10 files: lib/seo.ts (the one noindex definition), lib/theme.ts (the Mission Control palette), lib/entitlement.ts (the /entitlement caller), app/legal/layout.tsx (the DRAFT banner), plus two client components for the only two interactive controls (activate/request-form.tsx, checkout/pay-button.tsx).",
+    "DID NOT create portal/lib/supabase/client.ts. Session cookies are httpOnly by design (Step 6), which means a browser-side Supabase client cannot read the session. All four pages are server-rendered, so a browser client would have been non-functional dead code.",
+    "npm install pulled @supabase/supabase-js alongside @supabase/ssr — it is a required peer dependency of it, not an extra choice.",
+    "Dropped an `import 'server-only'` from lib/rate-limit.ts: the package is not installed and adding it exceeded the stated dependency budget. Replaced with a comment.",
+    "The per-IP rate limit trusts cf-connecting-ip / x-forwarded-for, which are spoofable until Cloudflare (Part D) sits in front and overwrites them. The per-identifier limit is the non-spoofable control."
+  ],
+
+  "open_items_for_owner": [
+    "GST treatment (inclusive vs exclusive) and the 18% rate need accountant confirmation.",
+    "Whether international sales are zero-rated exports is a separate accountant question.",
+    "All three legal pages are DRAFTS and carry [CONFIRM] markers where a decision is needed (entity name, addresses, contact emails, retention periods, grievance officer).",
+    "PHONE-ONLY SIGNUPS CANNOT RECEIVE AN ACTIVATION EMAIL. A user who signs up with a mobile number and no email address has no address to send to; /send-activation reports 'no_email_on_profile' rather than pretending. An SMS activation path belongs with the MSG91 work in Phase 5/6.",
+    "Resend currently sends from onboarding@resend.dev and, until a domain is verified, only delivers to the Resend account owner's address. Set ACTIVATION_FROM_EMAIL and BILLING_DOMAIN once the real domain exists.",
+    "BILLING_DOMAIN is currently set to http://localhost:3000."
+  ],
+
+  "checks": [
+    { "id": 1, "name": "Both secrets set, no value or temp file ever left on disk", "result": "pass" },
+    { "id": 2, "name": "Migration applied; anon/authenticated hold zero grants on both new tables", "result": "pass" },
+    { "id": 3, "name": "RLS enabled AND forced on both tables, with zero policies", "result": "pass" },
+    { "id": 4, "name": "Path A rejects a wrong webhook secret with 401", "result": "pass" },
+    { "id": 5, "name": "Path A with the correct secret returns status=sent (Resend answered 2xx)", "result": "pass" },
+    { "id": 6, "name": "Path B returns an identical body for a real and a non-existent account", "result": "pass" },
+    { "id": 7, "name": "Path B logs blocked and served attempts alike, so the window stays accurate", "result": "pass" },
+    { "id": 8, "name": "Valid activation token issues a real session for the correct user", "result": "pass" },
+    { "id": 9, "name": "Replayed, expired and never-existed tokens return byte-identical failures", "result": "pass" },
+    { "id": 10, "name": "Real throwaway signup fired the trigger and minted an activation token", "result": "pass" },
+    { "id": 11, "name": "Activation link lands an inactive user on /checkout, an active one on /account", "result": "pass" },
+    { "id": 12, "name": "Unauthenticated /checkout, /confirmation, /account all redirect to /activate", "result": "pass" },
+    { "id": 13, "name": "X-Robots-Tag present on every route, including 307 and 501 responses", "result": "pass" },
+    { "id": 14, "name": "noindex meta tag present on all 7 pages", "result": "pass" },
+    { "id": 15, "name": "robots.txt serves Disallow: / for all user agents", "result": "pass" },
+    { "id": 16, "name": "Session cookie is httpOnly", "result": "pass" },
+    { "id": 17, "name": "/checkout shows Rs109 with a GST line, from profiles.country_code", "result": "pass" },
+    { "id": 18, "name": "/account shows live licence status via the existing /entitlement function", "result": "pass" },
+    { "id": 19, "name": "/confirmation shows its honest empty state, with no fabricated data", "result": "pass" },
+    { "id": 20, "name": "/api/create-order returns 501 with an honest message", "result": "pass" },
+    { "id": 21, "name": "npm run build completes with zero errors", "result": "pass" },
+    { "id": 22, "name": "Nothing under lib/ or android/ changed", "result": "pass" }
+  ]
+}

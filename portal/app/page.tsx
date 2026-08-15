@@ -169,6 +169,73 @@ function readPhase3(): Phase3Report | null {
   }
 }
 
+type Phase4Check = {
+  id: number;
+  name: string;
+  result: string;
+};
+
+type Phase4Page = {
+  route: string;
+  purpose: string;
+  state: string;
+};
+
+type Phase4Report = {
+  phase: string;
+  name: string;
+  generated: string;
+  portal_framework: string;
+  supabase_ssr_package: string;
+  pages: Phase4Page[];
+  noindex_layers: {
+    layer_1_robots_txt: string;
+    layer_2_meta_tag: string;
+    layer_3_http_header: string;
+    all_three_verified: boolean;
+  };
+  rate_limiting: {
+    primary_db_backed: string;
+    logs_blocked_attempts_too: boolean;
+    identifier_storage: string;
+    secondary_in_process: string;
+    independent_of_cloudflare: boolean;
+  };
+  gst: {
+    treatment: string;
+    rate_percent: number;
+    exports_zero_rated: boolean;
+    WARNING: string;
+  };
+  razorpay: string;
+  session_bridge: {
+    mechanism: string;
+    token_ttl_minutes: number;
+    token_storage: string;
+    supabase_auth_emails_untouched: boolean;
+    email_transport: string;
+  };
+  app_untouched: {
+    files_changed_under_lib: number;
+    files_changed_under_android: number;
+    statement: string;
+  };
+  deviations: string[];
+  open_items_for_owner: string[];
+  checks: Phase4Check[];
+};
+
+function readPhase4(): Phase4Report | null {
+  try {
+    const file = path.join(process.cwd(), 'phase4-report.json');
+    const raw = fs.readFileSync(file, 'utf8');
+    return JSON.parse(raw) as Phase4Report;
+  } catch {
+    // Absent until the phase has been run — the panel renders a muted card.
+    return null;
+  }
+}
+
 function statusPill(status: string) {
   const map: Record<string, { fg: string; label: string }> = {
     done: { fg: C.green, label: 'done' },
@@ -201,6 +268,7 @@ export default function MissionControl() {
   const p1 = readPhase1();
   const p2 = readPhase2();
   const p3 = readPhase3();
+  const p4 = readPhase4();
 
   const shell = (children: React.ReactNode) => (
     <main
@@ -892,6 +960,258 @@ export default function MissionControl() {
             {/* Verification assertions */}
             <ul style={{ listStyle: 'none', margin: '16px 0 0', padding: 0 }}>
               {p3.checks.map((t) => {
+                const ok = t.result === 'pass';
+                return (
+                  <li
+                    key={t.id}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 12,
+                      padding: '9px 0',
+                      borderTop: `1px solid ${C.border}`,
+                      fontSize: 13,
+                    }}
+                  >
+                    <span
+                      style={{
+                        width: 16,
+                        textAlign: 'center',
+                        color: ok ? C.green : C.red,
+                        fontWeight: 700,
+                      }}
+                    >
+                      {ok ? '✓' : '✗'}
+                    </span>
+                    <span
+                      style={{
+                        color: C.muted,
+                        fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace',
+                        fontSize: 12,
+                        minWidth: 18,
+                      }}
+                    >
+                      {t.id}
+                    </span>
+                    <span style={{ color: ok ? C.text : C.red }}>{t.name}</span>
+                  </li>
+                );
+              })}
+            </ul>
+          </>
+        )}
+      </section>
+
+      {/* ---------------- Phase 4 — Billing Portal ---------------- */}
+      <section
+        style={{
+          backgroundColor: C.surface,
+          border: `1px solid ${C.border}`,
+          borderRadius: 12,
+          padding: 20,
+          marginBottom: 28,
+        }}
+      >
+        <h2 style={{ fontSize: 15, fontWeight: 700, margin: '0 0 4px' }}>
+          Phase 4 — Billing Portal
+        </h2>
+
+        {!p4 ? (
+          <p style={{ color: C.muted, fontSize: 12.5, margin: '8px 0 0', lineHeight: 1.5 }}>
+            Not yet run. <code>phase4-report.json</code> will appear here once the billing portal
+            and activation links have been built.
+          </p>
+        ) : (
+          <>
+            <p style={{ color: C.muted, fontSize: 12.5, margin: '0 0 16px', lineHeight: 1.5 }}>
+              Activation links, session bridging and the four portal pages verified on{' '}
+              {p4.generated}. {p4.portal_framework}.
+            </p>
+
+            {/* Headline badges */}
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, marginBottom: 14 }}>
+              {[
+                { label: 'Pages', value: `${p4.pages.length}` },
+                { label: 'Link TTL', value: `${p4.session_bridge.token_ttl_minutes} min` },
+                {
+                  label: 'noindex layers',
+                  value: p4.noindex_layers.all_three_verified ? '3 of 3' : 'INCOMPLETE',
+                },
+                { label: 'GST', value: `${p4.gst.treatment} ${p4.gst.rate_percent}%` },
+              ].map((b) => (
+                <span
+                  key={b.label}
+                  style={{
+                    display: 'inline-block',
+                    padding: '5px 11px',
+                    borderRadius: 8,
+                    border: `1px solid ${C.border}`,
+                    backgroundColor: C.card,
+                    fontSize: 12,
+                    color: C.muted,
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  {b.label} <span style={{ color: C.text, fontWeight: 700 }}>{b.value}</span>
+                </span>
+              ))}
+            </div>
+
+            {/* The headline constraint of this phase */}
+            <p
+              style={{
+                margin: '0 0 6px',
+                fontSize: 13,
+                fontWeight: 600,
+                color: p4.app_untouched.files_changed_under_lib === 0 ? C.green : C.red,
+                fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace',
+              }}
+            >
+              Flutter files changed under lib/: {p4.app_untouched.files_changed_under_lib}
+              {'  ·  '}android/: {p4.app_untouched.files_changed_under_android}
+            </p>
+
+            {/* Routes delivered */}
+            <ul style={{ listStyle: 'none', margin: '16px 0 0', padding: 0 }}>
+              {p4.pages.map((pg) => (
+                <li
+                  key={pg.route}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 12,
+                    padding: '9px 0',
+                    borderTop: `1px solid ${C.border}`,
+                    fontSize: 13,
+                  }}
+                >
+                  <span
+                    style={{
+                      width: 16,
+                      textAlign: 'center',
+                      color: pg.state === 'draft' ? C.amber : C.green,
+                      fontWeight: 700,
+                    }}
+                  >
+                    {pg.state === 'draft' ? '~' : '✓'}
+                  </span>
+                  <span
+                    style={{
+                      color: C.cyan,
+                      fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace',
+                      fontSize: 12,
+                      minWidth: 118,
+                    }}
+                  >
+                    {pg.route}
+                  </span>
+                  <span style={{ color: C.text }}>{pg.purpose}</span>
+                </li>
+              ))}
+            </ul>
+
+            {/* Three search-invisibility layers */}
+            <div style={{ marginTop: 16 }}>
+              <div
+                style={{
+                  color: C.cyan,
+                  fontSize: 11,
+                  fontWeight: 700,
+                  letterSpacing: 0.8,
+                  textTransform: 'uppercase',
+                  marginBottom: 5,
+                }}
+              >
+                Search invisibility
+              </div>
+              {[
+                p4.noindex_layers.layer_1_robots_txt,
+                p4.noindex_layers.layer_2_meta_tag,
+                p4.noindex_layers.layer_3_http_header,
+              ].map((l, i) => (
+                <p
+                  key={i}
+                  style={{ color: C.muted, fontSize: 12.5, lineHeight: 1.6, margin: '0 0 5px' }}
+                >
+                  <span style={{ color: C.green, fontWeight: 700 }}>✓</span> {l}
+                </p>
+              ))}
+            </div>
+
+            {/* Razorpay honesty + GST warning */}
+            {[
+              { title: 'Razorpay', body: p4.razorpay, colour: C.amber },
+              { title: 'GST — unconfirmed', body: p4.gst.WARNING, colour: C.amber },
+            ].map((b) => (
+              <p
+                key={b.title}
+                style={{
+                  margin: '12px 0 0',
+                  padding: '10px 12px',
+                  borderRadius: 8,
+                  border: `1px solid ${b.colour}`,
+                  color: b.colour,
+                  fontSize: 12.5,
+                  lineHeight: 1.5,
+                }}
+              >
+                <strong>{b.title}:</strong> {b.body}
+              </p>
+            ))}
+
+            {/* Things the owner still has to decide */}
+            <div style={{ marginTop: 16 }}>
+              <div
+                style={{
+                  color: C.cyan,
+                  fontSize: 11,
+                  fontWeight: 700,
+                  letterSpacing: 0.8,
+                  textTransform: 'uppercase',
+                  marginBottom: 5,
+                }}
+              >
+                Needs a decision from you
+              </div>
+              {p4.open_items_for_owner.map((d, i) => (
+                <p
+                  key={i}
+                  style={{ color: C.muted, fontSize: 12.5, lineHeight: 1.6, margin: '0 0 6px' }}
+                >
+                  • {d}
+                </p>
+              ))}
+            </div>
+
+            {/* Anything that did not go exactly to plan */}
+            {p4.deviations.length > 0 && (
+              <div style={{ marginTop: 16 }}>
+                <div
+                  style={{
+                    color: C.cyan,
+                    fontSize: 11,
+                    fontWeight: 700,
+                    letterSpacing: 0.8,
+                    textTransform: 'uppercase',
+                    marginBottom: 5,
+                  }}
+                >
+                  Deviations from the written plan
+                </div>
+                {p4.deviations.map((d, i) => (
+                  <p
+                    key={i}
+                    style={{ color: C.muted, fontSize: 12.5, lineHeight: 1.6, margin: '0 0 6px' }}
+                  >
+                    • {d}
+                  </p>
+                ))}
+              </div>
+            )}
+
+            {/* Verification assertions */}
+            <ul style={{ listStyle: 'none', margin: '16px 0 0', padding: 0 }}>
+              {p4.checks.map((t) => {
                 const ok = t.result === 'pass';
                 return (
                   <li
