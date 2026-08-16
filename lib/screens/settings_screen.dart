@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../constants/app_colors.dart';
 import '../constants/app_strings.dart';
+import '../providers/auth_provider.dart';
+import '../providers/entitlement_provider.dart';
 import '../providers/settings_provider.dart';
+import '../services/entitlement_service.dart';
 import '../services/obd_service.dart';
 
 class SettingsScreen extends StatelessWidget {
@@ -23,6 +26,17 @@ class SettingsScreen extends StatelessWidget {
         ],
       ),
       body: ListView(children: [
+        // Identity first, preferences after. Everything below this point is
+        // unchanged.
+        _SectionHeader(
+            icon: Icons.person_outline,
+            title: context.tr('account_section_title')),
+        const _AccountTile(),
+        const _LogoutTile(),
+        const Padding(
+          padding: EdgeInsets.fromLTRB(14, 14, 14, 0),
+          child: Divider(color: AppColors.divider, height: 1, thickness: 1),
+        ),
         _SectionHeader(
             icon: Icons.directions_car, title: context.tr('vehicle')),
         _SettingsTile(
@@ -75,6 +89,214 @@ class SettingsScreen extends StatelessWidget {
         const SizedBox(height: 40),
       ]),
     );
+  }
+}
+
+// ── Account (identity + licence status) ──────────────────────────────────────
+//
+// Read-only. It calls no new backend and adds no state: the identifier comes
+// from the session AuthProvider already holds, and the status from the token
+// EntitlementProvider already verified. Nothing here can be bought, renewed or
+// linked to — this app sells nothing from inside itself, and that constraint
+// applies to a status line exactly as it does to the paywall.
+class _AccountTile extends StatelessWidget {
+  const _AccountTile();
+
+  @override
+  Widget build(BuildContext context) {
+    final auth = context.watch<AuthProvider>();
+    final entitlement = context.watch<EntitlementProvider>();
+    final user = auth.user;
+
+    // Whichever channel the user actually registered on. Falls back to the
+    // pending identifier only so the row is never blank.
+    final identifier = (user?.email?.isNotEmpty ?? false)
+        ? user!.email!
+        : (user?.phone?.isNotEmpty ?? false)
+            ? user!.phone!
+            : (auth.pendingIdentifier ?? '—');
+
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 14, vertical: 3),
+      decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+                color: AppColors.navyMid.withValues(alpha: 0.05),
+                blurRadius: 6,
+                offset: const Offset(0, 2))
+          ]),
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
+        child: Row(children: [
+          // Circular rather than the rounded square the navigation tiles use:
+          // those point somewhere, this identifies somebody. Same tint and
+          // same icon colour, so it still reads as one family.
+          Container(
+            width: 42,
+            height: 42,
+            decoration: const BoxDecoration(
+                color: AppColors.bgSecondary, shape: BoxShape.circle),
+            child: const Icon(Icons.person_rounded,
+                color: AppColors.navyMid, size: 22),
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(identifier,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.textPrimary)),
+                const SizedBox(height: 7),
+                _LicencePill(entitlement: entitlement),
+              ],
+            ),
+          ),
+        ]),
+      ),
+    );
+  }
+}
+
+/// The licence state, said plainly. No price, no link, no call to action in
+/// any branch — see [AppStrings] for the literal text of each.
+class _LicencePill extends StatelessWidget {
+  const _LicencePill({required this.entitlement});
+
+  final EntitlementProvider entitlement;
+
+  @override
+  Widget build(BuildContext context) {
+    final Color tint;
+    final String label;
+
+    switch (entitlement.status) {
+      case EntitlementStatus.active:
+        tint = AppColors.success;
+        label = context.tr('account_status_active');
+      case EntitlementStatus.offlineGraceActive:
+        tint = AppColors.warning;
+        // The grace arithmetic is Phase 8's, used as-is. The three-key split
+        // mirrors the gate's own banner so no language says "1 days".
+        final d = entitlement.graceDaysRemaining;
+        if (d == null || d <= 0) {
+          label = context.tr('account_status_offline_grace_last');
+        } else if (d == 1) {
+          label = context.tr('account_status_offline_grace_one');
+        } else {
+          label = context
+              .trArgs('account_status_offline_grace', {'days': '$d'});
+        }
+      case EntitlementStatus.unknown:
+      case EntitlementStatus.inactive:
+      case EntitlementStatus.revoked:
+      case EntitlementStatus.expired:
+      case EntitlementStatus.supersededSession:
+        // Unreachable in practice: the gate routes an unlicensed user to the
+        // paywall before Settings can be opened, and the sentinel clears the
+        // whole stack if entitlement is withdrawn mid-session. Handled anyway,
+        // and handled honestly — a factual line, never a prompt to pay.
+        tint = AppColors.textSecondary;
+        label = context.tr('account_status_inactive');
+    }
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      decoration: BoxDecoration(
+          color: tint.withValues(alpha: 0.10),
+          borderRadius: BorderRadius.circular(999),
+          border: Border.all(color: tint.withValues(alpha: 0.35))),
+      child: Row(mainAxisSize: MainAxisSize.min, children: [
+        Container(
+            width: 6,
+            height: 6,
+            decoration: BoxDecoration(color: tint, shape: BoxShape.circle)),
+        const SizedBox(width: 6),
+        Flexible(
+          child: Text(label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                  fontSize: 11, fontWeight: FontWeight.w700, color: tint)),
+        ),
+      ]),
+    );
+  }
+}
+
+/// Styled on [_DisconnectTile] — the destructive-action precedent already in
+/// this file — and confirmed first, because signing out costs a one-time code
+/// to undo.
+class _LogoutTile extends StatelessWidget {
+  const _LogoutTile();
+
+  @override
+  Widget build(BuildContext context) => Container(
+        margin: const EdgeInsets.symmetric(horizontal: 14, vertical: 3),
+        decoration: BoxDecoration(
+            color: AppColors.error.withValues(alpha: 0.06),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: AppColors.error.withValues(alpha: 0.3))),
+        child: Material(
+          type: MaterialType.transparency,
+          child: ListTile(
+            leading: const Icon(Icons.logout_rounded, color: AppColors.error),
+            title: Text(context.tr('account_logout_cta'),
+                style: const TextStyle(
+                    color: AppColors.error,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 14)),
+            onTap: () => _confirm(context),
+          ),
+        ),
+      );
+
+  Future<void> _confirm(BuildContext context) async {
+    // Same shape as the delete confirmation on the vehicle screen: cancel on
+    // the left as a plain button, the destructive action on the right in the
+    // error colour.
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(context.tr('account_logout_confirm_title'),
+            style: const TextStyle(
+                fontSize: 17,
+                fontWeight: FontWeight.w700,
+                color: AppColors.textPrimary)),
+        content: Text(context.tr('account_logout_confirm_body'),
+            style: const TextStyle(
+                fontSize: 13, height: 1.4, color: AppColors.textSecondary)),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: Text(context.tr('cancel'),
+                style: const TextStyle(color: AppColors.textSecondary)),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.error,
+                foregroundColor: Colors.white),
+            onPressed: () => Navigator.pop(ctx, true),
+            child: Text(context.tr('account_logout_cta')),
+          ),
+        ],
+      ),
+    );
+    if (ok != true || !context.mounted) return;
+
+    // The existing method, unchanged and uncopied — the same one the paywall
+    // calls. It drops the locally stored session id and signs out through
+    // Supabase (the server-side `sessions` row is left for the next login to
+    // re-claim, which is Phase 7's design, not this section's business). The
+    // gate sentinel then sees `signedOut` on the auth stream and returns the
+    // user to /login on its own, so no navigation belongs here.
+    await context.read<AuthProvider>().logout();
   }
 }
 

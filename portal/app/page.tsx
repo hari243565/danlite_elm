@@ -286,6 +286,66 @@ function readPhase7(): Phase7Report | null {
   }
 }
 
+type Phase8Check = { id: number; name: string; result: string };
+
+type Phase8Report = {
+  phase: string;
+  name: string;
+  generated: string;
+  what_this_does: string;
+  unknown_timeout_seconds: number;
+  unknown_timeout_why: string;
+  decision_table: { state: string; decision: string; note: string }[];
+  every_path_that_can_block: {
+    statement: string;
+    the_six: string[];
+    why_no_ambiguous_condition_reaches_them: string;
+    verified_live_that_ambiguity_looks_like_this: string[];
+  };
+  deliberate_leniency: string;
+  residual_risk_stated_honestly: string;
+  no_purchase_path: {
+    constraint: string;
+    how_it_is_enforced: string;
+    opinion_asked_for: string;
+    strings_en: Record<string, string>;
+    audit_of_those_strings: string;
+    confirm_needed: string;
+  };
+  emergency_bypass: {
+    env_var: string;
+    current_state: string;
+    proof_it_is_off: string;
+    arming_value: string;
+    when_it_is_appropriate: string;
+    turn_it_off_immediately: string;
+    what_it_does_not_change: string;
+    audited: string;
+    audit_failure_policy: string;
+  };
+  the_missing_grant_found: Record<string, string>;
+  pre_existing_hole_closed: Record<string, string>;
+  where_the_gate_lives_at_runtime: Record<string, string>;
+  grace_banner: Record<string, string>;
+  analyze: { new_errors: number; new_warnings: number; pre_existing_issues: number; note: string };
+  tests: { passed: number; total: number };
+  deviations: string[];
+  test_hygiene: string;
+  phase_5_untouched: string;
+  checks: Phase8Check[];
+};
+
+function readPhase8(): Phase8Report | null {
+  try {
+    const file = path.join(process.cwd(), 'phase8-report.json');
+    const raw = fs.readFileSync(file, 'utf8');
+    return JSON.parse(raw) as Phase8Report;
+  } catch {
+    // Absent until the phase has been run — the panel renders a muted card.
+    return null;
+  }
+}
+
 function statusPill(status: string) {
   const map: Record<string, { fg: string; label: string }> = {
     done: { fg: C.green, label: 'done' },
@@ -320,6 +380,7 @@ export default function MissionControl() {
   const p3 = readPhase3();
   const p4 = readPhase4();
   const p7 = readPhase7();
+  const p8 = readPhase8();
 
   const shell = (children: React.ReactNode) => (
     <main
@@ -1491,6 +1552,391 @@ export default function MissionControl() {
             {/* Verification assertions */}
             <ul style={{ listStyle: 'none', margin: '16px 0 0', padding: 0 }}>
               {p7.checks.map((t) => {
+                const ok = t.result === 'pass';
+                return (
+                  <li
+                    key={t.id}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 12,
+                      padding: '9px 0',
+                      borderTop: `1px solid ${C.border}`,
+                      fontSize: 13,
+                    }}
+                  >
+                    <span
+                      style={{
+                        width: 16,
+                        textAlign: 'center',
+                        color: ok ? C.green : C.red,
+                        fontWeight: 700,
+                      }}
+                    >
+                      {ok ? '✓' : '✗'}
+                    </span>
+                    <span
+                      style={{
+                        color: C.muted,
+                        fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace',
+                        fontSize: 12,
+                        minWidth: 18,
+                      }}
+                    >
+                      {t.id}
+                    </span>
+                    <span style={{ color: ok ? C.text : C.red }}>{t.name}</span>
+                  </li>
+                );
+              })}
+            </ul>
+          </>
+        )}
+      </section>
+
+      {/* ---------------- Phase 8 — Paywall Gate ---------------- */}
+      <section
+        style={{
+          backgroundColor: C.surface,
+          border: `1px solid ${C.border}`,
+          borderRadius: 12,
+          padding: 20,
+          marginBottom: 28,
+        }}
+      >
+        <h2 style={{ fontSize: 15, fontWeight: 700, margin: '0 0 4px' }}>
+          Phase 8 — Paywall Gate
+        </h2>
+
+        {!p8 ? (
+          <p style={{ color: C.muted, fontSize: 12.5, margin: '8px 0 0', lineHeight: 1.5 }}>
+            Not yet run. <code>phase8-report.json</code> will appear here once the paywall gate
+            has been built.
+          </p>
+        ) : (
+          <>
+            <p style={{ color: C.muted, fontSize: 12.5, margin: '0 0 16px', lineHeight: 1.5 }}>
+              {p8.what_this_does} Verified on {p8.generated}.
+            </p>
+
+            {/* Bypass status — the single most important thing on this panel */}
+            <div
+              style={{
+                border: `1px solid ${p8.emergency_bypass.current_state === 'OFF' ? C.green : C.red}`,
+                borderRadius: 8,
+                padding: '12px 14px',
+                marginBottom: 14,
+              }}
+            >
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 10,
+                  marginBottom: 6,
+                }}
+              >
+                <span
+                  style={{
+                    color: C.muted,
+                    fontSize: 11,
+                    fontWeight: 700,
+                    letterSpacing: 0.8,
+                    textTransform: 'uppercase',
+                  }}
+                >
+                  Emergency bypass ({p8.emergency_bypass.env_var})
+                </span>
+                {statusPill(
+                  p8.emergency_bypass.current_state === 'OFF' ? 'done' : 'in_progress',
+                )}
+                <span
+                  style={{
+                    color: p8.emergency_bypass.current_state === 'OFF' ? C.green : C.red,
+                    fontWeight: 700,
+                    fontSize: 13,
+                  }}
+                >
+                  {p8.emergency_bypass.current_state}
+                </span>
+              </div>
+              {[
+                p8.emergency_bypass.proof_it_is_off,
+                p8.emergency_bypass.arming_value,
+                p8.emergency_bypass.when_it_is_appropriate,
+                p8.emergency_bypass.turn_it_off_immediately,
+                p8.emergency_bypass.audited,
+                p8.emergency_bypass.what_it_does_not_change,
+              ].map((line, i) => (
+                <p
+                  key={i}
+                  style={{ color: C.muted, fontSize: 12.5, lineHeight: 1.6, margin: '0 0 6px' }}
+                >
+                  • {line}
+                </p>
+              ))}
+            </div>
+
+            {/* The decision table */}
+            <div
+              style={{
+                border: `1px solid ${C.border}`,
+                borderRadius: 8,
+                padding: '12px 14px',
+                marginBottom: 14,
+              }}
+            >
+              <div
+                style={{
+                  color: C.cyan,
+                  fontSize: 11,
+                  fontWeight: 700,
+                  letterSpacing: 0.8,
+                  textTransform: 'uppercase',
+                  marginBottom: 8,
+                }}
+              >
+                The decision table — unknown timeout {p8.unknown_timeout_seconds}s
+              </div>
+              <div style={{ overflowX: 'auto' }}>
+                <table style={{ borderCollapse: 'collapse', width: '100%', minWidth: 560 }}>
+                  <tbody>
+                    {p8.decision_table.map((row) => {
+                      const blocks = row.decision.startsWith('BLOCK');
+                      return (
+                        <tr key={row.state}>
+                          <td
+                            style={{
+                              borderTop: `1px solid ${C.border}`,
+                              padding: '8px 10px 8px 0',
+                              color: C.text,
+                              fontSize: 12.5,
+                              verticalAlign: 'top',
+                            }}
+                          >
+                            {row.state}
+                          </td>
+                          <td
+                            style={{
+                              borderTop: `1px solid ${C.border}`,
+                              padding: '8px 10px',
+                              color: blocks ? C.amber : C.green,
+                              fontSize: 12.5,
+                              fontWeight: 700,
+                              whiteSpace: 'nowrap',
+                              verticalAlign: 'top',
+                            }}
+                          >
+                            {row.decision}
+                          </td>
+                          <td
+                            style={{
+                              borderTop: `1px solid ${C.border}`,
+                              padding: '8px 0 8px 10px',
+                              color: C.muted,
+                              fontSize: 12,
+                              lineHeight: 1.5,
+                              verticalAlign: 'top',
+                            }}
+                          >
+                            {row.note}
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+              <p style={{ color: C.muted, fontSize: 12.5, lineHeight: 1.6, margin: '10px 0 0' }}>
+                {p8.unknown_timeout_why}
+              </p>
+            </div>
+
+            {/* Everything that can block, and why nothing ambiguous can */}
+            <div
+              style={{
+                border: `1px solid ${C.amber}`,
+                borderRadius: 8,
+                padding: '12px 14px',
+                marginBottom: 14,
+              }}
+            >
+              <div
+                style={{
+                  color: C.amber,
+                  fontSize: 11,
+                  fontWeight: 700,
+                  letterSpacing: 0.8,
+                  textTransform: 'uppercase',
+                  marginBottom: 6,
+                }}
+              >
+                Every path that can block a user
+              </div>
+              <p style={{ color: C.text, fontSize: 12.5, lineHeight: 1.6, margin: '0 0 8px' }}>
+                {p8.every_path_that_can_block.statement}
+              </p>
+              {p8.every_path_that_can_block.the_six.map((d, i) => (
+                <p
+                  key={i}
+                  style={{
+                    color: C.muted,
+                    fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace',
+                    fontSize: 11.5,
+                    lineHeight: 1.7,
+                    margin: 0,
+                  }}
+                >
+                  {d}
+                </p>
+              ))}
+              <p style={{ color: C.muted, fontSize: 12.5, lineHeight: 1.6, margin: '10px 0 6px' }}>
+                {p8.every_path_that_can_block.why_no_ambiguous_condition_reaches_them}
+              </p>
+              {p8.every_path_that_can_block.verified_live_that_ambiguity_looks_like_this.map(
+                (d, i) => (
+                  <p
+                    key={i}
+                    style={{ color: C.muted, fontSize: 12.5, lineHeight: 1.6, margin: '0 0 4px' }}
+                  >
+                    • {d}
+                  </p>
+                ),
+              )}
+              <p style={{ color: C.muted, fontSize: 12.5, lineHeight: 1.6, margin: '10px 0 0' }}>
+                <span style={{ color: C.text, fontWeight: 600 }}>Residual risk: </span>
+                {p8.residual_risk_stated_honestly}
+              </p>
+            </div>
+
+            {/* Hard constraint — no purchase path */}
+            <div
+              style={{
+                border: `1px solid ${C.red}`,
+                borderRadius: 8,
+                padding: '12px 14px',
+                marginBottom: 14,
+              }}
+            >
+              <div
+                style={{
+                  color: C.red,
+                  fontSize: 11,
+                  fontWeight: 700,
+                  letterSpacing: 0.8,
+                  textTransform: 'uppercase',
+                  marginBottom: 6,
+                }}
+              >
+                Hard constraint — no purchase path in the app
+              </div>
+              {[
+                p8.no_purchase_path.constraint,
+                p8.no_purchase_path.how_it_is_enforced,
+                p8.no_purchase_path.audit_of_those_strings,
+                p8.no_purchase_path.opinion_asked_for,
+                p8.no_purchase_path.confirm_needed,
+              ].map((line, i) => (
+                <p
+                  key={i}
+                  style={{ color: C.muted, fontSize: 12.5, lineHeight: 1.6, margin: '0 0 6px' }}
+                >
+                  • {line}
+                </p>
+              ))}
+              <div
+                style={{
+                  marginTop: 8,
+                  border: `1px solid ${C.border}`,
+                  borderRadius: 6,
+                  padding: '10px 12px',
+                }}
+              >
+                {Object.entries(p8.no_purchase_path.strings_en).map(([k, v]) => (
+                  <p
+                    key={k}
+                    style={{
+                      margin: '0 0 5px',
+                      fontSize: 12,
+                      lineHeight: 1.55,
+                      color: C.muted,
+                    }}
+                  >
+                    <span
+                      style={{
+                        color: C.cyan,
+                        fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace',
+                        fontSize: 11.5,
+                      }}
+                    >
+                      {k}
+                    </span>
+                    {'  '}
+                    <span style={{ color: C.text }}>&ldquo;{v}&rdquo;</span>
+                  </p>
+                ))}
+              </div>
+            </div>
+
+            {/* Narrative findings */}
+            <div style={{ marginBottom: 14 }}>
+              {[
+                ['Deliberate leniency', p8.deliberate_leniency],
+                ['Where the gate lives at runtime', p8.where_the_gate_lives_at_runtime.mechanism],
+                ['OBD disconnect on withdrawal', p8.where_the_gate_lives_at_runtime.obd_disconnect],
+                ['Offline-grace banner placement', p8.grace_banner.placement],
+                ['Missing grant found and fixed', p8.the_missing_grant_found.fix],
+                ['Phase 5 side effect, stated', p8.the_missing_grant_found.phase_5_side_effect_stated],
+                ['Pre-existing hole closed', p8.pre_existing_hole_closed.fix],
+                ['Phase 5 untouched', p8.phase_5_untouched],
+                ['Test hygiene', p8.test_hygiene],
+              ].map(([k, v]) => (
+                <p
+                  key={k}
+                  style={{ color: C.muted, fontSize: 12.5, lineHeight: 1.6, margin: '0 0 6px' }}
+                >
+                  <span style={{ color: C.text, fontWeight: 600 }}>{k}: </span>
+                  {v}
+                </p>
+              ))}
+            </div>
+
+            {/* Anything that did not go exactly to plan */}
+            {p8.deviations.length > 0 && (
+              <div style={{ marginTop: 16 }}>
+                <div
+                  style={{
+                    color: C.cyan,
+                    fontSize: 11,
+                    fontWeight: 700,
+                    letterSpacing: 0.8,
+                    textTransform: 'uppercase',
+                    marginBottom: 5,
+                  }}
+                >
+                  Deviations from the written plan
+                </div>
+                {p8.deviations.map((d, i) => (
+                  <p
+                    key={i}
+                    style={{ color: C.muted, fontSize: 12.5, lineHeight: 1.6, margin: '0 0 6px' }}
+                  >
+                    • {d}
+                  </p>
+                ))}
+              </div>
+            )}
+
+            {/* Regression results */}
+            <p style={{ color: C.muted, fontSize: 12.5, lineHeight: 1.6, margin: '16px 0 0' }}>
+              <span style={{ color: C.text, fontWeight: 600 }}>Regression: </span>
+              flutter analyze — {p8.analyze.new_errors} new errors, {p8.analyze.new_warnings} new
+              warnings, {p8.analyze.pre_existing_issues} pre-existing. flutter test —{' '}
+              {p8.tests.passed}/{p8.tests.total} pass. {p8.analyze.note}
+            </p>
+
+            <ul style={{ listStyle: 'none', margin: '12px 0 0', padding: 0 }}>
+              {p8.checks.map((t) => {
                 const ok = t.result === 'pass';
                 return (
                   <li

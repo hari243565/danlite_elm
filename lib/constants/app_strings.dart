@@ -415,6 +415,90 @@ class AppStrings {
       'session_superseded_body':
           "You've been signed out because this account was used on another "
           'device. Sign in again to use Danlite on this phone.',
+
+      // ── Paywall gate (Phase 8) ───────────────────────────────────────
+      //
+      // HARD CONSTRAINT, and it applies to every language: no price, no
+      // numeral standing for a cost, no URL, no purchase call to action, and
+      // no mention of a website or of where to buy. An in-app tap that leads
+      // to a purchase makes it an in-app purchase, which costs 20% and
+      // defeats the whole billing architecture. The customer learns how to
+      // buy from the activation email, outside the app.
+      //
+      // The tone is deliberately calm. Most people who ever see this screen
+      // are legitimate customers whose licence has not synced yet, or who are
+      // signed in on a second account by mistake — which is why the account
+      // identifier is on the screen.
+      'paywall_title': 'No active licence yet',
+      'paywall_body':
+          'We could not find an active licence on this account yet. If your '
+          'purchase has just gone through it can take a few minutes to reach '
+          'this phone — tap Refresh to check again.',
+
+      // The expired variant. A materially different, and far more
+      // recoverable, situation: the licence may well be perfectly good and
+      // the phone has simply been offline past the grace window.
+      'paywall_expired_title': 'Reconnect to continue',
+      'paywall_expired_body':
+          'Danlite has been working offline for a while and now needs to '
+          'check your licence once. Connect this phone to mobile data or '
+          'Wi-Fi and tap Refresh. Nothing has been lost.',
+
+      'paywall_account_label': 'Signed in as',
+      'paywall_account_hint':
+          'Check this is the account you registered with. If it is not, log '
+          'out and sign in with that one.',
+      'paywall_refresh_cta': 'Refresh',
+      'paywall_refresh_checking': 'Checking…',
+      'paywall_refresh_unchanged':
+          'Checked just now — there is still no active licence on this '
+          'account.',
+      'paywall_refresh_unreachable':
+          'Could not reach the licence service. Check your connection and try '
+          'again.',
+      'paywall_support_label': 'Need help?',
+      'paywall_support_hint':
+          'Contact support and quote the account shown above.',
+      'paywall_logout_cta': 'Log out',
+
+      // ── Connect once to activate (Phase 8) ───────────────────────────
+      // NOT the paywall. This is the recoverable screen for a signed-in user
+      // with no cached token who could not reach the server — an ambiguous
+      // state, which must never present itself as "you have not paid".
+      'activate_title': 'Connect once to activate',
+      'activate_body':
+          'Danlite needs to reach the licence service once on this phone. '
+          'Connect to mobile data or Wi-Fi and tap Retry. After that the app '
+          'keeps working offline for up to 14 days.',
+      'activate_retry_cta': 'Retry',
+      'activate_retry_failed': 'Still could not reach the licence service.',
+
+      // ── Offline-grace banner (Phase 8) ───────────────────────────────
+      // Muted, never red. It exists so nobody is surprised on day 14.
+      'grace_banner_days': 'Offline · {days} days left',
+      'grace_banner_one_day': 'Offline · 1 day left',
+      'grace_banner_last_day': 'Offline · last day',
+
+      // ── Account section, Settings screen ─────────────────────────────
+      // States what the user holds, never what anything costs. There is no
+      // price, link or purchase wording here in any language, for the same
+      // reason there is none on the paywall.
+      'account_section_title': 'Account',
+      'account_status_active': 'Lifetime Licence · Active',
+      // Three keys rather than one substitution, matching grace_banner_* above,
+      // so no language is forced to say "1 days".
+      'account_status_offline_grace': 'Active · Offline ({days} days left)',
+      'account_status_offline_grace_one': 'Active · Offline (1 day left)',
+      'account_status_offline_grace_last': 'Active · Offline (last day)',
+      // Structurally unreachable — the gate sends an unlicensed user to the
+      // paywall before Settings can be opened. Present so that if it ever is
+      // reached, the screen states the fact plainly instead of guessing.
+      'account_status_inactive': 'No active licence',
+      'account_logout_cta': 'Log out',
+      'account_logout_confirm_title': 'Log out of Danlite ELM?',
+      'account_logout_confirm_body':
+          'You will need your email or phone and a one-time code to sign back '
+          'in on this phone.',
     },
 
     // ══════════════════════════════════════════════════════════════════════════
@@ -730,6 +814,61 @@ class AppStrings {
       'session_superseded_body':
           'यह खाता किसी दूसरे डिवाइस पर उपयोग किया गया, इसलिए आपको साइन आउट कर '
           'दिया गया है। इस फ़ोन पर Danlite चलाने के लिए फिर से साइन इन करें।',
+
+      // ── पेवॉल गेट (Phase 8) ──────────────────────────────────────────────
+      // कोई कीमत नहीं, कोई लिंक नहीं, कोई खरीद बटन नहीं — देखें app_strings
+      // की अंग्रेज़ी टिप्पणी और paywall_screen.dart।
+      'paywall_title': 'अभी कोई सक्रिय लाइसेंस नहीं मिला',
+      'paywall_body':
+          'इस खाते पर अभी तक कोई सक्रिय लाइसेंस नहीं मिला। यदि आपकी खरीद अभी-अभी '
+          'पूरी हुई है तो उसे इस फ़ोन तक पहुँचने में कुछ मिनट लग सकते हैं — '
+          'दोबारा जाँचने के लिए रिफ़्रेश दबाएँ।',
+      'paywall_expired_title': 'जारी रखने के लिए एक बार कनेक्ट करें',
+      'paywall_expired_body':
+          'Danlite कुछ समय से ऑफ़लाइन चल रहा है और अब आपके लाइसेंस की एक बार '
+          'जाँच करनी है। इस फ़ोन को मोबाइल डेटा या Wi-Fi से जोड़ें और रिफ़्रेश '
+          'दबाएँ। कुछ भी खोया नहीं है।',
+      'paywall_account_label': 'इस खाते से साइन इन',
+      'paywall_account_hint':
+          'जाँचें कि यह वही खाता है जिससे आपने पंजीकरण किया था। यदि नहीं, तो साइन '
+          'आउट करके उसी खाते से साइन इन करें।',
+      'paywall_refresh_cta': 'रिफ़्रेश',
+      'paywall_refresh_checking': 'जाँच हो रही है…',
+      'paywall_refresh_unchanged':
+          'अभी जाँचा गया — इस खाते पर अब भी कोई सक्रिय लाइसेंस नहीं है।',
+      'paywall_refresh_unreachable':
+          'लाइसेंस सेवा तक नहीं पहुँच सके। अपना कनेक्शन जाँचें और दोबारा कोशिश करें।',
+      'paywall_support_label': 'सहायता चाहिए?',
+      'paywall_support_hint':
+          'सहायता से संपर्क करें और ऊपर दिखाया गया खाता बताएँ।',
+      'paywall_logout_cta': 'साइन आउट करें',
+
+      // ── एक बार कनेक्ट करके चालू करें (Phase 8) ───────────────────────────
+      'activate_title': 'चालू करने के लिए एक बार कनेक्ट करें',
+      'activate_body':
+          'Danlite को इस फ़ोन पर एक बार लाइसेंस सेवा तक पहुँचना है। मोबाइल डेटा '
+          'या Wi-Fi से जोड़ें और दोबारा कोशिश करें दबाएँ। उसके बाद ऐप 14 दिनों तक '
+          'ऑफ़लाइन काम करता रहेगा।',
+      'activate_retry_cta': 'दोबारा कोशिश करें',
+      'activate_retry_failed': 'अब भी लाइसेंस सेवा तक नहीं पहुँच सके।',
+
+      // ── ऑफ़लाइन ग्रेस बैनर (Phase 8) ─────────────────────────────────────
+      'grace_banner_days': 'ऑफ़लाइन · {days} दिन शेष',
+      'grace_banner_one_day': 'ऑफ़लाइन · 1 दिन शेष',
+      'grace_banner_last_day': 'ऑफ़लाइन · आख़िरी दिन',
+
+      // ── खाता अनुभाग, सेटिंग्स स्क्रीन ────────────────────────────────────
+      'account_section_title': 'खाता',
+      'account_status_active': 'लाइफ़टाइम लाइसेंस · सक्रिय',
+      'account_status_offline_grace': 'सक्रिय · ऑफ़लाइन ({days} दिन शेष)',
+      'account_status_offline_grace_one': 'सक्रिय · ऑफ़लाइन (1 दिन शेष)',
+      'account_status_offline_grace_last': 'सक्रिय · ऑफ़लाइन (आख़िरी दिन)',
+      'account_status_inactive': 'कोई सक्रिय लाइसेंस नहीं',
+      'account_logout_cta': 'लॉग आउट',
+      'account_logout_confirm_title': 'Danlite ELM से लॉग आउट करें?',
+      'account_logout_confirm_body':
+          'इस फ़ोन पर दोबारा साइन इन करने के लिए आपको अपना ईमेल या फ़ोन और एक '
+          'बार का कोड चाहिए होगा।',
     },
 
     // ══════════════════════════════════════════════════════════════════════════

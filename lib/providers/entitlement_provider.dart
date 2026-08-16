@@ -63,6 +63,20 @@ class EntitlementProvider extends ChangeNotifier with WidgetsBindingObserver {
   int? get remainingGraceSeconds => _result.remainingGraceSeconds(
       DateTime.now().millisecondsSinceEpoch ~/ 1000);
 
+  /// (Phase 8) Whole days of offline grace left, for the gate's banner.
+  ///
+  /// Rounded DOWN, and clamped at zero. Rounding down is the safe direction: a
+  /// banner that says "1 day left" with 30 hours remaining is a pleasant
+  /// surprise, while one that says "2 days left" with 25 hours remaining is
+  /// the exact surprise this banner exists to prevent. Null when there is no
+  /// usable token, in which case there is no banner to draw.
+  int? get graceDaysRemaining {
+    final seconds = remainingGraceSeconds;
+    if (seconds == null) return null;
+    final days = seconds ~/ Duration.secondsPerDay;
+    return days < 0 ? 0 : days;
+  }
+
   // ── Lifecycle ─────────────────────────────────────────────────────────────
 
   /// Called from main.dart after AuthProvider.init(). Never throws: a failure

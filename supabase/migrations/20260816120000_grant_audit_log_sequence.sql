@@ -1,0 +1,49 @@
+-- ══════════════════════════════════════════════════════════════════════════
+-- Phase 8 — let service_role actually write an audit_log row.
+--
+-- WHY THIS EXISTS
+--   Phase 8's emergency paywall bypass must write one audit_log row per use.
+--   A silent global bypass is indefensible; the audit trail is the only thing
+--   that makes it an operational tool rather than a back door. Without this
+--   grant that write is impossible.
+--
+-- THE BUG THIS FIXES
+--   public.audit_log.id is a `bigserial`, which is a bigint column plus an
+--   OWNED BY sequence. The initial migration granted service_role INSERT on
+--   the TABLE, and that looks complete — but an INSERT that lets the column
+--   default fire calls nextval() on public.audit_log_id_seq, and the sequence
+--   carries its OWN privileges. service_role had none, so every insert failed
+--   with:
+--
+--     42501  permission denied for sequence audit_log_id_seq
+--
+--   Verified live against the deployed project before writing this file: a
+--   direct service-role INSERT returned exactly that error, and audit_log was
+--   completely empty — nothing has ever managed to write to it.
+--
+--   This is the same class of omission found in Phase 2 (profiles), Phase 3
+--   (licences) and Phase 7 (devices/sessions): the grant that was missing was
+--   the one nobody thought to check. Phase 7's report explicitly handed this
+--   decision forward — "Phase 8 must add write grants as its own reviewable
+--   decision if it ever needs them". It needs one.
+--
+-- SCOPE — deliberately as small as it can be
+--   USAGE on ONE sequence, to ONE role. Not SELECT, not UPDATE, not ALL, and
+--   not `all sequences in schema public` — invoice_seq is Phase 6's business
+--   and is left alone. USAGE is what nextval() requires and nothing more; it
+--   does not permit setval(), so a leaked service-role key cannot rewind or
+--   jump the audit id counter.
+--
+--   No table grant changes. No RLS change. No policy change. audit_log still
+--   has no grants at all for anon or authenticated, so this remains invisible
+--   to every client.
+--
+-- SIDE EFFECT, STATED PLAINLY
+--   Other server-side code that inserts into audit_log as service_role would
+--   have hit the same 42501 and will now succeed — that includes the Phase 5
+--   Razorpay webhook. No Phase 5 file is touched, deployed or altered by this
+--   migration; a shared grant that was wrong is simply no longer wrong. The
+--   webhook still fails closed at 500 until its secret is installed.
+-- ══════════════════════════════════════════════════════════════════════════
+
+grant usage on sequence public.audit_log_id_seq to service_role;

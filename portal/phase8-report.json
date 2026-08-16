@@ -1,0 +1,167 @@
+{
+  "phase": "8",
+  "name": "Full-app paywall gate",
+  "generated": "2026-08-16",
+
+  "what_this_does": "The licence finally decides what the app shows. One place — lib/screens/auth/auth_gate.dart — reads the entitlement state and sends the user to the app, to a paywall, or to a recoverable 'connect once' screen. No screen file was modified to make that work: the gate is a routing decision, and the offline-grace banner rides in a root overlay above every route.",
+
+  "unknown_timeout_seconds": 8,
+  "unknown_timeout_why": "The splash must never hang. EntitlementService's own network timeout is 15s, so without a shorter bound a dead connection would hold a blank splash for 15 seconds with no explanation and no way out. Eight seconds is long enough for a slow garage connection to answer and short enough that nobody concludes the app has crashed. The wait always ends in a screen with a Retry button on it, never in a lockout.",
+
+  "decision_table": [
+    { "state": "active (verified token, online)", "decision": "ALLOW", "note": "full app" },
+    { "state": "offlineGraceActive (valid cached token, within 14 days)", "decision": "ALLOW", "note": "full app, plus the grace banner" },
+    { "state": "inactive (server affirmatively said no licence)", "decision": "BLOCK", "note": "paywall" },
+    { "state": "revoked / refunded (server affirmatively said so)", "decision": "BLOCK", "note": "paywall; EntitlementStatus folds 'refunded' into 'revoked'" },
+    { "state": "expired (cached token past its 14-day window)", "decision": "BLOCK", "note": "paywall with the distinct 'reconnect to verify' wording" },
+    { "state": "supersededSession", "decision": "NOT the paywall", "note": "Phase 7 signs the user out; the gate follows them to /login. Held on the splash for at most 8s, then the recoverable screen rather than a hang" },
+    { "state": "unknown — still loading", "decision": "SPLASH, bounded at 8s", "note": "then the recoverable 'Connect once to activate' screen" },
+    { "state": "network error / timeout / 5xx / parse failure WITH a valid cached token", "decision": "ALLOW", "note": "arrives at the gate as offlineGraceActive; never blocks" },
+    { "state": "network error with NO cached token, freshly logged in", "decision": "RECOVERABLE", "note": "'Connect once to activate', with Retry. Not the paywall and not a silent lockout" },
+    { "state": "backend not configured in this build", "decision": "ALLOW", "note": "pre-Phase-8 behaviour preserved — a packaging fault must not read as 'you have not paid'" },
+    { "state": "anything not listed above", "decision": "ALLOW", "note": "stated explicitly, and proved: 112 input combinations were enumerated and exactly 6 block" }
+  ],
+
+  "every_path_that_can_block": {
+    "statement": "A user can be blocked by exactly three EntitlementStatus values — inactive, revoked and expired — and only when they are signed in AND the backend is configured. This was not argued, it was enumerated: gateDecision() is a pure function, and the complete cross product of AuthStatus (4) x EntitlementStatus (7) x isConfigured (2) x waitElapsed (2) = 112 combinations was evaluated. Exactly 6 resolve to a blocking decision, and all 6 are AuthStatus.signedIn + configured=true on one of those three statuses.",
+    "the_six": [
+      "signedIn / inactive / configured=true / waitElapsed=true  -> blockNoLicence",
+      "signedIn / inactive / configured=true / waitElapsed=false -> blockNoLicence",
+      "signedIn / revoked / configured=true / waitElapsed=true   -> blockNoLicence",
+      "signedIn / revoked / configured=true / waitElapsed=false  -> blockNoLicence",
+      "signedIn / expired / configured=true / waitElapsed=true   -> blockExpired",
+      "signedIn / expired / configured=true / waitElapsed=false  -> blockExpired"
+    ],
+    "why_no_ambiguous_condition_reaches_them": "Because none of those three statuses can be produced by a failure. EntitlementService.fetchAndVerify() funnels EVERY failure through readCached(): a socket error, a 15s timeout, any non-2xx including 5xx, a Supabase relay failure, an unparseable body, and a payload whose Ed25519 signature does not verify. readCached() returns offlineGraceActive when a valid cached token exists (ALLOW) and EntitlementResult.none — status unknown — when it does not (the recoverable screen). `inactive` and `revoked` require a live HTTP 200 whose signature verified against the key compiled into the APK. `expired` requires a cached token that itself verified and is genuinely past its exp, or a device clock behind a time the server has already attested. There is no third way to reach any of them.",
+    "verified_live_that_ambiguity_looks_like_this": [
+      "invalid bearer token -> HTTP 401 (not 200; client falls to readCached)",
+      "malformed JSON body -> HTTP 400 (client falls to readCached)",
+      "malformed session_id -> HTTP 400, never 409 (Phase 7 property, re-verified)",
+      "unreachable host -> no HTTP status at all, curl exit 6 (client's generic catch -> readCached)"
+    ]
+  },
+
+  "deliberate_leniency": "offlineGraceActive ALLOWS regardless of the licence string inside the cached token — so a token that says 'inactive' still lets the app run while offline, for up to 14 days. That is the written decision table and it is also the right way round. Blocking there would lock out the customer who paid five minutes ago, drove into a basement garage, and is carrying a token issued before the payment landed. The cost of the choice made is at most 14 days of use by somebody who never paid and then stayed offline; the cost of the other choice is a paying mechanic with a car on the ramp and no diagnostics.",
+
+  "residual_risk_stated_honestly": "The one blocking path not caused by a licence decision is `expired` via the clock-rollback defence: a phone whose clock has genuinely gone backwards (a flat battery resetting it, for instance) while it also has no signal will be shown the paywall. It is shown the EXPIRED variant — 'Reconnect to continue', with 'Nothing has been lost' — not the 'no licence' variant, and one successful connection clears it. This is inherited from Phase 3's anti-tamper design, not introduced here, and it is the only lockout path the reliability review could not eliminate. It is recoverable in one tap once the phone has signal.",
+
+  "no_purchase_path": {
+    "constraint": "The paywall screen contains no price, no numeral representing a cost, no URL, no tappable link, no purchase button or call to action, and no mention of a website or of where to buy. An in-app tap leading to a purchase makes it an in-app purchase, which costs 20% and forfeits the architecture Phases 4-6 exist to protect.",
+    "how_it_is_enforced": "The support address is rendered as SelectableText, deliberately NOT a mailto: launcher. No url_launcher import exists in paywall_screen.dart. Every string is listed verbatim below so this can be checked by reading rather than trusted.",
+    "opinion_asked_for": "The screen is less helpful than it could be. A customer who has genuinely not bought yet is told only that no licence was found and given a support address; nothing on the screen tells them how to buy. That is the correct trade — the activation email carries that — but it means the support address is doing real work and should be a monitored inbox, not an alias nobody reads.",
+    "strings_en": {
+      "paywall_title": "No active licence yet",
+      "paywall_body": "We could not find an active licence on this account yet. If your purchase has just gone through it can take a few minutes to reach this phone — tap Refresh to check again.",
+      "paywall_expired_title": "Reconnect to continue",
+      "paywall_expired_body": "Danlite has been working offline for a while and now needs to check your licence once. Connect this phone to mobile data or Wi-Fi and tap Refresh. Nothing has been lost.",
+      "paywall_account_label": "Signed in as",
+      "paywall_account_hint": "Check this is the account you registered with. If it is not, log out and sign in with that one.",
+      "paywall_refresh_cta": "Refresh",
+      "paywall_refresh_checking": "Checking…",
+      "paywall_refresh_unchanged": "Checked just now — there is still no active licence on this account.",
+      "paywall_refresh_unreachable": "Could not reach the licence service. Check your connection and try again.",
+      "paywall_support_label": "Need help?",
+      "paywall_support_hint": "Contact support and quote the account shown above.",
+      "paywall_logout_cta": "Log out",
+      "activate_title": "Connect once to activate",
+      "activate_body": "Danlite needs to reach the licence service once on this phone. Connect to mobile data or Wi-Fi and tap Retry. After that the app keeps working offline for up to 14 days.",
+      "activate_retry_cta": "Retry",
+      "activate_retry_failed": "Still could not reach the licence service.",
+      "grace_banner_days": "Offline · {days} days left",
+      "grace_banner_one_day": "Offline · 1 day left",
+      "grace_banner_last_day": "Offline · last day"
+    },
+    "audit_of_those_strings": "No numeral appears anywhere except '14 days' (a duration) and the grace-banner day count. No '₹', '$', 'Rs', 'price', 'buy', 'purchase now', 'website', 'link', 'store' or 'upgrade'. The word 'purchase' appears once, in paywall_body, as 'If your purchase has just gone through' — describing something that already happened elsewhere, with no instruction and nothing to tap.",
+    "confirm_needed": "kPaywallSupportContact in lib/screens/paywall_screen.dart is the placeholder 'support@danlite.example' and is marked [CONFIRM]. It is a single const at the top of the file. The real address is a client decision and has not been supplied."
+  },
+
+  "emergency_bypass": {
+    "env_var": "PAYWALL_EMERGENCY_BYPASS",
+    "current_state": "OFF",
+    "proof_it_is_off": "The variable does not exist on the project. The Management API secrets listing after testing returns exactly: ED25519_PRIVATE_KEY, SUPABASE_URL, SUPABASE_ANON_KEY, SUPABASE_SERVICE_ROLE_KEY, SUPABASE_PUBLISHABLE_KEYS, SUPABASE_SECRET_KEYS, SUPABASE_DB_URL, SUPABASE_JWKS, RESEND_API_KEY, ACTIVATION_WEBHOOK_SECRET, BILLING_DOMAIN — PAYWALL_EMERGENCY_BYPASS is absent. A live call for a user whose licence row says 'inactive' returned lic:'inactive'.",
+    "arming_value": "It arms ONLY on the exact string 'EMERGENCY-PAYWALL-BYPASS-ON'. Verified live: with the variable set to 'true' and the function redeployed, an inactive user still received lic:'inactive'. A truthy check would have armed on '0', on 'false', and on a stray copy-pasted space — a switch whose failure mode is 'the paywall silently stopped existing' must be impossible to arm by accident.",
+    "when_it_is_appropriate": "One situation only: a CONFIRMED paywall defect is locking out real paying customers and the fix is not deployed yet. It stops the bleeding. It is not a discount, not a trial, not a way to grant somebody a licence.",
+    "turn_it_off_immediately": "While it is on, every authenticated caller is entitled — including people who have never paid — and each walks away with a normally-signed token valid offline for 14 DAYS. Turning it off does not un-issue those. The longer it stays on, the longer the tail.",
+    "what_it_does_not_change": "Nothing about the signing, the key handling, the canonical string sub|lic|sid|did|iat|exp, the 14-day TTL, or the Phase 7 session check. It is placed AFTER the supersession branch on purpose: a superseded device must still be told it was superseded. It overrides exactly one value — the licence status that goes into the claims — so no client update is needed to use it.",
+    "audited": "One audit_log row per request, action 'paywall_emergency_bypass_used', recording the real licence status that was overridden. Verified live: row id=1 was written with detail {\"function\":\"entitlement\",\"had_session_id\":false,\"real_licence_status\":\"inactive\",\"issued_licence_status\":\"active\"}. That row is from THIS TEST and has been deliberately left in place — deleting an audit record to make a report look tidy would be exactly the wrong instinct.",
+    "audit_failure_policy": "A failed audit write logs loudly (console.error) but does not withhold the token. The switch is only ever on because customers are already locked out; failing closed there would defeat the entire reason for its existence."
+  },
+
+  "the_missing_grant_found": {
+    "what": "public.audit_log has never been written to by anything. service_role held INSERT on the table but no privileges on public.audit_log_id_seq, and audit_log.id is a bigserial — so every insert died with 42501 'permission denied for sequence audit_log_id_seq'.",
+    "how_it_was_found": "The first armed-bypass test issued the token correctly and wrote no audit row. A direct service-role INSERT against PostgREST reproduced the 42501 immediately.",
+    "fix": "A new migration, 20260816120000_grant_audit_log_sequence.sql, granting USAGE on that ONE sequence to service_role and nothing else. Not SELECT, not UPDATE, not ALL, and not 'all sequences in schema public' — invoice_seq is Phase 6's business and was left alone. USAGE permits nextval() and not setval(), so a leaked service-role key still cannot rewind the audit counter.",
+    "class_of_bug": "The same omission class as Phase 2 (profiles), Phase 3 (licences) and Phase 7 (devices/sessions). Phase 7's report explicitly handed this decision forward: 'Phase 8 must add write grants as its own reviewable decision if it ever needs them.'",
+    "phase_5_side_effect_stated": "Any other server-side code inserting into audit_log as service_role would have hit the same 42501 and will now succeed — that includes the Phase 5 Razorpay webhook. No Phase 5 file was read into, touched, deployed or altered. The webhook still fails closed at 500 until its secret is installed."
+  },
+
+  "pre_existing_hole_closed": {
+    "what": "Phase 7's forced sign-out could not actually reach the login screen on a running app.",
+    "why": "Phase 7's design says 'the Phase 2 AuthGate does the redirect'. But AuthGate replaces itself with /home via pushReplacementNamed the moment it decides, so by the time a supersession arrives mid-session the gate is unmounted and nothing is listening. There is also no logout affordance anywhere in lib/screens/ today, so the path had never been exercised on a live app.",
+    "fix": "The gate's sentinel (see below) watches AuthProvider as well as EntitlementProvider and follows a signedOut transition to /login. Confined to auth_gate.dart; no Phase 7 file was modified."
+  },
+
+  "where_the_gate_lives_at_runtime": {
+    "problem": "The gate replaces itself when it navigates, which is correct — pressing back from /home must exit the app, not reveal a splash — but it leaves nobody watching. Phase 8 needs a watcher for two things: a revocation or refund arriving mid-session, and the grace banner, which has to be visible over screens that may not be modified.",
+    "mechanism": "A single root OverlayEntry, installed by the gate immediately before it navigates. An overlay entry sits above every route without being one, so it survives pushes and pops, participates in no screen's layout, and is wrapped in IgnorePointer so it can never intercept a tap meant for a gauge. When there is nothing to show it renders a zero-size box.",
+    "self_healing": "Changing the language swaps MaterialApp's ValueKey, which rebuilds the tree from initialRoute '/auth' and disposes the old Overlay. The gate re-runs and installs a fresh entry.",
+    "double_navigation_avoided": "The sentinel acts only on transitions, and only when the PREVIOUS auth status was already signedIn. A user who has just signed in is the gate's business; without that guard both would have pushed the same route.",
+    "obd_disconnect": "When access is withdrawn mid-session the sentinel checks ObdService.isConnected and awaits ObdService.disconnect() before navigating. A dangling ELM327 connection is worse than none — the adapter stays claimed. ObdService was called, never modified.",
+    "do_not_undo_this": "The recoverable screen is returned directly from AuthGate.build(), NOT through the private navigator that hosts the splash. That navigator builds its route once via onGenerateRoute and never rebuilds it, so putting both screens behind a conditional inside that builder leaves the splash on screen forever when the 8-second timeout fires. That bug was written and caught during this phase; it is a lockout wearing a spinner. The private navigator still wraps the splash, which is what stops its own 2.4-second timer walking past the gate."
+  },
+
+  "grace_banner": {
+    "placement": "Inside the gate's own root overlay, floating horizontally centred just below where a standard AppBar ends (safe-area top + kToolbarHeight + 6). Not inside any screen, changes no screen's layout, and cannot be tapped.",
+    "appearance": "A slim pill: muted grey text and border on the standard #131922 card colour at 92% opacity, with a small cloud-off icon. Never red.",
+    "wording": "'Offline · N days left', with separate keys for the 1-day and last-day cases so no language ends up saying '1 days'. Days round DOWN — a banner that says '1 day left' with 30 hours remaining is a pleasant surprise; '2 days left' with 25 hours remaining is the exact surprise the banner exists to prevent.",
+    "no_screen_file_touched": "Confirmed by git status: the only files under lib/screens/ that changed are auth/auth_gate.dart and the new paywall_screen.dart."
+  },
+
+  "analyze": {
+    "new_errors": 0,
+    "new_warnings": 0,
+    "pre_existing_issues": 7,
+    "note": "Identical to every prior phase: 4 warnings and 3 infos, all in dashboard_screen.dart, fuel_screen.dart, hud_screen.dart and realtime_screen.dart — files this phase did not touch."
+  },
+
+  "tests": { "passed": 24, "total": 24 },
+
+  "deviations": [
+    "A new migration file was created — supabase/migrations/20260816120000_grant_audit_log_sequence.sql — which is not on this phase's MAY CREATE list. Step 4 requires every use of the bypass to be written to audit_log, and that was impossible: service_role had INSERT on the table but no USAGE on its bigserial sequence, so every insert failed 42501 and audit_log had never received a single row in the project's life. The choice was between a one-line additive grant and shipping an unaudited global bypass; the grant is the smaller risk by a wide margin. No existing migration was modified.",
+    "Step 2 says to reuse the language picker already present in the drawer. It could not be reused: home_screen.dart declares it as `_showLanguagePicker`, which is library-private, and home_screen.dart may not be modified to expose it. An equivalent picker was written in paywall_screen.dart reading the same SettingsProvider.supportedLanguages list. It differs in one deliberate way — the drawer version finishes with pushNamedAndRemoveUntil('/home'), which from the paywall would walk straight past the gate. The new one only closes the sheet; the ValueKey rebuild re-anchors at the gate on its own.",
+    "The recoverable 'Connect once to activate' screen has NO route. app.dart was permitted the /paywall route only, so the screen is mounted inside the gate's existing private navigator instead. This is strictly better: nothing can reach it — or walk past it — by name.",
+    "gateDecision() takes no 'is the provider still loading' input. An earlier draft passed EntitlementProvider.busy and a new hasSettled getter, but both branches produced the same answer once the bounded timeout existed, and the extra getter would not have been 'genuinely needed'. The only getter added to EntitlementProvider is graceDaysRemaining, for the banner.",
+    "Check 7 (network failure with a valid cached token resolves to ALLOW) was proved by code-path analysis plus live probes of every ambiguous server response, NOT by forcing a failure inside a running Flutter app. Doing that properly needs a device with a signed-in user and an email OTP round trip, which was not available in this session. What was proved live: 401, 400 and an unresolvable host all produce something other than a verified 200, and every one of those routes through EntitlementService.readCached(). What is therefore argued rather than observed: that readCached() returns offlineGraceActive for a real on-disk token in that situation. That path is unchanged Phase 3 code and was verified in Phase 3 by an airplane-mode run.",
+    "gateDecision() was verified by a temporary harness (phase8_gate_matrix_TEMP.dart at the repo root) run through `flutter test` and deleted immediately afterwards, because test/ may not be touched by this phase. Its output — 112 combinations, 6 blocking — is quoted above. git status is clean of it.",
+    "The audit_log row written during check 9 was left in the table rather than deleted. It is a truthful record that the bypass was armed and used at 2026-08-16 03:04:24Z against a throwaway account, and removing it would undermine the only thing that makes the bypass defensible."
+  ],
+
+  "test_hygiene": "Every live check ran against the real deployed stack with a throwaway auth user, deleted afterwards. Cascade verified: 0 auth users, 0 profiles, 0 licences left behind. The entitlement function was redeployed four times during bypass testing and is now on version 11, ACTIVE, with the bypass secret absent. The deployed bundle was downloaded back from the Management API and confirmed to contain PAYWALL_EMERGENCY_BYPASS, the exact arming string and the audit action name — so the OFF state is the new code with the switch unset, not old code without the switch.",
+
+  "phase_5_untouched": "Confirmed. supabase/functions/create-order/ and supabase/functions/razorpay-webhook/ were not opened for editing, not deployed, and do not appear in git status. Phase 5 remains 'in_progress' in phases.json and untagged. Note for the preflight record: the brief expected Phase 5's work to be uncommitted, but it is committed and the working tree was clean at the start of this phase.",
+
+  "checks": [
+    { "id": 1, "name": "preflight: v2.7-session present, v2.5-razorpay-in absent, android/key.properties not in git status", "result": "pass" },
+    { "id": 2, "name": "flutter analyze: 7 pre-existing issues, 0 new errors, 0 new warnings", "result": "pass" },
+    { "id": 3, "name": "flutter test: 24/24 pass", "result": "pass" },
+    { "id": 4, "name": "git status: no lib/screens file changed but auth/auth_gate.dart + new paywall_screen.dart; no lib/services, no auth_provider.dart, no main.dart, nothing under android/, no Phase 5 file, pubspec.yaml unchanged", "result": "pass" },
+    { "id": 5, "name": "portal npm run build: zero errors", "result": "pass" },
+    { "id": 6, "name": "live: active licence returns a signature-valid token, lic 'active', TTL 1209600 -> gate ALLOWS", "result": "pass" },
+    { "id": 7, "name": "live: inactive licence returns lic 'inactive' -> gate BLOCKS to the paywall", "result": "pass" },
+    { "id": 8, "name": "live: revoked and refunded both return their exact strings; both fold to blockNoLicence", "result": "pass" },
+    { "id": 9, "name": "gate matrix: 112 input combinations, exactly 6 block, all signedIn + configured on inactive/revoked/expired", "result": "pass" },
+    { "id": 10, "name": "no ambiguous status (unknown, offlineGraceActive, supersededSession, active) can block under ANY other input", "result": "pass" },
+    { "id": 11, "name": "an unconfigured build behaves exactly as it did before Phase 8, for every entitlement status", "result": "pass" },
+    { "id": 12, "name": "live: invalid bearer -> 401, malformed body -> 400, malformed session_id -> 400 (never 409), unreachable host -> no status", "result": "pass" },
+    { "id": 13, "name": "bypass OFF (deployed state): inactive user receives lic 'inactive'", "result": "pass" },
+    { "id": 14, "name": "bypass does NOT arm on the truthy value 'true'", "result": "pass" },
+    { "id": 15, "name": "bypass armed on the exact value: inactive user receives lic 'active', signature valid, TTL unchanged", "result": "pass" },
+    { "id": 16, "name": "audit_log row written for the bypass use, naming the real licence status", "result": "pass" },
+    { "id": 17, "name": "bypass disarmed and redeployed: PAYWALL_EMERGENCY_BYPASS absent from the project secrets, inactive user back to 'inactive'", "result": "pass" },
+    { "id": 18, "name": "missing grant found and fixed: service_role now holds USAGE (only) on audit_log_id_seq", "result": "pass" },
+    { "id": 19, "name": "canonical string, TTL, key handling and the Phase 7 session check all unchanged", "result": "pass" },
+    { "id": 20, "name": "paywall strings contain no price, no URL and no purchase affordance (quoted verbatim above)", "result": "pass" },
+    { "id": 21, "name": "app.dart: all 18 existing routes preserved (the brief said 14; there were 18), plus textScaler builder, locale, localeListResolutionCallback, delegates, supportedLocales and the ValueKey — one route added, 19 total", "result": "pass" },
+    { "id": 22, "name": "throwaway test user deleted; 0 users / 0 profiles / 0 licences left behind", "result": "pass" }
+  ]
+}
