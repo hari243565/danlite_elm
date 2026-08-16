@@ -499,6 +499,44 @@ class AppStrings {
       'account_logout_confirm_body':
           'You will need your email or phone and a one-time code to sign back '
           'in on this phone.',
+
+      // ── Account detail screen ────────────────────────────────────────
+      // Reached from the Settings row above. Same rule as everywhere else:
+      // it states what the account already holds and never what anything
+      // costs. 'account_member_since' and 'account_purchased_via' record a
+      // purchase that has already happened — neither is an offer, and there
+      // is no amount, currency or renewal wording in either.
+      'account_screen_title': 'Account',
+      'account_signed_in_via_email': 'Signed in with email',
+      'account_signed_in_via_mobile': 'Signed in with mobile',
+      'account_member_since': 'Member since {date}',
+      'account_purchased_via': 'Purchased via {rail}',
+
+      'account_details_title': 'Account details',
+      'account_email_label': 'Email',
+      'account_phone_label': 'Mobile',
+      'account_country_label': 'Country / Region',
+      'account_created_label': 'Account created',
+      // Shown only when a read could not be completed at all — not when a
+      // column is simply empty, which the screen handles by omitting the line.
+      'account_details_unavailable':
+          'Some details could not be loaded. Connect to the internet and open '
+          'this screen again.',
+
+      'account_id_label': 'Account ID',
+      'account_id_hint':
+          'Quote this if you contact support. It is a reference only.',
+      'account_id_copy_cta': 'Copy',
+      'account_id_copied_confirmation': 'Account ID copied',
+
+      'account_device_title': 'This device',
+      'account_device_label': 'Device',
+      'account_app_version_label': 'App version',
+
+      'account_support_title': 'Support & legal',
+      'account_legal_privacy': 'Privacy Policy',
+      'account_legal_terms': 'Terms of Service',
+      'account_legal_refund': 'Refund Policy',
     },
 
     // ══════════════════════════════════════════════════════════════════════════
@@ -869,6 +907,37 @@ class AppStrings {
       'account_logout_confirm_body':
           'इस फ़ोन पर दोबारा साइन इन करने के लिए आपको अपना ईमेल या फ़ोन और एक '
           'बार का कोड चाहिए होगा।',
+
+      // ── खाता विवरण स्क्रीन ───────────────────────────────────────────────
+      'account_screen_title': 'खाता',
+      'account_signed_in_via_email': 'ईमेल से साइन इन',
+      'account_signed_in_via_mobile': 'मोबाइल से साइन इन',
+      'account_member_since': '{date} से सदस्य',
+      'account_purchased_via': '{rail} के ज़रिए ख़रीदा गया',
+
+      'account_details_title': 'खाता विवरण',
+      'account_email_label': 'ईमेल',
+      'account_phone_label': 'मोबाइल',
+      'account_country_label': 'देश / क्षेत्र',
+      'account_created_label': 'खाता बना',
+      'account_details_unavailable':
+          'कुछ विवरण लोड नहीं हो सके। इंटरनेट से जुड़ें और यह स्क्रीन दोबारा '
+          'खोलें।',
+
+      'account_id_label': 'खाता आईडी',
+      'account_id_hint':
+          'सहायता से संपर्क करते समय यह बताएँ। यह केवल एक संदर्भ है।',
+      'account_id_copy_cta': 'कॉपी',
+      'account_id_copied_confirmation': 'खाता आईडी कॉपी हो गई',
+
+      'account_device_title': 'यह डिवाइस',
+      'account_device_label': 'डिवाइस',
+      'account_app_version_label': 'ऐप संस्करण',
+
+      'account_support_title': 'सहायता और क़ानूनी',
+      'account_legal_privacy': 'गोपनीयता नीति',
+      'account_legal_terms': 'सेवा की शर्तें',
+      'account_legal_refund': 'रिफ़ंड नीति',
     },
 
     // ══════════════════════════════════════════════════════════════════════════

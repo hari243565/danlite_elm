@@ -15,6 +15,7 @@ import 'screens/fuel_screen.dart';
 import 'screens/hud_screen.dart';
 import 'screens/graph_screen.dart';
 import 'screens/settings_screen.dart';
+import 'screens/account_screen.dart';
 import 'screens/vehicle_profile_screen.dart';
 import 'screens/trip_history_screen.dart';
 import 'screens/about_screen.dart';
@@ -85,6 +86,10 @@ class DanliteELMApp extends StatelessWidget {
         '/hud': (_) => const HudScreen(),
         '/graph': (_) => const GraphScreen(),
         '/settings': (_) => const SettingsScreen(),
+        // The single route added by the account-detail task. Reached only from
+        // the Settings summary row; it sits inside the gate like every other
+        // route here, so it is unreachable without an entitled session.
+        '/account': (_) => const AccountScreen(),
         '/vehicles': (_) => const VehicleProfileScreen(),
         '/trips': (_) => const TripHistoryScreen(),
         '/about': (_) => const AboutScreen(),
