@@ -236,6 +236,92 @@ function readPhase4(): Phase4Report | null {
   }
 }
 
+type Phase5Check = { id: number; name: string; result: string };
+
+type Phase5Report = {
+  phase: string;
+  name: string;
+  generated: string;
+  mode: string;
+  key_id_prefix_is_rzp_test: boolean;
+  key_id_prefix_check: string;
+  what_this_does: string;
+  governing_rule: string;
+  verdict: string;
+  secrets: {
+    installed: string[];
+    verified_by: string;
+    install_method: string;
+    shape_validation_only: string;
+    temp_file: string;
+    secret_lifetime_minimisation: string;
+    repo_sweep: {
+      tracked_files_scanned: number;
+      on_disk_files_scanned_including_gitignored: number;
+      hits_rzp_test: number;
+      hits_rzp_live: number;
+      hits_webhook_secret: number;
+      corroborating_evidence: string;
+    };
+  };
+  deployment: {
+    functions_deployed: string[];
+    reason: string;
+    source_was_byte_identical: boolean;
+    proof: string;
+    fail_closed_confirmed: string;
+  };
+  preconditions_verified: Record<string, string>;
+  the_real_transaction: Record<string, string | number>;
+  two_failed_attempts_before_success: Record<string, string>;
+  price_integrity_step_5: {
+    gst_treatment_current: string;
+    gst_rate_percent: number;
+    source_of_truth_read_only: string;
+    three_readings: Record<string, string | number>;
+    all_three_agree: boolean;
+    statement: string;
+    holds_only_while_inclusive: string;
+    why_no_existing_check_would_catch_it: string;
+    status: string;
+  };
+  security_tests: Record<string, Record<string, unknown>>;
+  open_items_for_owner: string[];
+  test_residue: Record<string, string>;
+  deviations: string[];
+  files_touched: Record<string, string | string[]>;
+  checks: Phase5Check[];
+};
+
+function readPhase5(): Phase5Report | null {
+  try {
+    const file = path.join(process.cwd(), 'phase5-report.json');
+    const raw = fs.readFileSync(file, 'utf8');
+    return JSON.parse(raw) as Phase5Report;
+  } catch {
+    // Absent until the phase has been run — the panel renders a muted card.
+    return null;
+  }
+}
+
+/**
+ * TEST-MODE indicator.
+ *
+ * Renders a BOOLEAN and nothing else. RAZORPAY_KEY_ID lives in the Supabase
+ * Edge Function secret store, not in this process's environment, so in the
+ * normal case the boolean comes from the verified fact recorded in
+ * phase5-report.json at install time. If the key ever IS present locally we
+ * derive it live instead — but either way only the prefix test crosses the
+ * boundary, never the key.
+ */
+function razorpayTestMode(reported: boolean): { isTest: boolean; source: string } {
+  const local = process.env.RAZORPAY_KEY_ID;
+  if (typeof local === 'string' && local.length > 0) {
+    return { isTest: local.startsWith('rzp_test_'), source: 'live check of RAZORPAY_KEY_ID' };
+  }
+  return { isTest: reported, source: 'verified at install time, recorded in phase5-report.json' };
+}
+
 type Phase7Check = { id: number; name: string; result: string };
 
 type Phase7Report = {
@@ -379,6 +465,7 @@ export default function MissionControl() {
   const p2 = readPhase2();
   const p3 = readPhase3();
   const p4 = readPhase4();
+  const p5 = readPhase5();
   const p7 = readPhase7();
   const p8 = readPhase8();
 
@@ -1363,6 +1450,460 @@ export default function MissionControl() {
               })}
             </ul>
           </>
+        )}
+      </section>
+
+      {/* ---------------- Phase 5 — Razorpay (Test Mode) ---------------- */}
+      <section
+        style={{
+          backgroundColor: C.surface,
+          border: `1px solid ${C.border}`,
+          borderRadius: 12,
+          padding: 20,
+          marginBottom: 28,
+        }}
+      >
+        <h2 style={{ fontSize: 15, fontWeight: 700, margin: '0 0 4px' }}>
+          Phase 5 — Razorpay (Test Mode)
+        </h2>
+
+        {!p5 ? (
+          <p style={{ color: C.muted, fontSize: 12.5, margin: '8px 0 0', lineHeight: 1.5 }}>
+            Not yet run. <code>phase5-report.json</code> will appear here once the Razorpay rail
+            has been verified against a real transaction.
+          </p>
+        ) : (
+          (() => {
+            const tm = razorpayTestMode(p5.key_id_prefix_is_rzp_test);
+            const tx = p5.the_real_transaction;
+            const pi = p5.price_integrity_step_5;
+            return (
+              <>
+                <p style={{ color: C.muted, fontSize: 12.5, margin: '0 0 16px', lineHeight: 1.5 }}>
+                  {p5.what_this_does} Verified on {p5.generated}.
+                </p>
+
+                {/* The single most important thing on this panel: are we taking
+                    real money? Renders a boolean only — never the key. */}
+                <div
+                  style={{
+                    border: `2px solid ${tm.isTest ? C.amber : C.red}`,
+                    borderRadius: 8,
+                    padding: '14px 16px',
+                    marginBottom: 16,
+                    backgroundColor: `${tm.isTest ? C.amber : C.red}14`,
+                  }}
+                >
+                  <div
+                    style={{
+                      color: tm.isTest ? C.amber : C.red,
+                      fontSize: 15,
+                      fontWeight: 800,
+                      letterSpacing: 0.4,
+                      marginBottom: 6,
+                    }}
+                  >
+                    {tm.isTest
+                      ? 'TEST MODE — not accepting real payments'
+                      : 'LIVE MODE — REAL PAYMENTS ARE BEING ACCEPTED'}
+                  </div>
+                  <p style={{ color: C.muted, fontSize: 12, lineHeight: 1.6, margin: 0 }}>
+                    Derived from whether RAZORPAY_KEY_ID begins with{' '}
+                    <code style={{ color: C.text }}>rzp_test_</code> ({tm.source}). Only this
+                    boolean is rendered; the key itself never crosses into this page.
+                  </p>
+                </div>
+
+                {/* Headline badges */}
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, marginBottom: 14 }}>
+                  {[
+                    { label: 'Price', value: `${String(tx.amount_minor)} ${String(tx.currency)}` },
+                    { label: 'GST', value: `${pi.gst_treatment_current} ${pi.gst_rate_percent}%` },
+                    { label: 'Prices agree', value: pi.all_three_agree ? '3 of 3' : 'DIVERGENT' },
+                    { label: 'Checks', value: `${p5.checks.filter((c) => c.result === 'pass').length} of ${p5.checks.length}` },
+                  ].map((b) => (
+                    <span
+                      key={b.label}
+                      style={{
+                        display: 'inline-block',
+                        padding: '5px 11px',
+                        borderRadius: 8,
+                        border: `1px solid ${C.border}`,
+                        backgroundColor: C.card,
+                        fontSize: 12,
+                        color: C.muted,
+                        whiteSpace: 'nowrap',
+                      }}
+                    >
+                      {b.label} <span style={{ color: C.text, fontWeight: 700 }}>{b.value}</span>
+                    </span>
+                  ))}
+                </div>
+
+                {/* The governing rule of the whole phase */}
+                <div
+                  style={{
+                    border: `1px solid ${C.red}`,
+                    borderRadius: 8,
+                    padding: '12px 14px',
+                    marginBottom: 14,
+                  }}
+                >
+                  <div
+                    style={{
+                      color: C.red,
+                      fontSize: 11,
+                      fontWeight: 700,
+                      letterSpacing: 0.8,
+                      textTransform: 'uppercase',
+                      marginBottom: 6,
+                    }}
+                  >
+                    Governing rule — the only way a licence turns on
+                  </div>
+                  <p style={{ color: C.muted, fontSize: 12.5, lineHeight: 1.6, margin: 0 }}>
+                    {p5.governing_rule}
+                  </p>
+                </div>
+
+                {/* The real transaction */}
+                <div
+                  style={{
+                    border: `1px solid ${C.border}`,
+                    backgroundColor: C.card,
+                    borderRadius: 8,
+                    padding: '12px 14px',
+                    marginBottom: 14,
+                  }}
+                >
+                  <div
+                    style={{
+                      color: C.cyan,
+                      fontSize: 11,
+                      fontWeight: 700,
+                      letterSpacing: 0.8,
+                      textTransform: 'uppercase',
+                      marginBottom: 8,
+                    }}
+                  >
+                    The real test-mode transaction
+                  </div>
+                  {[
+                    ['Payment', String(tx.gateway_payment_id)],
+                    ['Order', String(tx.gateway_order_id)],
+                    ['Amount', `${String(tx.amount_minor)} minor (${String(tx.currency)})`],
+                    ['Status', String(tx.status)],
+                    ['GST invoice', String(tx.gst_invoice_no)],
+                    ['Method', String(tx.method)],
+                    ['Webhook delivery', String(tx.webhook_events_row)],
+                  ].map(([k, v]) => (
+                    <div key={k} style={{ marginBottom: 6 }}>
+                      <span style={{ color: C.muted, fontSize: 11 }}>{k}</span>
+                      <div
+                        style={{
+                          color: C.text,
+                          fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace',
+                          fontSize: 12,
+                          wordBreak: 'break-all',
+                          lineHeight: 1.5,
+                        }}
+                      >
+                        {v}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Price integrity — the flagged risk, now measured */}
+                <div
+                  style={{
+                    border: `1px solid ${pi.all_three_agree ? C.green : C.red}`,
+                    borderRadius: 8,
+                    padding: '12px 14px',
+                    marginBottom: 14,
+                  }}
+                >
+                  <div
+                    style={{
+                      color: pi.all_three_agree ? C.green : C.red,
+                      fontSize: 11,
+                      fontWeight: 700,
+                      letterSpacing: 0.8,
+                      textTransform: 'uppercase',
+                      marginBottom: 8,
+                    }}
+                  >
+                    Price integrity — three independent readings
+                  </div>
+                  {Object.entries(pi.three_readings).map(([k, v]) => (
+                    <p
+                      key={k}
+                      style={{ color: C.muted, fontSize: 12.5, lineHeight: 1.6, margin: '0 0 5px' }}
+                    >
+                      <span style={{ color: pi.all_three_agree ? C.green : C.red, fontWeight: 700 }}>
+                        {pi.all_three_agree ? '✓' : '✗'}
+                      </span>{' '}
+                      {String(v)}
+                    </p>
+                  ))}
+                  {[pi.statement, pi.holds_only_while_inclusive, pi.why_no_existing_check_would_catch_it, pi.status].map(
+                    (line, i) => (
+                      <p
+                        key={i}
+                        style={{ color: C.muted, fontSize: 12.5, lineHeight: 1.6, margin: '8px 0 0' }}
+                      >
+                        {line}
+                      </p>
+                    ),
+                  )}
+                </div>
+
+                {/* Secrets + deployment integrity */}
+                <div style={{ marginBottom: 14 }}>
+                  {[
+                    ['Secrets installed', p5.secrets.installed.join(', ')],
+                    ['Verified by', p5.secrets.verified_by],
+                    ['Install method', p5.secrets.install_method],
+                    ['Temp file', p5.secrets.temp_file],
+                    ['Secret lifetime', p5.secrets.secret_lifetime_minimisation],
+                    [
+                      'Repo sweep',
+                      `${p5.secrets.repo_sweep.tracked_files_scanned} tracked and ${p5.secrets.repo_sweep.on_disk_files_scanned_including_gitignored} on-disk files scanned — ${p5.secrets.repo_sweep.hits_rzp_test} rzp_test_ hits, ${p5.secrets.repo_sweep.hits_rzp_live} rzp_live_ hits, ${p5.secrets.repo_sweep.hits_webhook_secret} webhook-secret hits`,
+                    ],
+                    ['Deploy integrity', p5.deployment.proof],
+                    ['Fail-closed proof', p5.deployment.fail_closed_confirmed],
+                  ].map(([k, v]) => (
+                    <p
+                      key={k}
+                      style={{ color: C.muted, fontSize: 12.5, lineHeight: 1.6, margin: '0 0 6px' }}
+                    >
+                      <span style={{ color: C.text, fontWeight: 600 }}>{k}: </span>
+                      {v}
+                    </p>
+                  ))}
+                </div>
+
+                {/* The four security tests */}
+                <div
+                  style={{
+                    border: `1px solid ${C.amber}`,
+                    borderRadius: 8,
+                    padding: '12px 14px',
+                    marginBottom: 14,
+                  }}
+                >
+                  <div
+                    style={{
+                      color: C.amber,
+                      fontSize: 11,
+                      fontWeight: 700,
+                      letterSpacing: 0.8,
+                      textTransform: 'uppercase',
+                      marginBottom: 8,
+                    }}
+                  >
+                    Security tests — executed against a real gateway
+                  </div>
+                  {Object.entries(p5.security_tests).map(([key, body]) => {
+                    const rec = body as Record<string, unknown>;
+                    const ok = rec.result === 'pass';
+                    const lines: [string, string][] = [];
+                    const walk = (o: Record<string, unknown>, prefix: string) => {
+                      for (const [k, v] of Object.entries(o)) {
+                        if (k === 'result') continue;
+                        if (typeof v === 'string' || typeof v === 'number' || typeof v === 'boolean') {
+                          lines.push([prefix + k, String(v)]);
+                        } else if (v && typeof v === 'object') {
+                          walk(v as Record<string, unknown>, `${prefix}${k}.`);
+                        }
+                      }
+                    };
+                    walk(rec, '');
+                    return (
+                      <div key={key} style={{ marginBottom: 12 }}>
+                        <div
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: 8,
+                            marginBottom: 4,
+                          }}
+                        >
+                          <span style={{ color: ok ? C.green : C.red, fontWeight: 700 }}>
+                            {ok ? '✓' : '✗'}
+                          </span>
+                          <span
+                            style={{
+                              color: C.text,
+                              fontWeight: 700,
+                              fontSize: 12.5,
+                              fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace',
+                            }}
+                          >
+                            {key}
+                          </span>
+                        </div>
+                        {lines.map(([k, v]) => (
+                          <p
+                            key={k}
+                            style={{
+                              color: C.muted,
+                              fontSize: 12,
+                              lineHeight: 1.6,
+                              margin: '0 0 3px',
+                              paddingLeft: 20,
+                            }}
+                          >
+                            <span
+                              style={{
+                                color: C.cyan,
+                                fontFamily:
+                                  'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace',
+                                fontSize: 11,
+                              }}
+                            >
+                              {k}
+                            </span>{' '}
+                            {v}
+                          </p>
+                        ))}
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* The unplanned discovery */}
+                <div style={{ marginBottom: 14 }}>
+                  {Object.entries(p5.two_failed_attempts_before_success).map(([k, v]) => (
+                    <p
+                      key={k}
+                      style={{ color: C.muted, fontSize: 12.5, lineHeight: 1.6, margin: '0 0 6px' }}
+                    >
+                      <span style={{ color: C.text, fontWeight: 600 }}>{k}: </span>
+                      {v}
+                    </p>
+                  ))}
+                </div>
+
+                {/* Things the owner still has to decide */}
+                <div style={{ marginTop: 16 }}>
+                  <div
+                    style={{
+                      color: C.cyan,
+                      fontSize: 11,
+                      fontWeight: 700,
+                      letterSpacing: 0.8,
+                      textTransform: 'uppercase',
+                      marginBottom: 5,
+                    }}
+                  >
+                    Needs a decision from you
+                  </div>
+                  {p5.open_items_for_owner.map((d, i) => (
+                    <p
+                      key={i}
+                      style={{ color: C.muted, fontSize: 12.5, lineHeight: 1.6, margin: '0 0 6px' }}
+                    >
+                      • {d}
+                    </p>
+                  ))}
+                </div>
+
+                {/* Test residue, stated rather than tidied away */}
+                <div style={{ marginTop: 16 }}>
+                  <div
+                    style={{
+                      color: C.cyan,
+                      fontSize: 11,
+                      fontWeight: 700,
+                      letterSpacing: 0.8,
+                      textTransform: 'uppercase',
+                      marginBottom: 5,
+                    }}
+                  >
+                    Test residue left in the database
+                  </div>
+                  {Object.entries(p5.test_residue).map(([k, v]) => (
+                    <p
+                      key={k}
+                      style={{ color: C.muted, fontSize: 12.5, lineHeight: 1.6, margin: '0 0 6px' }}
+                    >
+                      <span style={{ color: C.text, fontWeight: 600 }}>{k}: </span>
+                      {v}
+                    </p>
+                  ))}
+                </div>
+
+                {/* Anything that did not go exactly to plan */}
+                {p5.deviations.length > 0 && (
+                  <div style={{ marginTop: 16 }}>
+                    <div
+                      style={{
+                        color: C.cyan,
+                        fontSize: 11,
+                        fontWeight: 700,
+                        letterSpacing: 0.8,
+                        textTransform: 'uppercase',
+                        marginBottom: 5,
+                      }}
+                    >
+                      Deviations from the written plan
+                    </div>
+                    {p5.deviations.map((d, i) => (
+                      <p
+                        key={i}
+                        style={{ color: C.muted, fontSize: 12.5, lineHeight: 1.6, margin: '0 0 6px' }}
+                      >
+                        • {d}
+                      </p>
+                    ))}
+                  </div>
+                )}
+
+                {/* Verification assertions */}
+                <ul style={{ listStyle: 'none', margin: '16px 0 0', padding: 0 }}>
+                  {p5.checks.map((t) => {
+                    const ok = t.result === 'pass';
+                    return (
+                      <li
+                        key={t.id}
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 12,
+                          padding: '9px 0',
+                          borderTop: `1px solid ${C.border}`,
+                          fontSize: 13,
+                        }}
+                      >
+                        <span
+                          style={{
+                            width: 16,
+                            textAlign: 'center',
+                            color: ok ? C.green : C.red,
+                            fontWeight: 700,
+                          }}
+                        >
+                          {ok ? '✓' : '✗'}
+                        </span>
+                        <span
+                          style={{
+                            color: C.muted,
+                            fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace',
+                            fontSize: 12,
+                            minWidth: 18,
+                          }}
+                        >
+                          {t.id}
+                        </span>
+                        <span style={{ color: ok ? C.text : C.red }}>{t.name}</span>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </>
+            );
+          })()
         )}
       </section>
 

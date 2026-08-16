@@ -1,0 +1,254 @@
+{
+  "phase": "5",
+  "name": "Razorpay domestic ₹109 + webhook signature verification + idempotency",
+  "generated": "2026-08-17",
+  "mode": "TEST MODE",
+  "key_id_prefix_is_rzp_test": true,
+  "key_id_prefix_check": "RAZORPAY_KEY_ID was validated at install time to begin with 'rzp_test_' and explicitly checked NOT to begin with 'rzp_live_'. Only that boolean was ever recorded; the key itself appears in no file, log, report or command argument.",
+
+  "what_this_does": "Turns a real Razorpay test-mode payment into an active lifetime licence, and proves that nothing else can. A licence becomes active only when a webhook's HMAC-SHA256 signature verifies against the raw request body using a timing-safe comparison.",
+
+  "governing_rule": "A licence becomes active ONLY when a Razorpay webhook's HMAC-SHA256 signature verifies against the RAW request body with a constant-time comparison. Not a client callback, not a page redirect, not an order being created. Verified live in this session: the only two writes to payments/licences in the entire run both originated from signature-verified webhook deliveries.",
+
+  "verdict": "All six verification steps and all four security tests passed against a real Razorpay test-mode transaction. No defect was found in create-order or razorpay-webhook. Three open items are recorded below for owner decision; none of them block tagging, and none of them is a code defect.",
+
+  "secrets": {
+    "installed": ["RAZORPAY_KEY_ID", "RAZORPAY_KEY_SECRET", "RAZORPAY_WEBHOOK_SECRET"],
+    "verified_by": "npx supabase secrets list — names only; the CLI returns SHA-256 digests, never plaintext",
+    "install_method": "supabase secrets set --env-file. Chosen over inline NAME=\"value\" arguments so the values never appear in a process argument list, which is readable by any other process on the machine while the command runs.",
+    "shape_validation_only": "3 non-empty lines, no surrounding quotes, no leading/trailing whitespace, no internal whitespace; line 1 prefix 'rzp_test_' confirmed, 'rzp_live_' explicitly ruled out.",
+    "temp_file": "Created in the session scratchpad OUTSIDE the repository, three-pass overwritten (zero/random/zero) and deleted. Confirmed absent.",
+    "secret_lifetime_minimisation": "RAZORPAY_KEY_ID and RAZORPAY_KEY_SECRET were destroyed immediately after install — neither was needed again. Only RAZORPAY_WEBHOOK_SECRET was retained, in the scratchpad only, because tests 6a and 6c require signing payloads; it was destroyed at the end of the session.",
+    "repo_sweep": {
+      "tracked_files_scanned": 205,
+      "on_disk_files_scanned_including_gitignored": 250,
+      "hits_rzp_test": 0,
+      "hits_rzp_live": 0,
+      "hits_webhook_secret": 0,
+      "corroborating_evidence": "git status --short reports no modification to any tracked file other than the two dashboard files this phase is permitted to touch, which independently proves nothing leaked into the repository."
+    }
+  },
+
+  "deployment": {
+    "functions_deployed": ["razorpay-webhook (--no-verify-jwt)", "create-order"],
+    "reason": "Edge Functions read secrets at cold start; newly set secrets require a redeploy to take effect.",
+    "source_was_byte_identical": true,
+    "proof": "git blob hashes of the working-tree files matched HEAD exactly before deploying — razorpay-webhook/index.ts 5ba1516b2d5e0817dbad05f4b7245b70e824c9bd, create-order/index.ts 770619c2b3a4bdf42716930f4a8eb4d106c9f00d. This was a secrets refresh, not a code change. No payment code was edited during its own verification run.",
+    "fail_closed_confirmed": "Before the secret was installed the webhook returned HTTP 500 {\"error\":\"webhook not configured\"} — refusing every delivery rather than degrading into skipping the signature check. After install the failure mode correctly moved to HTTP 400 {\"error\":\"invalid signature\"}."
+  },
+
+  "preconditions_verified": {
+    "paywall_emergency_bypass": "OFF — PAYWALL_EMERGENCY_BYPASS is absent from the project's 14 secrets. Checked deliberately before testing: had it been armed, /entitlement would answer 'active' for every caller and the entire test run would have been meaningless.",
+    "project": "danlite-elm / uomelinvbqabczhrzhnb / ap-south-1 / ACTIVE_HEALTHY",
+    "tag_state": "v2.8-paywall present; v2.5-razorpay-in absent as expected"
+  },
+
+  "test_subject": {
+    "email": "hs0238766@gmail.com",
+    "user_id": "2d3fcc83-a7cd-4517-9ff7-818c2e600f7a",
+    "country_code": "IN",
+    "before": {
+      "licences": "status=active, purchased_at=2026-08-16 09:07:46.676374+00, purchase_rail=null, revoked_at=null, revoke_reason=null (the signature of the manual Phase 8 activation — active but with no purchase rail)",
+      "payments_rows_user": 0,
+      "orders_rows_user": 0,
+      "payments_rows_all": 0,
+      "orders_rows_all": 0,
+      "webhook_events_rows_all": 0
+    },
+    "reset_to": {
+      "licences": "status=inactive, purchased_at=null, purchase_rail=null, revoked_at=null, revoke_reason=null",
+      "entitlement_confirmed": "/entitlement returned lic:\"inactive\" for this user, verified through the real signed-token path, not read from the table"
+    },
+    "after_purchase": {
+      "licences": "status=active, purchase_rail=razorpay_in, purchased_at=2026-08-16 20:15:30.974952+00",
+      "payments_rows_user": 1,
+      "orders_rows_user": 1
+    },
+    "final_state": "licences.status=active (restored by hand after the 6d refund test — see restoration_note). payments.status remains 'refunded', which is the truthful record of what actually happened at the gateway."
+  },
+
+  "portal_session": {
+    "established_by": "activation link emailed via send-activation public path (identifier), Phase 4 mechanism",
+    "verified_server_side": "activation_tokens row 5578e41b-d6ca-49c4-a568-447ef8d28f46 created 2026-08-16 19:57:38.617603+00, consumed (used_at) 2026-08-16 20:06:05.262+00, inside its 20:12:38 expiry. The session was proven server-side, not taken on trust."
+  },
+
+  "the_real_transaction": {
+    "gateway": "razorpay",
+    "gateway_order_id": "order_TQZGIiJ5rvelcx",
+    "gateway_payment_id": "pay_TQZME3BGV3X1tU",
+    "amount_minor": 10900,
+    "currency": "INR",
+    "status": "captured",
+    "gst_invoice_no": "INV/2026-27/000001",
+    "method": "card",
+    "gateway_fee_minor": 218,
+    "created_at": "2026-08-16 20:15:30.974952+00",
+    "orders_row": "status=paid, amount_minor=10900, currency=INR, created_at=2026-08-16 20:08:55.157704+00",
+    "webhook_events_row": "exactly one row for this delivery — event_id TQZNFoYn9j2zj3, event_type payment.captured, processed_at 2026-08-16 20:15:30.72981+00",
+    "confirmation_page": "resolved to success — 'Payment received... lifetime licence is active' (owner-reported)",
+    "raw_payload_redaction_verified": "payments.raw_payload contains only id, order_id, amount, currency, status, method, fee, tax, captured, created_at, notes and the _webhook stamp. No card object, no vpa, no token_id, no acquirer_data — redactPaymentEntity() behaved exactly as documented, confirmed against a real gateway payload rather than argued from code."
+  },
+
+  "two_failed_attempts_before_success": {
+    "what_happened": "Two payment.failed deliveries preceded the capture: pay_TQZKNAeoroyoW3 at 20:12:48 and pay_TQZKqr3qWkePAA at 20:13:14, both on the same order order_TQZGIiJ5rvelcx.",
+    "razorpay_reason": "BAD_REQUEST_ERROR — 'Your payment could not be completed as this business accepts domestic (Indian) card payments only. Try another payment method.'",
+    "cause": "The documented test card 4111 1111 1111 1111 is classed by Razorpay as an INTERNATIONAL card, and international payments are not enabled on this Razorpay account.",
+    "why_this_is_good_news_for_phase_5": "The payment.failed branch behaved exactly as designed — logged to audit_log for visibility, wrote nothing to payments, changed nothing on licences, and did not open a second order. Three payment attempts produced exactly ONE orders row. This was an unplanned but genuine test of the failure path.",
+    "why_it_matters_for_phase_6": "International payments are currently DISABLED on this Razorpay account. The Phase 6 $1.10 international rail cannot function until that is enabled in the Razorpay dashboard. Discovered here by accident; recorded so Phase 6 does not rediscover it the hard way."
+  },
+
+  "price_integrity_step_5": {
+    "gst_treatment_current": "inclusive",
+    "gst_rate_percent": 18,
+    "source_of_truth_read_only": "portal/lib/gst.ts:14 — read, not modified",
+    "three_readings": {
+      "1_checkout_screen_owner_literal": "Licence (excl. GST) ₹92.37 / GST ₹16.63 / Total ₹109.00 / 'Price includes 18% GST. Billed in INR.'",
+      "2_payments_amount_minor_server": 10900,
+      "3_razorpay_dashboard_owner_literal": "₹109.00"
+    },
+    "all_three_agree": true,
+    "statement": "All three readings agree exactly at ₹109.00 / 10900 minor units. The orders row independently records amount_minor=10900, and the webhook's own amount/currency cross-check passed — had they diverged the webhook would have refused to activate rather than activating at the wrong price.",
+    "holds_only_while_inclusive": "This agreement holds ONLY while GST_TREATMENT remains 'inclusive'. create-order/index.ts hardcodes PRICE_MINOR_IN = 10_900 entirely independently of portal/lib/gst.ts. If GST_TREATMENT were flipped to 'exclusive', checkout would display ₹128.62 while the card is charged ₹109.",
+    "why_no_existing_check_would_catch_it": "The webhook's amount check compares the payment against the ORDERS row, and create-order writes that row from its own constant. Both sides of that comparison would move together, so the check would still pass. The divergence would be silent and would surface only as customer complaints about being charged less than displayed — or, in the reverse direction, more.",
+    "status": "OPEN ITEM — pending the client's accountant confirming GST treatment. This phase establishes the current factual state only; it does not resolve the tax question."
+  },
+
+  "security_tests": {
+    "6a_replay_idempotency": {
+      "result": "pass",
+      "note": "Run as two independent variants deliberately, because the code claims the replay is 'guarded twice, independently' and a single test would only have exercised one of the two guards.",
+      "variant_i_same_event_id": {
+        "request": "event_id TQZNFoYn9j2zj3 (the real delivery id), correctly signed, 342-byte body",
+        "response": "HTTP 200 {\"status\":\"already_processed\"}",
+        "guard_that_caught_it": "delivery-level — webhook_events UNIQUE(gateway, event_id). Never reached business logic."
+      },
+      "variant_ii_new_event_id_same_payment": {
+        "request": "event_id evt_test6a_new_eventid_same_payment (fresh), same payment pay_TQZME3BGV3X1tU, correctly signed",
+        "response": "HTTP 200 {\"status\":\"already_processed\",\"invoice_no\":\"INV/2026-27/000001\"}",
+        "guard_that_caught_it": "payment-level — UNIQUE(gateway, gateway_payment_id) inside activate_licence_from_payment(). Returned the EXISTING invoice number rather than minting a second one.",
+        "why_this_variant_matters": "It bypasses the delivery-level claim entirely. Had only that guard existed, this variant would have double-written the payment and consumed a second GST invoice number."
+      },
+      "verified_after": {
+        "payments_rows_total": 1,
+        "rows_for_this_payment": 1,
+        "purchased_at_before": "2026-08-16 20:15:30.974952+00",
+        "purchased_at_after": "2026-08-16 20:15:30.974952+00",
+        "purchased_at_unchanged": true,
+        "webhook_events_rows_for_TQZNFoYn9j2zj3": 1,
+        "distinct_gst_invoice_numbers": 1,
+        "orders_rows": 1,
+        "licence_status": "active"
+      },
+      "closes": "The gap flagged in Phase 1's own report, which explicitly warned not to rely on a structural check alone as replay-protection proof. Both guards are now demonstrated by execution, not by inspection.",
+      "honest_limitation": "The replayed bytes were reconstructed from the stored payload and re-signed with the real webhook secret, not captured verbatim from Razorpay's original delivery (that raw body is not observable from here). The signature is computed exactly as Razorpay computes it, so the verification path exercised is identical; but this is a faithful re-delivery, not a byte-for-byte capture-and-replay."
+    },
+
+    "6b_tamper": {
+      "result": "pass",
+      "note": "Run as three variants. The payload deliberately targeted the REAL owner user_id with a valid ₹109 amount, so a successful forgery would have granted a real licence.",
+      "variant_i_wrong_key": "HMAC correctly computed but under an attacker-chosen key → HTTP 400 {\"error\":\"invalid signature\"}",
+      "variant_ii_garbage_signature": "64 hex chars of deadbeef → HTTP 400 {\"error\":\"invalid signature\"}",
+      "variant_iii_no_signature_header": "→ HTTP 400 {\"error\":\"missing signature\"}",
+      "verified_after": {
+        "payments_rows": 0,
+        "orders_rows": 0,
+        "webhook_events_rows": "unchanged at 1 — the three forged requests created NO claim row, proving rejection happens BEFORE any database write",
+        "webhook_audit_rows": "unchanged at 1",
+        "owner_licence_status": "unchanged"
+      },
+      "significance": "Nothing whatsoever changed in payments, licences, orders or webhook_events."
+    },
+
+    "6c_positive_control": {
+      "result": "pass",
+      "why_it_exists": "Without it, 6b passing proves nothing — a function that rejected every request unconditionally would also pass 6b. This proves the HMAC path genuinely ACCEPTS valid signatures.",
+      "request": "correctly signed payment.captured referencing order_DOES_NOT_EXIST_6C / pay_TEST6CPOSCTRL01",
+      "response": "HTTP 200 {\"status\":\"ignored_unknown_order\"}",
+      "how_the_unknown_order_was_handled": "The signature verified, so the request reached business logic — which is the whole point. The orders lookup found nothing, the function wrote an audit_log row (webhook.unknown_order with the payment and order ids), activated nothing, and returned 200 rather than 500. 200 is correct here: this is a deliberate refusal, not a transient fault, and a non-2xx would make Razorpay retry forever an event that will never succeed.",
+      "verified_after": {
+        "payments_rows": 0,
+        "orders_rows": 0,
+        "licences_activated": 0,
+        "did_not_500": true
+      },
+      "run_order_note": "Executed BEFORE the real payment rather than after. Two reasons: it proves the signature-accept path works before the owner spends real money, and it allowed RAZORPAY_KEY_ID and RAZORPAY_KEY_SECRET to be destroyed at the earliest possible moment instead of being held until the end of the run."
+    },
+
+    "6d_refund": {
+      "result": "pass",
+      "refund_issued": "PARTIAL — ₹90.00 (9000 minor) of the ₹109.00 (10900 minor) charged",
+      "why_partial": "The owner's full-refund attempt was rejected by Razorpay for insufficient available balance — Razorpay retains its fee (₹2.18 recorded on this payment) and does not return it, so the balance available to refund from was under ₹109. This is a Razorpay account-balance condition, NOT application behaviour; the request never reached our code. In live mode with a funded settlement balance a full ₹109 refund succeeds normally, with the merchant absorbing the fee.",
+      "webhook_fired": "refund.created, event_id TQZZs07AOvvFio, processed_at 2026-08-16 20:27:27.708202+00",
+      "licences_status_became": "revoked",
+      "payments_status_became": "refunded",
+      "revoked_at": "2026-08-16 20:27:27.791604+00",
+      "revoke_reason": "refund.created refund_id=rfnd_TQZZIxXaF43SDe amount_minor=9000",
+      "restoration_note": "The licence was restored to status=active by hand immediately afterwards, with revoked_at and revoke_reason cleared, so the owner is not locked out of their own app. Confirmed through the real path: /entitlement subsequently returned lic:\"active\". purchased_at and purchase_rail were left intact because the purchase genuinely happened. payments.status was deliberately left as 'refunded' because that is the truth of what occurred at the gateway, and falsifying it would corrupt reconciliation."
+    }
+  },
+
+  "open_items_for_owner": [
+    "GST TREATMENT (unchanged from Phase 4, now measured rather than predicted): GST_TREATMENT='inclusive' makes the displayed total ₹109.00 match the charged amount exactly, confirmed three ways. Flipping it to 'exclusive' would display ₹128.62 while charging ₹109, and no existing check would catch it because create-order and gst.ts hold the price independently. Needs the accountant's confirmation, then the two constants should be reconciled to a single source.",
+    "PARTIAL REFUND REVOKES THE WHOLE LICENCE: discovered by test 6d. revoke_licence_from_refund() takes only a payment id and a reason — it has no amount logic at all. A ₹90 refund of a ₹109 payment set payments.status='refunded' (not 'partially_refunded') and fully revoked the lifetime licence. A small goodwill refund to an unhappy customer would therefore silently destroy the licence they still mostly paid for. The owner's own experience in this session suggests partial refunds may be the COMMON case, not the rare one. This is not a code defect — the behaviour matches the documented 'Refund → revoke' intent and fails in the safe direction — but it is an unstated business rule that was never explicitly chosen. NOT FIXED in this session by design: payment code must not be hot-patched during its own verification run.",
+    "INTERNATIONAL PAYMENTS ARE DISABLED on this Razorpay account (proved by the two payment.failed events). Phase 6's $1.10 rail cannot work until this is enabled in the Razorpay dashboard.",
+    "GST INVOICE SEQUENCE: this test transaction consumed INV/2026-27/000001. The first genuine customer will be INV/2026-27/000002. Decide before launch whether the test rows (1 payments row, 1 orders row, 6 webhook_events rows) should be cleared and the sequence reset, or retained as an audit trail.",
+    "WEBHOOK SECRET STRENGTH: the webhook secret chosen is 10 characters. Adequate for test mode. Before going live, generate a long random value (32+ characters) — this secret is the single gate between 'someone typed a card number' and 'our database says they paid'."
+  ],
+
+  "test_residue": {
+    "webhook_events": "6 rows total. Four are genuine Razorpay deliveries (2 payment.failed, 1 payment.captured, 1 refund.created). Two are synthetic and clearly labelled: 'evt_test6c_positive_control' and 'evt_test6a_new_eventid_same_payment'. They were left in place rather than deleted, because silently removing audit records to make a report look tidy is the wrong instinct.",
+    "audit_log": "Contains webhook.unknown_order from 6c and two webhook.payment_failed rows from the real failed card attempts.",
+    "payments_orders": "1 real payments row (status refunded) and 1 real orders row (status paid) remain, reflecting a genuine test-mode transaction."
+  },
+
+  "deviations": [
+    "Test 6c was run BEFORE the real payment instead of in Step 6 order. It has no dependency on a real transaction, and running it early proved the signature-accept path before the owner spent money while also permitting two of the three secrets to be destroyed immediately after install rather than held for the whole session.",
+    "Tests 6b and 6c were both executed before Step 2's licence reset, using the pristine zero-row database state as the baseline — a stronger 'nothing changed' proof than comparing against a populated table.",
+    "Secrets were installed with 'supabase secrets set --env-file' rather than the inline NAME=\"value\" form given in the brief. Same result, but the values never appear in a process argument list.",
+    "Test 6a used a reconstructed-and-re-signed delivery rather than Razorpay's dashboard Resend. This was chosen because it permits testing BOTH idempotency guards independently, which a single dashboard resend cannot do. The limitation is recorded honestly under 6a.honest_limitation.",
+    "SQL was executed with 'npx supabase db query --linked'. A note carried from an earlier phase claimed the Supabase CLI was unavailable and the Management API was required; that note was out of date — the CLI works and was used throughout.",
+    "The refund in 6d was partial (₹90) rather than full (₹109), because Razorpay rejected the full refund for insufficient balance. The test objective was still met: the refund path fired, revoked the licence and marked the payment refunded. It additionally surfaced the partial-refund finding recorded in open_items_for_owner."
+  ],
+
+  "files_touched": {
+    "created": ["portal/phase5-report.json"],
+    "modified": ["portal/phases.json (Phase 5 status only)", "portal/app/page.tsx (one new panel appended; no existing panel altered)"],
+    "not_touched": "Nothing under lib/, android/, supabase/, or any portal page other than page.tsx and phases.json. android/key.properties never appeared in git status. No migration was written or altered. The two Edge Functions were redeployed from byte-identical committed source and their code was not edited.",
+    "git_actions": "None. No commit, no tag, no push — the owner tags after review."
+  },
+
+  "checks": [
+    { "id": 1,  "name": "v2.8-paywall present; v2.5-razorpay-in absent; working tree clean", "result": "pass" },
+    { "id": 2,  "name": "Supabase project danlite-elm ACTIVE_HEALTHY in ap-south-1", "result": "pass" },
+    { "id": 3,  "name": "Portal reachable on localhost:3000; /checkout redirects when unauthenticated", "result": "pass" },
+    { "id": 4,  "name": "Webhook failed CLOSED (HTTP 500) before the secret was installed", "result": "pass" },
+    { "id": 5,  "name": "Key ID validated as rzp_test_, explicitly not rzp_live_", "result": "pass" },
+    { "id": 6,  "name": "All three Razorpay secrets installed and verified by name only", "result": "pass" },
+    { "id": 7,  "name": "No secret value written to any file, log, report or command argument", "result": "pass" },
+    { "id": 8,  "name": "Temp secret file three-pass overwritten and deleted; confirmed absent", "result": "pass" },
+    { "id": 9,  "name": "Repo sweep — 0 hits across 205 tracked and 250 on-disk files", "result": "pass" },
+    { "id": 10, "name": "Both functions deployed from git-blob-verified byte-identical source", "result": "pass" },
+    { "id": 11, "name": "Failure mode moved from 'webhook not configured' to 'invalid signature'", "result": "pass" },
+    { "id": 12, "name": "PAYWALL_EMERGENCY_BYPASS confirmed OFF before testing began", "result": "pass" },
+    { "id": 13, "name": "Test subject reset to inactive; /entitlement confirmed lic:inactive", "result": "pass" },
+    { "id": 14, "name": "Portal session proven server-side via consumed activation token", "result": "pass" },
+    { "id": 15, "name": "payments — exactly one row, real gateway_payment_id, captured, 10900 INR", "result": "pass" },
+    { "id": 16, "name": "payments.gst_invoice_no generated — INV/2026-27/000001", "result": "pass" },
+    { "id": 17, "name": "licences — active, purchase_rail=razorpay_in, purchased_at set", "result": "pass" },
+    { "id": 18, "name": "orders — status=paid; three payment attempts produced only one order row", "result": "pass" },
+    { "id": 19, "name": "webhook_events — exactly one row for the capture delivery", "result": "pass" },
+    { "id": 20, "name": "raw_payload redaction verified against a real gateway payload", "result": "pass" },
+    { "id": 21, "name": "Step 5 — checkout, payments.amount_minor and Razorpay dashboard all read ₹109.00", "result": "pass" },
+    { "id": 22, "name": "6a-i replay, same event_id — 200 already_processed, delivery-level guard", "result": "pass" },
+    { "id": 23, "name": "6a-ii replay, new event_id same payment — 200, payment-level guard, same invoice", "result": "pass" },
+    { "id": 24, "name": "6a — no second payments row, purchased_at unchanged, no duplicate event row", "result": "pass" },
+    { "id": 25, "name": "6b tamper — wrong key, garbage sig and missing sig all rejected 400", "result": "pass" },
+    { "id": 26, "name": "6b — nothing changed in payments, licences, orders or webhook_events", "result": "pass" },
+    { "id": 27, "name": "6c positive control — valid signature accepted, unknown order refused at 200", "result": "pass" },
+    { "id": 28, "name": "6c — activated nothing and did not 500", "result": "pass" },
+    { "id": 29, "name": "6d refund — webhook fired, licence revoked, payment refunded", "result": "pass" },
+    { "id": 30, "name": "6d — licence restored to active and confirmed via /entitlement", "result": "pass" },
+    { "id": 31, "name": "payment.failed path logged to audit_log and wrote nothing to payments/licences", "result": "pass" },
+    { "id": 32, "name": "portal npm run build — zero errors", "result": "pass" }
+  ]
+}

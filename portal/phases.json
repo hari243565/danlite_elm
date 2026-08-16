@@ -8,7 +8,7 @@
     { "id": "2",   "name": "App auth screens + secure storage",     "status": "done",    "tag": "v2.2-auth",          "verify": "token in Android Keystore, absent from shared_preferences" },
     { "id": "3",   "name": "Entitlement token + 14d offline grace", "status": "done",    "tag": "v2.3-entitlement",   "verify": "airplane mode 3 days works; tampered token rejected" },
     { "id": "4",   "name": "Billing portal P1-P4 + noindex",        "status": "done",    "tag": "v2.4-portal",        "verify": "curl -I shows X-Robots-Tag; /checkout redirects unauthenticated" },
-    { "id": "5",   "name": "Razorpay domestic Rs109 + idempotency", "status": "in_progress", "tag": "v2.5-razorpay-in",   "verify": "replayed webhook creates no second licence" },
+    { "id": "5",   "name": "Razorpay domestic Rs109 + idempotency", "status": "done", "tag": "v2.5-razorpay-in",   "verify": "replayed webhook creates no second licence" },
     { "id": "6",   "name": "Razorpay international $1.10 + fraud",  "status": "pending", "tag": "v2.6-razorpay-intl", "verify": "foreign test card activates licence; EMAIL OTP path used" },
     { "id": "7",   "name": "Single active session",                 "status": "done",    "tag": "v2.7-session",       "verify": "login on device B logs out device A on next refresh" },
     { "id": "8",   "name": "Full-app paywall gate",                 "status": "done",    "tag": "v2.8-paywall",       "verify": "full regression: BT, WiFi, 15 PIDs, DTC, freeze frame, 11 languages, process-death" },

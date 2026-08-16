@@ -212,7 +212,18 @@
       "PowerShell($adb=\"C:\\\\Users\\\\a\\\\AppData\\\\Local\\\\Android\\\\Sdk\\\\platform-tools\\\\adb.exe\"; $sp=\"C:\\\\Users\\\\a\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\C--Users-a-Downloads-danlite-elm-complete-danlite-elm\\\\4858a0c4-8ff6-4a8e-8666-60be523059b8\\\\scratchpad\"; & $adb shell input tap 1006 205; Start-Sleep -Seconds 3; & $adb exec-out screencap -p > \"$sp\\\\acc_02_settings_grace.png\"; \\(Get-Item \"$sp\\\\acc_02_settings_grace.png\"\\).Length)",
       "PowerShell($adb=\"C:\\\\Users\\\\a\\\\AppData\\\\Local\\\\Android\\\\Sdk\\\\platform-tools\\\\adb.exe\"; $sp=\"C:\\\\Users\\\\a\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\C--Users-a-Downloads-danlite-elm-complete-danlite-elm\\\\4858a0c4-8ff6-4a8e-8666-60be523059b8\\\\scratchpad\"; & $adb shell cmd connectivity airplane-mode disable; Start-Sleep -Seconds 8; & $adb shell input tap 540 742; Start-Sleep -Seconds 2; & $adb exec-out screencap -p > \"$sp\\\\acc_03_logout_dialog.png\"; \\(Get-Item \"$sp\\\\acc_03_logout_dialog.png\"\\).Length)",
       "PowerShell($adb=\"C:\\\\Users\\\\a\\\\AppData\\\\Local\\\\Android\\\\Sdk\\\\platform-tools\\\\adb.exe\"; $sp=\"C:\\\\Users\\\\a\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\C--Users-a-Downloads-danlite-elm-complete-danlite-elm\\\\4858a0c4-8ff6-4a8e-8666-60be523059b8\\\\scratchpad\"; & $adb shell input tap 762 1404; Start-Sleep -Seconds 6; & $adb exec-out screencap -p > \"$sp\\\\acc_04_after_logout.png\"; \\(Get-Item \"$sp\\\\acc_04_after_logout.png\"\\).Length)",
-      "PowerShell($sp=\"C:\\\\Users\\\\a\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\C--Users-a-Downloads-danlite-elm-complete-danlite-elm\\\\4858a0c4-8ff6-4a8e-8666-60be523059b8\\\\scratchpad\"; pwsh -NoProfile -File \"$sp\\\\sbq.ps1\" -File \"$sp\\\\acc_sess.sql\")"
+      "PowerShell($sp=\"C:\\\\Users\\\\a\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\C--Users-a-Downloads-danlite-elm-complete-danlite-elm\\\\4858a0c4-8ff6-4a8e-8666-60be523059b8\\\\scratchpad\"; pwsh -NoProfile -File \"$sp\\\\sbq.ps1\" -File \"$sp\\\\acc_sess.sql\")",
+      "PowerShell(npx supabase secrets set --env-file $env_f 2>&1)",
+      "Bash(node sign.js wh.secret \"evt_test6c_positive_control\" payload6c.json)",
+      "Bash(printf 'attacker-guessed-secret')",
+      "Bash(node sign.js attacker.secret \"evt_test6b_forged_key\" payload6b.json)",
+      "Bash(curl -s -w \"\\\\nHTTP_STATUS:%{http_code}\\\\n\" -X POST \"https://uomelinvbqabczhrzhnb.supabase.co/functions/v1/razorpay-webhook\" -H \"Content-Type: application/json\" -H \"x-razorpay-signature: deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef\" -H \"x-razorpay-event-id: evt_test6b_garbage\" --data-binary @payload6b.json)",
+      "Bash(curl -s -w \"\\\\nHTTP_STATUS:%{http_code}\\\\n\" -X POST \"https://uomelinvbqabczhrzhnb.supabase.co/functions/v1/razorpay-webhook\" -H \"Content-Type: application/json\" -H \"x-razorpay-event-id: evt_test6b_nosig\" --data-binary @payload6b.json)",
+      "WebFetch(domain:razorpay.com)",
+      "Bash(node sign.js wh.secret \"TQZNFoYn9j2zj3\" replay6a.json)",
+      "Bash(node sign.js wh.secret \"evt_test6a_new_eventid_same_payment\" replay6a.json)",
+      "Bash(curl -s -m 20 http://localhost:3000/)",
+      "Bash(grep -oE \"[A-Za-z0-9_-]{40,}\" portal/phase5-report.json)"
     ]
   }
 }
