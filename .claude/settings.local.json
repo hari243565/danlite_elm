@@ -223,7 +223,17 @@
       "Bash(node sign.js wh.secret \"TQZNFoYn9j2zj3\" replay6a.json)",
       "Bash(node sign.js wh.secret \"evt_test6a_new_eventid_same_payment\" replay6a.json)",
       "Bash(curl -s -m 20 http://localhost:3000/)",
-      "Bash(grep -oE \"[A-Za-z0-9_-]{40,}\" portal/phase5-report.json)"
+      "Bash(grep -oE \"[A-Za-z0-9_-]{40,}\" portal/phase5-report.json)",
+      "Bash(flutter pub *)",
+      "Bash(flutter clean *)",
+      "Bash(git check-ignore *)",
+      "Bash(git hash-object *)",
+      "Bash(openssl version *)",
+      "Bash(openssl rand *)",
+      "Bash(awk '{print \"  generated length: \" $1-1 \" hex chars \\(256-bit\\)\"}')",
+      "Bash(awk -F= '{k=$1; v=substr\\($0, index\\($0,\"=\"\\)+1\\); gsub\\(/\\\\r/,\"\",v\\); print \"  \" k \" -> length \" length\\(v\\)}')",
+      "Bash(shred -u __TRACKED_VAR__/newsecret.txt)",
+      "Bash(rm -f __TRACKED_VAR__/newsecret.txt)"
     ]
   }
 }

@@ -443,6 +443,37 @@ class _SentinelWidgetState extends State<_SentinelWidget> {
 // Muted, not red. The point is to stop a mechanic being surprised on day 14,
 // not to nag somebody who is working normally in a basement with no signal.
 // ══════════════════════════════════════════════════════════════════════════
+// ── Banner geometry ────────────────────────────────────────────────────────
+//
+// Hoisted out of build() so that the space the banner OCCUPIES and the space
+// scrollable screens RESERVE for it are computed from one set of numbers.
+// lib/app.dart reads kGraceBannerReservedSpace; if these ever drift apart the
+// banner starts landing on content again, which is the exact defect Phase 8's
+// verification found.
+const double _kGraceNavBar = kBottomNavigationBarHeight; // 56
+const double _kGraceRibbon = 28; // connection status ribbon
+const double _kGraceGap = 8;
+
+/// Height of the pill itself: 5+5 container padding, 1+1 border, and a single
+/// 11pt/1.2 line which the app-wide TextScaler(1.18) in lib/app.dart renders at
+/// ~15.6dp. Rounded up, so the reserve is never short.
+const double kGraceBannerHeight = 28;
+
+/// Vertical space a scrollable must leave free at its bottom edge, measured up
+/// from the bottom of the safe area, so the floating banner cannot overlap its
+/// content at any scroll offset.
+///
+/// This is deliberately NOT just [kGraceBannerHeight]. The banner is anchored
+/// clear of the nav bar and the connection ribbon, so its top edge sits roughly
+/// 92dp above the safe area — reserving only its own height would still let the
+/// last rows scroll straight through the band it floats in. `viewPadding.bottom`
+/// is excluded here because the padding this is added to already carries it.
+const double kGraceBannerReservedSpace = _kGraceNavBar +
+    _kGraceRibbon +
+    _kGraceGap +
+    kGraceBannerHeight +
+    _kGraceGap;
+
 class _GraceBanner extends StatelessWidget {
   const _GraceBanner({required this.days});
 
@@ -478,17 +509,16 @@ class _GraceBanner extends StatelessWidget {
     // cleared: the gesture inset, /home's bottom navigation bar, and the
     // connection ribbon that stacks on top of that bar while an adapter is
     // connected. `viewInsets` keeps it above an open keyboard too.
-    const double kNavBar = kBottomNavigationBarHeight;
-    const double kRibbon = 28; // connection status ribbon
-    const double kGap = 8;
+    // Same three constants lib/app.dart reserves space from — see the block
+    // above _GraceBanner. Values and behaviour are unchanged from Phase 8.
     final mq = MediaQuery.of(context);
 
     return Positioned(
       bottom: mq.viewInsets.bottom +
           mq.viewPadding.bottom +
-          kNavBar +
-          kRibbon +
-          kGap,
+          _kGraceNavBar +
+          _kGraceRibbon +
+          _kGraceGap,
       left: 0,
       right: 0,
       child: IgnorePointer(

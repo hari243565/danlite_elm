@@ -7,6 +7,7 @@ import '../constants/app_colors.dart';
 import '../constants/app_strings.dart';
 import '../providers/auth_provider.dart';
 import '../providers/entitlement_provider.dart';
+import '../services/app_version_service.dart';
 import '../services/entitlement_service.dart';
 import '../services/supabase_service.dart';
 import 'paywall_screen.dart' show kPaywallSupportContact;
@@ -38,26 +39,21 @@ import 'paywall_screen.dart' show kPaywallSupportContact;
 const String kBillingDomain = 'http://localhost:3000'; // [DRAFT]
 
 // ══════════════════════════════════════════════════════════════════════════
-// [CONFIRM] APP VERSION — HAND-MIRRORED FROM pubspec.yaml `version: 1.0.0+1`.
+// APP VERSION — RESOLVED. Now read at runtime, no longer hand-mirrored.
 //
-// This should be read at runtime, and the intended way was package_info_plus.
-// That package is NOT a dependency of this project (contrary to what this
-// task assumed) and cannot become one right now: package_info_plus 9.0.1 —
-// the newest version that resolves against this SDK constraint — fails
-// `:package_info_plus:compileReleaseKotlin` with "Too many arguments for
-// 'public constructor(): kotlin/String'" against the Kotlin Gradle plugin
-// this project pins. Flutter's own fix is to raise the KGP version in
-// android/settings.gradle, and android/ is out of bounds for this task, so
-// the fallback is a constant.
+// The old constant here, plus the copies in about_screen.dart and
+// settings_screen.dart, are all gone; the three screens read
+// lib/services/app_version_service.dart instead.
 //
-// Consequence, stated plainly: this line does not follow a version bump on
-// its own. It is the third hand-copy of the version in the tree —
-// about_screen.dart:47 and settings_screen.dart both say 'Version 1.0.0',
-// already dropping the build number. Raising the Kotlin plugin and switching
-// all three to package_info_plus is a small, self-contained job for whichever
-// phase is allowed to touch android/.
+// The earlier blocker recorded here was real but mis-attributed to the Kotlin
+// pin alone. package_info_plus 9.0.0 raised its Android floor to Kotlin 2.2.0
+// AND AGP >=8.12.1 AND Gradle wrapper >=8.13 (see its 9.0.0 changelog), which
+// is why 9.0.1 died at :package_info_plus:compileReleaseKotlin against this
+// build's effective Kotlin 2.0.0. package_info_plus 8.3.1 declares
+// ext.kotlin_version '1.7.22' and needs none of that, so it drops in with no
+// toolchain change whatsoever — see the pin note in pubspec.yaml before
+// bumping it.
 // ══════════════════════════════════════════════════════════════════════════
-const String kAppVersionLabel = '1.0.0 (1)'; // [CONFIRM] = pubspec 1.0.0+1
 
 /// Rendered as [SelectableText], never launched.
 ///
@@ -137,6 +133,7 @@ class AccountScreen extends StatefulWidget {
 class _AccountScreenState extends State<AccountScreen> {
   _AccountFacts? _facts;
   String? _deviceModel;
+  String? _appVersion;
 
   @override
   void initState() {
@@ -148,7 +145,7 @@ class _AccountScreenState extends State<AccountScreen> {
     // Two independent lookups. Neither may take the screen down: the identity
     // header and the licence pill come from providers that are already in
     // memory, so the page is useful even if both fail.
-    await Future.wait([_loadFacts(), _loadDevice()]);
+    await Future.wait([_loadFacts(), _loadDevice(), _loadAppVersion()]);
   }
 
   Future<void> _loadFacts() async {
@@ -210,6 +207,14 @@ class _AccountScreenState extends State<AccountScreen> {
     } catch (e) {
       debugPrint('[account] device info unavailable: ${e.runtimeType}');
     }
+  }
+
+  /// Same shape as [_loadDevice]: best-effort, never fatal, and the row simply
+  /// keeps its em-dash if the platform channel cannot answer.
+  Future<void> _loadAppVersion() async {
+    final info = await AppVersionService.load();
+    final label = AppVersionService.versionWithBuildOf(info);
+    if (label != null && mounted) setState(() => _appVersion = label);
   }
 
   static DateTime? _parseTs(Object? value) {
@@ -325,7 +330,7 @@ class _AccountScreenState extends State<AccountScreen> {
               ),
               _DetailRow(
                 label: context.tr('account_app_version_label'),
-                value: kAppVersionLabel,
+                value: _appVersion ?? '—',
                 mono: true,
                 last: true,
               ),

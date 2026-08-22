@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import '../constants/app_colors.dart';
+import '../services/app_version_service.dart';
 
 class AboutScreen extends StatelessWidget {
   const AboutScreen({super.key});
@@ -44,9 +46,20 @@ class AboutScreen extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: AppColors.flameOrange.withValues(alpha: 0.25),
                     borderRadius: BorderRadius.circular(20)),
-                  child: const Text('Version 1.0.0',
-                      style: TextStyle(color: AppColors.flameGold,
-                          fontWeight: FontWeight.w700, fontSize: 13)),
+                  // Real versionName from the APK, not a hand-copied literal.
+                  // `initialData` means this only ever shows the bare label on
+                  // the very first read of the process; afterwards the cached
+                  // value paints on the first frame.
+                  child: FutureBuilder<PackageInfo?>(
+                    future: AppVersionService.load(),
+                    initialData: AppVersionService.cached,
+                    builder: (context, snap) {
+                      final v = AppVersionService.versionOf(snap.data);
+                      return Text(v == null ? 'Version' : 'Version $v',
+                          style: const TextStyle(color: AppColors.flameGold,
+                              fontWeight: FontWeight.w700, fontSize: 13));
+                    },
+                  ),
                 ),
               ]),
             ),

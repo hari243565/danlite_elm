@@ -21,6 +21,20 @@ dependencies:
   intl: ^0.20.2
   cupertino_icons: ^1.0.6
 
+  # Real app version/build number for the About, Settings and Account screens,
+  # read through lib/services/app_version_service.dart.
+  #
+  # PINNED TO 8.x DELIBERATELY — DO NOT BUMP TO 9.x/10.x CASUALLY.
+  # 8.3.1 declares ext.kotlin_version '1.7.22', so it compiles against this
+  # project's Kotlin 1.8.22 pin as-is. package_info_plus 9.0.0 raised its
+  # Android floor to Kotlin 2.2.0 + AGP >=8.12.1 + Gradle wrapper >=8.13
+  # (see its 9.0.0 changelog). Adopting 9.x/10.x therefore means a three-way
+  # toolchain bump, not a dependency bump, and this app's release build is
+  # sensitive to that surface (minifyEnabled false / shrinkResources false are
+  # load-bearing for com.danlite.elm.BluetoothSppPlugin). An earlier attempt
+  # died at :package_info_plus:compileReleaseKotlin for exactly this reason.
+  package_info_plus: ^8.3.1
+
   # ── Backend auth (Phase 2) ─────────────────────────────────────────────────
   supabase_flutter: ^2.8.0
   flutter_secure_storage: ^9.2.2

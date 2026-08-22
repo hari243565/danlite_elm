@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
 import '../constants/app_colors.dart';
 import '../constants/app_strings.dart';
 import '../providers/auth_provider.dart';
 import '../providers/entitlement_provider.dart';
 import '../providers/settings_provider.dart';
+import '../services/app_version_service.dart';
 import '../services/obd_service.dart';
 // The pill and the identifier helper live with the screen this row opens, so
 // there is one of each rather than two that can drift apart. entitlement_service
@@ -81,11 +83,21 @@ class SettingsScreen extends StatelessWidget {
         _AlarmsTile(label: 'Max Coolant Temp', defaultVal: 105, unit: '°C'),
         _AlarmsTile(label: 'Min Fuel Level', defaultVal: 15, unit: '%'),
         _SectionHeader(icon: Icons.info_outline, title: context.tr('about')),
-        _SettingsTile(
-          icon: Icons.local_fire_department_outlined,
-          title: 'About OBD Danlite',
-          subtitle: 'Version 1.0.0 · OBD2 Vehicle Diagnostics',
-          onTap: () => Navigator.pushNamed(context, '/about'),
+        // Subtitle carries the real versionName; the tile itself is unchanged.
+        FutureBuilder<PackageInfo?>(
+          future: AppVersionService.load(),
+          initialData: AppVersionService.cached,
+          builder: (context, snap) {
+            final v = AppVersionService.versionOf(snap.data);
+            return _SettingsTile(
+              icon: Icons.local_fire_department_outlined,
+              title: 'About OBD Danlite',
+              subtitle: v == null
+                  ? 'OBD2 Vehicle Diagnostics'
+                  : 'Version $v · OBD2 Vehicle Diagnostics',
+              onTap: () => Navigator.pushNamed(context, '/about'),
+            );
+          },
         ),
         _DisconnectTile(),
         const SizedBox(height: 40),
