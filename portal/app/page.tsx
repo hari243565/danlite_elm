@@ -432,6 +432,46 @@ function readPhase8(): Phase8Report | null {
   }
 }
 
+type AdminCheck = { id: number; name: string; result: string };
+
+type AdminReport = {
+  phase: string;
+  name: string;
+  generated: string;
+  what_this_does: string;
+  the_security_claim: {
+    statement: string;
+    how_it_is_enforced: string[];
+    proof_executed_live: string;
+  };
+  why_admin_login_differs_from_customer_signup: Record<string, string>;
+  rate_limiting: {
+    table: string;
+    identifier_per_hour: number;
+    ip_per_hour: number;
+    verified_live: string;
+  };
+  search_invisibility: Record<string, string>;
+  audit_log_grant: Record<string, string>;
+  postgrest_embed_finding: Record<string, string>;
+  observations_flagged_not_changed: { what: string; why_it_matters: string; why_not_changed: string }[];
+  deviations: string[];
+  analyze: { new_errors: number; new_warnings: number; pre_existing_issues: number; note: string };
+  build: { result: string; errors: number; routes: number };
+  checks: AdminCheck[];
+};
+
+function readAdmin1(): AdminReport | null {
+  try {
+    const file = path.join(process.cwd(), 'phase-admin1-report.json');
+    const raw = fs.readFileSync(file, 'utf8');
+    return JSON.parse(raw) as AdminReport;
+  } catch {
+    // Absent until the phase has been run — the panel renders a muted card.
+    return null;
+  }
+}
+
 function statusPill(status: string) {
   const map: Record<string, { fg: string; label: string }> = {
     done: { fg: C.green, label: 'done' },
@@ -468,6 +508,7 @@ export default function MissionControl() {
   const p5 = readPhase5();
   const p7 = readPhase7();
   const p8 = readPhase8();
+  const adm = readAdmin1();
 
   const shell = (children: React.ReactNode) => (
     <main
@@ -2516,6 +2557,221 @@ export default function MissionControl() {
                 );
               })}
             </ul>
+          </>
+        )}
+      </section>
+
+      {/* ---------------- Admin Portal — Phase 1 (Read-Only) ---------------- */}
+      <section
+        style={{
+          backgroundColor: C.surface,
+          border: `1px solid ${C.border}`,
+          borderRadius: 12,
+          padding: 20,
+          marginBottom: 28,
+        }}
+      >
+        <h2 style={{ fontSize: 15, fontWeight: 700, margin: '0 0 4px' }}>
+          Admin Portal — Phase 1 (Read-Only)
+        </h2>
+
+        {!adm ? (
+          <p style={{ color: C.muted, fontSize: 12.5, margin: '8px 0 0', lineHeight: 1.5 }}>
+            Not yet run. <code>phase-admin1-report.json</code> will appear here once the
+            internal admin tool has been built.
+          </p>
+        ) : (
+          <>
+            <p style={{ color: C.muted, fontSize: 12.5, margin: '0 0 16px', lineHeight: 1.5 }}>
+              {adm.what_this_does} Verified on {adm.generated}.
+            </p>
+
+            {/* The security claim is the headline here, the way TEST/LIVE mode is
+                the headline on the Phase 5 panel. This tool sees every customer's
+                data, so the only thing worth leading with is how that is gated. */}
+            <div
+              style={{
+                border: `2px solid ${C.green}`,
+                borderRadius: 8,
+                padding: '14px 16px',
+                marginBottom: 16,
+                backgroundColor: `${C.green}12`,
+              }}
+            >
+              <div
+                style={{
+                  color: C.green,
+                  fontSize: 13.5,
+                  fontWeight: 800,
+                  letterSpacing: 0.3,
+                  marginBottom: 7,
+                }}
+              >
+                ALLOWLIST RE-CHECKED ON EVERY REQUEST — PROVEN LIVE
+              </div>
+              <p style={{ color: C.muted, fontSize: 12, lineHeight: 1.6, margin: 0 }}>
+                {adm.the_security_claim.proof_executed_live}
+              </p>
+            </div>
+
+            {/* Headline badges */}
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, marginBottom: 14 }}>
+              {[
+                { label: 'Read-only', value: 'no action buttons' },
+                {
+                  label: 'Rate limit',
+                  value: `${adm.rate_limiting.identifier_per_hour}/addr · ${adm.rate_limiting.ip_per_hour}/IP per hr`,
+                },
+                { label: 'Build', value: `${adm.build.errors} errors · ${adm.build.routes} routes` },
+                {
+                  label: 'Checks',
+                  value: `${adm.checks.filter((c) => c.result === 'pass').length} of ${adm.checks.length}`,
+                },
+              ].map((b) => (
+                <span
+                  key={b.label}
+                  style={{
+                    display: 'inline-block',
+                    padding: '5px 11px',
+                    borderRadius: 8,
+                    border: `1px solid ${C.border}`,
+                    fontSize: 12,
+                    color: C.muted,
+                  }}
+                >
+                  {b.label}:{' '}
+                  <span style={{ color: C.text, fontWeight: 700 }}>{b.value}</span>
+                </span>
+              ))}
+            </div>
+
+            {/* Why admin login is deliberately not enumeration-safe. This is the
+                one design decision most likely to look like a bug to a reviewer
+                who knows the customer flow, so it is stated on the dashboard
+                rather than buried in the JSON. */}
+            <div
+              style={{
+                border: `1px solid ${C.border}`,
+                borderRadius: 8,
+                padding: '12px 14px',
+                marginBottom: 14,
+              }}
+            >
+              <div
+                style={{
+                  color: C.muted,
+                  fontSize: 11,
+                  fontWeight: 700,
+                  letterSpacing: 0.8,
+                  textTransform: 'uppercase',
+                  marginBottom: 7,
+                }}
+              >
+                Admin login is deliberately NOT enumeration-safe
+              </div>
+              <p style={{ color: C.muted, fontSize: 12, lineHeight: 1.6, margin: 0 }}>
+                {adm.why_admin_login_differs_from_customer_signup.why_that_is_correct_here}{' '}
+                <span style={{ color: C.amber }}>
+                  {adm.why_admin_login_differs_from_customer_signup.do_not_copy_back}
+                </span>
+              </p>
+            </div>
+
+            {/* Things found while verifying, that the owner should actually read. */}
+            {adm.observations_flagged_not_changed.length > 0 && (
+              <div
+                style={{
+                  border: `1px solid ${C.amber}55`,
+                  backgroundColor: `${C.amber}0E`,
+                  borderRadius: 8,
+                  padding: '12px 14px',
+                  marginBottom: 14,
+                }}
+              >
+                <div
+                  style={{
+                    color: C.amber,
+                    fontSize: 11,
+                    fontWeight: 700,
+                    letterSpacing: 0.8,
+                    textTransform: 'uppercase',
+                    marginBottom: 8,
+                  }}
+                >
+                  Flagged for you — found, not changed
+                </div>
+                {adm.observations_flagged_not_changed.map((o) => (
+                  <p
+                    key={o.what}
+                    style={{ color: C.muted, fontSize: 12, lineHeight: 1.6, margin: '0 0 8px' }}
+                  >
+                    <span style={{ color: C.text }}>{o.what}</span> {o.why_it_matters}{' '}
+                    <span style={{ color: C.muted }}>({o.why_not_changed})</span>
+                  </p>
+                ))}
+              </div>
+            )}
+
+            <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 4px' }}>
+              {adm.checks.map((t) => {
+                const ok = t.result === 'pass';
+                return (
+                  <li
+                    key={t.id}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 12,
+                      padding: '9px 0',
+                      borderTop: `1px solid ${C.border}`,
+                      fontSize: 13,
+                    }}
+                  >
+                    <span
+                      style={{
+                        width: 16,
+                        textAlign: 'center',
+                        color: ok ? C.green : C.red,
+                        fontWeight: 700,
+                      }}
+                    >
+                      {ok ? '✓' : '✗'}
+                    </span>
+                    <span
+                      style={{
+                        color: C.muted,
+                        fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace',
+                        fontSize: 12,
+                        minWidth: 18,
+                      }}
+                    >
+                      {t.id}
+                    </span>
+                    <span style={{ color: ok ? C.text : C.red }}>{t.name}</span>
+                  </li>
+                );
+              })}
+            </ul>
+
+            {adm.deviations.length > 0 && (
+              <p
+                style={{
+                  color: C.muted,
+                  fontSize: 11.5,
+                  lineHeight: 1.6,
+                  margin: '12px 0 0',
+                  borderTop: `1px solid ${C.border}`,
+                  paddingTop: 12,
+                }}
+              >
+                <span style={{ color: C.text, fontWeight: 700 }}>
+                  {adm.deviations.length} deviations
+                </span>{' '}
+                recorded in <code>phase-admin1-report.json</code>, including three
+                migrations (allowlist, audit_log SELECT grant, audit_log TRUNCATE
+                revoke) and the robots.txt fix.
+              </p>
+            )}
           </>
         )}
       </section>

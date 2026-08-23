@@ -1,0 +1,227 @@
+{
+  "phase": "admin1",
+  "name": "Admin Portal — Phase 1 (Read-Only)",
+  "generated": "2026-08-23",
+  "what_this_does": "A separate internal Next.js app at admin/ that renders every customer's account, licence, payment, device and session history, plus the audit trail. It is read-only by design: there is no button anywhere in it that changes anything. Access is gated on a new admin_users allowlist that is re-checked inside every Edge Function on every single request, not once at login.",
+  "the_security_claim": {
+    "statement": "This tool can see every customer's data, so its access control is checked at the data layer, per request, and is provable by removing one database row.",
+    "how_it_is_enforced": [
+      "The admin Next.js app holds NO service-role key. It cannot read a table directly; it can only ask an admin-* Edge Function, carrying the signed-in admin's own JWT.",
+      "Every admin-* function calls requireAdmin() as its first statement. That validates the JWT against the auth server with getUser() (never a local decode) and then re-reads public.admin_users for that email.",
+      "The admin's JWT is an ordinary 'authenticated' role token with no elevated claim. Privilege comes only from allowlist membership, so a forged or stolen session still fails at the allowlist.",
+      "A database fault during the allowlist lookup returns 503, never a pass. The guard fails closed.",
+      "admin_users has RLS enabled AND forced, and anon/authenticated hold zero privileges — they do not appear in the table ACL at all."
+    ],
+    "proof_executed_live": "The allowlist row was DELETED while a valid admin session was open. All five data functions immediately returned 403 for that same unchanged token. Restoring the row restored access. See check 7."
+  },
+  "why_admin_login_differs_from_customer_signup": {
+    "customer_behaviour": "send-activation returns an identical response whether or not an account exists, because customers are an open, unknown population and confirming membership leaks a real person's private fact.",
+    "admin_behaviour": "admin-request-otp returns HTTP 403 'This email is not authorized for admin access.' and sends nothing.",
+    "why_that_is_correct_here": "The admin population is two or three people, fixed and known in advance, so there is nothing to leak. Enumeration-safety here would burn a Resend send, create a stray auth.users row for any stranger who guessed the URL (which would fire the customer signup trigger chain and email them a billing link), and leave a legitimate admin who mistyped their address hunting a spam folder for a message that was never sent.",
+    "what_defends_it_instead": "Honest answers make rate limiting more important, not less. A DB-backed append-only ledger keyed by peppered identifier hash and IP, reusing the Phase 4 activation_requests pattern verbatim.",
+    "do_not_copy_back": "This divergence is deliberate and scoped to the admin functions. It must not be applied to any customer-facing endpoint."
+  },
+  "rate_limiting": {
+    "pattern_reused_from": "Phase 4 public.activation_requests",
+    "table": "public.admin_otp_requests",
+    "why_a_separate_table": "Sharing activation_requests would let admin logins exhaust the per-IP budget that customer activation emails depend on, and would change the counts a function this phase must not touch reads over.",
+    "identifier_per_hour": 5,
+    "ip_per_hour": 8,
+    "identifier_storage": "peppered SHA-256, with a different domain-separating label from send-activation's so the two ledgers cannot be cross-matched",
+    "logged_unconditionally": "Blocked attempts are logged too. If a rejection did not extend the window, a prober could hammer forever and the limit would never bite.",
+    "verified_live": "403 on requests 1-5, HTTP 429 on request 6, with auth.users unchanged throughout."
+  },
+  "search_invisibility": {
+    "layer_1": "admin/app/robots.ts — Disallow: / for every user agent, no sitemap.",
+    "layer_2": "admin/lib/seo.ts NOINDEX applied at the root layout, so every current and future page inherits noindex,nofollow,noarchive,nocache.",
+    "layer_3": "admin/proxy.ts sets X-Robots-Tag: noindex, nofollow, noarchive on every response including redirects, API routes and errors.",
+    "bug_found_and_fixed": "The proxy's PUBLIC_PATHS allowlist is default-protected, which swept up /robots.txt: a crawler requesting it received a 307 to /login and never saw a single Disallow line, so layer 1 was silently dead while appearing configured. Caught by the header check in Step 7. /robots.txt is now explicitly public; layer 3 still stamps it."
+  },
+  "file_convention": {
+    "proxy_not_middleware": "admin/proxy.ts, verified against the INSTALLED Next.js 16.3.0 rather than assumed. The middleware.js convention is deprecated and renamed to proxy.js in Next 16. The build output confirms it loads ('ƒ Proxy (Middleware)'). Using the deprecated name would not error — the file would simply never load, taking X-Robots-Tag and the login redirect with it.",
+    "searchparams_is_a_promise": "params and searchParams are awaited on every page, per the installed version's contract.",
+    "turbopack_root_pinned": "Three package-lock.json files exist in this repo; without pinning, Next inferred the repo root as the workspace root, which is what output file tracing uses to decide what to bundle."
+  },
+  "session_design": {
+    "claim": "The browser never holds a token.",
+    "flow": [
+      "The login form posts email, then the 6-digit code, to same-origin route handlers under admin/app/api/auth/.",
+      "Those handlers call the Edge Functions server-side and receive { access_token, refresh_token } server-to-server.",
+      "setSession() on the @supabase/ssr server client writes httpOnly + Secure + SameSite=Lax cookies.",
+      "The response body deliberately contains no token."
+    ],
+    "why": "The common alternative — verifying in the browser and calling setSession() client-side — puts the refresh token in JS-reachable storage, turning any XSS bug in this tool into a durable breach of the entire customer database rather than a bounded session hijack.",
+    "verified_live": "Cookie stored with the #HttpOnly_ flag, Secure=TRUE, path=/. The verify response body carries no token. A wrong code sets no cookie at all.",
+    "sdk_calls_verified_against_installed_packages": {
+      "supabase-js": "2.112.3",
+      "ssr": "0.12.4",
+      "request_otp": "signInWithOtp({ email, options: { shouldCreateUser: true } })",
+      "verify_otp": "verifyOtp({ email, token, type: 'email' }) — 'email' confirmed a member of EmailOtpType",
+      "set_session": "setSession({ access_token, refresh_token })"
+    }
+  },
+  "grants": {
+    "admin_users_before": "table did not exist; default privilege for a table created by postgres in public is anon=Dxtm, authenticated=Dxtm, service_role=Dxtm — i.e. NO SELECT for anyone",
+    "admin_users_after": "service_role: SELECT only. anon and authenticated: no rows in role_table_grants at all.",
+    "truncate_revoked": "service_role's inherited TRUNCATE on admin_users was revoked by name. Reading the allowlist is all any function needs; TRUNCATE is a one-statement way to empty it and lock every admin out permanently.",
+    "admin_otp_requests": "service_role: SELECT + INSERT. No UPDATE, no DELETE — code that cannot delete rows cannot erase its own rate-limit history.",
+    "rls": "Both tables have RLS enabled AND forced, with zero policies. service_role has rolbypassrls=true; anon and authenticated have false, so they are blocked at two independent layers."
+  },
+  "audit_log_grant": {
+    "what_happened": "admin-audit-log returned 500 on first live call. service_role held INSERT on audit_log but NOT SELECT — every previous consumer only ever wrote to it, so nothing had needed to read it back.",
+    "fix": "A second migration granting SELECT, and only SELECT, to service_role.",
+    "not_a_schema_change": "No column, constraint, index, trigger or default was touched, and no row was written. One privilege bit changed so an existing table can be read.",
+    "precedent": "20260816120000_grant_audit_log_sequence.sql did exactly this for audit_log's bigserial sequence, for the same underlying reason.",
+    "select_only": "Deliberately not UPDATE or DELETE. An audit trail that the tool displaying it can also rewrite is not an audit trail."
+  },
+  "audit_log_truncate_revoked": {
+    "authorised_by": "Owner, on review of the flag raised by this phase's verification.",
+    "migration": "20260823124500_revoke_audit_log_truncate.sql",
+    "before": "service_role: INSERT, REFERENCES, SELECT, TRIGGER, TRUNCATE",
+    "after": "service_role: INSERT, REFERENCES, SELECT, TRIGGER",
+    "why_it_mattered": "TRUNCATE is not a row-level operation and is not constrained by the absence of DELETE. service_role already had no DELETE — the append-only intent was there — but one TRUNCATE statement would have emptied the whole audit trail anyway, and left no audit trail of having done so. That is exactly the failure an audit log exists to make impossible.",
+    "where_it_came_from": "Never granted deliberately. It arrives from this project's default privilege, which hands anon/authenticated/service_role `Dxtm` on every newly created table — the same default that has required five corrective migrations here for the DML it does NOT hand out.",
+    "safety_checked_before_revoking": [
+      "No Edge Function references TRUNCATE (grep over supabase/functions).",
+      "No function in the public schema contains TRUNCATE in its definition.",
+      "supabase-js exposes no truncate() API, so an Edge Function could not have issued one through the client. The privilege had no consumer; it was latent risk only."
+    ],
+    "verified_live_after": {
+      "read_path": "set role service_role -> select count(*) from audit_log returns 5. The admin viewer's path is unaffected.",
+      "write_path": "set role service_role -> INSERT succeeded inside a transaction (5 -> 6 rows visible), then rolled back. entitlement and razorpay-webhook can still write.",
+      "truncate_path": "set role service_role -> truncate public.audit_log now fails with 42501: permission denied for table audit_log.",
+      "trail_intact": "audit_log still holds its 5 real rows; zero probe rows leaked."
+    },
+    "net_effect": "service_role now holds exactly write-and-read on audit_log, with no way to remove or rewrite an entry — no UPDATE, no DELETE, no TRUNCATE."
+  },
+  "postgrest_embed_finding": {
+    "symptom": "admin-list-users and admin-list-payments failed with a generic 500 on their first live call.",
+    "cause": "Verified live against information_schema: the ONLY foreign key among the public tables is sessions.device_id -> devices. Every user_id column on licences, payments, orders, devices and sessions references auth.users(id), in the AUTH schema — not public.profiles(id).",
+    "consequence": "PostgREST infers embeds from foreign keys, so profiles->licences and payments->profiles do not exist for it to follow, and the embed fails the whole query rather than degrading.",
+    "fix": "Both functions now join by hand in two batched queries.",
+    "fix_not_taken": "Adding a foreign key. That would alter a live money-relevant table's schema, which this phase forbids, to make an internal list page tidier."
+  },
+  "out_of_scope_respected": {
+    "no_action_buttons": "No grant, no revoke, no force sign-out anywhere. The only mutating endpoint in the whole app is /api/auth/signout, which ends the ADMIN's own session and touches no customer.",
+    "no_refund_ui": "Refunds stay in Razorpay's dashboard. Refund state already in payments is displayed; nothing can initiate one.",
+    "audit_log_schema_untouched": "Read-only. Nothing in this phase writes to it — including the act of viewing it.",
+    "nothing_writes_to_audit_log": "Deliberate. Logging 'admin viewed the audit log' would require INSERT on audit_log for a viewer, and that grant is not one to hand out as a side effect of building a read-only page. Admin reads remain visible in the Edge Function logs.",
+    "existing_code_untouched": "No existing Edge Function, no existing migration, nothing under lib/ or android/, and no file under portal/app/ other than page.tsx."
+  },
+  "observations_flagged_not_changed": [
+    {
+      "what": "Licence 1284d79b for hs0238766@gmail.com is status 'active' while its only payment, INV/2026-27/000001, is status 'refunded'.",
+      "why_it_matters": "A refund is expected to revoke the licence (see commit ee680fd). This may be correct if the refund was issued after a manual re-grant during Phase 5 testing, or it may be the known partial-refund open item.",
+      "why_not_changed": "This phase is read-only and ships no licence actions. Surfacing exactly this kind of inconsistency is what the tool is for."
+    }
+  ],
+  "deviations": [
+    "A SECOND table, public.admin_otp_requests, was created inside the admin_users migration. The brief specified the allowlist table but also required DB-backed rate limiting reusing the Phase 4 pattern, which needs a ledger. Kept separate from activation_requests so the two flows cannot exhaust each other's budget.",
+    "A SECOND migration file, 20260823113000_grant_audit_log_select.sql, was created. Required: service_role had no SELECT on audit_log, so the audit-log deliverable was impossible without it. It is a grant, not a schema change.",
+    "A new shared file, supabase/functions/_shared/admin_guard.ts, was created. No existing file in _shared was modified. Five functions each hand-rolling their own allowlist check is five chances for one to be subtly wrong.",
+    "Test hygiene: 7 rows generated by the rate-limit test were deleted from admin_otp_requests before the owner's real login, so the test did not consume the owner's per-IP budget. Done as postgres via the SQL editor — the Edge Functions hold no DELETE grant on that ledger, which is the property that matters.",
+    "The allowlist row was deliberately deleted and restored to prove the per-call re-check (check 7). The row was restored with its original id and added_at.",
+    "PREFLIGHT MISMATCH: the brief expected android/key.properties to be ABSENT. It is present on disk but untracked and gitignored (.gitignore:44), which is the expected state for a machine with signing configured. No change was made to it.",
+    "A THIRD migration file, 20260823124500_revoke_audit_log_truncate.sql, was created after the owner authorised revoking service_role’s inherited TRUNCATE on audit_log — the same fix already applied to admin_users. It is a grant change, not a schema change; verified beforehand that no Edge Function, no public function and no supabase-js API could issue TRUNCATE, so the privilege had no consumer."
+  ],
+  "analyze": {
+    "new_errors": 0,
+    "new_warnings": 0,
+    "pre_existing_issues": 7,
+    "note": "flutter analyze reports the same 7 pre-existing issues. Nothing in this phase touches Flutter at all — it is a sanity check, not a target."
+  },
+  "build": {
+    "command": "cd admin && npm run build",
+    "result": "pass",
+    "errors": 0,
+    "routes": 11,
+    "note": "Proxy confirmed loaded in the build output."
+  },
+  "checks": [
+    {
+      "id": 1,
+      "name": "admin_users created; RLS enabled and forced; anon/authenticated hold zero privileges; service_role SELECT only; TRUNCATE revoked",
+      "result": "pass"
+    },
+    {
+      "id": 2,
+      "name": "Exactly one seeded row, the owner's own confirmed address",
+      "result": "pass"
+    },
+    {
+      "id": 3,
+      "name": "Non-allowlisted email -> HTTP 403 with the plain honest message",
+      "result": "pass"
+    },
+    {
+      "id": 4,
+      "name": "Rejected request created NO auth.users row (count 2 -> 2) and NO activation token (9 -> 9): no email was sent or attempted",
+      "result": "pass"
+    },
+    {
+      "id": 5,
+      "name": "Rate limit bites: 403 x5 then HTTP 429 on the 6th, no auth rows created across any of them",
+      "result": "pass"
+    },
+    {
+      "id": 6,
+      "name": "Allowlisted owner -> code sent, real OTP received, login completed, httpOnly Secure cookie set, no token in the response body",
+      "result": "pass"
+    },
+    {
+      "id": 7,
+      "name": "Allowlist row deleted mid-session -> all five functions 403 on the SAME valid token; restored -> all five 200",
+      "result": "pass"
+    },
+    {
+      "id": 8,
+      "name": "No token, anon key as bearer, and garbage token all rejected 401",
+      "result": "pass"
+    },
+    {
+      "id": 9,
+      "name": "All five data functions return real live data, including INV/2026-27/000001",
+      "result": "pass"
+    },
+    {
+      "id": 10,
+      "name": "All four pages render that real data; TEST MODE banner shows from the server-side key prefix",
+      "result": "pass"
+    },
+    {
+      "id": 11,
+      "name": "X-Robots-Tag present on every route including redirects, API routes and robots.txt",
+      "result": "pass"
+    },
+    {
+      "id": 12,
+      "name": "robots.txt serves Disallow: / (bug found and fixed — it was being redirected to /login)",
+      "result": "pass"
+    },
+    {
+      "id": 13,
+      "name": "meta robots noindex,nofollow,noarchive,nocache present in rendered HTML",
+      "result": "pass"
+    },
+    {
+      "id": 14,
+      "name": "admin npm run build: zero errors",
+      "result": "pass"
+    },
+    {
+      "id": 15,
+      "name": "git status clean of lib/, android/, portal/app/ (except page.tsx), existing Edge Functions and existing migrations",
+      "result": "pass"
+    },
+    {
+      "id": 16,
+      "name": "flutter analyze: same 7 pre-existing issues, zero new",
+      "result": "pass"
+    },
+    {
+      "id": 17,
+      "name": "audit_log TRUNCATE revoked from service_role: read still works (5 rows), INSERT still works (rolled back), TRUNCATE now fails 42501, trail intact",
+      "result": "pass"
+    }
+  ]
+}

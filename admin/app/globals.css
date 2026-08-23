@@ -1,0 +1,14 @@
+@import "tailwindcss";
+
+/* The admin tool is dark-only. Unlike the billing portal it has no
+   prefers-color-scheme branch: there is no light variant of this palette,
+   and a half-applied light mode on a dense data table is worse than none. */
+html,
+body {
+  background: #07090E;
+  color: #EEF2F8;
+}
+
+* {
+  scrollbar-color: #1C2A3A #07090E;
+}

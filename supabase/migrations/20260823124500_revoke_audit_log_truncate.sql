@@ -1,0 +1,45 @@
+-- ════════════════════════════════════════════════════════════════════════
+-- Make audit_log genuinely append-only for service_role.
+--
+-- ── WHAT THIS CLOSES ────────────────────────────────────────────────────
+-- Flagged during Admin Phase 1 verification and authorised by the owner.
+-- Before this migration, service_role held on public.audit_log:
+--
+--     INSERT, REFERENCES, SELECT, TRIGGER, TRUNCATE
+--
+-- The TRUNCATE was never granted deliberately. It arrives from this
+-- project's default privilege, which hands anon/authenticated/service_role
+-- `Dxtm` (TRUNCATE, REFERENCES, TRIGGER, MAINTAIN) on every newly created
+-- table — the same default that has already required five corrective
+-- migrations here for the DML it does NOT hand out.
+--
+-- It matters because TRUNCATE is not a row-level operation and is not
+-- constrained by the absence of DELETE. service_role had no DELETE on
+-- audit_log — the append-only intent was there — but a single TRUNCATE
+-- statement would have emptied the entire audit trail anyway, and left no
+-- audit trail of having done so. That is precisely the failure an audit log
+-- exists to make impossible.
+--
+-- ── WHY IT IS SAFE ──────────────────────────────────────────────────────
+-- Verified live before writing this file:
+--   • No Edge Function references TRUNCATE (grep over supabase/functions).
+--   • No function in the public schema contains TRUNCATE in its definition.
+--   • supabase-js exposes no truncate() API at all, so the Edge Functions
+--     could not have issued one through the client even if they wanted to.
+-- The privilege had no consumer. It was latent risk only.
+--
+-- ── WHAT IS DELIBERATELY LEFT ALONE ─────────────────────────────────────
+-- INSERT stays: entitlement (paywall_emergency_bypass_used) and
+-- razorpay-webhook (refund revocations) write here, and those functions are
+-- not to be touched. SELECT stays: it was granted in 20260823113000 so the
+-- admin audit-log viewer can read the trail. After this migration
+-- service_role holds exactly write-and-read, with no way to remove or
+-- rewrite an entry — no UPDATE, no DELETE, no TRUNCATE.
+--
+-- ── NOT A SCHEMA CHANGE ─────────────────────────────────────────────────
+-- No column, constraint, index, trigger or default is touched, and no row is
+-- read or written. One privilege bit is removed. Same reasoning, and the
+-- same fix, already applied to public.admin_users in 20260823101500.
+-- ════════════════════════════════════════════════════════════════════════
+
+revoke truncate on public.audit_log from service_role;

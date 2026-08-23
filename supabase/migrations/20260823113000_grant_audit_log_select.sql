@@ -1,0 +1,44 @@
+-- ════════════════════════════════════════════════════════════════════════
+-- ADMIN PORTAL — Phase 1: let the admin viewer READ the audit log.
+--
+-- ── WHY THIS MIGRATION EXISTS ───────────────────────────────────────────
+-- Discovered live while verifying admin-audit-log, which failed with a 500.
+-- The cause, from information_schema.role_table_grants:
+--
+--     audit_log  service_role  ->  INSERT, REFERENCES, TRIGGER, TRUNCATE
+--
+-- INSERT but NO SELECT. Every previous consumer of this table only ever
+-- WROTE to it (entitlement logs the emergency-bypass action, razorpay-webhook
+-- logs refund revocations), so nothing had ever needed to read it back and
+-- the grant was never made. Reading it is the entire point of the audit-log
+-- page, so without this the feature cannot work at all.
+--
+-- This is the same class of omission that has now required five corrective
+-- migrations on this project (20260812140944, 20260813185001,
+-- 20260814190500, 20260816120000, and this one). 20260816120000 is the
+-- closest precedent: it granted USAGE on audit_log's bigserial sequence for
+-- exactly the same underlying reason.
+--
+-- ── THIS IS NOT A SCHEMA CHANGE ─────────────────────────────────────────
+-- The phase constraint is that audit_log's SCHEMA must not change, and it
+-- does not: no column is added, altered or dropped, no constraint, index,
+-- trigger or default is touched, and no row is written. This migration
+-- changes one privilege bit so an existing table can be read.
+--
+-- ── SELECT AND NOTHING ELSE ─────────────────────────────────────────────
+-- Deliberately not UPDATE and not DELETE. audit_log is append-only, and an
+-- audit trail that the tool displaying it could also rewrite or erase is not
+-- an audit trail. The admin portal reads it; nothing in this phase writes to
+-- it, including the act of viewing it.
+--
+-- ── OBSERVATION, NOT CHANGED HERE ───────────────────────────────────────
+-- service_role also holds TRUNCATE on audit_log, inherited from this
+-- project's default privilege (anon/authenticated/service_role get `Dxtm` on
+-- every new table). That means a bug in any Edge Function could empty the
+-- audit trail in one statement. That is a pre-existing condition on a table
+-- this phase is scoped to treat as read-only, and revoking it could affect
+-- functions this phase must not touch — so it is flagged for the owner to
+-- decide on rather than silently changed here.
+-- ════════════════════════════════════════════════════════════════════════
+
+grant select on public.audit_log to service_role;

@@ -233,7 +233,13 @@
       "Bash(awk '{print \"  generated length: \" $1-1 \" hex chars \\(256-bit\\)\"}')",
       "Bash(awk -F= '{k=$1; v=substr\\($0, index\\($0,\"=\"\\)+1\\); gsub\\(/\\\\r/,\"\",v\\); print \"  \" k \" -> length \" length\\(v\\)}')",
       "Bash(shred -u __TRACKED_VAR__/newsecret.txt)",
-      "Bash(rm -f __TRACKED_VAR__/newsecret.txt)"
+      "Bash(rm -f __TRACKED_VAR__/newsecret.txt)",
+      "Bash(git status *)",
+      "Bash(curl *)",
+      "Bash(cd portal *)",
+      "Bash(node -e ' *)",
+      "Bash(npm install *)",
+      "Bash(cd *)"
     ]
   }
 }
