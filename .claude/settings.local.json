@@ -239,7 +239,11 @@
       "Bash(cd portal *)",
       "Bash(node -e ' *)",
       "Bash(npm install *)",
-      "Bash(cd *)"
+      "Bash(cd *)",
+      "Bash(jq --version)",
+      "Bash(node \"C:/Users/a/AppData/Local/Temp/claude/C--Users-a-Downloads-danlite-elm-complete-danlite-elm/3e7e8bc1-2763-4911-b94f-4629fbaf6bee/scratchpad/e2e.mjs\" auth)",
+      "Bash(node *)",
+      "Bash(awk -F: '$1>2560')"
     ]
   }
 }

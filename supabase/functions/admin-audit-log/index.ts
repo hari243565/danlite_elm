@@ -53,9 +53,17 @@ Deno.serve(async (req: Request): Promise<Response> => {
     const from = page * pageSize;
     const to = from + pageSize - 1;
 
+    // PHASE 2, and the only change this phase makes to a Phase 1 file. The
+    // column list here is explicit rather than `select *`, so audit_log's two
+    // new columns would otherwise be invisible in the one tool built to read
+    // the audit trail — an audit log that silently omits who performed an
+    // action is worse than no viewer at all, because it looks complete.
     let query = admin
       .from("audit_log")
-      .select("id, user_id, action, detail, ip, created_at", { count: "exact" });
+      .select(
+        "id, user_id, action, detail, ip, created_at, actor_user_id, actor_email",
+        { count: "exact" },
+      );
 
     if (action) query = query.ilike("action", `%${action}%`);
     if (UUID_RE.test(userId)) query = query.eq("user_id", userId);
@@ -106,6 +114,11 @@ Deno.serve(async (req: Request): Promise<Response> => {
           detail: r.detail,
           ip: r.ip,
           created_at: r.created_at,
+          // Null on every system-generated row (webhook, entitlement); set on
+          // anything an admin did. actor_email is the historical record and
+          // stays readable even if that person later leaves the allowlist.
+          actor_user_id: r.actor_user_id,
+          actor_email: r.actor_email,
         })),
         known_actions: knownActions,
         page,

@@ -2572,7 +2572,7 @@ export default function MissionControl() {
         }}
       >
         <h2 style={{ fontSize: 15, fontWeight: 700, margin: '0 0 4px' }}>
-          Admin Portal — Phase 1 (Read-Only)
+          Admin Portal — Phase 1 (Read-Only) + Phase 2 (Actions)
         </h2>
 
         {!adm ? (
@@ -2774,6 +2774,150 @@ export default function MissionControl() {
             )}
           </>
         )}
+
+        {/* ---- Phase 2 (Actions) ----------------------------------------
+            Kept inside the same panel rather than given its own, because it
+            is the same tool: the Phase 1 read surface with three writes added.
+            Phase 1's headline was how access is gated; Phase 2's headline is
+            that nothing can be done without a name and a reason attached, so
+            that is what leads here. Hardcoded rather than read from a report
+            file — this phase added no phase-admin2-report.json. */}
+        <div
+          style={{
+            borderTop: `1px solid ${C.border}`,
+            marginTop: 18,
+            paddingTop: 16,
+          }}
+        >
+          <div
+            style={{
+              border: `2px solid ${C.green}`,
+              borderRadius: 8,
+              padding: '14px 16px',
+              marginBottom: 14,
+              backgroundColor: `${C.green}12`,
+            }}
+          >
+            <div
+              style={{
+                color: C.green,
+                fontSize: 13.5,
+                fontWeight: 800,
+                letterSpacing: 0.3,
+                marginBottom: 7,
+              }}
+            >
+              NO ACTION WITHOUT A NAMED ACTOR AND A REASON — ENFORCED IN THE DATABASE
+            </div>
+            <p style={{ color: C.muted, fontSize: 12, lineHeight: 1.6, margin: 0 }}>
+              <code>admin_grant_licence</code> and <code>admin_revoke_licence</code> raise
+              on a null, empty or whitespace-only reason, and refuse a call with no
+              identified actor. Proven live by calling both directly with an empty reason
+              and confirming nothing changed — not argued from the disabled button in the
+              browser, which is courtesy only. The acting admin is taken from the verified
+              JWT and never from the request body; a grant sent with a forged
+              <code> actor_email</code> was recorded against the real caller.
+            </p>
+          </div>
+
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, marginBottom: 14 }}>
+            {[
+              { label: 'Actions', value: 'grant · revoke · force sign-out' },
+              { label: 'Audit', value: 'actor_user_id + actor_email' },
+              { label: 'Grant rail', value: 'admin_grant, never razorpay' },
+              { label: 'Escalation test', value: '403 for a real customer JWT' },
+            ].map((b) => (
+              <span
+                key={b.label}
+                style={{
+                  display: 'inline-block',
+                  padding: '5px 11px',
+                  borderRadius: 8,
+                  border: `1px solid ${C.border}`,
+                  fontSize: 12,
+                  color: C.muted,
+                }}
+              >
+                {b.label}: <span style={{ color: C.text, fontWeight: 700 }}>{b.value}</span>
+              </span>
+            ))}
+          </div>
+
+          <div
+            style={{
+              border: `1px solid ${C.border}`,
+              borderRadius: 8,
+              padding: '12px 14px',
+              marginBottom: 14,
+            }}
+          >
+            <div
+              style={{
+                color: C.muted,
+                fontSize: 11,
+                fontWeight: 700,
+                letterSpacing: 0.8,
+                textTransform: 'uppercase',
+                marginBottom: 7,
+              }}
+            >
+              An admin grant is not recorded as a payment
+            </div>
+            <p style={{ color: C.muted, fontSize: 12, lineHeight: 1.6, margin: 0 }}>
+              <code>licences.purchase_rail</code> was widened from{' '}
+              <code>razorpay_in | razorpay_intl</code> to also allow{' '}
+              <code>admin_grant</code>. Stamping a gifted licence as a Razorpay sale would
+              fabricate payment provenance that never happened and would corrupt revenue
+              reconciliation.{' '}
+              <span style={{ color: C.amber }}>
+                Revocations are likewise distinguishable: an admin writes
+                &ldquo;admin_revoke: …&rdquo; into revoke_reason, where the refund webhook
+                writes &ldquo;refund.created refund_id=… &rdquo;.
+              </span>
+            </p>
+          </div>
+
+          <ul
+            style={{
+              listStyle: 'none',
+              padding: 0,
+              margin: 0,
+              display: 'grid',
+              gap: 7,
+              fontSize: 12.5,
+            }}
+          >
+            {[
+              'audit_log gains actor_user_id (FK, ON DELETE SET NULL) + actor_email (flat copy, survives allowlist removal)',
+              'admin-grant-licence, admin-revoke-licence, admin-force-signout deployed; all re-check the allowlist per call',
+              'Force sign-out reuses Phase 7 sign_out_all_devices unchanged — no new session logic written',
+              'Grant/Revoke shown contextually, never both; each behind a modal needing a typed reason',
+              'admin-audit-log widened to return the two new actor columns (its select list was hardcoded)',
+            ].map((line) => (
+              <li key={line} style={{ display: 'flex', gap: 9, alignItems: 'flex-start' }}>
+                <span style={{ color: C.green, fontWeight: 700 }}>✓</span>
+                <span style={{ color: C.text }}>{line}</span>
+              </li>
+            ))}
+          </ul>
+
+          <p
+            style={{
+              color: C.muted,
+              fontSize: 11.5,
+              lineHeight: 1.6,
+              margin: '12px 0 0',
+              borderTop: `1px solid ${C.border}`,
+              paddingTop: 12,
+            }}
+          >
+            <span style={{ color: C.text, fontWeight: 700 }}>Carried forward:</span> the
+            /audit-log page still renders Phase 1&apos;s columns, so the new actor is in the
+            API response but not yet on that screen — that file was out of scope this phase.
+            Force sign-out&apos;s reason is enforced at the Edge Function, not the database,
+            because its RPC is Phase 7&apos;s and was deliberately not modified.
+          </p>
+        </div>
       </section>
 
       {/* ---------------- Footer ---------------- */}
