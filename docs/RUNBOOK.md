@@ -170,6 +170,49 @@ currently ~280 KB; at 90-day retention that is roughly **25 MB** of artifact
 storage. Both have ample headroom, but the storage figure grows with the
 database, and it disappears entirely once backups move to R2.
 
+### Free-tier project pausing — and why there is no keep-alive job
+
+Supabase pauses Free Plan projects that show **low activity over a 7-day
+period**. The docs are explicit that *database queries* are what counts:
+"typically a few user requests to the database each day over the previous week
+is enough to keep the project from being paused." Visiting the dashboard also
+generates activity, but that depends on a human remembering to do it.
+
+**The nightly backup already satisfies this.** Every run opens a session-pooler
+connection and reads the entire database with `pg_dump` — real database
+activity, every single day, with no extra moving parts. A separate keep-alive
+workflow or `SELECT 1` ping is **not needed** and is not configured; it would be
+one more thing to maintain that does nothing the backup is not already doing.
+
+The catch is worth understanding rather than discovering later:
+
+> Pause-protection is now a **side effect of the backup**, so the two fail
+> together. If backups break — rotated database password, a bad secret, an
+> Actions outage — you lose the backups *and* your only source of daily database
+> activity at the same moment. The 7-day pause window is short enough that this
+> can land before anyone notices.
+>
+> **This is why consecutive backup failures are urgent, not routine.** One
+> failed night is noise; two in a row is a signal. See *If a backup fails*.
+
+A related worry that does **not** apply here: GitHub auto-disables scheduled
+workflows after 60 days of inactivity **in public repositories only**. This repo
+is private, so the nightly schedule will not be switched off underneath you.
+
+If the project is ever paused anyway:
+
+- **Data is not deleted.** A paused project can be restored from the Supabase
+  dashboard, and there is a **1-year window** to do so from Studio.
+- **Backups fail while paused** — the dump cannot connect to a paused database.
+  Restore the project first, then run a manual backup before trusting the
+  schedule again.
+- Pausing is discretionary ("we *may* pause"), so do not treat daily activity as
+  a contractual guarantee. Projects on the Pro plan are never paused for
+  inactivity; that is the only real removal of this risk.
+
+Sources: [Project Pausing](https://supabase.com/docs/guides/platform/free-project-pausing),
+[Production Checklist](https://supabase.com/docs/guides/deployment/going-into-prod).
+
 ---
 
 ### Restoring a backup
@@ -327,10 +370,49 @@ possible without the private key:
 - the `.toc.txt` sidecar confirms `profiles`, `licences`, `payments`, `orders`
   and `admin_users` are present — auditable **without** decrypting
 
+#### Proven on GitHub Actions — 2026-08-24
+
+The workflow is committed and **has now run for real on GitHub Actions**, which
+was the last outstanding gap. Two earlier attempts failed first, and both are
+recorded here because they are environment faults that will recur on any fresh
+runner image:
+
+| Run | Result | Cause | Fix |
+|---|---|---|---|
+| `32691927541` | failed, 12s | `gpg --dearmor` invoked under `sudo` reached for `/dev/tty`, which does not exist on a runner; it died, and `curl` then failed writing into the dead pipe (exit 23) | dearmor as the normal user, then `sudo install` the result — `b671827` |
+| `32691986679` | failed, 40s | the runner image's own PG16 client in `/usr/bin` shadowed the PGDG 17 binaries — `psql` resolved to 17.11 but `pg_dump` to 16.15 | put `/usr/lib/postgresql/17/bin` ahead of `/usr/bin` via `$GITHUB_PATH` and assert `pg_dump` is v17 — `16c48e5` |
+| `32692117213` | **success, 1m28s** | — | published `danlite-encrypted-backup-32692117213` |
+
+The second failure is the safety check working exactly as designed: the script
+refused to dump a 17 server with a 16 client, producing **no backup rather than
+a subtly bad one**. That is the behaviour you want from this pipeline.
+
+The published artifact was then **downloaded and inspected**, not merely observed
+to be green:
+
+- three files, 322 KB total — `.dump.age`, its `.sha256` sidecar, and a
+  plaintext `.toc.txt`
+- SHA-256 recomputed after download **matches the recorded sidecar**
+  (`486a631a…35c7ffc`), so the file survived upload and download intact
+- valid `age-encryption.org/v1` header with an `X25519` recipient stanza
+- **no plaintext `PGDMP`, `CREATE TABLE` or `COPY public` markers anywhere in the
+  payload** — the body is real ciphertext, not an unencrypted dump wearing an
+  `.age` extension
+- the TOC describes a real archive: `pg_dump` 17.11 against server 17.6, 558
+  entries, 44 of them `TABLE DATA`, plus 37 `ROW SECURITY`, 9 `POLICY`, 33
+  `FUNCTION`, 33 `FK CONSTRAINT`, 81 `INDEX` and 9 `TRIGGER` — a restore rebuilds
+  RLS and constraints, not merely rows
+- **all 13 tables** declared in `supabase/migrations/` are present, diffed
+  name-by-name against the migration files so nothing was silently missed —
+  alongside `auth.users` and the `invoice_seq` and `audit_log_id_seq` values
+
+None of this changes the one gap that remains: only the owner's private key can
+prove these artifacts actually decrypt — which is the subject of the next section.
+
 #### Not proven — and only the owner can prove it
 
-Be precise about what the test above did and did not establish. It proved the
-**mechanism** works, using a key the build session controlled. It did **not**
+Be precise about what the tests above did and did not establish. They proved the
+**mechanism** works, using a key the build session controlled. They did **not**
 prove that *your* key opens *your* backups.
 
 > **What remains unverified: that the private key you hold actually decrypts
@@ -352,12 +434,6 @@ prove that *your* key opens *your* backups.
 > Repeat the rehearsal roughly every quarter, and after any change to the
 > schema, the key, or the storage destination.
 
-Also still unexercised: **the workflow has never run on GitHub Actions.** It was
-proven locally in a container built to match the CI environment (same PG17
-client, same `age`), but the workflow file is uncommitted, so no real run
-exists. Committing it is what activates both the schedule and the first real
-run — trigger one manually straight after committing rather than waiting for
-03:30 IST.
 
 ### Verification log
 
