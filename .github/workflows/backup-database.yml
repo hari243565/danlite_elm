@@ -1,0 +1,145 @@
+name: Database Backup
+
+# Encrypted nightly logical backup of the production Supabase database.
+#
+# COMMITTING THIS FILE IS WHAT ACTIVATES THE SCHEDULE. Until it is on the
+# default branch on GitHub, nothing runs. See docs/RUNBOOK.md.
+#
+# The workflow only ever holds the age PUBLIC key. It cannot decrypt what it
+# produces; that requires the owner's offline private key, by design.
+
+on:
+  schedule:
+    # 22:00 UTC daily = 03:30 IST — deep off-peak for an India-facing app.
+    # GitHub cron is always UTC and has no timezone option.
+    # Note: scheduled runs on free plans are queued, not guaranteed punctual,
+    # and can be delayed by minutes to hours under load. Fine for a daily
+    # backup; do not treat the start time as exact.
+    - cron: '0 22 * * *'
+
+  # On-demand backup: Actions tab > Database Backup > Run workflow.
+  workflow_dispatch:
+    inputs:
+      reason:
+        description: 'Why are you running this backup? (recorded in the run log)'
+        required: false
+        default: 'manual on-demand backup'
+
+# Read-only. This workflow must never be able to push to the repo.
+permissions:
+  contents: read
+
+# Never let a slow run overlap the next night's run.
+concurrency:
+  group: database-backup
+  cancel-in-progress: false
+
+jobs:
+  backup:
+    name: Dump, encrypt, store
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v4
+
+      - name: Record why this run happened
+        run: |
+          echo "Trigger: ${{ github.event_name }}"
+          echo "Reason:  ${{ github.event.inputs.reason || 'scheduled nightly run' }}"
+
+      # Supabase runs Postgres 17. pg_dump refuses to dump from a server newer
+      # than itself, and the ubuntu-latest image does not reliably ship a v17
+      # client. Install it explicitly from PGDG rather than trusting the image.
+      # backup-database.sh re-checks this at runtime and fails loudly if the
+      # client is ever older than the server.
+      - name: Install PostgreSQL 17 client
+        run: |
+          set -euo pipefail
+          sudo install -d /usr/share/postgresql-common/pgdg
+          curl -fsSL https://www.postgresql.org/media/keys/ACCC4CF8.asc \
+            | sudo gpg --dearmor -o /usr/share/postgresql-common/pgdg/apt.postgresql.org.gpg
+          echo "deb [signed-by=/usr/share/postgresql-common/pgdg/apt.postgresql.org.gpg] \
+            https://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" \
+            | sudo tee /etc/apt/sources.list.d/pgdg.list > /dev/null
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq postgresql-client-17
+          pg_dump --version
+          psql --version
+
+      - name: Install age
+        run: |
+          set -euo pipefail
+          sudo apt-get install -y -qq age
+          age --version
+
+      - name: Run the backup
+        env:
+          # MUST be the Supabase SESSION POOLER on port 5432:
+          #   postgresql://postgres.<ref>:<pw>@aws-0-<region>.pooler.supabase.com:5432/postgres
+          #
+          # Not the direct connection (db.<ref>.supabase.co). On the free tier
+          # that hostname resolves to IPv6 only — verified: AAAA record, no A
+          # record — and GitHub-hosted runners are IPv4-only, so it is simply
+          # unreachable from here regardless of credentials.
+          #
+          # Not the transaction pooler on 6543 either; pg_dump breaks on it.
+          # The script rejects 6543 outright and warns on the direct host.
+          DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+          # Public key only. There is no private-key secret and there must never be one.
+          AGE_PUBLIC_KEY: ${{ secrets.AGE_PUBLIC_KEY }}
+
+          # ---- TEMPORARY — swap to Cloudflare R2 once the client's account is ready.
+          # The R2 bucket does not exist yet (card + domain arriving). Until then
+          # the encrypted dump is kept as a GitHub Actions artifact, below.
+          #
+          # TO SWITCH TO R2, the entire change is:
+          #   1. set BACKUP_DEST to 'r2'
+          #   2. uncomment the four R2_* lines
+          #   3. add the four R2_* repository secrets
+          #   4. delete the "Upload the encrypted backup" step below
+          # Nothing about the dump, the encryption, or the restore changes.
+          BACKUP_DEST: artifact
+          ARTIFACT_DIR: ./backup-artifact
+          # BACKUP_DEST: r2
+          # R2_ACCESS_KEY_ID:     ${{ secrets.R2_ACCESS_KEY_ID }}
+          # R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          # R2_BUCKET:            ${{ secrets.R2_BUCKET }}
+          # R2_ENDPOINT:          ${{ secrets.R2_ENDPOINT }}
+          # RETENTION_DAYS: '30'
+        run: bash scripts/backup-database.sh
+
+      # ---- TEMPORARY — delete this whole step when BACKUP_DEST becomes 'r2'.
+      # 90 days is GitHub's default artifact retention. Artifacts count against
+      # the free plan's storage quota, so this is a stopgap, not the destination.
+      - name: Upload the encrypted backup (TEMPORARY — until R2 is ready)
+        uses: actions/upload-artifact@v4
+        with:
+          name: danlite-encrypted-backup-${{ github.run_id }}
+          path: backup-artifact/
+          retention-days: 90
+          if-no-files-found: error
+          # The payload is already age-encrypted and pg_dump-compressed.
+          # Re-zipping it wastes time and gains nothing.
+          compression-level: 0
+
+      - name: Summarise the run
+        if: always()
+        run: |
+          {
+            echo "### Database backup — ${{ job.status }}"
+            echo ""
+            if [ -d backup-artifact ]; then
+              echo '```'
+              ls -lh backup-artifact/
+              echo '```'
+            else
+              echo "No artifact directory was produced."
+            fi
+            echo ""
+            echo "Storage: **GitHub Actions artifact, 90-day retention** (TEMPORARY — moves to Cloudflare R2)."
+            echo ""
+            echo "This pipeline cannot verify the file decrypts — that needs the owner's offline private key."
+            echo "See \`docs/RUNBOOK.md\` for the restore procedure."
+          } >> "$GITHUB_STEP_SUMMARY"
