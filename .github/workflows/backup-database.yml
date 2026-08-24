@@ -71,8 +71,21 @@ jobs:
             | sudo tee /etc/apt/sources.list.d/pgdg.list > /dev/null
           sudo apt-get update -qq
           sudo apt-get install -y -qq postgresql-client-17
+
+          # The runner image ships its own PG16 client in /usr/bin, which
+          # shadows the PGDG 17 binaries: on run 32691986679 psql resolved to
+          # 17.11 but pg_dump still resolved to 16.15, and backup-database.sh
+          # correctly refused to dump a 17 server with a 16 client. Put the 17
+          # bindir ahead of /usr/bin for every later step.
+          echo "/usr/lib/postgresql/17/bin" >> "$GITHUB_PATH"
+          export PATH="/usr/lib/postgresql/17/bin:$PATH"
+
           pg_dump --version
           psql --version
+
+          # Fail here, not three steps later, if the shadowing ever returns.
+          pg_dump --version | grep -q ' 17\.' \
+            || { echo "FATAL: pg_dump is not v17 after install: $(pg_dump --version)"; exit 1; }
 
       - name: Install age
         run: |
