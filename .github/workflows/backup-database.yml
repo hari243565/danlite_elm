@@ -58,8 +58,14 @@ jobs:
         run: |
           set -euo pipefail
           sudo install -d /usr/share/postgresql-common/pgdg
+          # Dearmor as the normal user, then install with sudo. Running gpg
+          # itself under sudo makes it reach for /dev/tty, which does not exist
+          # on a runner: it dies, curl fails writing into the dead pipe, and the
+          # step exits 23. Verified on run 32691927541.
           curl -fsSL https://www.postgresql.org/media/keys/ACCC4CF8.asc \
-            | sudo gpg --dearmor -o /usr/share/postgresql-common/pgdg/apt.postgresql.org.gpg
+            | gpg --dearmor --batch --yes -o /tmp/pgdg-apt-key.gpg
+          sudo install -o root -g root -m 644 /tmp/pgdg-apt-key.gpg \
+            /usr/share/postgresql-common/pgdg/apt.postgresql.org.gpg
           echo "deb [signed-by=/usr/share/postgresql-common/pgdg/apt.postgresql.org.gpg] \
             https://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" \
             | sudo tee /etc/apt/sources.list.d/pgdg.list > /dev/null
