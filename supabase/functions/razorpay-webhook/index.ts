@@ -38,6 +38,7 @@
 // ══════════════════════════════════════════════════════════════════════════
 
 import { createClient, type SupabaseClient } from "jsr:@supabase/supabase-js@2";
+import { captureFunctionError } from "../_shared/sentry.ts";
 
 const enc = new TextEncoder();
 
@@ -469,6 +470,12 @@ Deno.serve(async (req: Request): Promise<Response> => {
       err instanceof Error ? err.message : String(err),
     );
     await releaseClaim();
+    // Report-only (Phase 9), and deliberately AFTER releaseClaim(): the
+    // idempotency claim must be released before anything that can block, and
+    // the flush inside captureFunctionError waits up to 2s. The 500 below is
+    // unchanged. `eventType` is Razorpay's event name (e.g. "payment.captured")
+    // — not a customer identifier.
+    await captureFunctionError("razorpay-webhook", err, { event: eventType });
     return json({ error: "handler error" }, 500);
   }
 });

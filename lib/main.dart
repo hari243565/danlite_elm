@@ -8,6 +8,7 @@ import 'providers/entitlement_provider.dart';
 import 'providers/settings_provider.dart';
 import 'providers/vehicle_provider.dart';
 import 'services/bluetooth_classic_service.dart';
+import 'services/error_reporting_service.dart';
 import 'services/obd_service.dart';
 import 'services/supabase_service.dart';
 import 'services/trip_logger.dart';
@@ -101,18 +102,24 @@ void main() {
     final entitlement = EntitlementProvider();
     await entitlement.init();
 
-    runApp(
-      MultiProvider(
-        providers: [
-          ChangeNotifierProvider<SettingsProvider>.value(value: settings),
-          ChangeNotifierProvider<VehicleProvider>.value(value: vehicles),
-          ChangeNotifierProvider<TripLogger>.value(value: tripLog),
-          ChangeNotifierProvider<BluetoothClassicService>.value(value: btService),
-          ChangeNotifierProvider<ObdService>.value(value: obdService),
-          ChangeNotifierProvider<AuthProvider>.value(value: auth),
-          ChangeNotifierProvider<EntitlementProvider>.value(value: entitlement),
-        ],
-        child: const DanliteELMApp(),
+    // Error reporting (Phase 9). This wraps the existing runApp call and
+    // changes nothing else: when SENTRY_DSN is absent from `.env`,
+    // ErrorReportingService.init invokes the appRunner directly, so the app
+    // starts exactly as it did before this line existed.
+    await ErrorReportingService.init(
+      appRunner: () => runApp(
+        MultiProvider(
+          providers: [
+            ChangeNotifierProvider<SettingsProvider>.value(value: settings),
+            ChangeNotifierProvider<VehicleProvider>.value(value: vehicles),
+            ChangeNotifierProvider<TripLogger>.value(value: tripLog),
+            ChangeNotifierProvider<BluetoothClassicService>.value(value: btService),
+            ChangeNotifierProvider<ObdService>.value(value: obdService),
+            ChangeNotifierProvider<AuthProvider>.value(value: auth),
+            ChangeNotifierProvider<EntitlementProvider>.value(value: entitlement),
+          ],
+          child: const DanliteELMApp(),
+        ),
       ),
     );
   }, (Object error, StackTrace stack) {

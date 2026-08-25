@@ -22,6 +22,7 @@
 // ══════════════════════════════════════════════════════════════════════════
 
 import { createClient } from "jsr:@supabase/supabase-js@2";
+import { captureFunctionError } from "../_shared/sentry.ts";
 import {
   buildCanonicalPayload,
   type EntitlementClaims,
@@ -354,6 +355,10 @@ Deno.serve(async (req: Request): Promise<Response> => {
     // Never let an exception carry key material out. Log the message, return a
     // generic failure.
     console.error("entitlement error:", err instanceof Error ? err.message : String(err));
+    // Report-only (Phase 9): the 500 below is unchanged. `signing_path` is a
+    // module-level diagnostic (which Ed25519 implementation was used) and
+    // carries no key material and no user data.
+    await captureFunctionError("entitlement", err, { signing_path: signingPath });
     return json({ error: "entitlement generation failed" }, 500);
   }
 });

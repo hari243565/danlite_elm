@@ -7,6 +7,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' show FunctionsHttpException;
 
 import '../constants/entitlement_public_key.dart';
+import 'error_reporting_service.dart';
 import 'session_service.dart';
 import 'supabase_service.dart';
 
@@ -249,6 +250,15 @@ class EntitlementService {
         // not partially trusted, not used for this call. An unverified payload
         // is indistinguishable from one an attacker wrote.
         debugPrint('[entitlement] signature verification FAILED — discarding');
+        // Report-only (Phase 9). The discard decision is already made above;
+        // this observes it. A signature failure is worth surfacing because it
+        // is either a backend key mismatch or tampering, and neither is
+        // visible from the user-facing behaviour (which is just "cached").
+        ErrorReportingService.reportError(
+          'entitlement signature verification failed',
+          StackTrace.current,
+          context: {'stage': 'network_payload'},
+        );
         return readCached(reason: 'signature invalid');
       }
 
@@ -307,11 +317,32 @@ class EntitlementService {
         debugPrint('[entitlement] 409 with an unrecognised body — ignoring');
       }
       debugPrint('[entitlement] http ${e.status}');
+      // Report-only (Phase 9). Reached only when the 409/SESSION_SUPERSEDED
+      // branch above did NOT apply, so the forced-logout decision has already
+      // been made and declined. Status code only — never `e.details`, which
+      // can echo server text.
+      ErrorReportingService.reportError(
+        'entitlement function returned an error status',
+        StackTrace.current,
+        context: {'stage': 'network', 'status': '${e.status}'},
+      );
       return readCached(reason: 'http ${e.status}');
     } catch (e) {
       // Offline is the expected case here, not an exception worth shouting
       // about. Type only — never the message, which can echo server text.
       debugPrint('[entitlement] fetch failed: ${e.runtimeType}');
+      // Report-only (Phase 9). Offline is the expected case here and is NOT
+      // worth an alert — but this catch is deliberately broad and also swallows
+      // jsonDecode and cast failures, which are real bugs that would otherwise
+      // be invisible. The exception type is reported so the two can be told
+      // apart in Sentry: filter out SocketException / TimeoutException /
+      // ClientException and what remains is a genuine defect. Type only, never
+      // the message, which can echo server text.
+      ErrorReportingService.reportError(
+        e,
+        StackTrace.current,
+        context: {'stage': 'network', 'exception': '${e.runtimeType}'},
+      );
       return readCached(reason: 'fetch failed');
     }
   }
@@ -351,6 +382,15 @@ class EntitlementService {
       // signature has no value and keeping it only invites confusion later.
       debugPrint('[entitlement] cached token failed verification — clearing');
       await _clearToken();
+      // Report-only (Phase 9). The token is already cleared above. Worth
+      // surfacing: a stored token that fails its own signature means either
+      // on-device tampering or a signing-key rotation that left real customers
+      // stranded — and the second one is an outage nobody would otherwise see.
+      ErrorReportingService.reportError(
+        'cached entitlement token failed verification',
+        StackTrace.current,
+        context: {'stage': 'cache'},
+      );
       return const EntitlementResult.none('cached token tampered');
     }
 

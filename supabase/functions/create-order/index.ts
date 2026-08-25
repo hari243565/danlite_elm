@@ -23,6 +23,7 @@
 // ══════════════════════════════════════════════════════════════════════════
 
 import { createClient } from "jsr:@supabase/supabase-js@2";
+import { captureFunctionError } from "../_shared/sentry.ts";
 
 // ── PRICE ─────────────────────────────────────────────────────────────────
 // ₹109.00 in paise. Phase 5 is the India rail only.
@@ -231,6 +232,11 @@ Deno.serve(async (req: Request): Promise<Response> => {
       "create-order error:",
       err instanceof Error ? err.message : String(err),
     );
+    // Report-only (Phase 9): the 500 and its message below are unchanged.
+    // No order id is attached — `order` is declared inside the try block and is
+    // deliberately not hoisted, because hoisting it would be a change to the
+    // business logic this phase is not permitted to make.
+    await captureFunctionError("create-order", err);
     return json({ error: "could not start checkout. Please try again." }, 500);
   }
 });

@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../services/app_config.dart';
+import '../services/error_reporting_service.dart';
 import '../services/session_service.dart';
 import '../services/supabase_service.dart';
 
@@ -239,6 +240,21 @@ class AuthProvider extends ChangeNotifier {
     }
 
     _errorKey = res.messageKey;
+    // Report-only (Phase 9). The classification in SupabaseService has already
+    // chosen `res.messageKey`, and `_errorKey` is already assigned from it
+    // above. This call observes that decision; it cannot alter it, and removing
+    // it would leave every surrounding line identical.
+    if (!res.ok) {
+      ErrorReportingService.reportError(
+        'auth dispatch failed',
+        StackTrace.current,
+        context: {
+          'stage': isSignup ? 'signup' : 'login',
+          'channel': channel.name,
+          'classification': res.messageKey ?? 'none',
+        },
+      );
+    }
     _busy = false;
     notifyListeners();
     return false;
@@ -300,6 +316,17 @@ class AuthProvider extends ChangeNotifier {
       return true;
     }
     _errorKey = res.messageKey;
+    // Report-only (Phase 9) — see the note in [_dispatch].
+    if (!res.ok) {
+      ErrorReportingService.reportError(
+        'otp verification failed',
+        StackTrace.current,
+        context: {
+          'channel': channel.name,
+          'classification': res.messageKey ?? 'none',
+        },
+      );
+    }
     notifyListeners();
     return false;
   }
@@ -369,6 +396,13 @@ class AuthProvider extends ChangeNotifier {
           '${info.manufacturer}|${info.model}|${info.device}|${info.hardware}|${info.id}';
     } catch (e) {
       debugPrint('[auth] device info unavailable: ${e.runtimeType}');
+      // Report-only (Phase 9). The existing behaviour — swallow, leave
+      // `_deviceFingerprint` null, carry on — is unchanged.
+      ErrorReportingService.reportError(
+        e,
+        StackTrace.current,
+        context: {'stage': 'device_fingerprint'},
+      );
     }
   }
 

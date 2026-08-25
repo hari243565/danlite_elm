@@ -31,6 +31,7 @@
 // ══════════════════════════════════════════════════════════════════════════
 
 import { createClient } from "jsr:@supabase/supabase-js@2";
+import { captureFunctionError } from "../_shared/sentry.ts";
 
 /** Activation links are short-lived: they are a bridge, not a credential. */
 const TOKEN_TTL_MINUTES = 15;
@@ -359,6 +360,10 @@ Deno.serve(async (req: Request): Promise<Response> => {
       "send-activation error:",
       err instanceof Error ? err.message : String(err),
     );
+    // Report-only (Phase 9): the 500 below is unchanged. No identifier is
+    // attached — this function's whole input is an email address or a phone
+    // number, and none of it may reach Sentry.
+    await captureFunctionError("send-activation", err);
     return json({ error: "activation request failed" }, 500);
   }
 });

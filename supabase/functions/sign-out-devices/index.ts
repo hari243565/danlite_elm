@@ -17,6 +17,7 @@
 // ══════════════════════════════════════════════════════════════════════════
 
 import { createClient } from "jsr:@supabase/supabase-js@2";
+import { captureFunctionError } from "../_shared/sentry.ts";
 
 const CORS_HEADERS: Record<string, string> = {
   "Access-Control-Allow-Origin": "*",
@@ -81,6 +82,8 @@ Deno.serve(async (req: Request): Promise<Response> => {
       "sign-out-devices error:",
       err instanceof Error ? err.message : String(err),
     );
+    // Report-only (Phase 9): the 500 below is unchanged.
+    await captureFunctionError("sign-out-devices", err);
     return json({ error: "sign out failed" }, 500);
   }
 });

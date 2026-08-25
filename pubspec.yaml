@@ -47,6 +47,23 @@ dependencies:
   # Function against the public key in lib/constants/entitlement_public_key.dart.
   cryptography: ^2.7.0
 
+  # ── Crash/error reporting (Phase 9) ────────────────────────────────────────
+  #
+  # EXACT PIN, DELIBERATELY — same reasoning as package_info_plus above.
+  # Cleared against this project's Android pins before adoption, from the
+  # package's own android/build.gradle rather than from assumption:
+  #   sentry_flutter 9.27.0 declares ext.kotlin_version '1.8.0' and AGP 7.4.2 —
+  #   both BELOW this project's Kotlin 1.8.22 / AGP 8.9.1 / Gradle 8.11.1, so it
+  #   compiles against them as-is. Zero toolchain bump required.
+  #
+  # It does pin `jni: 0.14.2` exactly, which drags path_provider_android back
+  # from 2.3.1 to 2.2.23 and drops jni_flutter. That is a downgrade, but a
+  # conservative one: on Android path_provider_android serves only google_fonts'
+  # font cache (not auth, not secure storage), and 2.2.23 uses the plain
+  # platform-channel implementation instead of the newer JNI binding — so the
+  # native surface shrinks. Verified by a full `flutter build apk --release`.
+  sentry_flutter: 9.27.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

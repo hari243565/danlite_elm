@@ -26,6 +26,7 @@
 // ══════════════════════════════════════════════════════════════════════════
 
 import { createClient } from "jsr:@supabase/supabase-js@2";
+import { captureFunctionError } from "../_shared/sentry.ts";
 
 const CORS_HEADERS: Record<string, string> = {
   "Access-Control-Allow-Origin": "*",
@@ -173,6 +174,10 @@ Deno.serve(async (req: Request): Promise<Response> => {
       "verify-activation error:",
       err instanceof Error ? err.message : String(err),
     );
+    // Report-only (Phase 9): the GENERIC_FAILURE 400 below is unchanged — that
+    // deliberately-vague response is what stops this endpoint confirming
+    // whether an account exists, and nothing here alters it.
+    await captureFunctionError("verify-activation", err);
     return json(GENERIC_FAILURE, 400);
   }
 });
