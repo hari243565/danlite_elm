@@ -283,7 +283,16 @@
       "Bash(grep -E '\\\\.\\(ts|tsx\\)$')",
       "Bash(xargs grep -Hn \"http://\\\\|https://\")",
       "Bash(grep -v \"^\\\\S*:.*//.*docs\\\\|nextjs.org\\\\|schema.org\")",
-      "Read(//tmp/**)"
+      "Read(//tmp/**)",
+      "Bash(sort -u -t: -k3)",
+      "Bash(grep -o \"options.webpack[^;]\\\\{0,160\\\\}\")",
+      "Bash(grep -rno \"turbopack[A-Za-z]*: [^,]\\\\{0,80\\\\}\" node_modules/next/dist/build/index.js)",
+      "Bash(awk 'NR>=1010 && NR<=1150' node_modules/next/dist/build/swc/index.js)",
+      "Bash(rm -rf .next)",
+      "Bash(npx next *)",
+      "Bash(npx eslint *)",
+      "Bash(echo \"admin lint exit: $?\")",
+      "Bash(echo \"portal lint exit: $?\")"
     ]
   }
 }
