@@ -18,6 +18,7 @@
 
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
+import { siteUrl } from '@/lib/site-url';
 
 /**
  * Layer 3 of search-invisibility. Applied to every matched route, including
@@ -98,7 +99,10 @@ export async function proxy(request: NextRequest) {
     );
 
     if (needsSession && !user) {
-      const redirectResponse = NextResponse.redirect(new URL('/activate', request.url));
+      // NOT new URL(..., request.url) — see lib/site-url.ts. Behind the
+      // reverse proxy request.url carries the internal bind address, which
+      // would send a signed-out customer to https://0.0.0.0:3000/activate.
+      const redirectResponse = NextResponse.redirect(siteUrl('/activate'));
       redirectResponse.headers.set('X-Robots-Tag', ROBOTS_HEADER);
       return redirectResponse;
     }

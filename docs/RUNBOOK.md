@@ -769,17 +769,25 @@ with `Failed host lookup` means the phone had no network. If you see a handful
 of these, that is normal life in a car park or a basement workshop. See *Fetch
 failures* below for how to separate them from real bugs.
 
-**A cluster of activation-email failures from `send-activation`.** This project
-still sends activation email from Resend's **shared** sending domain
-(`onboarding@resend.dev`), because `ACTIVATION_FROM_EMAIL` has never been set and
-no domain of our own has been verified. **That gap is open today — it is not a
-past problem.** While it stands, delivery depends on a domain we do not control:
-codes land in spam, or are rejected outright by stricter mail providers. A
-cluster of failures here — especially all to the same mail provider — points at
-the sending domain, not at our code. Its signature is customers saying "the code
-never arrived" while the function log shows the send being made. **The fix is to
-verify a real domain in Resend and set `ACTIVATION_FROM_EMAIL`, not to retry the
-sends.**
+**A cluster of activation-email failures from `send-activation`.** This used to
+be the expected reading of such a cluster, because activation email went out
+from Resend's **shared** sending domain (`onboarding@resend.dev`) and delivery
+depended on a domain we do not control. **That gap is closed as of 2026-08-26**
+and this is now a past problem, not an open one. `ACTIVATION_FROM_EMAIL` is set
+to `Danlite ELM <activate@mail.danlite.in>` — confirmed by matching Supabase's
+secret digest against the SHA-256 of the intended string, since Supabase never
+discloses the value itself — and a real end-to-end delivery to a non-owner inbox
+passed `dkim=pass (d=mail.danlite.in)`, `spf=pass` and `dmarc=pass`, with the
+token in the delivered message hashing to its exact `activation_tokens` row.
+Full detail in *Activation email — sending domain* at the end of this runbook.
+
+So a cluster here no longer points at a shared sending domain by default. Read
+it in this order instead: confirm the `ACTIVATION_FROM_EMAIL` secret is still
+present (if it is ever deleted the code falls back to `onboarding@resend.dev`
+silently, which reinstates exactly the old failure), then check Resend's
+delivery log for the specific messages, then the function logs for
+`resend send failed: HTTP <status>`. A `403` there means Resend is refusing the
+sender. Retrying the sends is still not the fix.
 
 **A burst of `42501 permission denied` from any function.** This project has hit
 this before. It means a table or sequence is missing a grant for `service_role` —
@@ -819,3 +827,75 @@ Both halves switch off completely when their DSN is absent:
 
 If you have seen no events at all for a week, confirm the DSN is still in place
 before concluding that things are healthy.
+
+## Activation email — sending domain
+
+Activation mail is sent by the `send-activation` Edge Function through Resend,
+from a dedicated subdomain:
+
+    Danlite ELM <activate@mail.danlite.in>
+
+`mail.danlite.in` is deliberately a separate subdomain from `danlite.in`, which
+carries the company's own human email. Automated sending and human email
+therefore build separate reputations, and a problem with one cannot drag the
+other down. Its DNS records were added in hPanel from Resend's own generated
+values; all four are published and resolving:
+
+- `send.mail.danlite.in` TXT — `v=spf1 include:amazonses.com ~all`
+- `send.mail.danlite.in` MX — `feedback-smtp.ap-northeast-1.amazonses.com` (10)
+- `resend._domainkey.mail.danlite.in` TXT — the DKIM public key
+- `_dmarc.mail.danlite.in` TXT — `v=DMARC1; p=none;`
+
+This replaced Resend's shared sandbox sender, `onboarding@resend.dev`, which
+only ever delivered to the Resend account owner's own inbox. While that was the
+sender, no other person could complete a signup at all — the mail was accepted
+by the API and then silently dropped.
+
+### Where the address is configured
+
+In the `ACTIVATION_FROM_EMAIL` secret, not in code:
+
+```bash
+npx supabase secrets list          # shows a SHA-256 digest, never the value
+npx supabase secrets set 'ACTIVATION_FROM_EMAIL=Danlite ELM <activate@mail.danlite.in>'
+npx supabase functions deploy send-activation
+```
+
+Supabase only ever discloses a digest, so confirm a change took by hashing the
+string you intended and comparing — do not trust the command's own success
+message:
+
+```bash
+printf '%s' 'Danlite ELM <activate@mail.danlite.in>' | sha256sum
+# f1f1cdc687a88812c7bf462f03821394b9b5cfa20f1a43dc7dda07f9c3b3a099
+```
+
+The redeploy matters. `Deno.env.get` is called per request, so the code itself
+never caches the value — but the process environment it reads is fixed when the
+worker boots, and a warm worker started before the change keeps serving the old
+address. Deploying forces a fresh worker instead of waiting for an unpredictable
+recycle.
+
+**The fallback in the code is a trap worth knowing about.** If that secret is
+ever deleted, `send-activation/index.ts` silently falls back to
+`onboarding@resend.dev` and every signup outside the owner's own inbox breaks
+again, with no error anywhere. Check the secret is present before concluding
+anything else.
+
+### If an activation email fails to send
+
+1. **Resend's dashboard delivery log** — the authoritative record of what
+   happened to a specific message: whether it was accepted, delivered, bounced
+   or dropped, and whether SPF and DKIM passed for that message. A domain shown
+   as Verified only means the records were seen once; it is not proof that any
+   particular message authenticated.
+2. **Supabase function logs for `send-activation`** — the function logs
+   `resend send failed: HTTP <status>` with the response body on any non-2xx
+   from Resend. A `403` there means Resend is refusing the sender, which points
+   back at the domain's verification state or the address in the secret.
+
+Note that the unauthenticated resend path returns the same generic success body
+whatever happens, deliberately, so that it cannot be used to discover which
+addresses have accounts. A `200` from it is not evidence of delivery. To confirm
+a send really occurred, check for a new row in `activation_tokens` and read the
+function logs.

@@ -292,7 +292,12 @@
       "Bash(npx next *)",
       "Bash(npx eslint *)",
       "Bash(echo \"admin lint exit: $?\")",
-      "Bash(echo \"portal lint exit: $?\")"
+      "Bash(echo \"portal lint exit: $?\")",
+      "Bash(sed -E 's/\\(re_[A-Za-z0-9_]{4}\\)[A-Za-z0-9_]*/\\\\1***REDACTED***/g')",
+      "Bash(echo \"\\(exit $?\\)\")",
+      "Bash(grep -n \"^#\\\\{1,2\\\\} \" docs/RUNBOOK.md)",
+      "Bash(NEXT_PUBLIC_BILLING_DOMAIN=https://billing.danlite.in npm run build)",
+      "Bash(git diff *)"
     ]
   }
 }

@@ -18,12 +18,16 @@ import { NextResponse, type NextRequest } from 'next/server';
 import { cookies } from 'next/headers';
 import { createClient, SESSION_COOKIE_OPTIONS } from '@/lib/supabase/server';
 import { fetchEntitlement } from '@/lib/entitlement';
+import { siteOrigin } from '@/lib/site-url';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET(request: NextRequest) {
   const token = request.nextUrl.searchParams.get('t');
-  const origin = request.nextUrl.origin;
+  // NOT request.nextUrl.origin — behind Hostinger's reverse proxy that is the
+  // server's internal bind address, and every redirect below came out as
+  // https://0.0.0.0:3000/... See lib/site-url.ts.
+  const origin = siteOrigin();
 
   // No token — nothing to redeem. Send them to the request-a-link form.
   if (!token) {
