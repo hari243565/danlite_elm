@@ -351,17 +351,8 @@ class AppStrings {
       'auth_login_subtitle': 'We will send you a one-time code.',
       'auth_country_label': 'Country',
       'auth_country_in': 'India',
-      'auth_channel_label': 'Verify with',
-      'auth_channel_email': 'Email',
-      'auth_channel_mobile': 'Mobile',
-      'auth_mobile_unavailable_hint':
-          'SMS verification is being enabled. Use email for now.',
       'auth_email_hint': 'Email address',
-      'auth_phone_hint': 'Mobile number',
-      'auth_identifier_hint': 'Email or mobile number',
       'auth_email_invalid': 'Enter a valid email address',
-      'auth_phone_invalid': 'Enter a valid 10-digit mobile number',
-      'auth_identifier_invalid': 'Enter a valid email or mobile number',
       'auth_create_account_cta': 'Create account',
       'auth_login_cta': 'Log in',
       'auth_have_account': 'Already have an account?',
@@ -376,9 +367,9 @@ class AppStrings {
       'auth_verify_cta': 'Verify',
       'auth_resend': 'Resend code',
       'auth_resend_in': 'Resend code in {s}s',
-      'auth_change_identifier': 'Use a different email or number',
+      'auth_change_identifier': 'Use a different email',
       'auth_privacy_note':
-          'Your email or number is used only to secure your account.',
+          'Your email is used only to secure your account.',
       'auth_err_generic': 'Something went wrong. Please try again.',
       'auth_err_network':
           'No connection. Check your internet and try again.',
@@ -397,8 +388,6 @@ class AppStrings {
       'auth_err_credentials':
           'Verification service rejected the request. Please contact support.',
       'auth_err_otp_invalid': 'That code is incorrect or has expired.',
-      'auth_err_sms_unavailable':
-          "SMS verification isn't available yet. Please use email.",
       'auth_err_unknown': 'Something went wrong. Please try again.',
 
       // Label for the on-device setup strip. The detail beside it is generated
@@ -508,13 +497,11 @@ class AppStrings {
       // is no amount, currency or renewal wording in either.
       'account_screen_title': 'Account',
       'account_signed_in_via_email': 'Signed in with email',
-      'account_signed_in_via_mobile': 'Signed in with mobile',
       'account_member_since': 'Member since {date}',
       'account_purchased_via': 'Purchased via {rail}',
 
       'account_details_title': 'Account details',
       'account_email_label': 'Email',
-      'account_phone_label': 'Mobile',
       'account_country_label': 'Country / Region',
       'account_created_label': 'Account created',
       // Shown only when a read could not be completed at all — not when a
@@ -800,17 +787,8 @@ class AppStrings {
       'auth_login_subtitle': 'हम आपको एक बार का कोड भेजेंगे।',
       'auth_country_label': 'देश',
       'auth_country_in': 'भारत',
-      'auth_channel_label': 'सत्यापन का तरीका',
-      'auth_channel_email': 'ईमेल',
-      'auth_channel_mobile': 'मोबाइल',
-      'auth_mobile_unavailable_hint':
-          'SMS सत्यापन अभी सक्षम किया जा रहा है। फिलहाल ईमेल का उपयोग करें।',
       'auth_email_hint': 'ईमेल पता',
-      'auth_phone_hint': 'मोबाइल नंबर',
-      'auth_identifier_hint': 'ईमेल या मोबाइल नंबर',
       'auth_email_invalid': 'मान्य ईमेल पता दर्ज करें',
-      'auth_phone_invalid': 'मान्य 10 अंकों का मोबाइल नंबर दर्ज करें',
-      'auth_identifier_invalid': 'मान्य ईमेल या मोबाइल नंबर दर्ज करें',
       'auth_create_account_cta': 'खाता बनाएं',
       'auth_login_cta': 'लॉग इन करें',
       'auth_have_account': 'पहले से खाता है?',
@@ -825,9 +803,9 @@ class AppStrings {
       'auth_verify_cta': 'सत्यापित करें',
       'auth_resend': 'कोड फिर भेजें',
       'auth_resend_in': '{s} सेकंड में कोड फिर भेजें',
-      'auth_change_identifier': 'दूसरा ईमेल या नंबर उपयोग करें',
+      'auth_change_identifier': 'दूसरा ईमेल उपयोग करें',
       'auth_privacy_note':
-          'आपका ईमेल या नंबर केवल आपके खाते की सुरक्षा के लिए उपयोग होता है।',
+          'आपका ईमेल केवल आपके खाते की सुरक्षा के लिए उपयोग होता है।',
       'auth_err_generic': 'कुछ गलत हो गया। कृपया पुनः प्रयास करें।',
       'auth_err_network':
           'कनेक्शन नहीं है। अपना इंटरनेट जांचें और पुनः प्रयास करें।',
@@ -842,8 +820,6 @@ class AppStrings {
       'auth_err_credentials':
           'सत्यापन सेवा ने अनुरोध अस्वीकार कर दिया। कृपया सहायता से संपर्क करें।',
       'auth_err_otp_invalid': 'यह कोड गलत है या समाप्त हो चुका है।',
-      'auth_err_sms_unavailable':
-          'SMS सत्यापन अभी उपलब्ध नहीं है। कृपया ईमेल का उपयोग करें।',
       'auth_err_unknown': 'कुछ गलत हो गया। कृपया पुनः प्रयास करें।',
       'auth_setup_diagnostic': 'सेटअप',
 
@@ -911,13 +887,11 @@ class AppStrings {
       // ── खाता विवरण स्क्रीन ───────────────────────────────────────────────
       'account_screen_title': 'खाता',
       'account_signed_in_via_email': 'ईमेल से साइन इन',
-      'account_signed_in_via_mobile': 'मोबाइल से साइन इन',
       'account_member_since': '{date} से सदस्य',
       'account_purchased_via': '{rail} के ज़रिए ख़रीदा गया',
 
       'account_details_title': 'खाता विवरण',
       'account_email_label': 'ईमेल',
-      'account_phone_label': 'मोबाइल',
       'account_country_label': 'देश / क्षेत्र',
       'account_created_label': 'खाता बना',
       'account_details_unavailable':

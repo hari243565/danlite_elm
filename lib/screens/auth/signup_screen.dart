@@ -22,8 +22,8 @@ class _C {
 
 /// The countries offered at sign-up. `code` is written to
 /// `profiles.country_code` and drives PRICING only (₹109 India vs $1.10
-/// international). It has no bearing on how the OTP is delivered — that is the
-/// user's own choice, see [OtpChannel].
+/// international). It has no bearing on identity: every user, in every country,
+/// signs up by email OTP.
 class _Country {
   final String code;
   final String name;
@@ -54,27 +54,10 @@ class _SignupScreenState extends State<SignupScreen> {
   final _controller = TextEditingController();
   _Country _country = _kCountries.first;
 
-  /// Email for every country, India included: SMS is not provisioned yet
-  /// (DLT/TRAI registration pending), so email is the only channel that
-  /// actually delivers today. The user can still switch.
-  OtpChannel _channel = OtpChannel.email;
-
   @override
   void dispose() {
     _controller.dispose();
     super.dispose();
-  }
-
-  bool get _usesPhone => _channel == OtpChannel.phone;
-
-  void _selectChannel(OtpChannel channel) {
-    if (channel == _channel) return;
-    setState(() {
-      _channel = channel;
-      // Email and phone are different inputs — never carry one over.
-      _controller.clear();
-    });
-    context.read<AuthProvider>().clearError();
   }
 
   /// `context.tr()` watches SettingsProvider, which is only legal inside
@@ -86,15 +69,6 @@ class _SignupScreenState extends State<SignupScreen> {
 
   String? _validate(String? raw) {
     final value = (raw ?? '').trim();
-    if (_usesPhone) {
-      final digits = value.replaceAll(RegExp(r'\D'), '');
-      // Indian subscriber numbers are 10 digits starting 6-9; elsewhere the
-      // national part varies, so only a loose length check is possible.
-      final ok = _country.code == 'IN'
-          ? RegExp(r'^[6-9]\d{9}$').hasMatch(digits)
-          : digits.length >= 6 && digits.length <= 14;
-      return ok ? null : _t('auth_phone_invalid');
-    }
     final ok = RegExp(r'^[\w.+-]+@[\w-]+\.[\w.-]+$').hasMatch(value);
     return ok ? null : _t('auth_email_invalid');
   }
@@ -106,15 +80,11 @@ class _SignupScreenState extends State<SignupScreen> {
     final auth = context.read<AuthProvider>();
     final value = _controller.text.trim();
 
-    // The country selector is the sole source of `profiles.country_code`, on
-    // every channel — it is pricing data, not routing data.
+    // The country selector is the sole source of `profiles.country_code` — it
+    // is pricing data, and it has never been routing data.
     auth.countryCode = _country.code;
 
-    final identifier = _usesPhone
-        ? '${_country.dial}${value.replaceAll(RegExp(r'\D'), '')}'
-        : value;
-    final sent =
-        await auth.startSignup(identifier: identifier, channel: _channel);
+    final sent = await auth.startSignup(identifier: value);
 
     if (!mounted || !sent) return;
     Navigator.of(context).pushNamed('/otp');
@@ -154,24 +124,9 @@ class _SignupScreenState extends State<SignupScreen> {
                 _countryField(),
                 const SizedBox(height: 20),
 
-                _label(context.tr('auth_channel_label')),
-                const SizedBox(height: 8),
-                _channelToggle(),
-                const SizedBox(height: 20),
-
-                _label(_usesPhone
-                    ? context.tr('auth_phone_hint')
-                    : context.tr('auth_email_hint')),
+                _label(context.tr('auth_email_hint')),
                 const SizedBox(height: 8),
                 _identifierField(),
-                if (_usesPhone) ...[
-                  const SizedBox(height: 8),
-                  Text(
-                    context.tr('auth_mobile_unavailable_hint'),
-                    style: const TextStyle(
-                        color: _C.muted, fontSize: 11.5, height: 1.45),
-                  ),
-                ],
                 const SizedBox(height: 20),
 
                 if (auth.errorKey != null) ...[
@@ -251,11 +206,7 @@ class _SignupScreenState extends State<SignupScreen> {
             style: const TextStyle(color: _C.text, fontSize: 15),
             onChanged: (c) {
               if (c == null) return;
-              setState(() {
-                _country = c;
-                // Email and phone are different inputs — never carry one over.
-                _controller.clear();
-              });
+              setState(() => _country = c);
               context.read<AuthProvider>()
                 ..countryCode = c.code
                 ..clearError();
@@ -276,89 +227,18 @@ class _SignupScreenState extends State<SignupScreen> {
         ),
       );
 
-  /// Email / Mobile segmented control. Independent of the country selector
-  /// above it: country is pricing, this is delivery.
-  Widget _channelToggle() => Container(
-        padding: const EdgeInsets.all(4),
-        decoration: BoxDecoration(
-          color: _C.card,
-          border: Border.all(color: _C.border),
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Row(
-          children: [
-            Expanded(
-              child: _channelTab(
-                  OtpChannel.email, context.tr('auth_channel_email')),
-            ),
-            const SizedBox(width: 4),
-            Expanded(
-              child: _channelTab(
-                  OtpChannel.phone, context.tr('auth_channel_mobile')),
-            ),
-          ],
-        ),
-      );
-
-  Widget _channelTab(OtpChannel channel, String label) {
-    final selected = _channel == channel;
-    return Material(
-      color: selected ? _C.cyan.withValues(alpha: 0.14) : Colors.transparent,
-      borderRadius: BorderRadius.circular(9),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(9),
-        onTap: () => _selectChannel(channel),
-        child: Container(
-          height: 40,
-          alignment: Alignment.center,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(9),
-            border: Border.all(
-                color: selected ? _C.cyan.withValues(alpha: 0.55) : Colors.transparent),
-          ),
-          child: Text(
-            label,
-            overflow: TextOverflow.ellipsis,
-            style: TextStyle(
-              color: selected ? _C.cyan : _C.muted,
-              fontSize: 13.5,
-              fontWeight: selected ? FontWeight.w800 : FontWeight.w600,
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
   Widget _identifierField() => TextFormField(
         controller: _controller,
         validator: _validate,
         autovalidateMode: AutovalidateMode.onUserInteraction,
-        keyboardType:
-            _usesPhone ? TextInputType.phone : TextInputType.emailAddress,
-        inputFormatters: _usesPhone
-            ? [FilteringTextInputFormatter.digitsOnly, LengthLimitingTextInputFormatter(14)]
-            : [LengthLimitingTextInputFormatter(254)],
+        keyboardType: TextInputType.emailAddress,
+        inputFormatters: [LengthLimitingTextInputFormatter(254)],
         style: const TextStyle(color: _C.text, fontSize: 15),
         cursorColor: _C.cyan,
         decoration: InputDecoration(
           filled: true,
           fillColor: _C.card,
-          prefixIcon: _usesPhone
-              ? Padding(
-                  padding: const EdgeInsetsDirectional.only(start: 14, end: 8),
-                  child: Text(
-                    _country.dial,
-                    style: const TextStyle(
-                        color: _C.muted, fontSize: 15, fontWeight: FontWeight.w700),
-                  ),
-                )
-              : null,
-          prefixIconConstraints:
-              const BoxConstraints(minWidth: 0, minHeight: 0),
-          hintText: _usesPhone
-              ? context.tr('auth_phone_hint')
-              : context.tr('auth_email_hint'),
+          hintText: context.tr('auth_email_hint'),
           hintStyle: const TextStyle(color: _C.muted, fontSize: 14),
           errorStyle: const TextStyle(color: _C.red, fontSize: 12),
           contentPadding:

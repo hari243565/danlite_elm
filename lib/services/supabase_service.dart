@@ -51,7 +51,6 @@ class AuthMessages {
 
   static const String otpInvalid = 'auth_err_otp_invalid';
   static const String rateLimited = 'auth_err_rate_limited';
-  static const String smsUnavailable = 'auth_err_sms_unavailable';
   static const String unknown = 'auth_err_unknown';
 }
 
@@ -288,14 +287,6 @@ class SupabaseService {
   Future<AuthResult> signInWithEmailOtp(String email, {String? countryCode}) =>
       _sendEmailOtp(email, countryCode: countryCode);
 
-  Future<AuthResult> signUpWithPhoneOtp(String phoneE164,
-          {String? countryCode}) =>
-      _sendPhoneOtp(phoneE164, countryCode: countryCode);
-
-  Future<AuthResult> signInWithPhoneOtp(String phoneE164,
-          {String? countryCode}) =>
-      _sendPhoneOtp(phoneE164, countryCode: countryCode);
-
   /// Signup metadata for the `data:` payload of [GoTrueClient.signInWithOtp].
   ///
   /// GoTrue writes this to `auth.users.raw_user_meta_data` when the row is
@@ -334,23 +325,7 @@ class SupabaseService {
       );
       return const AuthResult.otpSent();
     } catch (e) {
-      return AuthResult.failure(_sendErrorKey(e, isPhone: false));
-    }
-  }
-
-  Future<AuthResult> _sendPhoneOtp(String phoneE164,
-      {String? countryCode}) async {
-    final blocked = _configGuard();
-    if (blocked != null) return blocked;
-    try {
-      await _auth.signInWithOtp(
-        phone: phoneE164,
-        shouldCreateUser: true,
-        data: _signupMetadata(countryCode),
-      );
-      return const AuthResult.otpSent();
-    } catch (e) {
-      return AuthResult.failure(_sendErrorKey(e, isPhone: true));
+      return AuthResult.failure(_sendErrorKey(e));
     }
   }
 
@@ -372,27 +347,7 @@ class SupabaseService {
           ? const AuthResult.success()
           : const AuthResult.failure(AuthMessages.otpInvalid);
     } catch (e) {
-      return AuthResult.failure(_verifyErrorKey(e, isPhone: false));
-    }
-  }
-
-  Future<AuthResult> verifyPhoneOtp({
-    required String phoneE164,
-    required String token,
-  }) async {
-    final blocked = _configGuard();
-    if (blocked != null) return blocked;
-    try {
-      final res = await _auth.verifyOTP(
-        phone: phoneE164,
-        token: token,
-        type: OtpType.sms,
-      );
-      return res.session != null
-          ? const AuthResult.success()
-          : const AuthResult.failure(AuthMessages.otpInvalid);
-    } catch (e) {
-      return AuthResult.failure(_verifyErrorKey(e, isPhone: true));
+      return AuthResult.failure(_verifyErrorKey(e));
     }
   }
 
@@ -426,7 +381,8 @@ class SupabaseService {
   // internet problem: Supabase returns 500 when GoTrue's *mail sender* fails,
   // so a perfectly healthy device was told to check its internet. The presence
   // of `statusCode` is the discriminator, and it is the only thing separating
-  // those two branches.
+  // those two branches: no statusCode is [AuthMessages.network], a statusCode
+  // falls through to [AuthMessages.unknown] at the end of [_sendErrorKey].
 
   /// A genuine transport failure — nothing reached the server. This is the only
   /// condition allowed to produce [AuthMessages.network].
@@ -438,32 +394,11 @@ class SupabaseService {
     return e is AuthRetryableFetchException && e.statusCode == null;
   }
 
-  /// The connection worked; the server answered 5xx. Never a network fault.
-  bool _isServerFault(Object e) =>
-      e is AuthRetryableFetchException && e.statusCode != null;
-
   bool _isRateLimited(Object e) =>
       e is AuthException &&
-      // Covers over_email_send_rate_limit, over_sms_send_rate_limit and the
-      // generic over_request_rate_limit.
+      // Covers over_email_send_rate_limit and the generic
+      // over_request_rate_limit.
       (e.statusCode == '429' || (e.code ?? '').contains('rate_limit'));
-
-  /// The SMS channel is not provisioned. Twilio is selected on the project but
-  /// carries no credentials (DLT/TRAI registration pending), so GoTrue rejects
-  /// every phone send. Telling the user to use email is the only useful copy.
-  bool _isSmsUnavailable(Object e, bool isPhone) {
-    if (!isPhone) return false;
-    if (e is! AuthException) return false;
-    final code = e.code ?? '';
-    if (code == 'sms_send_failed' ||
-        code == 'phone_provider_disabled' ||
-        code == 'validation_failed' && e.message.toLowerCase().contains('phone')) {
-      return true;
-    }
-    // A 5xx on the phone channel is the provider failing to dispatch; on the
-    // email channel the same status means the mail sender, handled separately.
-    return _isServerFault(e);
-  }
 
   /// 400/401/403 — the request itself was refused. A bad or revoked anon key, a
   /// disabled provider, a malformed payload. Configuration, not connectivity.
@@ -485,7 +420,7 @@ class SupabaseService {
   /// the shape of the exception, never on which entry point was called, so the
   /// two flows return byte-identical copy. Any code that would betray an
   /// existing account is folded into the generic bucket first.
-  String _sendErrorKey(Object e, {required bool isPhone}) {
+  String _sendErrorKey(Object e) {
     _log('send', e);
 
     if (e is AuthException && _enumerationCodes.contains(e.code)) {
@@ -495,24 +430,22 @@ class SupabaseService {
     if (AppConfig.validate() != ConfigStatus.ok) return AuthMessages.config;
     if (_isTransportFailure(e)) return AuthMessages.network;
     if (_isRateLimited(e)) return AuthMessages.rateLimited;
-    if (_isSmsUnavailable(e, isPhone)) return AuthMessages.smsUnavailable;
     if (_isRejected(e)) return AuthMessages.credentials;
 
-    // Everything left over, including a 5xx on the email channel. That one is
-    // almost always GoTrue's mail sender refusing the send; it is a backend
-    // problem, so the honest copy is the generic one — never "no connection".
+    // Everything left over, including a 5xx. That one is almost always GoTrue's
+    // mail sender refusing the send; it is a backend problem, so the honest
+    // copy is the generic one — never "no connection".
     return AuthMessages.unknown;
   }
 
   /// Verify path: the identifier is already known to the caller at this point,
   /// so telling the user their code was wrong or expired leaks nothing.
-  String _verifyErrorKey(Object e, {required bool isPhone}) {
+  String _verifyErrorKey(Object e) {
     _log('verify', e);
 
     if (AppConfig.validate() != ConfigStatus.ok) return AuthMessages.config;
     if (_isTransportFailure(e)) return AuthMessages.network;
     if (_isRateLimited(e)) return AuthMessages.rateLimited;
-    if (_isSmsUnavailable(e, isPhone)) return AuthMessages.smsUnavailable;
 
     // On this endpoint a 4xx means the code itself did not work — wrong or
     // expired, which are not worth distinguishing to the user. This is checked

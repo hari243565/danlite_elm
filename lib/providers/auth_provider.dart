@@ -21,12 +21,6 @@ const String kSessionSupersededMessageKey = 'session_superseded_body';
 /// SDK reports its first state — the auth gate shows the splash meanwhile.
 enum AuthStatus { unknown, signedOut, awaitingOtp, signedIn }
 
-/// How a one-time code is delivered. This is the user's own choice on the
-/// sign-up / log-in screens and is deliberately independent of [countryCode],
-/// which only drives pricing. SMS is not provisioned in India yet (DLT/TRAI
-/// registration pending), so the screens default everyone to email.
-enum OtpChannel { email, phone }
-
 class AuthProvider extends ChangeNotifier {
   AuthProvider({SupabaseService? service, SessionService? sessions})
       : _svc = service ?? SupabaseService.instance,
@@ -58,16 +52,13 @@ class AuthProvider extends ChangeNotifier {
   String? _errorKey;
   String? get errorKey => _errorKey;
 
-  /// The email or E.164 phone the pending OTP went to.
+  /// The email address the pending OTP went to.
   String? _pendingIdentifier;
   String? get pendingIdentifier => _pendingIdentifier;
 
-  OtpChannel? _pendingChannel;
-  OtpChannel? get pendingChannel => _pendingChannel;
-
   /// ISO-3166 alpha-2, e.g. 'IN'. Chosen on the sign-up screen. It decides
-  /// pricing only (₹109 India vs $1.10 international) and never the OTP
-  /// channel.
+  /// pricing only (₹109 India vs $1.10 international) and has never had any
+  /// bearing on how a user proves their identity.
   ///
   /// The client does not write it: `profiles.country_code` is set by the
   /// server-side `handle_new_user` trigger from the signup metadata, and
@@ -149,14 +140,12 @@ class AuthProvider extends ChangeNotifier {
       case AuthChangeEvent.initialSession:
         if (session != null) {
           _pendingIdentifier = null;
-          _pendingChannel = null;
           _set(AuthStatus.signedIn);
         } else if (_status != AuthStatus.awaitingOtp) {
           _set(AuthStatus.signedOut);
         }
       case AuthChangeEvent.signedOut:
         _pendingIdentifier = null;
-        _pendingChannel = null;
         // Normally null, and then this is an ordinary sign-out. When Phase 7
         // forced it, the login screen's existing error banner explains why —
         // no screen had to change to say it.
@@ -176,27 +165,18 @@ class AuthProvider extends ChangeNotifier {
 
   // ── Actions ───────────────────────────────────────────────────────────────
 
-  /// Signs up over the channel the user picked. [identifier] is an email
-  /// address for [OtpChannel.email], or an E.164 number (dial code already
-  /// attached) for [OtpChannel.phone]. The country selector is unrelated: it
-  /// is written through [countryCode] by the screen and only affects pricing.
-  Future<bool> startSignup({
-    required String identifier,
-    required OtpChannel channel,
-  }) =>
-      _dispatch(identifier.trim(), channel, isSignup: true);
+  /// Signs up by email OTP — the only way an account is ever created. The
+  /// country selector is unrelated: it is written through [countryCode] by the
+  /// screen and only affects pricing.
+  Future<bool> startSignup({required String identifier}) =>
+      _dispatch(identifier.trim(), isSignup: true);
 
-  /// Logs in over the channel the user picked, same identifier rules as
-  /// [startSignup].
-  Future<bool> login({
-    required String identifier,
-    required OtpChannel channel,
-  }) =>
-      _dispatch(identifier.trim(), channel, isSignup: false);
+  /// Logs in by email OTP, same identifier rules as [startSignup].
+  Future<bool> login({required String identifier}) =>
+      _dispatch(identifier.trim(), isSignup: false);
 
   Future<bool> _dispatch(
-    String identifier,
-    OtpChannel channel, {
+    String identifier, {
     required bool isSignup,
   }) async {
     _beginBusy();
@@ -216,23 +196,15 @@ class AuthProvider extends ChangeNotifier {
     // payload; `isSignup` only picks which service method name is used, so the
     // two flows are indistinguishable on the wire.
     //
-    // `countryCode` rides along on all four, log-in included: omitting it on
+    // `countryCode` rides along on both, log-in included: omitting it on
     // log-in would make the two requests differ on the wire. The server only
     // reads it when it creates the auth user, so it is inert on a log-in.
-    final AuthResult res;
-    if (channel == OtpChannel.email) {
-      res = isSignup
-          ? await _svc.signUpWithEmailOtp(identifier, countryCode: _countryCode)
-          : await _svc.signInWithEmailOtp(identifier, countryCode: _countryCode);
-    } else {
-      res = isSignup
-          ? await _svc.signUpWithPhoneOtp(identifier, countryCode: _countryCode)
-          : await _svc.signInWithPhoneOtp(identifier, countryCode: _countryCode);
-    }
+    final AuthResult res = isSignup
+        ? await _svc.signUpWithEmailOtp(identifier, countryCode: _countryCode)
+        : await _svc.signInWithEmailOtp(identifier, countryCode: _countryCode);
 
     if (res.ok && res.needsOtp) {
       _pendingIdentifier = identifier;
-      _pendingChannel = channel;
       _errorKey = null;
       _busy = false;
       _set(AuthStatus.awaitingOtp);
@@ -250,7 +222,6 @@ class AuthProvider extends ChangeNotifier {
         StackTrace.current,
         context: {
           'stage': isSignup ? 'signup' : 'login',
-          'channel': channel.name,
           'classification': res.messageKey ?? 'none',
         },
       );
@@ -263,9 +234,8 @@ class AuthProvider extends ChangeNotifier {
   /// Re-sends the code to the pending identifier. The screen owns the cooldown.
   Future<bool> resendOtp() async {
     final id = _pendingIdentifier;
-    final channel = _pendingChannel;
-    if (id == null || channel == null) return false;
-    return _dispatch(id, channel, isSignup: false);
+    if (id == null) return false;
+    return _dispatch(id, isSignup: false);
   }
 
   /// Verifies the 6-digit code. On success [status] becomes
@@ -273,8 +243,7 @@ class AuthProvider extends ChangeNotifier {
   /// moments later and is idempotent.
   Future<bool> verifyOtp(String code) async {
     final id = _pendingIdentifier;
-    final channel = _pendingChannel;
-    if (id == null || channel == null) {
+    if (id == null) {
       _errorKey = AuthMessages.unknown;
       notifyListeners();
       return false;
@@ -288,9 +257,7 @@ class AuthProvider extends ChangeNotifier {
     }
 
     _beginBusy();
-    final res = channel == OtpChannel.email
-        ? await _svc.verifyEmailOtp(email: id, token: code.trim())
-        : await _svc.verifyPhoneOtp(phoneE164: id, token: code.trim());
+    final res = await _svc.verifyEmailOtp(email: id, token: code.trim());
 
     _busy = false;
     if (res.ok) {
@@ -322,7 +289,6 @@ class AuthProvider extends ChangeNotifier {
         'otp verification failed',
         StackTrace.current,
         context: {
-          'channel': channel.name,
           'classification': res.messageKey ?? 'none',
         },
       );
@@ -336,7 +302,6 @@ class AuthProvider extends ChangeNotifier {
     await _sessions.clearSession();
     await _svc.signOut();
     _pendingIdentifier = null;
-    _pendingChannel = null;
     _errorKey = null;
     _busy = false;
     _set(AuthStatus.signedOut);

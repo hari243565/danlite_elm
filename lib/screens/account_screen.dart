@@ -233,8 +233,6 @@ class _AccountScreenState extends State<AccountScreen> {
     final facts = _facts;
 
     final identifier = accountIdentifierOf(auth);
-    final isPhone = (user?.email?.isEmpty ?? true) &&
-        (user?.phone?.isNotEmpty ?? false);
 
     return Scaffold(
       backgroundColor: AppColors.bgPrimary,
@@ -245,7 +243,7 @@ class _AccountScreenState extends State<AccountScreen> {
       body: ListView(
         padding: const EdgeInsets.only(bottom: 40),
         children: [
-          _IdentityHeader(identifier: identifier, isPhone: isPhone),
+          _IdentityHeader(identifier: identifier),
 
           // ── Membership ────────────────────────────────────────────────
           _SectionHeader(
@@ -287,8 +285,7 @@ class _AccountScreenState extends State<AccountScreen> {
             padded: false,
             child: Column(children: [
               _DetailRow(
-                label: context.tr(
-                    isPhone ? 'account_phone_label' : 'account_email_label'),
+                label: context.tr('account_email_label'),
                 value: identifier,
               ),
               if (facts?.countryCode != null)
@@ -383,17 +380,15 @@ class _AccountScreenState extends State<AccountScreen> {
 String accountIdentifierOf(AuthProvider auth) {
   final user = auth.user;
   if (user?.email?.isNotEmpty ?? false) return user!.email!;
-  if (user?.phone?.isNotEmpty ?? false) return user!.phone!;
   return auth.pendingIdentifier ?? '—';
 }
 
 // ── Identity header ─────────────────────────────────────────────────────────
 
 class _IdentityHeader extends StatelessWidget {
-  const _IdentityHeader({required this.identifier, required this.isPhone});
+  const _IdentityHeader({required this.identifier});
 
   final String identifier;
-  final bool isPhone;
 
   @override
   Widget build(BuildContext context) => Padding(
@@ -409,16 +404,13 @@ class _IdentityHeader extends StatelessWidget {
                   color: AppColors.navyMid.withValues(alpha: 0.12), width: 2),
             ),
             alignment: Alignment.center,
-            child: isPhone
-                ? const Icon(Icons.smartphone_rounded,
-                    color: AppColors.navyMid, size: 34)
-                : Text(
-                    _initials(identifier),
-                    style: const TextStyle(
-                        fontSize: 30,
-                        fontWeight: FontWeight.w700,
-                        color: AppColors.navyMid),
-                  ),
+            child: Text(
+              _initials(identifier),
+              style: const TextStyle(
+                  fontSize: 30,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.navyMid),
+            ),
           ),
           const SizedBox(height: 14),
           Text(
@@ -438,9 +430,7 @@ class _IdentityHeader extends StatelessWidget {
                 color: AppColors.navyMid.withValues(alpha: 0.07),
                 borderRadius: BorderRadius.circular(999)),
             child: Text(
-              context.tr(isPhone
-                  ? 'account_signed_in_via_mobile'
-                  : 'account_signed_in_via_email'),
+              context.tr('account_signed_in_via_email'),
               style: const TextStyle(
                   fontSize: 11,
                   fontWeight: FontWeight.w600,

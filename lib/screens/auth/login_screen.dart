@@ -30,26 +30,10 @@ class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
   final _controller = TextEditingController();
 
-  /// Same default as sign-up: email, for everyone. SMS is not provisioned in
-  /// India yet (DLT/TRAI registration pending).
-  OtpChannel _channel = OtpChannel.email;
-
   @override
   void dispose() {
     _controller.dispose();
     super.dispose();
-  }
-
-  bool get _usesPhone => _channel == OtpChannel.phone;
-
-  void _selectChannel(OtpChannel channel) {
-    if (channel == _channel) return;
-    setState(() {
-      _channel = channel;
-      // Email and phone are different inputs — never carry one over.
-      _controller.clear();
-    });
-    context.read<AuthProvider>().clearError();
   }
 
   /// See the note in signup_screen.dart: `context.tr()` watches and is only
@@ -59,31 +43,9 @@ class _LoginScreenState extends State<LoginScreen> {
 
   String? _validate(String? raw) {
     final value = (raw ?? '').trim();
-    if (!_usesPhone) {
-      return RegExp(r'^[\w.+-]+@[\w-]+\.[\w.-]+$').hasMatch(value)
-          ? null
-          : _t('auth_email_invalid');
-    }
-    final digits = value.replaceAll(RegExp(r'\D'), '');
-    // Log-in has no country selector — country is fixed on the profile at
-    // sign-up. A bare 10-digit number is assumed Indian and gets the +91 dial
-    // code; anything else must already be in international +<dial><number>
-    // form.
-    if (value.startsWith('+')) {
-      return digits.length >= 8 && digits.length <= 15
-          ? null
-          : _t('auth_phone_invalid');
-    }
-    return RegExp(r'^[6-9]\d{9}$').hasMatch(digits)
+    return RegExp(r'^[\w.+-]+@[\w-]+\.[\w.-]+$').hasMatch(value)
         ? null
-        : _t('auth_phone_invalid');
-  }
-
-  /// Normalises what the user typed into an E.164 number.
-  String _normalisePhone(String raw) {
-    final value = raw.trim();
-    final digits = value.replaceAll(RegExp(r'\D'), '');
-    return value.startsWith('+') ? '+$digits' : '+91$digits';
+        : _t('auth_email_invalid');
   }
 
   Future<void> _submit() async {
@@ -91,69 +53,10 @@ class _LoginScreenState extends State<LoginScreen> {
     if (!(_formKey.currentState?.validate() ?? false)) return;
 
     final auth = context.read<AuthProvider>();
-    final value = _controller.text.trim();
-    final sent = await auth.login(
-      identifier: _usesPhone ? _normalisePhone(value) : value,
-      channel: _channel,
-    );
+    final sent = await auth.login(identifier: _controller.text.trim());
 
     if (!mounted || !sent) return;
     Navigator.of(context).pushNamed('/otp');
-  }
-
-  /// Email / Mobile segmented control — mirrors the sign-up screen.
-  Widget _channelToggle() => Container(
-        padding: const EdgeInsets.all(4),
-        decoration: BoxDecoration(
-          color: _C.card,
-          border: Border.all(color: _C.border),
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Row(
-          children: [
-            Expanded(
-              child: _channelTab(
-                  OtpChannel.email, context.tr('auth_channel_email')),
-            ),
-            const SizedBox(width: 4),
-            Expanded(
-              child: _channelTab(
-                  OtpChannel.phone, context.tr('auth_channel_mobile')),
-            ),
-          ],
-        ),
-      );
-
-  Widget _channelTab(OtpChannel channel, String label) {
-    final selected = _channel == channel;
-    return Material(
-      color: selected ? _C.cyan.withValues(alpha: 0.14) : Colors.transparent,
-      borderRadius: BorderRadius.circular(9),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(9),
-        onTap: () => _selectChannel(channel),
-        child: Container(
-          height: 40,
-          alignment: Alignment.center,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(9),
-            border: Border.all(
-                color: selected
-                    ? _C.cyan.withValues(alpha: 0.55)
-                    : Colors.transparent),
-          ),
-          child: Text(
-            label,
-            overflow: TextOverflow.ellipsis,
-            style: TextStyle(
-              color: selected ? _C.cyan : _C.muted,
-              fontSize: 13.5,
-              fontWeight: selected ? FontWeight.w800 : FontWeight.w600,
-            ),
-          ),
-        ),
-      ),
-    );
   }
 
   @override
@@ -205,22 +108,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 const SizedBox(height: 28),
 
                 Text(
-                  context.tr('auth_channel_label').toUpperCase(),
-                  style: const TextStyle(
-                      color: _C.muted,
-                      fontSize: 10,
-                      fontWeight: FontWeight.w800,
-                      letterSpacing: 1.1),
-                ),
-                const SizedBox(height: 8),
-                _channelToggle(),
-                const SizedBox(height: 20),
-
-                Text(
-                  (_usesPhone
-                          ? context.tr('auth_phone_hint')
-                          : context.tr('auth_email_hint'))
-                      .toUpperCase(),
+                  context.tr('auth_email_hint').toUpperCase(),
                   style: const TextStyle(
                       color: _C.muted,
                       fontSize: 10,
@@ -232,19 +120,14 @@ class _LoginScreenState extends State<LoginScreen> {
                   controller: _controller,
                   validator: _validate,
                   autovalidateMode: AutovalidateMode.onUserInteraction,
-                  keyboardType:
-                      _usesPhone ? TextInputType.phone : TextInputType.emailAddress,
-                  inputFormatters: [
-                    LengthLimitingTextInputFormatter(_usesPhone ? 16 : 254)
-                  ],
+                  keyboardType: TextInputType.emailAddress,
+                  inputFormatters: [LengthLimitingTextInputFormatter(254)],
                   style: const TextStyle(color: _C.text, fontSize: 15),
                   cursorColor: _C.cyan,
                   decoration: InputDecoration(
                     filled: true,
                     fillColor: _C.card,
-                    hintText: _usesPhone
-                        ? context.tr('auth_phone_hint')
-                        : context.tr('auth_email_hint'),
+                    hintText: context.tr('auth_email_hint'),
                     hintStyle: const TextStyle(color: _C.muted, fontSize: 14),
                     errorStyle: const TextStyle(color: _C.red, fontSize: 12),
                     contentPadding: const EdgeInsets.symmetric(
@@ -267,14 +150,6 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ),
                 ),
-                if (_usesPhone) ...[
-                  const SizedBox(height: 8),
-                  Text(
-                    context.tr('auth_mobile_unavailable_hint'),
-                    style: const TextStyle(
-                        color: _C.muted, fontSize: 11.5, height: 1.45),
-                  ),
-                ],
                 const SizedBox(height: 20),
 
                 if (auth.errorKey != null) ...[

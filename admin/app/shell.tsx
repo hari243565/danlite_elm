@@ -17,6 +17,7 @@ const NAV = [
   { href: '/users', label: 'Users' },
   { href: '/payments', label: 'Payments' },
   { href: '/audit-log', label: 'Audit log' },
+  { href: '/mission-control', label: 'Mission Control' },
 ] as const;
 
 export function Shell({
