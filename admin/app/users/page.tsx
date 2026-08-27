@@ -14,7 +14,7 @@
 import Link from 'next/link';
 import type { Metadata } from 'next';
 import { callAdminFn, getAdminSession, type UserList } from '@/lib/admin-api';
-import { C, FONT, inputStyle, MONO, when } from '@/lib/theme';
+import { C, FONT, fullName, inputStyle, MONO, when } from '@/lib/theme';
 import { NOINDEX } from '@/lib/seo';
 import { ErrorCard, Section, Shell, StatusPill, Table, tdStyle } from '../shell';
 
@@ -87,7 +87,7 @@ export default async function UsersPage({
             type="search"
             name="q"
             defaultValue={search}
-            placeholder="Search email, phone or country…"
+            placeholder="Search name, email, phone or country…"
             style={{ ...inputStyle, flex: '1 1 260px', width: 'auto', fontSize: 13.5 }}
           />
           <select
@@ -141,7 +141,7 @@ export default async function UsersPage({
         </form>
 
         <Table
-          headers={['Email', 'Phone', 'Country', 'Licence', 'Purchased', 'Signed up', '']}
+          headers={['Name', 'Email', 'Phone', 'Country', 'Licence', 'Purchased', 'Signed up', '']}
           isEmpty={users.length === 0}
           empty={
             search || status
@@ -151,6 +151,11 @@ export default async function UsersPage({
         >
           {users.map((u) => (
             <tr key={u.id}>
+              {/* Name first: it is what an operator handling a support email
+                  actually has in front of them. Accounts created before this
+                  field existed have none, and show an em-dash rather than a
+                  guess — their email is in the next column either way. */}
+              <td style={tdStyle}>{fullName(u) ?? '—'}</td>
               <td style={tdStyle}>
                 <Link href={`/users/${u.id}`} style={{ color: C.cyan, textDecoration: 'none' }}>
                   {u.email ?? '—'}

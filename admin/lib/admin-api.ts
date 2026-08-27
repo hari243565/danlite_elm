@@ -160,6 +160,8 @@ export type Overview = {
 export type UserRow = {
   id: string;
   email: string | null;
+  first_name: string | null;
+  last_name: string | null;
   phone: string | null;
   country_code: string | null;
   signup_platform: string | null;
@@ -186,6 +188,8 @@ export type UserDetail = {
   profile: {
     id: string;
     email: string | null;
+    first_name: string | null;
+    last_name: string | null;
     phone: string | null;
     country_code: string | null;
     signup_platform: string | null;

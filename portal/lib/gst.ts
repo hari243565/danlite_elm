@@ -119,3 +119,33 @@ export function priceFor(countryCode: string): Breakdown {
     note: `${GST_RATE_PERCENT}% GST added on top of the listed price.`,
   };
 }
+
+/**
+ * Who an invoice is made out to.
+ *
+ * The name the customer gave on the Create Account screen, or their email
+ * address when there is none. That fallback is not a nicety — a GST invoice
+ * has to name a recipient, and every account created before that screen
+ * collected a name has only an email to name them by. Nothing about those
+ * older invoices changes.
+ *
+ * It deliberately never falls back to the user id: an invoice that identifies
+ * its recipient by a UUID identifies them to nobody. `first_name` alone is a
+ * complete name here, not half of one — see the split note in
+ * signup_screen.dart.
+ */
+export function billedTo(
+  profile:
+    | { first_name?: string | null; last_name?: string | null; email?: string | null }
+    | null
+    | undefined,
+  fallbackEmail?: string | null,
+): string {
+  const parts = [profile?.first_name, profile?.last_name]
+    .map((p) => (p ?? '').trim())
+    .filter((p) => p.length > 0);
+  if (parts.length > 0) return parts.join(' ');
+
+  const email = (profile?.email ?? fallbackEmail ?? '').trim();
+  return email.length > 0 ? email : '—';
+}

@@ -24,7 +24,7 @@ import { redirect } from 'next/navigation';
 import { NOINDEX } from '@/lib/seo';
 import { C, cardStyle, pageStyle, legalLinkStyle, MONO } from '@/lib/theme';
 import { createClient } from '@/lib/supabase/server';
-import { formatMinor } from '@/lib/gst';
+import { billedTo, formatMinor } from '@/lib/gst';
 import StatusPoller from './status-poller';
 
 export const dynamic = 'force-dynamic';
@@ -96,6 +96,20 @@ export default async function ConfirmationPage({
 
   const payment = await readCapturedPayment(orderId);
 
+  // Who this receipt is made out to. Read only when there is a receipt to
+  // make out: a customer still waiting on the webhook is shown no payment
+  // detail at all, and this page does not need their name to say "waiting".
+  //
+  // Read as the user, under profiles_select_own, exactly like every other
+  // read on this page — the portal holds no service-role key.
+  const { data: billingProfile } = payment
+    ? await supabase
+        .from('profiles')
+        .select('first_name, last_name, email')
+        .eq('id', user.id)
+        .maybeSingle()
+    : { data: null };
+
   // The poller's read. Returns a boolean and nothing else: no payment detail
   // crosses this boundary, so the client cannot be handed a receipt it might
   // render before the server has confirmed one exists.
@@ -148,6 +162,10 @@ export default async function ConfirmationPage({
                 }}
               >
                 {[
+                  {
+                    k: 'Billed to',
+                    v: billedTo(billingProfile, user.email),
+                  },
                   {
                     k: 'Amount',
                     v: `${payment.currency} ${formatMinor(payment.amount_minor)}`,

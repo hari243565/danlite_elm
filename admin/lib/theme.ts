@@ -121,3 +121,21 @@ export function when(iso: string | null | undefined): string {
     minute: '2-digit',
   });
 }
+
+/**
+ * first_name + last_name as one line, or null when neither is set.
+ *
+ * Null, not '—', on purpose: every caller here needs to distinguish "this
+ * customer told us their name" from "this account predates the name field",
+ * because the two get different fallbacks. Accounts created before the Create
+ * Account screen collected a name have neither column, and there is nothing
+ * dishonest about showing their email instead.
+ */
+export function fullName(
+  who: { first_name?: string | null; last_name?: string | null } | null | undefined,
+): string | null {
+  const parts = [who?.first_name, who?.last_name]
+    .map((p) => (p ?? '').trim())
+    .filter((p) => p.length > 0);
+  return parts.length > 0 ? parts.join(' ') : null;
+}

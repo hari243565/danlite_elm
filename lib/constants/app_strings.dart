@@ -353,6 +353,20 @@ class AppStrings {
       'auth_country_in': 'India',
       'auth_email_hint': 'Email address',
       'auth_email_invalid': 'Enter a valid email address',
+
+      // ── Name and contact phone (Create Account screen only) ──────────────
+      // Collected as data, never as an authentication factor, and used ONLY by
+      // signup_screen.dart — the log-in screen has no field for either. The
+      // phone note is a promise the code keeps rather than copy that softens
+      // it: nothing anywhere in this app sends anything to profiles.phone.
+      'auth_name_label': 'Full name',
+      'auth_name_hint': 'Your full name',
+      'auth_name_required': 'Please enter your name',
+      'auth_phone_label': 'Phone number (optional)',
+      'auth_phone_hint': '+91 98765 43210',
+      'auth_phone_invalid': 'Enter a valid phone number, or leave this blank',
+      'auth_phone_note':
+          'For support only. We never send codes or messages to this number.',
       'auth_create_account_cta': 'Create account',
       'auth_login_cta': 'Log in',
       'auth_have_account': 'Already have an account?',
@@ -533,6 +547,8 @@ class AppStrings {
 
       'account_details_title': 'Account details',
       'account_email_label': 'Email',
+      'account_name_label': 'Name',
+      'account_phone_label': 'Phone',
       'account_country_label': 'Country / Region',
       'account_created_label': 'Account created',
       // Shown only when a read could not be completed at all — not when a
@@ -820,6 +836,16 @@ class AppStrings {
       'auth_country_in': 'भारत',
       'auth_email_hint': 'ईमेल पता',
       'auth_email_invalid': 'मान्य ईमेल पता दर्ज करें',
+
+      // ── नाम और संपर्क फ़ोन (केवल "खाता बनाएं" स्क्रीन) ────────────────────
+      'auth_name_label': 'पूरा नाम',
+      'auth_name_hint': 'आपका पूरा नाम',
+      'auth_name_required': 'कृपया अपना नाम दर्ज करें',
+      'auth_phone_label': 'फ़ोन नंबर (वैकल्पिक)',
+      'auth_phone_hint': '+91 98765 43210',
+      'auth_phone_invalid': 'मान्य फ़ोन नंबर दर्ज करें, या इसे खाली छोड़ें',
+      'auth_phone_note':
+          'केवल सहायता के लिए। हम इस नंबर पर कोई कोड या संदेश कभी नहीं भेजते।',
       'auth_create_account_cta': 'खाता बनाएं',
       'auth_login_cta': 'लॉग इन करें',
       'auth_have_account': 'पहले से खाता है?',
@@ -941,6 +967,8 @@ class AppStrings {
 
       'account_details_title': 'खाता विवरण',
       'account_email_label': 'ईमेल',
+      'account_name_label': 'नाम',
+      'account_phone_label': 'फ़ोन',
       'account_country_label': 'देश / क्षेत्र',
       'account_created_label': 'खाता बना',
       'account_details_unavailable':

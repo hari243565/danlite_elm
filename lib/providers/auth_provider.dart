@@ -75,6 +75,45 @@ class AuthProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// The name and contact phone typed on the SIGN-UP screen, held in memory
+  /// only until the account they belong to has actually been verified.
+  ///
+  /// Staged rather than sent with the OTP request, deliberately.
+  /// [SupabaseService] attaches its signup metadata to the log-in path too, so
+  /// that a sign-up and a log-in are byte-identical on the wire and cannot be
+  /// used to tell a registered address from an unregistered one — and the
+  /// log-in screen has no name field whose value could be put in it. These are
+  /// written afterwards instead, by an authenticated update on the user's own
+  /// profile row through the grant and policy Phase 1 already created.
+  ///
+  /// The log-in path never sets them and [login] actively clears them, so a
+  /// returning customer's flow writes nothing and is unchanged in every
+  /// respect.
+  String? _pendingFirstName;
+  String? _pendingLastName;
+  String? _pendingPhone;
+
+  /// Called by the sign-up screen immediately before [startSignup].
+  ///
+  /// [phone] is contact data. It is never verified, never messaged, and never
+  /// used to identify anybody — no OTP, SMS or notification of any kind is
+  /// sent to it anywhere in this app.
+  void stageSignupDetails({
+    required String firstName,
+    String? lastName,
+    String? phone,
+  }) {
+    _pendingFirstName = firstName;
+    _pendingLastName = lastName;
+    _pendingPhone = phone;
+  }
+
+  void _clearStagedSignupDetails() {
+    _pendingFirstName = null;
+    _pendingLastName = null;
+    _pendingPhone = null;
+  }
+
   /// Stable-ish device identity, held in memory only. Phase 7 (single active
   /// session) is what registers devices; nothing is sent anywhere in Phase 2.
   String? _deviceFingerprint;
@@ -172,8 +211,18 @@ class AuthProvider extends ChangeNotifier {
       _dispatch(identifier.trim(), isSignup: true);
 
   /// Logs in by email OTP, same identifier rules as [startSignup].
-  Future<bool> login({required String identifier}) =>
-      _dispatch(identifier.trim(), isSignup: false);
+  ///
+  /// Clearing the staged sign-up details is the one thing this does that
+  /// [startSignup] does not. Someone who opened the sign-up screen, typed a
+  /// name, and then went to log in instead is logging into an account that
+  /// already exists — that name was for the account this flow is no longer
+  /// creating, and must not land on top of the real one. Note that [resendOtp]
+  /// calls [_dispatch] directly and therefore does NOT clear them: a resend
+  /// during sign-up is still that same sign-up.
+  Future<bool> login({required String identifier}) {
+    _clearStagedSignupDetails();
+    return _dispatch(identifier.trim(), isSignup: false);
+  }
 
   Future<bool> _dispatch(
     String identifier, {
@@ -273,6 +322,14 @@ class AuthProvider extends ChangeNotifier {
       // mode until the next successful claim.
       await _sessions.claimSession();
 
+      // Persist whatever the sign-up screen collected, on exactly the same
+      // terms as the claim above: it cannot fail this login, and it reports
+      // its own problems. Awaited rather than fired and forgotten because the
+      // caller navigates straight back to the gate and the account surfaces
+      // that read these columns rebuild moments later. On a log-in nothing is
+      // staged, so this returns without making a request.
+      await _saveStagedSignupDetails();
+
       // Set the status here rather than waiting for the SDK's broadcast event:
       // the caller navigates straight back to the gate, and the gate must not
       // still see `awaitingOtp` on that rebuild or it would bounce the user
@@ -297,8 +354,46 @@ class AuthProvider extends ChangeNotifier {
     return false;
   }
 
+  /// Writes the staged sign-up details, then forgets them either way.
+  ///
+  /// The result is deliberately not returned and cannot change the outcome of
+  /// [verifyOtp]. Somebody who has just proved who they are is signed in
+  /// whether or not their name reached the database.
+  Future<void> _saveStagedSignupDetails() async {
+    if (_pendingFirstName == null &&
+        _pendingLastName == null &&
+        _pendingPhone == null) {
+      return;
+    }
+
+    final ok = await _svc.saveProfileDetails(
+      firstName: _pendingFirstName,
+      lastName: _pendingLastName,
+      phone: _pendingPhone,
+    );
+
+    // Cleared unconditionally, success or failure. Keeping a customer's name
+    // and phone number alive in memory past the one moment they were needed is
+    // how they end up somewhere they were never meant to be.
+    _clearStagedSignupDetails();
+
+    if (!ok) {
+      debugPrint('[auth] signup details were not saved');
+      // Report-only (Phase 9) — see the note in [_dispatch]. Note what is NOT
+      // in the context map: no name, no phone number, no email address. The
+      // event records that a write failed and nothing at all about who it was
+      // for. See ErrorReportingService's PII rule.
+      ErrorReportingService.reportError(
+        'signup profile details write failed',
+        StackTrace.current,
+        context: const {'stage': 'signup_details'},
+      );
+    }
+  }
+
   Future<void> logout() async {
     _beginBusy();
+    _clearStagedSignupDetails();
     await _sessions.clearSession();
     await _svc.signOut();
     _pendingIdentifier = null;

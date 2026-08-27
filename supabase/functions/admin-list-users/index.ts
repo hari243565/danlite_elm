@@ -100,13 +100,20 @@ Deno.serve(async (req: Request): Promise<Response> => {
     // silently hide exactly the people an admin most often goes looking for.
     let query = admin
       .from("profiles")
-      .select("id, email, phone, country_code, signup_platform, created_at, deleted_at", {
+      .select("id, email, first_name, last_name, phone, country_code, signup_platform, created_at, deleted_at", {
         count: "exact",
       });
 
     if (search) {
+      // Name is searchable for the same reason it is now displayed: an
+      // operator handling a support email has a person's name in front of
+      // them far more often than their account's email address. The same
+      // sanitizeTerm() escaping covers these two columns — see its note; the
+      // term is still never interpolated raw into a PostgREST filter.
       query = query.or(
-        `email.ilike.%${search}%,phone.ilike.%${search}%,country_code.ilike.%${search}%`,
+        `email.ilike.%${search}%,first_name.ilike.%${search}%,` +
+          `last_name.ilike.%${search}%,phone.ilike.%${search}%,` +
+          `country_code.ilike.%${search}%`,
       );
     }
 
@@ -187,6 +194,8 @@ Deno.serve(async (req: Request): Promise<Response> => {
       return {
         id: u.id,
         email: u.email,
+        first_name: u.first_name,
+        last_name: u.last_name,
         phone: u.phone,
         country_code: u.country_code,
         signup_platform: u.signup_platform,

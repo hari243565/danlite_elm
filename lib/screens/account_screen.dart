@@ -98,6 +98,8 @@ const Map<String, String> _kCountryNames = {
 /// omits the corresponding line rather than printing an empty one.
 class _AccountFacts {
   const _AccountFacts({
+    this.fullName,
+    this.phone,
     this.countryCode,
     this.accountCreatedAt,
     this.purchasedAt,
@@ -105,6 +107,12 @@ class _AccountFacts {
     this.failed = false,
   });
 
+  /// The name and contact phone collected on the Create Account screen, or
+  /// null for an account that predates it. [fullName] is already joined for
+  /// display — the two columns exist because the database has two, not
+  /// because this screen wants them apart.
+  final String? fullName;
+  final String? phone;
   final String? countryCode;
   final DateTime? accountCreatedAt;
   final DateTime? purchasedAt;
@@ -163,7 +171,7 @@ class _AccountScreenState extends State<AccountScreen> {
       // nothing.
       final profile = await client
           .from('profiles')
-          .select('country_code, created_at')
+          .select('first_name, last_name, phone, country_code, created_at')
           .eq('id', uid)
           .maybeSingle();
       final licence = await client
@@ -175,6 +183,8 @@ class _AccountScreenState extends State<AccountScreen> {
       if (!mounted) return;
       setState(() {
         _facts = _AccountFacts(
+          fullName: _joinName(profile),
+          phone: profile?['phone'] as String?,
           countryCode: profile?['country_code'] as String?,
           accountCreatedAt: _parseTs(profile?['created_at']),
           purchasedAt: _parseTs(licence?['purchased_at']),
@@ -215,6 +225,19 @@ class _AccountScreenState extends State<AccountScreen> {
     final info = await AppVersionService.load();
     final label = AppVersionService.versionWithBuildOf(info);
     if (label != null && mounted) setState(() => _appVersion = label);
+  }
+
+  /// first_name + last_name as one line, or null when the account predates
+  /// the Create Account screen's name field and has neither.
+  ///
+  /// Rejoined here rather than stored joined, so that the two columns stay the
+  /// authority and this screen stays a view of them. `last_name` is null for a
+  /// single-token name, which is the normal case and not a missing value.
+  static String? _joinName(Map<String, dynamic>? profile) {
+    final parts = ['first_name', 'last_name']
+        .map((k) => (profile?[k] as String?)?.trim() ?? '')
+        .where((s) => s.isNotEmpty);
+    return parts.isEmpty ? null : parts.join(' ');
   }
 
   static DateTime? _parseTs(Object? value) {
@@ -284,10 +307,20 @@ class _AccountScreenState extends State<AccountScreen> {
           _Card(
             padded: false,
             child: Column(children: [
+              if (facts?.fullName != null)
+                _DetailRow(
+                  label: context.tr('account_name_label'),
+                  value: facts!.fullName!,
+                ),
               _DetailRow(
                 label: context.tr('account_email_label'),
                 value: identifier,
               ),
+              if (facts?.phone != null)
+                _DetailRow(
+                  label: context.tr('account_phone_label'),
+                  value: facts!.phone!,
+                ),
               if (facts?.countryCode != null)
                 _DetailRow(
                   label: context.tr('account_country_label'),

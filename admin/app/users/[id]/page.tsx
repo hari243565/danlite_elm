@@ -26,7 +26,7 @@
 import Link from 'next/link';
 import type { Metadata } from 'next';
 import { callAdminFn, getAdminSession, type UserDetail } from '@/lib/admin-api';
-import { C, money, MONO, when } from '@/lib/theme';
+import { C, fullName, money, MONO, when } from '@/lib/theme';
 import { NOINDEX } from '@/lib/seo';
 import { ErrorCard, Section, Shell, StatusPill, Table, tdStyle } from '../../shell';
 import { ConfirmAction, type ActionResult } from '../../confirm-action';
@@ -146,9 +146,18 @@ export default async function UserDetailPage({
   // already gone.
   const isActive = licence?.status === 'active';
 
-  // What the confirmation dialogs name. The email is what an operator
-  // recognises; the id is the fallback that is always present.
-  const who = profile.email ?? profile.id;
+  // The customer's own name, or null on an account created before the Create
+  // Account screen collected one.
+  const name = fullName(profile);
+
+  // What the confirmation dialogs name. The name is what an operator
+  // recognises fastest, but it is deliberately never shown alone: names are
+  // not unique, and these dialogs authorise taking away something a customer
+  // paid for. The email — or the id, the one field always present — rides
+  // along as the thing that actually identifies the row.
+  const who = name
+    ? `${name} (${profile.email ?? profile.id})`
+    : (profile.email ?? profile.id);
 
   return (
     <Shell email={session.email} active="/users">
@@ -168,7 +177,11 @@ export default async function UserDetailPage({
           marginBottom: 4,
         }}
       >
-        <h1 style={{ fontSize: 19, fontWeight: 800, margin: 0 }}>{profile.email ?? '(no email)'}</h1>
+        {/* Name first, email behind it. An account that predates the name
+            field still leads with its email, exactly as it did before. */}
+        <h1 style={{ fontSize: 19, fontWeight: 800, margin: 0 }}>
+          {name ?? profile.email ?? '(no email)'}
+        </h1>
         <StatusPill status={licence?.status} />
         {profile.deleted_at ? (
           <span style={{ color: C.red, fontSize: 11.5, fontWeight: 700 }}>
@@ -194,6 +207,7 @@ export default async function UserDetailPage({
           }}
         >
           <Field label="User ID" value={profile.id} mono />
+          <Field label="Name" value={name ?? '—'} />
           <Field label="Email" value={profile.email ?? '—'} />
           <Field label="Phone" value={profile.phone ?? '—'} mono />
           <Field label="Country" value={profile.country_code ?? '—'} />

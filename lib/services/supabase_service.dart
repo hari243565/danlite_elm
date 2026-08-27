@@ -364,6 +364,63 @@ class SupabaseService {
     }
   }
 
+  // ── Profile details (sign-up name and contact phone) ──────────────────────
+  //
+  // The only table write this class performs, and it is on the caller's OWN
+  // row: `profiles_update_own` restricts it to auth.uid() = id, and
+  // `protect_profile_fields` reverts country_code, signup_platform and
+  // deleted_at for every non-service_role caller. Nothing reachable from here
+  // can move the pricing rail, touch a licence, or resurrect a deleted
+  // account. The UPDATE grant and the policy both date from Phase 1; this
+  // adds no grant and no policy.
+  //
+  // Called once, immediately after a SIGN-UP's OTP verification succeeds. It
+  // is not part of authentication — the user is already signed in by the time
+  // it runs, and its outcome cannot make a verified login fail. See
+  // [AuthProvider.verifyOtp].
+  //
+  // `phone` is contact data and nothing else. No code in this app sends
+  // anything to it, and none may be added that does: email OTP is the only
+  // channel by which anybody proves who they are.
+  Future<bool> saveProfileDetails({
+    String? firstName,
+    String? lastName,
+    String? phone,
+  }) async {
+    if (!_configured) return false;
+    final uid = currentUser?.id;
+    if (uid == null) return false;
+
+    // Only columns that were actually collected are sent. A blank optional
+    // field leaves its column exactly as it was rather than overwriting it
+    // with an empty string — the same reasoning as the `nullif` calls in
+    // handle_new_user().
+    final patch = <String, dynamic>{};
+    void put(String column, String? value) {
+      final v = value?.trim();
+      if (v != null && v.isNotEmpty) patch[column] = v;
+    }
+
+    put('first_name', firstName);
+    put('last_name', lastName);
+    put('phone', phone);
+
+    if (patch.isEmpty) return true;
+
+    try {
+      // The `.eq` is redundant under RLS and stated anyway, matching the
+      // convention account_screen.dart already uses for its own reads.
+      await client.from('profiles').update(patch).eq('id', uid);
+      return true;
+    } catch (e) {
+      // Never fatal and never surfaced. The account exists and the user is
+      // signed in; the only casualty is a display field. The exception itself
+      // is not logged — a PostgREST error can echo the submitted row back.
+      debugPrint('[auth] profile details write failed: ${e.runtimeType}');
+      return false;
+    }
+  }
+
   // ── Error translation ─────────────────────────────────────────────────────
   //
   // Read this before touching anything below.

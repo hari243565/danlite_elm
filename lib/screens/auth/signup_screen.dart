@@ -42,6 +42,24 @@ const List<_Country> _kCountries = [
   _Country('DE', 'Germany', '+49'),
 ];
 
+/// Generous, and a ceiling rather than a rule. It exists so that a pasted
+/// document cannot become a name; it is not an opinion about how long a name
+/// may be. Mirrors `profiles_first_name_len` / `profiles_last_name_len`.
+const int _kNameMaxLength = 80;
+
+/// Long enough for the longest international number written out with a country
+/// code, spaces and brackets. Mirrors `profiles_phone_len`.
+const int _kPhoneMaxLength = 32;
+
+/// A loose shape check for the optional phone field, and it stays loose.
+///
+/// Digits, spaces, a plus, and the hyphens and brackets real people actually
+/// type. There is deliberately no country-specific format check: this app
+/// sells into eight countries that write their numbers eight different ways,
+/// the value authenticates nothing, and a validator precise enough to be
+/// useful would be precise enough to reject somebody's real number.
+final RegExp _kPhoneShape = RegExp(r'^[0-9+\-() ]+$');
+
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
 
@@ -52,11 +70,15 @@ class SignupScreen extends StatefulWidget {
 class _SignupScreenState extends State<SignupScreen> {
   final _formKey = GlobalKey<FormState>();
   final _controller = TextEditingController();
+  final _nameController = TextEditingController();
+  final _phoneController = TextEditingController();
   _Country _country = _kCountries.first;
 
   @override
   void dispose() {
     _controller.dispose();
+    _nameController.dispose();
+    _phoneController.dispose();
     super.dispose();
   }
 
@@ -73,6 +95,32 @@ class _SignupScreenState extends State<SignupScreen> {
     return ok ? null : _t('auth_email_invalid');
   }
 
+  /// Required, and that is the whole of it.
+  ///
+  /// There is NO character-set check here and none is coming. This app serves
+  /// international customers, and real names carry apostrophes, hyphens,
+  /// accents and non-Latin scripts; a name field that accepts only `[A-Za-z ]`
+  /// is a field that tells real people their real name is invalid. Length is
+  /// capped by the input formatter, exactly as the email field's 254 is, so
+  /// there is no length message to write either.
+  String? _validateName(String? raw) =>
+      (raw ?? '').trim().isEmpty ? _t('auth_name_required') : null;
+
+  /// Optional, and only sanity-checked.
+  ///
+  /// An empty field is always valid — this is contact data, not an identity,
+  /// and nothing in this app is ever sent to it. What is typed only has to be
+  /// plausibly a phone number at all: the right characters, and somewhere
+  /// between a short national number and E.164's fifteen-digit maximum.
+  String? _validatePhone(String? raw) {
+    final value = (raw ?? '').trim();
+    if (value.isEmpty) return null;
+    if (!_kPhoneShape.hasMatch(value)) return _t('auth_phone_invalid');
+    final digits = value.replaceAll(RegExp(r'[^0-9]'), '').length;
+    if (digits < 6 || digits > 15) return _t('auth_phone_invalid');
+    return null;
+  }
+
   Future<void> _submit() async {
     FocusScope.of(context).unfocus();
     if (!(_formKey.currentState?.validate() ?? false)) return;
@@ -83,6 +131,33 @@ class _SignupScreenState extends State<SignupScreen> {
     // The country selector is the sole source of `profiles.country_code` — it
     // is pricing data, and it has never been routing data.
     auth.countryCode = _country.code;
+
+    // ── One name box, two columns ─────────────────────────────────────────
+    // The screen collects a single "full name" and `profiles` has first_name
+    // and last_name, so the split happens here, on the last run of whitespace.
+    //
+    // Deliberately naive, and deliberately biased the safe way. A single-token
+    // name keeps the whole string as the first name and leaves last_name null
+    // rather than inventing a surname for somebody who does not use one; a
+    // multi-part given name ("Maria Del Carmen Ruiz") keeps everything but the
+    // final token together. Nothing is rejected and nothing is discarded —
+    // every character typed survives in one column or the other.
+    //
+    // One field rather than two is also what fits this screen: every other
+    // input on it is a single full-width control in a vertical stack, and a
+    // side-by-side First/Last row would be the only exception. It is the more
+    // honest field as well, since a First/Last pair quietly asserts that
+    // everyone's name has exactly two parts in that order.
+    final name = _nameController.text.trim().replaceAll(RegExp(r'\s+'), ' ');
+    final cut = name.lastIndexOf(' ');
+
+    // Staged, not sent with the OTP — see AuthProvider.stageSignupDetails for
+    // why. Nothing is written until this account's OTP has been verified.
+    auth.stageSignupDetails(
+      firstName: cut < 0 ? name : name.substring(0, cut),
+      lastName: cut < 0 ? null : name.substring(cut + 1),
+      phone: _phoneController.text.trim(),
+    );
 
     final sent = await auth.startSignup(identifier: value);
 
@@ -124,9 +199,28 @@ class _SignupScreenState extends State<SignupScreen> {
                 _countryField(),
                 const SizedBox(height: 20),
 
+                _label(context.tr('auth_name_label')),
+                const SizedBox(height: 8),
+                _nameField(),
+                const SizedBox(height: 20),
+
                 _label(context.tr('auth_email_hint')),
                 const SizedBox(height: 8),
                 _identifierField(),
+                const SizedBox(height: 20),
+
+                _label(context.tr('auth_phone_label')),
+                const SizedBox(height: 8),
+                _phoneField(),
+                const SizedBox(height: 6),
+                // Says plainly what the number is and is not for. The promise
+                // it makes is kept in code, not just in copy: nothing anywhere
+                // in this app sends anything to profiles.phone.
+                Text(
+                  context.tr('auth_phone_note'),
+                  style: const TextStyle(
+                      color: _C.muted, fontSize: 11, height: 1.5),
+                ),
                 const SizedBox(height: 20),
 
                 if (auth.errorKey != null) ...[
@@ -227,6 +321,36 @@ class _SignupScreenState extends State<SignupScreen> {
         ),
       );
 
+  /// The decoration every text field on this screen wears. Lifted out when the
+  /// name and phone fields were added, rather than copied twice more — the
+  /// three are visually identical and there is no reason for them to be able
+  /// to drift apart.
+  InputDecoration _decoration(String hint) => InputDecoration(
+        filled: true,
+        fillColor: _C.card,
+        hintText: hint,
+        hintStyle: const TextStyle(color: _C.muted, fontSize: 14),
+        errorStyle: const TextStyle(color: _C.red, fontSize: 12),
+        contentPadding:
+            const EdgeInsets.symmetric(horizontal: 14, vertical: 16),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: _C.border),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: _C.cyan, width: 1.5),
+        ),
+        errorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: _C.red),
+        ),
+        focusedErrorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: _C.red, width: 1.5),
+        ),
+      );
+
   Widget _identifierField() => TextFormField(
         controller: _controller,
         validator: _validate,
@@ -235,31 +359,36 @@ class _SignupScreenState extends State<SignupScreen> {
         inputFormatters: [LengthLimitingTextInputFormatter(254)],
         style: const TextStyle(color: _C.text, fontSize: 15),
         cursorColor: _C.cyan,
-        decoration: InputDecoration(
-          filled: true,
-          fillColor: _C.card,
-          hintText: context.tr('auth_email_hint'),
-          hintStyle: const TextStyle(color: _C.muted, fontSize: 14),
-          errorStyle: const TextStyle(color: _C.red, fontSize: 12),
-          contentPadding:
-              const EdgeInsets.symmetric(horizontal: 14, vertical: 16),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-            borderSide: const BorderSide(color: _C.border),
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-            borderSide: const BorderSide(color: _C.cyan, width: 1.5),
-          ),
-          errorBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-            borderSide: const BorderSide(color: _C.red),
-          ),
-          focusedErrorBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-            borderSide: const BorderSide(color: _C.red, width: 1.5),
-          ),
-        ),
+        decoration: _decoration(context.tr('auth_email_hint')),
+      );
+
+  /// No `inputFormatters` beyond the length cap, on purpose: a filtering
+  /// formatter here would silently swallow characters out of somebody's own
+  /// name as they typed it. See [_validateName].
+  Widget _nameField() => TextFormField(
+        controller: _nameController,
+        validator: _validateName,
+        autovalidateMode: AutovalidateMode.onUserInteraction,
+        keyboardType: TextInputType.name,
+        textCapitalization: TextCapitalization.words,
+        inputFormatters: [LengthLimitingTextInputFormatter(_kNameMaxLength)],
+        style: const TextStyle(color: _C.text, fontSize: 15),
+        cursorColor: _C.cyan,
+        decoration: _decoration(context.tr('auth_name_hint')),
+      );
+
+  /// `TextInputType.phone` selects the keypad and nothing more. It is not a
+  /// claim that this value will be dialled, messaged or verified — it will not
+  /// be, in any language, on any rail.
+  Widget _phoneField() => TextFormField(
+        controller: _phoneController,
+        validator: _validatePhone,
+        autovalidateMode: AutovalidateMode.onUserInteraction,
+        keyboardType: TextInputType.phone,
+        inputFormatters: [LengthLimitingTextInputFormatter(_kPhoneMaxLength)],
+        style: const TextStyle(color: _C.text, fontSize: 15),
+        cursorColor: _C.cyan,
+        decoration: _decoration(context.tr('auth_phone_hint')),
       );
 
   /// Bottom-of-screen setup strip, shown ONLY when the backend config that

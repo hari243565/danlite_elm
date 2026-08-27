@@ -43,7 +43,7 @@ Deno.serve(async (req: Request): Promise<Response> => {
       await Promise.all([
         admin
           .from("profiles")
-          .select("id, email, phone, country_code, signup_platform, deleted_at, created_at, updated_at")
+          .select("id, email, first_name, last_name, phone, country_code, signup_platform, deleted_at, created_at, updated_at")
           .eq("id", userId)
           .maybeSingle(),
         admin
