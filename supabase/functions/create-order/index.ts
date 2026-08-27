@@ -26,17 +26,17 @@ import { createClient } from "jsr:@supabase/supabase-js@2";
 import { captureFunctionError } from "../_shared/sentry.ts";
 
 // ── PRICE ─────────────────────────────────────────────────────────────────
-// ₹109.00 in paise. Phase 5 is the India rail only.
+// ₹129.00 in paise. Phase 5 is the India rail only.
 //
 // ⚠ THIS MUST STAY IN STEP WITH portal/lib/gst.ts.
 // That module is the source of truth for what the customer is SHOWN; this
 // constant is the source of truth for what the customer is CHARGED. They agree
-// today because GST_TREATMENT is 'inclusive', which makes the total ₹109.
+// today because GST_TREATMENT is 'inclusive', which makes the total ₹129.
 // If GST_TREATMENT is ever flipped to 'exclusive' the portal would display
-// ₹128.62 while this function still charged ₹109 — a silent divergence between
+// ₹152.22 while this function still charged ₹129 — a silent divergence between
 // the price on screen and the price on the card. Flagged in phase5-report.json
 // as an open item rather than left as a comment nobody reads.
-const PRICE_MINOR_IN = 10_900;
+const PRICE_MINOR_IN = 12_900;
 const CURRENCY_IN = "INR";
 
 const CORS_HEADERS: Record<string, string> = {

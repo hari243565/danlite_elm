@@ -43,7 +43,7 @@ export default function TermsDraft() {
       <p style={p}>
         You are buying a <strong>one-time, lifetime licence</strong> to use the Danlite ELM
         Android application. There is no subscription and no recurring charge. The price is
-        ₹109 for customers in India and US$1.10 for customers elsewhere, determined by the
+        ₹129 for customers in India and US$1.29 for customers elsewhere, determined by the
         country recorded on your account at signup.
       </p>
       <p style={p}>

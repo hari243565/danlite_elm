@@ -1,11 +1,11 @@
 /**
  * GST TREATMENT — PLACEHOLDER, PENDING ACCOUNTANT CONFIRMATION.
  *
- * 'inclusive' = the displayed price (₹109) already contains GST; the
+ * 'inclusive' = the displayed price (₹129) already contains GST; the
  *   invoice extracts the tax portion from within it. The customer pays
- *   exactly ₹109 either way.
- * 'exclusive' = GST is added ON TOP of ₹109 at checkout, so the amount
- *   charged becomes ₹109 + GST. This is a real pricing change, not just an
+ *   exactly ₹129 either way.
+ * 'exclusive' = GST is added ON TOP of ₹129 at checkout, so the amount
+ *   charged becomes ₹129 + GST. This is a real pricing change, not just an
  *   invoice-math change — confirm which the client actually wants.
  *
  * DO NOT change this without an explicit instruction citing the
@@ -32,12 +32,12 @@ export const GST_ON_EXPORTS = false; // export of service treated as zero-rated 
 /**
  * Prices are held in MINOR UNITS (paise, cents) as integers, mirroring the
  * `payments.amount_minor bigint` column from Phase 1. Money is never a float
- * here: 109/1.18 in floating point is exactly the kind of value that
+ * here: 129/1.18 in floating point is exactly the kind of value that
  * reconciles to a rounding difference six months later.
  */
 export const PRICE_MINOR = {
-  IN: 10_900, // ₹109.00
-  INTL: 110, //  $1.10
+  IN: 12_900, // ₹129.00
+  INTL: 129, //  $1.29
 } as const;
 
 export type Breakdown = {
@@ -55,7 +55,7 @@ export type Breakdown = {
   note: string;
 };
 
-/** Minor units -> display string, e.g. 10900 -> "109.00". */
+/** Minor units -> display string, e.g. 12900 -> "129.00". */
 export function formatMinor(minor: number): string {
   return (minor / 100).toFixed(2);
 }

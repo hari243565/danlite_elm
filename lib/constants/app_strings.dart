@@ -445,6 +445,37 @@ class AppStrings {
       'paywall_refresh_unreachable':
           'Could not reach the licence service. Check your connection and try '
           'again.',
+
+      // ── Self-serve activation-link resend ────────────────────────────
+      //
+      // Checked against the hard constraint at the top of this block, key by
+      // key: no price, no numeral standing for a cost, no URL, no website
+      // named, and no purchase wording. "Link" here means the activation link
+      // that was already emailed once; these keys ask for that same email
+      // again. None of them describes, offers or locates a purchase.
+      //
+      // The wording deliberately keeps the Edge Function's own
+      // enumeration-safe phrasing ("if that email matches an account") even
+      // though the app only ever submits the address of the account it is
+      // already signed in to. Claiming "sent" would assert a delivery this
+      // screen cannot observe — the function answers before Resend does.
+      'paywall_resend_cta': 'Email me a new link',
+      'paywall_resend_sending': 'Requesting…',
+      // {s} is a whole number of seconds. Not a cost.
+      'paywall_resend_in': 'You can request another link in {s}s',
+      'paywall_resend_sent':
+          'If that email matches an account, a new link is on its way. Check '
+          'your inbox, including spam. A link stops working 15 minutes after '
+          'it is sent.',
+      'paywall_resend_throttled':
+          'Too many link requests for this account. Please try again in an '
+          'hour.',
+      'paywall_resend_failed':
+          'Could not request a new link. Check your connection and try again.',
+      'paywall_resend_no_email':
+          'This account has no email address on file, so a link cannot be '
+          'sent. Contact support and quote the account shown above.',
+
       'paywall_support_label': 'Need help?',
       'paywall_support_hint':
           'Contact support and quote the account shown above.',
@@ -852,6 +883,24 @@ class AppStrings {
           'अभी जाँचा गया — इस खाते पर अब भी कोई सक्रिय लाइसेंस नहीं है।',
       'paywall_refresh_unreachable':
           'लाइसेंस सेवा तक नहीं पहुँच सके। अपना कनेक्शन जाँचें और दोबारा कोशिश करें।',
+
+      // ── नया चालू करने वाला लिंक स्वयं मँगाएँ ─────────────────────────
+      'paywall_resend_cta': 'मुझे नया लिंक ईमेल करें',
+      'paywall_resend_sending': 'माँगा जा रहा है…',
+      'paywall_resend_in': 'आप {s} सेकंड में दूसरा लिंक माँग सकते हैं',
+      'paywall_resend_sent':
+          'यदि यह ईमेल किसी खाते से मेल खाता है, तो नया लिंक भेजा जा रहा है। '
+          'अपना इनबॉक्स और स्पैम फ़ोल्डर देखें। लिंक भेजे जाने के 15 मिनट बाद '
+          'काम करना बंद कर देता है।',
+      'paywall_resend_throttled':
+          'इस खाते के लिए बहुत अधिक लिंक माँगे गए। कृपया एक घंटे बाद दोबारा '
+          'कोशिश करें।',
+      'paywall_resend_failed':
+          'नया लिंक नहीं माँगा जा सका। अपना कनेक्शन जाँचें और दोबारा कोशिश करें।',
+      'paywall_resend_no_email':
+          'इस खाते पर कोई ईमेल पता दर्ज नहीं है, इसलिए लिंक नहीं भेजा जा सकता। '
+          'सहायता से संपर्क करें और ऊपर दिखाया गया खाता बताएँ।',
+
       'paywall_support_label': 'सहायता चाहिए?',
       'paywall_support_hint':
           'सहायता से संपर्क करें और ऊपर दिखाया गया खाता बताएँ।',

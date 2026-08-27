@@ -297,7 +297,12 @@
       "Bash(echo \"\\(exit $?\\)\")",
       "Bash(grep -n \"^#\\\\{1,2\\\\} \" docs/RUNBOOK.md)",
       "Bash(NEXT_PUBLIC_BILLING_DOMAIN=https://billing.danlite.in npm run build)",
-      "Bash(git diff *)"
+      "Bash(git diff *)",
+      "Bash(export ADB=\"/c/Users/a/AppData/Local/Android/Sdk/platform-tools/adb.exe\")",
+      "Bash(/c/Users/a/AppData/Local/Android/Sdk/platform-tools/adb.exe exec-out *)",
+      "Bash(/c/Users/a/AppData/Local/Android/Sdk/platform-tools/adb.exe install *)",
+      "Bash(gh api *)",
+      "Bash(grep -rn \"10900\\\\|10_900\\\\|1\\\\.10\\\\|₹109\\\\|\\\\$1\\\\.10\" portal/lib portal/app supabase/functions)"
     ]
   }
 }
