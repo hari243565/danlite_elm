@@ -215,6 +215,38 @@ class ObdPids {
   /// for Mode 01 PID 42, which a large share of vehicles do not implement.
   /// Response is plain text, e.g. "12.4V", not a hex PID frame.
   static const String readVoltage = 'ATRV';
+
+  // ── Physical module addressing (used only by the chassis/ABS scan) ────────
+  // The live-telemetry and Mode 03 paths never touch these: they rely on the
+  // adapter's default functional addressing. A chassis module has to be
+  // addressed directly, which means overriding the transmit header and the
+  // receive filter, then putting both back afterwards.
+
+  /// `ATSH <id>` — set the CAN request header (the ID the adapter transmits
+  /// on). Retargets from the OBD functional broadcast to one specific module.
+  static String setHeader(String canId) => 'ATSH$canId';
+
+  /// `ATCRA <id>` — set the CAN receive-address filter, so only that module's
+  /// replies are accepted and another ECU's traffic cannot be misattributed.
+  static String setReceiveFilter(String canId) => 'ATCRA$canId';
+
+  /// `ATCRA` with no argument — clear the receive filter.
+  static const String clearReceiveFilter = 'ATCRA';
+
+  /// `ATAR` — restore automatic receive addressing.
+  static const String autoReceiveAddress = 'ATAR';
+
+  /// `ATFCSH <id>` — flow-control header. When a reply spans multiple frames
+  /// the adapter must send its flow-control frame back to the module it is
+  /// talking to, not to the default address.
+  static String setFlowControlHeader(String canId) => 'ATFCSH$canId';
+
+  /// `ATFCSD 300000` — flow-control data: ClearToSend, block size 0,
+  /// separation time 0. The standard "send it all, no throttling" reply.
+  static const String flowControlData = 'ATFCSD300000';
+
+  /// `ATFCSM1` — use the user-supplied flow-control header and data above.
+  static const String flowControlMode = 'ATFCSM1';
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -806,6 +838,170 @@ class ObdParser {
     if (current == null) return incoming;
     return current + incoming;
   }
+
+  // ── UDS (ISO 14229) chassis/ABS fault decode ─────────────────────────────
+  /// Positive-response service id for UDS ReadDTCInformation (0x19 + 0x40).
+  static const int udsReadDtcResponseByte = 0x59;
+
+  /// UDS negative-response marker; followed by the echoed service id and a
+  /// negative response code (NRC).
+  static const int udsNegativeResponseByte = 0x7F;
+
+  /// Subfunction 0x02 — reportDTCByStatusMask, the one this app requests.
+  static const int udsReportDtcByStatusMask = 0x02;
+
+  /// Decode a UDS `59 02` ReadDTCInformation reply from an ABS/chassis module.
+  ///
+  /// Format, per ISO 14229-1:
+  ///   `59 02 <statusAvailabilityMask> [ <b0> <b1> <b2> <status> ]…`
+  /// Each record is **4 bytes**, unlike OBD-II Mode 03's 2-byte pairs: three
+  /// DTC bytes plus a status byte. The first two DTC bytes carry the same
+  /// bit-packing as an OBD-II pair (top two bits select P/C/B/U), so
+  /// [decodeDtcPair] decodes them directly and the app gets the familiar
+  /// five-character form the service manual prints. The third byte is the
+  /// failure-type byte (the `-04` in `C1015-04`) and is preserved separately
+  /// rather than folded into the code.
+  ///
+  /// Frame tokenisation, ECU grouping and ISO-TP reassembly are shared with
+  /// the Mode 03 path — only the payload layout differs.
+  static UdsDtcParseResult parseUdsDtcDetailed(String? response) {
+    final warnings = <String>[];
+    try {
+      if (response == null || response.trim().isEmpty) {
+        return UdsDtcParseResult(
+            records: const <UdsDtcRecord>[],
+            warnings: const <String>['Empty response.']);
+      }
+      final frames = _tokenizeFrames(response, warnings);
+      if (frames.isEmpty) {
+        return UdsDtcParseResult(
+            records: const <UdsDtcRecord>[],
+            warnings: warnings..add('No usable data.'));
+      }
+      final grouped = <String, List<_RawFrame>>{};
+      for (final frame in frames) {
+        grouped.putIfAbsent(frame.ecuId, () => <_RawFrame>[]).add(frame);
+      }
+
+      final records = <UdsDtcRecord>[];
+      int? negativeResponseCode;
+      var sawPositive = false;
+
+      for (final entry in grouped.entries) {
+        final payload = _reassembleIsoTp(entry.value, entry.key, warnings).payload;
+        if (payload.isEmpty) continue;
+
+        // Negative response: 7F <serviceId> <NRC>. Report it rather than
+        // treating a refusal as "no faults" — they mean very different things.
+        for (var i = 0; i + 2 < payload.length; i++) {
+          if (payload[i] == udsNegativeResponseByte && payload[i + 1] == 0x19) {
+            negativeResponseCode = payload[i + 2];
+            warnings.add(
+                'Module ${entry.key} refused 19 02 (NRC 0x${payload[i + 2].toRadixString(16).toUpperCase()}).');
+            break;
+          }
+        }
+
+        var start = -1;
+        for (var i = 0; i < payload.length; i++) {
+          if (payload[i] == udsReadDtcResponseByte) { start = i; break; }
+        }
+        if (start < 0) continue;
+
+        var cursor = start + 1;
+        // Subfunction echo, then the status-availability mask byte.
+        if (cursor >= payload.length ||
+            payload[cursor] != udsReportDtcByStatusMask) {
+          warnings.add('Module ${entry.key}: unexpected 19 subfunction echo.');
+          continue;
+        }
+        sawPositive = true;
+        cursor += 1;
+        if (cursor >= payload.length) continue;
+        cursor += 1; // statusAvailabilityMask
+
+        while (cursor + 4 <= payload.length) {
+          final b0 = payload[cursor];
+          final b1 = payload[cursor + 1];
+          final ftb = payload[cursor + 2];
+          final status = payload[cursor + 3];
+          cursor += 4;
+          if (b0 == 0x00 && b1 == 0x00 && ftb == 0x00) continue; // padding
+          final code = decodeDtcPair(b0, b1);
+          if (code == null) continue;
+          records.add(UdsDtcRecord(
+              code: code, failureTypeByte: ftb, statusByte: status));
+        }
+      }
+
+      final seen = <String>{};
+      final unique = <UdsDtcRecord>[];
+      for (final r in records) {
+        if (seen.add('${r.code}-${r.failureTypeByte}')) unique.add(r);
+      }
+
+      return UdsDtcParseResult(
+        records: List<UdsDtcRecord>.unmodifiable(unique),
+        warnings: List<String>.unmodifiable(warnings),
+        negativeResponseCode: negativeResponseCode,
+        sawPositiveResponse: sawPositive,
+      );
+    } catch (e) {
+      return UdsDtcParseResult(
+          records: const <UdsDtcRecord>[],
+          warnings: List<String>.unmodifiable(
+              warnings..add('Unrecoverable UDS parser error: $e')));
+    }
+  }
+}
+
+/// One DTC record from a UDS `59 02` reply.
+class UdsDtcRecord {
+  /// Five-character SAE form (e.g. `C1015`), as printed in service manuals.
+  final String code;
+
+  /// ISO 14229 failure-type byte — the `-04` suffix form. Kept separate so the
+  /// code still matches the manual's bare five-character table key.
+  final int failureTypeByte;
+
+  /// ISO 14229 DTC status byte.
+  final int statusByte;
+
+  const UdsDtcRecord({
+    required this.code,
+    required this.failureTypeByte,
+    required this.statusByte,
+  });
+
+  /// Bit 3 — confirmedDTC: the fault has been stored, not merely seen once.
+  bool get isConfirmed => (statusByte & 0x08) != 0;
+
+  /// Bit 0 — testFailed on the most recent test.
+  bool get isCurrentlyFailing => (statusByte & 0x01) != 0;
+}
+
+class UdsDtcParseResult {
+  final List<UdsDtcRecord> records;
+  final List<String> warnings;
+
+  /// Set when the module answered `7F 19 <NRC>` — an explicit refusal, which
+  /// is not the same as a healthy module reporting zero faults.
+  final int? negativeResponseCode;
+
+  /// True when a well-formed `59 02` header was seen, even if it carried no
+  /// DTC records. This is what distinguishes "ABS module answered, no faults"
+  /// from "nothing on the bus answered at all".
+  final bool sawPositiveResponse;
+
+  const UdsDtcParseResult({
+    required this.records,
+    required this.warnings,
+    this.negativeResponseCode,
+    this.sawPositiveResponse = false,
+  });
+
+  List<String> get codes =>
+      <String>[for (final r in records) r.code];
 }
 
 enum DtcCountByteMode { auto, present, absent }

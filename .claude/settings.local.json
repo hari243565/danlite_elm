@@ -302,7 +302,11 @@
       "Bash(/c/Users/a/AppData/Local/Android/Sdk/platform-tools/adb.exe exec-out *)",
       "Bash(/c/Users/a/AppData/Local/Android/Sdk/platform-tools/adb.exe install *)",
       "Bash(gh api *)",
-      "Bash(grep -rn \"10900\\\\|10_900\\\\|1\\\\.10\\\\|₹109\\\\|\\\\$1\\\\.10\" portal/lib portal/app supabase/functions)"
+      "Bash(grep -rn \"10900\\\\|10_900\\\\|1\\\\.10\\\\|₹109\\\\|\\\\$1\\\\.10\" portal/lib portal/app supabase/functions)",
+      "Bash(tasklist //FI \"IMAGENAME eq java.exe\")",
+      "Bash(tasklist //FI \"IMAGENAME eq dart.exe\")",
+      "Bash(/c/Users/a/AppData/Local/Android/Sdk/build-tools/36.0.0/apksigner.bat verify *)",
+      "Bash(echo \"=== exit: $? ===\")"
     ]
   }
 }

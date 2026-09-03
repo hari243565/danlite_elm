@@ -3,7 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import '../constants/app_strings.dart';
+import '../constants/chassis_dtc_dictionary.dart';
+import '../constants/chassis_modules.dart';
 import '../providers/settings_provider.dart';
+import '../providers/vehicle_provider.dart';
 import '../services/dtc_service.dart';
 import '../services/obd_service.dart';
 import '../models/vehicle_data.dart';
@@ -41,6 +44,14 @@ class _DtcScreenState extends State<DtcScreen> {
   bool _hasReadOnce = false;
   DateTime? _lastReadAt;
 
+  /// Which diagnostic module the single results list is currently showing.
+  ///
+  /// This is a category *within* the one diagnostics screen, not a new
+  /// navigation tab: both modules render through the same results list and the
+  /// same fault card, so adding a further module later (SRS, EPS…) is a new
+  /// enum value plus a dictionary, not another screen.
+  DtcModule _module = DtcModule.engine;
+
   @override
   void initState() {
     super.initState();
@@ -51,6 +62,25 @@ class _DtcScreenState extends State<DtcScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) => _readCodes());
   }
 
+  /// Free-text make and model from the active vehicle profile. Both are needed
+  /// to pick a chassis dictionary: one manufacturer can ship several ABS
+  /// platforms whose code systems disagree, so make alone is not a safe key.
+  VehicleProfile? get _activeVehicle =>
+      context.read<VehicleProvider>().active;
+
+  Future<void> _scanChassis() async {
+    if (!mounted) return;
+    final obd = context.read<ObdService>();
+    if (!obd.isConnected || obd.chassisScanInFlight) return;
+    final vehicle = _activeVehicle;
+    await obd.readChassisDtcs(
+      vehicleMake: vehicle?.make,
+      vehicleModel: vehicle?.model,
+    );
+    if (!mounted) return;
+    setState(() => _lastReadAt = DateTime.now());
+  }
+
   @override
   void dispose() {
     _loopTimer?.cancel();
@@ -59,6 +89,10 @@ class _DtcScreenState extends State<DtcScreen> {
 
   Future<void> _readCodes() async {
     if (!mounted) return;
+    // Pause the engine auto-scan while the ABS category is showing: a chassis
+    // scan rewrites the adapter's addressing state, and a Mode 03 poll landing
+    // mid-scan would both fight for the socket and confuse the results.
+    if (_module != DtcModule.engine) return;
     final obd = context.read<ObdService>();
     if (!obd.isConnected || _reading) return;
     setState(() => _reading = true);
@@ -199,7 +233,91 @@ class _DtcScreenState extends State<DtcScreen> {
           child: Container(height: 1, color: _RC.border),
         ),
       ),
-      body: obd.isConnected ? _buildConnected(context, codes) : _buildDisconnected(context),
+      body: Column(
+        children: [
+          _buildModuleSelector(context),
+          Expanded(
+            child: obd.isConnected
+                ? (_module == DtcModule.engine
+                    ? _buildConnected(context, codes)
+                    : _buildChassis(context, obd))
+                : _buildDisconnected(context),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ── Module selector ───────────────────────────────────────────────────────
+  // One diagnostics screen, module as a selectable category within it — the
+  // same shape established multi-module scan tools use. Adding SRS/EPS later
+  // means one more segment here, not another screen or navigation tab.
+  Widget _buildModuleSelector(BuildContext context) {
+    Widget segment(DtcModule module, String labelKey, IconData icon) {
+      final selected = _module == module;
+      return Expanded(
+        child: GestureDetector(
+          onTap: () {
+            if (_module == module) return;
+            setState(() => _module = module);
+            if (module == DtcModule.engine) _readCodes();
+          },
+          behavior: HitTestBehavior.opaque,
+          child: Container(
+            padding: const EdgeInsets.symmetric(vertical: 9),
+            decoration: BoxDecoration(
+              color: selected ? _RC.neonCyan.withValues(alpha: 0.14) : Colors.transparent,
+              borderRadius: BorderRadius.circular(9),
+              border: Border.all(
+                color: selected ? _RC.neonCyan.withValues(alpha: 0.55) : Colors.transparent,
+              ),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(icon, size: 15, color: selected ? _RC.neonCyan : _RC.textMuted),
+                const SizedBox(width: 6),
+                Flexible(
+                  child: Text(
+                    context.tr(labelKey),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      color: selected ? _RC.neonCyan : _RC.textMuted,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 0.4,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
+
+    return Container(
+      padding: const EdgeInsets.fromLTRB(14, 10, 14, 10),
+      decoration: const BoxDecoration(
+        color: _RC.surface,
+        border: Border(bottom: BorderSide(color: _RC.border)),
+      ),
+      child: Container(
+        padding: const EdgeInsets.all(4),
+        decoration: BoxDecoration(
+          color: _RC.bg,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: _RC.border),
+        ),
+        child: Row(
+          children: [
+            segment(DtcModule.engine, 'moduleEngine', Icons.settings_rounded),
+            const SizedBox(width: 4),
+            segment(DtcModule.chassis, 'moduleAbs', Icons.disc_full_rounded),
+          ],
+        ),
+      ),
     );
   }
 
@@ -425,11 +543,288 @@ class _DtcScreenState extends State<DtcScreen> {
       ],
     );
   }
+
+  // ── ABS / chassis category ────────────────────────────────────────────────
+  // Same results list and same fault card as the engine category; only the
+  // action bar, the summary and the empty states differ, because a chassis
+  // scan has genuinely different outcomes to report.
+  Widget _buildChassis(BuildContext context, ObdService obd) {
+    // watch, not read: editing the make or model on the vehicle profile must
+    // re-resolve which platform dictionary describes the codes already shown.
+    final vehicle = context.watch<VehicleProvider>().active;
+    final make = vehicle?.make;
+    final model = vehicle?.model;
+    final manufacturerKey = ChassisManufacturers.resolveKey(make);
+    final platformKey = ChassisPlatforms.resolve(make, model);
+    final codes = obd.chassisDtcCodes;
+    final scanning = obd.chassisScanInFlight;
+
+    return Column(
+      children: [
+        if (platformKey == null) _platformNotice(context, make, manufacturerKey),
+        _buildChassisSummaryBar(context, obd, codes),
+        _buildChassisActionBar(context, scanning),
+        Expanded(
+          child: RefreshIndicator(
+            color: _RC.neonCyan,
+            backgroundColor: _RC.card,
+            onRefresh: _scanChassis,
+            child: codes.isEmpty
+                ? _buildChassisEmptyState(context, obd)
+                : ListView.builder(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    padding: const EdgeInsets.fromLTRB(14, 12, 14, 20),
+                    itemCount: codes.length,
+                    itemBuilder: (_, i) => _HazardCard(
+                      code: codes[i],
+                      platformKey: platformKey,
+                    ),
+                  ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  /// Why no platform dictionary is in play, said honestly.
+  ///
+  /// Three genuinely different reasons, and the rider can act on each one
+  /// differently: no make entered, a make we have no data for, or a known make
+  /// whose model we cannot identify. The last one is new with the second Royal
+  /// Enfield platform — "Royal Enfield" alone is no longer enough to know which
+  /// code table applies, and guessing between two tables that disagree about
+  /// what a number means is exactly what must not happen.
+  Widget _platformNotice(
+      BuildContext context, String? make, String? manufacturerKey) {
+    if ((make ?? '').trim().isEmpty) {
+      return _makeNotice(context,
+          title: context.tr('absSetMake'), body: context.tr('absSetMakeDesc'));
+    }
+    if (manufacturerKey == null) {
+      return _makeNotice(context,
+          title: context.tr('absMakeUnsupported'),
+          body: context.tr('absMakeUnsupportedDesc'));
+    }
+    // Make is known, model is not. Name the models we can identify, so the
+    // rider knows exactly what to type rather than guessing at spellings.
+    final known = ChassisPlatforms.forManufacturer(manufacturerKey)
+        .map((p) => p.displayName)
+        .join(', ');
+    return _makeNotice(
+      context,
+      title: context.tr('absSetModel'),
+      body: '${context.tr('absSetModelDesc')}\n$known',
+    );
+  }
+
+  Widget _makeNotice(BuildContext context,
+      {required String title, required String body}) {
+    return Container(
+      margin: const EdgeInsets.fromLTRB(14, 12, 14, 0),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: _RC.neonAmber.withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: _RC.neonAmber.withValues(alpha: 0.35)),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Icon(Icons.info_outline_rounded, size: 16, color: _RC.neonAmber),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(title,
+                    style: const TextStyle(
+                        color: _RC.neonAmber,
+                        fontSize: 12.5,
+                        fontWeight: FontWeight.w800)),
+                const SizedBox(height: 4),
+                Text(body,
+                    style: const TextStyle(
+                        color: _RC.textMuted, fontSize: 11.5, height: 1.45)),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildChassisSummaryBar(
+      BuildContext context, ObdService obd, List<DtcCode> codes) {
+    final responded = obd.chassisRespondingModule;
+    return Container(
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
+      decoration: const BoxDecoration(
+        color: _RC.surface,
+        border: Border(bottom: BorderSide(color: _RC.border)),
+      ),
+      child: Row(
+        children: [
+          _statChip(
+              label: 'CODES',
+              value: '${codes.length}',
+              color: codes.isEmpty ? _RC.neonGreen : _RC.neonRed),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              responded.isEmpty
+                  ? context.tr('moduleAbs')
+                  : '${context.tr('absRespondingModule')}: $responded',
+              textAlign: TextAlign.end,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(
+                  color: _RC.textMuted,
+                  fontSize: 10,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: 0.6),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildChassisActionBar(BuildContext context, bool scanning) {
+    return Container(
+      padding: const EdgeInsets.fromLTRB(16, 10, 16, 10),
+      decoration: const BoxDecoration(
+        color: _RC.bg,
+        border: Border(bottom: BorderSide(color: _RC.border)),
+      ),
+      child: SizedBox(
+        width: double.infinity,
+        child: ElevatedButton.icon(
+          onPressed: scanning ? null : _scanChassis,
+          icon: scanning
+              ? const SizedBox(
+                  width: 15,
+                  height: 15,
+                  child: CircularProgressIndicator(
+                      strokeWidth: 2, color: Colors.black))
+              : const Icon(Icons.radar_rounded, size: 18),
+          label: Text(
+              scanning ? context.tr('scanningAbs') : context.tr('scanAbsModule'),
+              style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 12.5)),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: _RC.neonCyan,
+            foregroundColor: Colors.black,
+            disabledBackgroundColor: _RC.darkTrack,
+            padding: const EdgeInsets.symmetric(vertical: 12),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// The four genuinely different "no codes on screen" states. Collapsing them
+  /// into one message would tell a rider their ABS is fine when in fact the
+  /// module was never reached.
+  Widget _buildChassisEmptyState(BuildContext context, ObdService obd) {
+    late final IconData icon;
+    late final Color color;
+    late final String title;
+    late final String body;
+
+    switch (obd.chassisScanOutcome) {
+      case ChassisScanOutcome.clean:
+        icon = Icons.check_circle_outline;
+        color = _RC.neonGreen;
+        title = context.tr('absNoFaults');
+        body = context.tr('absNoFaultsDesc');
+        break;
+      case ChassisScanOutcome.noModuleResponse:
+        icon = Icons.help_outline_rounded;
+        color = _RC.neonAmber;
+        title = context.tr('absNoModule');
+        body = context.tr('absNoModuleDesc');
+        break;
+      case ChassisScanOutcome.addressingUnsupported:
+        icon = Icons.usb_off_rounded;
+        color = _RC.neonAmber;
+        title = context.tr('absAddressingUnsupported');
+        body = context.tr('absAddressingUnsupportedDesc');
+        break;
+      case ChassisScanOutcome.linkUnavailable:
+        icon = Icons.bluetooth_disabled;
+        color = _RC.textMuted;
+        title = context.tr('connectionFailed');
+        body = context.tr('connectToRead');
+        break;
+      case ChassisScanOutcome.faultsFound:
+      case ChassisScanOutcome.idle:
+        icon = Icons.radar_rounded;
+        color = _RC.textMuted;
+        title = context.tr('absNotScanned');
+        body = context.tr('absNotScannedDesc');
+        break;
+    }
+
+    final log = obd.chassisScanLog;
+
+    return ListView(
+      physics: const AlwaysScrollableScrollPhysics(),
+      padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
+      children: [
+        SizedBox(height: MediaQuery.of(context).size.height * 0.08),
+        Icon(icon, size: 60, color: color),
+        const SizedBox(height: 16),
+        Text(title,
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+                color: _RC.textMain, fontSize: 17, fontWeight: FontWeight.w800)),
+        const SizedBox(height: 8),
+        Text(body,
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+                color: _RC.textMuted, fontSize: 13, height: 1.5)),
+        if (log.isNotEmpty) ...[
+          const SizedBox(height: 20),
+          Theme(
+            data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+            child: ExpansionTile(
+              tilePadding: EdgeInsets.zero,
+              title: Text(context.tr('absScanDetails'),
+                  style: const TextStyle(
+                      color: _RC.textMuted,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w700)),
+              iconColor: _RC.textMuted,
+              collapsedIconColor: _RC.textMuted,
+              children: [
+                for (final line in log)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 6),
+                    child: Text('• $line',
+                        style: const TextStyle(
+                            color: _RC.textMuted,
+                            fontSize: 11,
+                            height: 1.4,
+                            fontFamily: 'monospace')),
+                  ),
+              ],
+            ),
+          ),
+        ],
+      ],
+    );
+  }
 }
 
 class _HazardCard extends StatelessWidget {
   final DtcCode code;
-  const _HazardCard({required this.code});
+
+  /// Set only for chassis codes: which platform dictionary (manufacturer +
+  /// model family) describes this code. Null for engine codes, whose P-code
+  /// meanings are make-agnostic, and null when the platform is unidentified.
+  final String? platformKey;
+
+  const _HazardCard({required this.code, this.platformKey});
 
   Color get _severityColor {
     switch (code.severity) {
@@ -475,6 +870,16 @@ class _HazardCard extends StatelessWidget {
   // description already resolved by ObdService until it ships its own set.
   String _localizedDescription(BuildContext context) {
     final languageCode = context.watch<SettingsProvider>().locale.languageCode;
+
+    // Chassis codes resolve through the manufacturer-keyed dictionary: the
+    // same C-code means different faults on different makes, so the generic
+    // description table must never be consulted for one.
+    if (code.isChassis) {
+      final entry = _chassisText(context);
+      if (entry != null && entry.description.isNotEmpty) return entry.description;
+      return context.tr('absNoDictionary');
+    }
+
     final resolved = DtcLocalizations.description(
       code.code,
       languageCode,
@@ -482,6 +887,42 @@ class _HazardCard extends StatelessWidget {
     );
     return resolved.isEmpty ? '—' : resolved;
   }
+
+  /// The chassis dictionary entry for this code, already resolved into the
+  /// app's active language, or null when this make/code has no real entry.
+  ChassisDtcResolved? _chassisText(BuildContext context) {
+    if (!code.isChassis) return null;
+    final languageCode = context.watch<SettingsProvider>().locale.languageCode;
+    return DtcLocalizations.chassisEntry(
+        platformKey, code.code, languageCode);
+  }
+
+  /// One labelled manual column (Component / Query / Remedy).
+  Widget _detailRow(String label, String value, Color accent) => Padding(
+        padding: const EdgeInsets.only(top: 8),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SizedBox(
+              width: 82,
+              child: Text(label.toUpperCase(),
+                  style: const TextStyle(
+                      color: _RC.textMuted,
+                      fontSize: 9.5,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 0.7)),
+            ),
+            Expanded(
+              child: Text(value,
+                  style: TextStyle(
+                      color: accent,
+                      fontSize: 12.5,
+                      fontWeight: FontWeight.w600,
+                      height: 1.35)),
+            ),
+          ],
+        ),
+      );
 
   String _severityLabel(BuildContext context) {
     switch (code.severity) {
@@ -579,6 +1020,25 @@ class _HazardCard extends StatelessWidget {
                                   fontSize: 11,
                                   fontWeight: FontWeight.w700)),
                         ),
+                        // UDS status bit 3 clear: the module saw this fault but
+                        // has not stored it as confirmed. Worth flagging rather
+                        // than presenting it with the same weight as a stored
+                        // braking fault.
+                        if (code.isChassis && !code.isConfirmed) ...[
+                          const SizedBox(width: 6),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 8, vertical: 3),
+                            decoration: BoxDecoration(
+                                color: _RC.textMuted.withValues(alpha: 0.14),
+                                borderRadius: BorderRadius.circular(6)),
+                            child: Text(context.tr('absUnconfirmed'),
+                                style: const TextStyle(
+                                    color: _RC.textMuted,
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.w700)),
+                          ),
+                        ],
                       ],
                     ),
                     const SizedBox(height: 6),
@@ -588,6 +1048,31 @@ class _HazardCard extends StatelessWidget {
                             fontSize: 14,
                             fontWeight: FontWeight.w600,
                             height: 1.3)),
+
+                    // Chassis codes carry the manufacturer's own Component,
+                    // Query and Remedy columns — genuinely actionable detail a
+                    // generic P-code has no equivalent of, so it is shown
+                    // rather than flattened into the description.
+                    if (code.isChassis) ...[
+                      Builder(builder: (context) {
+                        final entry = _chassisText(context);
+                        if (entry == null) return const SizedBox.shrink();
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            if (entry.component.isNotEmpty)
+                              _detailRow(context.tr('absComponent'),
+                                  entry.component, _RC.textMain),
+                            if (entry.query.isNotEmpty)
+                              _detailRow(context.tr('absQuery'), entry.query,
+                                  _RC.textMuted),
+                            if (entry.remedy.isNotEmpty)
+                              _detailRow(context.tr('absRemedy'), entry.remedy,
+                                  _RC.neonCyan),
+                          ],
+                        );
+                      }),
+                    ],
                   ],
                 ),
               ),

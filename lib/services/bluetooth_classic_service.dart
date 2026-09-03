@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 // ── Device model ─────────────────────────────────────────────────────────────
@@ -71,17 +72,61 @@ class BluetoothClassicService extends ChangeNotifier {
   StreamSubscription<dynamic>? _dataSub;
 
   // ── Permissions ───────────────────────────────────────────────────────────
-  /// Returns true if all required Bluetooth permissions are granted.
-  Future<bool> requestPermissions() async {
-    final toRequest = <Permission>[
-      Permission.bluetoothConnect,
-      Permission.bluetoothScan,
-    ];
+  /// Cached `Build.VERSION.SDK_INT`. Read once — the OS version cannot change
+  /// while the process is alive.
+  static int? _sdkIntCache;
 
-    // Android < 12 (API 31) also needs location for BT discovery
-    if (defaultTargetPlatform == TargetPlatform.android) {
-      toRequest.add(Permission.locationWhenInUse);
+  /// The running device's Android API level.
+  ///
+  /// Falls back to 31 if device_info_plus cannot answer. That fallback is
+  /// deliberate: 31+ is the branch that asks for the FEWEST permissions, so a
+  /// failure here can never invent a new mandatory prompt that locks a working
+  /// adapter out.
+  static Future<int> _sdkInt() async {
+    final cached = _sdkIntCache;
+    if (cached != null) return cached;
+    try {
+      final info = await DeviceInfoPlugin().androidInfo;
+      return _sdkIntCache = info.version.sdkInt;
+    } catch (_) {
+      return _sdkIntCache = 31;
     }
+  }
+
+  /// Returns true if all required Bluetooth permissions are granted.
+  ///
+  /// ═══════════════════════════════════════════════════════════════════════
+  /// LOAD-BEARING: *which* permissions are asked for depends on the API level,
+  /// and asking for the wrong set is a total Bluetooth lockout, not a warning.
+  ///
+  /// Android 12 (API 31) split Bluetooth out of the location permission group.
+  /// AndroidManifest.xml already reflects that split exactly — BLUETOOTH and
+  /// BLUETOOTH_ADMIN are capped at `maxSdkVersion="30"`, and BLUETOOTH_SCAN is
+  /// declared `neverForLocation` — so the two halves must never be mixed:
+  ///
+  ///   API >= 31 : BLUETOOTH_CONNECT + BLUETOOTH_SCAN are the runtime grants.
+  ///               Location is NOT needed and is NOT requested. Asking for it
+  ///               anyway put an unexplained "allow location?" prompt in front
+  ///               of a mechanic connecting an OBD dongle, and a perfectly
+  ///               reasonable "Don't allow" then failed the all-or-nothing
+  ///               check below — leaving every screen rendering correctly with
+  ///               no live data and no connection of any kind.
+  ///
+  ///   API <  31 : BLUETOOTH/BLUETOOTH_ADMIN are install-time grants, so there
+  ///               is nothing to request for them — and BLUETOOTH_CONNECT /
+  ///               BLUETOOTH_SCAN do not exist as runtime permissions on these
+  ///               devices, so requesting them returns denied and would fail
+  ///               the same check. Location genuinely IS required for
+  ///               discovery here, so it is the only thing asked for.
+  /// ═══════════════════════════════════════════════════════════════════════
+  Future<bool> requestPermissions() async {
+    if (defaultTargetPlatform != TargetPlatform.android) return true;
+
+    final sdkInt = await _sdkInt();
+
+    final toRequest = sdkInt >= 31
+        ? <Permission>[Permission.bluetoothConnect, Permission.bluetoothScan]
+        : <Permission>[Permission.locationWhenInUse];
 
     final statuses = await toRequest.request();
 

@@ -2,6 +2,8 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
+import '../constants/chassis_dtc_dictionary.dart';
+import '../constants/chassis_modules.dart';
 import '../constants/dtc_descriptions.dart';
 import '../constants/obd_pids.dart';
 import '../models/vehicle_data.dart';
@@ -56,6 +58,30 @@ class ObdService extends ChangeNotifier {
 
   List<DtcCode> _dtcCodes = [];
   List<DtcCode> get dtcCodes => _dtcCodes;
+
+  // ── Chassis / ABS module scan state ───────────────────────────────────────
+  // Kept separate from _dtcCodes rather than merged into it: these come from a
+  // different module via a different service, and conflating them would make
+  // "clear codes" (Mode 04, engine-only) look like it applied to ABS faults
+  // when it does not.
+  List<DtcCode> _chassisDtcCodes = [];
+  List<DtcCode> get chassisDtcCodes => _chassisDtcCodes;
+
+  ChassisScanOutcome _chassisScanOutcome = ChassisScanOutcome.idle;
+  ChassisScanOutcome get chassisScanOutcome => _chassisScanOutcome;
+
+  /// Which candidate module address actually answered, for display/support.
+  String _chassisRespondingModule = '';
+  String get chassisRespondingModule => _chassisRespondingModule;
+
+  /// Human-readable probe trace, surfaced in the UI so a failed scan can be
+  /// diagnosed (wrong address vs. adapter refusing the command) instead of
+  /// being an opaque "nothing found".
+  List<String> _chassisScanLog = [];
+  List<String> get chassisScanLog => _chassisScanLog;
+
+  bool _chassisScanInFlight = false;
+  bool get chassisScanInFlight => _chassisScanInFlight;
 
   String _lastError = '';
   String get lastError => _lastError;
@@ -134,6 +160,13 @@ class ObdService extends ChangeNotifier {
   // wire time on a busy CAN bus), so it needs a longer window than a
   // single-frame live PID read to gather every frame before the '>' prompt.
   static const Duration _readDtcsMinTimeout = Duration(milliseconds: 3000);
+
+  // A chassis/ABS scan is slower again: each candidate address costs a round
+  // of ATSH/ATCRA/flow-control setup before the request itself, and a UDS
+  // 19 02 reply is routinely multi-frame. Non-engine modules are also simply
+  // less prompt than the engine ECU, which is polled continuously and stays
+  // warm on the bus.
+  static const Duration _chassisScanMinTimeout = Duration(milliseconds: 5000);
 
   // ══════════════════════════════════════════════════════════════════════════
   // WIFI CONNECTION
@@ -936,6 +969,256 @@ class ObdService extends ChangeNotifier {
       _cmdTimeout = previousTimeout;
       _releasePollLock();
     }
+  }
+
+  // ══════════════════════════════════════════════════════════════════════════
+  // CHASSIS / ABS MODULE SCAN
+  // ══════════════════════════════════════════════════════════════════════════
+  /// Read stored fault codes from the ABS/chassis module.
+  ///
+  /// This deliberately does NOT reuse [readDtcs]. Mode 03 goes out on the OBD
+  /// functional address, which only emissions ECUs are obliged to answer; an
+  /// ABS module is not one, so Mode 03 alone returns nothing from it no matter
+  /// how healthy it is. Instead each candidate module address is taken in
+  /// turn: `ATSH` retargets the adapter's transmit header at that module,
+  /// `ATCRA` filters reception so no other ECU's traffic can be misread as an
+  /// ABS reply, flow control is pointed back at the same module, and the UDS
+  /// request `19 02 FF` (ReadDTCInformation / reportDTCByStatusMask) is sent.
+  /// Plain `03` is then tried against the same physical address, because some
+  /// chassis modules implement it once addressed directly.
+  ///
+  /// Unlike the engine read this is manual-only, never looped: it rewrites the
+  /// adapter's addressing state, so it re-runs the init sequence afterwards to
+  /// restore known-good live telemetry. Running that every five seconds would
+  /// starve the dashboard.
+  ///
+  /// [vehicleMake] and [vehicleModel] are the free-text fields from the active
+  /// vehicle profile. Together they select which platform dictionary the
+  /// returned codes are described from, via [ChassisPlatforms.resolve]: the
+  /// model is required because one manufacturer can ship several ABS platforms
+  /// whose code systems disagree. The make alone still selects the module
+  /// probe order, which is a manufacturer-level concern.
+  ///
+  /// When the platform cannot be identified the scan still runs and still
+  /// returns the codes it read — only their descriptions are withheld, because
+  /// describing a braking fault from the wrong platform's table is worse than
+  /// describing nothing.
+  Future<List<DtcCode>> readChassisDtcs({
+    String? vehicleMake,
+    String? vehicleModel,
+  }) async {
+    if (!isConnected) {
+      _chassisScanOutcome = ChassisScanOutcome.linkUnavailable;
+      notifyListeners();
+      return _chassisDtcCodes;
+    }
+    if (_chassisScanInFlight) return _chassisDtcCodes;
+
+    _chassisScanInFlight = true;
+    notifyListeners();
+
+    // Two different keys, deliberately: the module probe order is a
+    // manufacturer-level concern (which CAN address the ABS ECU sits at),
+    // while the fault dictionary is a platform-level one (what a given code
+    // number means on this specific model family).
+    final manufacturerKey = ChassisManufacturers.resolveKey(vehicleMake);
+    final platformKey = ChassisPlatforms.resolve(vehicleMake, vehicleModel);
+    final log = <String>[];
+    final previousTimeout = _cmdTimeout;
+
+    var headersOn = false;
+    var stWidened = false;
+    var addressingChanged = false;
+    var addressingAccepted = false;
+
+    _acquirePollLock();
+    await _waitForLinkIdle();
+
+    try {
+      if (!_linkSynced) {
+        final recovered = await _recoverAdapter();
+        if (!recovered) {
+          _chassisScanOutcome = ChassisScanOutcome.linkUnavailable;
+          log.add('Adapter link could not be resynced.');
+          return _chassisDtcCodes;
+        }
+      }
+
+      // Chassis modules are slower to answer than the engine ECU, and a UDS
+      // reply is usually multi-frame. Widen both the app-side and adapter-side
+      // timeouts for the duration of the scan.
+      if (_cmdTimeout < _chassisScanMinTimeout) _cmdTimeout = _chassisScanMinTimeout;
+      headersOn = await _enableDtcHeaders();
+      final stResp = await _send('ATST7D');
+      stWidened = !_isDeadResponse(stResp);
+
+      final candidates = ChassisModuleProfiles.candidatesFor(manufacturerKey);
+      List<DtcCode>? found;
+
+      for (final target in candidates) {
+        if (found != null) break;
+
+        final shResp = await _send(target.headerCommand);
+        if (_isDeadResponse(shResp) || shResp.contains('?')) {
+          log.add('${target.label}: adapter rejected ${target.headerCommand}.');
+          continue;
+        }
+        addressingChanged = true;
+        addressingAccepted = true;
+
+        final craResp = await _send(target.filterCommand);
+        if (_isDeadResponse(craResp) || craResp.contains('?')) {
+          // Not fatal: without the filter we may also see other ECUs, but the
+          // parser groups by ECU id so the reply is still attributable.
+          log.add('${target.label}: ATCRA unsupported — reading unfiltered.');
+        }
+
+        // Flow control must point back at the module we are addressing, or a
+        // multi-frame UDS reply stalls after the first frame.
+        for (final cmd in target.flowControlCommands) {
+          await _send(cmd);
+        }
+
+        for (final request in target.requests) {
+          final response = await _send(request);
+
+          if (response == 'TIMEOUT') {
+            log.add('${target.label} · $request: timeout.');
+            await _recoverAdapter();
+            continue;
+          }
+          if (_isChassisNoReply(response)) {
+            log.add('${target.label} · $request: no reply from module.');
+            continue;
+          }
+
+          if (request.startsWith('19')) {
+            final uds = ObdParser.parseUdsDtcDetailed(response);
+            if (uds.negativeResponseCode != null) {
+              log.add('${target.label} · $request: module refused '
+                  '(NRC 0x${uds.negativeResponseCode!.toRadixString(16).toUpperCase()}).');
+              continue;
+            }
+            if (!uds.sawPositiveResponse) {
+              log.add('${target.label} · $request: reply not a 59 02 response.');
+              continue;
+            }
+            log.add('${target.label} · $request: answered — '
+                '${uds.records.length} code(s).');
+            _chassisRespondingModule = target.label;
+            found = <DtcCode>[
+              for (final r in uds.records)
+                _buildChassisDtc(
+                  code: r.code,
+                  platformKey: platformKey,
+                  failureTypeByte: r.failureTypeByte,
+                  isConfirmed: r.isConfirmed,
+                ),
+            ];
+            break;
+          }
+
+          // Mode 03 fallback against the physically-addressed module.
+          if (!_isUsableDtcResponse(response)) {
+            log.add('${target.label} · $request: unrecognised reply.');
+            continue;
+          }
+          final parsed = ObdParser.parseDetailed(response);
+          log.add('${target.label} · $request (Mode 03): answered — '
+              '${parsed.allCodes.length} code(s).');
+          _chassisRespondingModule = target.label;
+          found = <DtcCode>[
+            for (final code in parsed.allCodes)
+              _buildChassisDtc(code: code, platformKey: platformKey),
+          ];
+          break;
+        }
+      }
+
+      if (found == null) {
+        _chassisDtcCodes = <DtcCode>[];
+        _chassisScanOutcome = addressingAccepted
+            ? ChassisScanOutcome.noModuleResponse
+            : ChassisScanOutcome.addressingUnsupported;
+      } else {
+        _chassisDtcCodes = found;
+        _chassisScanOutcome = found.isEmpty
+            ? ChassisScanOutcome.clean
+            : ChassisScanOutcome.faultsFound;
+      }
+      return _chassisDtcCodes;
+    } catch (e) {
+      debugPrint('[ObdService] readChassisDtcs exception: $e');
+      log.add('Scan error: $e');
+      _chassisScanOutcome = ChassisScanOutcome.noModuleResponse;
+      return _chassisDtcCodes;
+    } finally {
+      _cmdTimeout = previousTimeout;
+      // Restoring addressing matters more than saving time here: ATSH/ATCRA
+      // persist on the adapter, and leaving them set would silently break
+      // every subsequent live PID poll. Re-running the init sequence puts the
+      // adapter back to the exact known-good live baseline the rest of the app
+      // assumes.
+      if (addressingChanged && _linkSynced) {
+        await _send(ObdPids.autoReceiveAddress);
+        await _send(ObdPids.clearReceiveFilter);
+        final restored = await _runInitSequence();
+        if (!restored) log.add('Warning: adapter re-init after scan failed.');
+      } else {
+        if (stWidened && _linkSynced) await _send('ATST32');
+        if (headersOn) await _restoreLiveHeaders();
+      }
+      _chassisScanLog = List<String>.unmodifiable(log);
+      _releasePollLock();
+      _chassisScanInFlight = false;
+      notifyListeners();
+    }
+  }
+
+  /// Build a chassis [DtcCode], filling the manufacturer columns when the
+  /// dictionary has a real entry and leaving them empty when it does not.
+  ///
+  /// Empty is deliberate: the UI renders an undocumented chassis code honestly
+  /// as "no manufacturer description available" rather than inventing one for
+  /// a braking-system fault.
+  DtcCode _buildChassisDtc({
+    required String code,
+    required String? platformKey,
+    int? failureTypeByte,
+    bool isConfirmed = true,
+  }) {
+    final entry = ChassisDtcDatabase.lookup(platformKey, code);
+    return DtcCode(
+      code: code,
+      description: entry?.description ?? '',
+      possibleCause: entry?.query ?? '',
+      severity: entry?.severity ?? 'unknown',
+      action: entry?.remedy ?? '',
+      module: 'chassis',
+      component: entry?.component ?? '',
+      query: entry?.query ?? '',
+      remedy: entry?.remedy ?? '',
+      failureTypeByte: failureTypeByte,
+      isConfirmed: isConfirmed,
+    );
+  }
+
+  /// True when a physically-addressed module produced nothing usable.
+  ///
+  /// "NO DATA" is treated as no-reply here, unlike the engine path: when the
+  /// adapter is addressed at one specific module, NO DATA means that module
+  /// did not answer at all — not that a healthy module reported zero faults.
+  bool _isChassisNoReply(String r) {
+    if (r.isEmpty) return true;
+    final upper = r.toUpperCase();
+    return upper.contains('NO DATA') ||
+        upper.contains('NODATA') ||
+        upper.contains('UNABLE TO CONNECT') ||
+        upper.contains('CAN ERROR') ||
+        upper.contains('BUS INIT') ||
+        upper.contains('DISCONNECTED') ||
+        upper.trim() == '?' ||
+        upper.contains('STOPPED');
   }
 
   // ══════════════════════════════════════════════════════════════════════════

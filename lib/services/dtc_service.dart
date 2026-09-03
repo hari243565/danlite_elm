@@ -31,6 +31,8 @@ library;
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
+import '../constants/chassis_dtc_dictionary.dart';
+import '../constants/chassis_dtc_dictionary_hi.dart';
 import '../constants/dtc_dictionary_hi.dart';
 
 /// The four SAE J2012 diagnostic categories, keyed by the first character of
@@ -114,6 +116,45 @@ class DtcLocalizations {
     final jsonEn = _jsonDescriptions['en']?[upper];
     if (jsonEn != null && jsonEn.isNotEmpty) return jsonEn;
     return englishFallback;
+  }
+
+  // ── Chassis / ABS platform dictionary ─────────────────────────────────────
+  /// Localized chassis entry for [code] under [platformKey].
+  ///
+  /// [platformKey] is a manufacturer + model-family key (see
+  /// [ChassisPlatforms]), not a bare manufacturer: one manufacturer can ship
+  /// several ABS platforms whose code systems disagree, so the model is part
+  /// of the identity of a chassis code.
+  ///
+  /// Resolution mirrors [description] exactly: Hindi is served from the
+  /// parallel Hindi map when present, every other language (and any Hindi gap)
+  /// falls back to the English master. Returns null when the English master
+  /// has no entry — the app must never render a Hindi-only or invented
+  /// description for a braking-system fault, so "no data" stays "no data".
+  static ChassisDtcResolved? chassisEntry(
+    String? platformKey,
+    String code,
+    String langCode,
+  ) {
+    final upper = code.toUpperCase();
+    final master = ChassisDtcDatabase.lookup(platformKey, upper);
+    if (master == null) return null;
+
+    final hi = langCode == 'hi'
+        ? ChassisDtcDictionaryHi.lookup(platformKey, upper)
+        : null;
+
+    String pick(String? localized, String fallback) =>
+        (localized != null && localized.isNotEmpty) ? localized : fallback;
+
+    return ChassisDtcResolved(
+      // Component is a manufacturer identifier token, never translated.
+      component: master.component,
+      description: pick(hi?.description, master.description),
+      query: pick(hi?.query, master.query),
+      remedy: pick(hi?.remedy, master.remedy),
+      severity: master.severity,
+    );
   }
 
   // ── Category-header matrix ────────────────────────────────────────────────
@@ -244,4 +285,22 @@ class DtcLocalizations {
     flush();
     return result;
   }
+}
+
+/// A chassis/ABS dictionary entry already resolved into the app's active
+/// language, ready for the fault card to render without further lookups.
+class ChassisDtcResolved {
+  final String component;
+  final String description;
+  final String query;
+  final String remedy;
+  final String severity;
+
+  const ChassisDtcResolved({
+    required this.component,
+    required this.description,
+    required this.query,
+    required this.remedy,
+    required this.severity,
+  });
 }

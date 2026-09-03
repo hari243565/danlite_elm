@@ -185,6 +185,58 @@ class AppStrings {
       'severityMedium': '🟡 Medium',
       'severityLow': '🟢 Low',
       'severityUnknown': '⚪ Unknown',
+
+      // ── Module selector (Engine / ABS) ──────────────────────────────────
+      // Only 'en' and 'hi' ship these; AppStrings.get falls every other
+      // language back to English, exactly as DTC descriptions already do.
+      'moduleEngine': 'Engine',
+      'moduleAbs': 'ABS / Chassis',
+      'scanAbsModule': 'Scan ABS',
+      'scanningAbs': 'Scanning…',
+      'absComponent': 'Component',
+      'absQuery': 'Query',
+      'absRemedy': 'Remedy',
+      'absRespondingModule': 'Module',
+      'absScanDetails': 'Scan details',
+      'absUnconfirmed': 'Unconfirmed',
+      'absNotScanned': 'ABS not scanned yet',
+      'absNotScannedDesc':
+          'Tap Scan ABS to query the braking module. This is a separate module '
+          'from the engine ECU, so it is scanned on demand rather than '
+          'continuously.',
+      'absNoFaults': 'No ABS fault codes',
+      'absNoFaultsDesc':
+          'The ABS module answered and reported no stored faults.',
+      'absNoModule': 'No reply from the ABS module',
+      'absNoModuleDesc':
+          'Every candidate ABS address was tried and none answered. This can '
+          'mean the module uses a different address on this vehicle, or that '
+          'this ELM327 adapter cannot reach non-engine modules at all — many '
+          'adapters that read engine codes perfectly still cannot read ABS. '
+          'It does not by itself mean the ABS system is faulty.',
+      'absAddressingUnsupported': 'Adapter cannot address the ABS module',
+      'absAddressingUnsupportedDesc':
+          'This adapter rejected the commands needed to talk to a specific '
+          'module (ATSH / ATCRA). Reading ABS codes requires an ELM327 that '
+          'supports module addressing. Engine codes are unaffected.',
+      'absNoDictionary':
+          'No manufacturer description available for this code.',
+      'absSetMake': 'Set your vehicle make',
+      'absSetMakeDesc':
+          'Chassis codes are manufacturer-specific — the same code means '
+          'different faults on different makes. Add the make to your vehicle '
+          'profile so codes can be described correctly.',
+      'absMakeUnsupported': 'No ABS dictionary for this make yet',
+      'absMakeUnsupportedDesc':
+          'Codes will still be read and shown, but without manufacturer '
+          'descriptions.',
+      'absSetModel': 'Set your vehicle model',
+      'absSetModelDesc':
+          'This make has more than one ABS platform, and the same code number '
+          'means different faults on each — so the model is needed before a '
+          'code can be described. Codes are still read and shown without it. '
+          'Models recognised:',
+
       'emissionReadiness': 'Emission Readiness',
       'freezeFrameTitle': 'Freeze Frame Data',
       'freezeFrameDesc':
@@ -782,6 +834,51 @@ class AppStrings {
       'severityMedium': '🟡 मध्यम',
       'severityLow': '🟢 कम',
       'severityUnknown': '⚪ अज्ञात',
+
+      // ── मॉड्यूल चयन (इंजन / ABS) ────────────────────────────────────────
+      'moduleEngine': 'इंजन',
+      'moduleAbs': 'ABS / चेसिस',
+      'scanAbsModule': 'ABS स्कैन करें',
+      'scanningAbs': 'स्कैन हो रहा है…',
+      'absComponent': 'कंपोनेंट',
+      'absQuery': 'विवरण',
+      'absRemedy': 'उपाय',
+      'absRespondingModule': 'मॉड्यूल',
+      'absScanDetails': 'स्कैन विवरण',
+      'absUnconfirmed': 'अपुष्ट',
+      'absNotScanned': 'ABS अभी स्कैन नहीं हुआ',
+      'absNotScannedDesc':
+          'ब्रेकिंग मॉड्यूल से कोड पढ़ने के लिए "ABS स्कैन करें" दबाएँ। यह इंजन ECU से '
+          'अलग मॉड्यूल है, इसलिए इसे लगातार नहीं, माँगने पर स्कैन किया जाता है।',
+      'absNoFaults': 'कोई ABS फॉल्ट कोड नहीं',
+      'absNoFaultsDesc':
+          'ABS मॉड्यूल ने उत्तर दिया और कोई संग्रहित फॉल्ट नहीं बताया।',
+      'absNoModule': 'ABS मॉड्यूल से कोई उत्तर नहीं',
+      'absNoModuleDesc':
+          'सभी संभावित ABS पतों पर प्रयास किया गया, किसी ने उत्तर नहीं दिया। इसका अर्थ '
+          'यह हो सकता है कि इस वाहन में मॉड्यूल का पता अलग है, या यह ELM327 एडाप्टर '
+          'इंजन के अलावा किसी मॉड्यूल तक पहुँच ही नहीं सकता — कई एडाप्टर इंजन कोड ठीक '
+          'पढ़ते हैं फिर भी ABS नहीं पढ़ पाते। इससे यह सिद्ध नहीं होता कि ABS सिस्टम खराब है।',
+      'absAddressingUnsupported': 'एडाप्टर ABS मॉड्यूल को संबोधित नहीं कर सकता',
+      'absAddressingUnsupportedDesc':
+          'इस एडाप्टर ने किसी विशिष्ट मॉड्यूल से बात करने वाले कमांड (ATSH / ATCRA) '
+          'अस्वीकार कर दिए। ABS कोड पढ़ने के लिए मॉड्यूल एड्रेसिंग सपोर्ट करने वाला '
+          'ELM327 चाहिए। इंजन कोड इससे प्रभावित नहीं होते।',
+      'absNoDictionary':
+          'इस कोड के लिए निर्माता का विवरण उपलब्ध नहीं है।',
+      'absSetMake': 'अपने वाहन का मेक दर्ज करें',
+      'absSetMakeDesc':
+          'चेसिस कोड निर्माता-विशिष्ट होते हैं — एक ही कोड अलग-अलग मेक पर अलग फॉल्ट '
+          'दर्शाता है। सही विवरण दिखाने के लिए वाहन प्रोफ़ाइल में मेक जोड़ें।',
+      'absMakeUnsupported': 'इस मेक के लिए अभी ABS डिक्शनरी नहीं है',
+      'absMakeUnsupportedDesc':
+          'कोड फिर भी पढ़े और दिखाए जाएँगे, पर निर्माता के विवरण के बिना।',
+      'absSetModel': 'अपने वाहन का मॉडल दर्ज करें',
+      'absSetModelDesc':
+          'इस मेक में एक से अधिक ABS प्लेटफ़ॉर्म हैं, और एक ही कोड नंबर हर प्लेटफ़ॉर्म पर '
+          'अलग फॉल्ट दर्शाता है — इसलिए कोड का विवरण दिखाने से पहले मॉडल जानना ज़रूरी है। '
+          'मॉडल के बिना भी कोड पढ़े और दिखाए जाएँगे। पहचाने जाने वाले मॉडल:',
+
       'emissionReadiness': 'उत्सर्जन तत्परता',
       'freezeFrameDesc':
           'फॉल्ट सेट होने पर सेंसर स्नैपशॉट कैप्चर करता है। पहले फॉल्ट कोड पढ़ें।',

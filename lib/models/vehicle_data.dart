@@ -107,6 +107,35 @@ class DtcCode {
   final String action;
   final bool isPending;
 
+  // ── Chassis/ABS extensions ────────────────────────────────────────────────
+  // All optional with defaults, so every existing engine-code construction
+  // site is untouched. They carry the extra columns a manufacturer chassis
+  // service table provides, which the generic powertrain path has no analogue
+  // for.
+
+  /// Which diagnostic module reported this code — `'engine'` (OBD-II Mode 03
+  /// on the functional address) or `'chassis'` (UDS against a physically
+  /// addressed ABS/chassis module). Distinct from the code's SAE letter.
+  final String module;
+
+  /// Manufacturer's internal "Failure Component" token (e.g. `RFP/RFP_HW`).
+  /// Never translated — a technician matches it against the manual verbatim.
+  final String component;
+
+  /// Manufacturer's "Query" column: what the fault actually indicates.
+  final String query;
+
+  /// Manufacturer's "Remedy" column: the prescribed fix.
+  final String remedy;
+
+  /// ISO 14229 failure-type byte, when the code came from a UDS reply
+  /// (the `-04` in `C1015-04`). Null for OBD-II Mode 03 codes.
+  final int? failureTypeByte;
+
+  /// True when the module reported this code as a confirmed, stored fault
+  /// (UDS status bit 3) rather than a single unconfirmed test failure.
+  final bool isConfirmed;
+
   const DtcCode({
     required this.code,
     required this.description,
@@ -114,7 +143,15 @@ class DtcCode {
     required this.severity,
     required this.action,
     this.isPending = false,
+    this.module = 'engine',
+    this.component = '',
+    this.query = '',
+    this.remedy = '',
+    this.failureTypeByte,
+    this.isConfirmed = true,
   });
+
+  bool get isChassis => module == 'chassis';
 }
 
 /// Connection State
