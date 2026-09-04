@@ -11,6 +11,36 @@ import 'bluetooth_classic_service.dart';
 
 enum ConnectionType { wifi, bluetooth }
 
+/// What a raw adapter reply proves about the *link*, as opposed to what it
+/// says about the *command*.
+///
+/// These are two different questions and the service used to answer both from
+/// the same string. That conflation is what produced false "Connection Failed"
+/// reports: a command that did not answer inside its own window was reported
+/// to the user as a dead connection, even while the adapter was demonstrably
+/// still carrying traffic.
+enum ObdReplyClass {
+  /// Bytes came back from the adapter, so the link is PROVEN alive.
+  ///
+  /// The payload may be empty. A bare `>` prompt with nothing before it is the
+  /// complete and correct reply to any command the ECU answers with no data —
+  /// an unsupported live PID, and notably a Mode 04 flash erase, whose normal
+  /// acknowledgement on single-ECU vehicles carries no payload bytes at all.
+  /// "Thin" is not "absent".
+  answered,
+
+  /// The window elapsed with no reply, but the link has delivered traffic
+  /// recently enough that it cannot honestly be called failed. The COMMAND did
+  /// not answer; the CONNECTION is fine. Callers must resolve this on the
+  /// command's own terms — never by reporting a connection failure.
+  noAnswer,
+
+  /// The transport itself reported failure, or nothing has come back for long
+  /// enough that the link can no longer be presumed alive. This — and only
+  /// this — is a genuine connection failure.
+  linkFailure,
+}
+
 /// Static sensor snapshot captured by the ECU at the moment a DTC was set
 /// (OBD2 Mode 02). Any field may be null if that PID isn't supported by the
 /// vehicle or its response didn't parse.
@@ -115,6 +145,20 @@ class ObdService extends ChangeNotifier {
 
   DateTime? _lastGoodResponseAt;
   DateTime? get lastGoodResponseAt => _lastGoodResponseAt;
+
+  // How many consecutive unanswered commands it takes before the link stops
+  // being presumed alive. Shared by _classifyReply() and _pollLoop() so the
+  // "is this connection dead?" question has exactly one threshold rather than
+  // one per caller.
+  static const int _deadLinkTimeouts = 6;
+
+  // How long a delivered reply keeps proving the link is alive. Sized to sit
+  // above the largest single-command window in this service
+  // (_chassisScanMinTimeout, 5s) so one slow command can never, on its own,
+  // age the link out of "proven alive" — while a link that has genuinely gone
+  // quiet crosses the line within a second or two of the timeout that
+  // announced it.
+  static const Duration _linkProofWindow = Duration(seconds: 6);
 
   // ── WiFi transport ────────────────────────────────────────────────────────
   Socket? _wifiSocket;
@@ -483,12 +527,58 @@ class ObdService extends ChangeNotifier {
     }
   }
 
+  /// Did this AT command take effect?
+  ///
+  /// Deliberately stricter than [_classifyReply] and deliberately NOT changed
+  /// to match it. This asks a configuration question, not a link question: a
+  /// healthy ELM327 always answers an AT command with `OK` or a value, so for
+  /// an AT command an empty payload really is anomalous and must not be taken
+  /// as "applied". [_classifyReply]'s "empty is still an answer" rule is about
+  /// OBD mode replies, where the ECU legitimately has nothing to say.
   bool _isDeadResponse(String r) {
     if (r.isEmpty) return true;
     final upper = r.toUpperCase();
     return upper.contains('TIMEOUT') ||
         upper == 'DISCONNECTED' ||
         upper.contains('ERROR');
+  }
+
+  /// The single place that decides what a reply proves about the LINK.
+  ///
+  /// Every site that needs to know "is the connection still there?" asks this
+  /// instead of pattern-matching the reply string itself, so the answer cannot
+  /// drift between commands. Three rules, in order:
+  ///
+  ///  1. A hard transport verdict — the layer below reported the socket gone,
+  ///     or the write itself threw — is a link failure. Matched on the whole
+  ///     string, not a substring, so an ECU that answers `BUS INIT: ERROR` or
+  ///     `CAN ERROR` over a working link is not mistaken for a dead socket;
+  ///     that is a command failure and the per-command checks still catch it.
+  ///  2. Anything else that came back is proof of life, INCLUDING an empty
+  ///     payload. The adapter emitting a bare `>` prompt answered us. This is
+  ///     the rule the service previously lacked, and it is general: it holds
+  ///     for an unsupported live PID, for a Mode 04 erase acknowledged with no
+  ///     payload, and for any future command whose correct reply is silence.
+  ///  3. Only a timeout is ambiguous, and it is resolved with evidence rather
+  ///     than assumption: if the link has delivered a reply inside
+  ///     [_linkProofWindow] and has not missed [_deadLinkTimeouts] in a row,
+  ///     the command did not answer but the connection is fine. Otherwise the
+  ///     link has stopped proving itself and the failure is real.
+  ObdReplyClass _classifyReply(String r) {
+    final upper = r.toUpperCase().trim();
+
+    if (upper == 'DISCONNECTED' || upper == 'ERROR') {
+      return ObdReplyClass.linkFailure;
+    }
+    if (upper != 'TIMEOUT') return ObdReplyClass.answered;
+
+    if (_consecutiveTimeouts >= _deadLinkTimeouts) return ObdReplyClass.linkFailure;
+    final last = _lastGoodResponseAt;
+    if (last == null) return ObdReplyClass.linkFailure;
+    if (DateTime.now().difference(last) > _linkProofWindow) {
+      return ObdReplyClass.linkFailure;
+    }
+    return ObdReplyClass.noAnswer;
   }
 
   // ══════════════════════════════════════════════════════════════════════════
@@ -529,7 +619,12 @@ class ObdService extends ChangeNotifier {
     try {
       for (var attempt = 0; attempt < 2; attempt++) {
         final r = await _sendRaw('');
-        if (!_isDeadResponse(r)) {
+        // A bare CR asks the adapter one question — "are you there?" — and a
+        // bare '>' prompt is a complete yes. Judged with _isDeadResponse()
+        // this probe could never succeed on a healthy adapter, because that
+        // check calls an empty payload dead; the recovery it gates was
+        // therefore always forced down the slower ATZ path.
+        if (_classifyReply(r) == ObdReplyClass.answered) {
           debugPrint('[ObdService] adapter responded to CR — resynced');
           _adapterWedged = false;
           _linkSynced = true;
@@ -608,11 +703,21 @@ class ObdService extends ChangeNotifier {
     final completer = _wifiPendingCmd!;
     return completer.future.timeout(_cmdTimeout, onTimeout: () {
       _consecutiveTimeouts++;
-      _linkSynced = false;
+      // Close the write gate only when the link has actually stopped proving
+      // itself. Slamming it shut on every single missed reply is what turned
+      // one slow command into a cascade: the next _send() was then discarded
+      // unsent and returned a synthetic 'TIMEOUT' of its own. The dead-link
+      // detector above is untouched, so a link that really is gone still
+      // trips it on the same count it always did.
+      if (_classifyReply('TIMEOUT') == ObdReplyClass.linkFailure) {
+        _linkSynced = false;
+      }
       if (_wifiPendingCmd == completer) _wifiPendingCmd = null;
       return 'TIMEOUT';
     }).then((value) {
-      if (value != 'TIMEOUT' && value != 'ERROR' && value.isNotEmpty) {
+      // Keyed on whether bytes came back, not on how many. An empty payload
+      // is a delivered reply and proves the link as well as a full one does.
+      if (_classifyReply(value) == ObdReplyClass.answered) {
         _consecutiveTimeouts = 0;
         _linkSynced = true;
         _adapterWedged = false;
@@ -638,11 +743,17 @@ class ObdService extends ChangeNotifier {
     final completer = _btPendingCmd!;
     return completer.future.timeout(_cmdTimeout, onTimeout: () {
       _consecutiveTimeouts++;
-      _linkSynced = false;
+      // Same rule as the Wi-Fi path — see _sendWifi() for why the write gate
+      // is no longer closed on a single missed reply.
+      if (_classifyReply('TIMEOUT') == ObdReplyClass.linkFailure) {
+        _linkSynced = false;
+      }
       if (_btPendingCmd == completer) _btPendingCmd = null;
       return 'TIMEOUT';
     }).then((value) {
-      if (value != 'TIMEOUT' && value != 'ERROR' && value.isNotEmpty) {
+      // Keyed on whether bytes came back, not on how many. An empty payload
+      // is a delivered reply and proves the link as well as a full one does.
+      if (_classifyReply(value) == ObdReplyClass.answered) {
         _consecutiveTimeouts = 0;
         _linkSynced = true;
         _adapterWedged = false;
@@ -716,9 +827,9 @@ class ObdService extends ChangeNotifier {
         }
 
         // If we've had too many consecutive timeouts, the link is likely dead.
-        if (_consecutiveTimeouts >= 6) {
+        if (_consecutiveTimeouts >= _deadLinkTimeouts) {
           debugPrint(
-              '[ObdService] 6 consecutive timeouts — link considered dead');
+              '[ObdService] $_deadLinkTimeouts consecutive timeouts — link considered dead');
           _handleTransportDrop('Lost connection to adapter (no response)');
           return;
         }
@@ -956,18 +1067,69 @@ class ObdService extends ChangeNotifier {
       }
 
       final response = await _send(ObdPids.clearDtcs);
-      if (_isClearDtcsSuccess(response)) {
-        _dtcCodes = [];
-        notifyListeners();
-        return true;
+
+      switch (_classifyReply(response)) {
+        case ObdReplyClass.linkFailure:
+          // The connection really is gone. Report it — this is the path the
+          // user must still see when Bluetooth is switched off or the bike is
+          // walked away from mid-clear.
+          return false;
+
+        case ObdReplyClass.answered:
+          // Includes the empty-payload acknowledgement. _isClearDtcsSuccess()
+          // still vetoes a genuine ECU refusal (negative response 7F 04).
+          if (!_isClearDtcsSuccess(response)) return false;
+          _dtcCodes = [];
+          notifyListeners();
+          return true;
+
+        case ObdReplyClass.noAnswer:
+          // The erase went out on a link that is demonstrably still alive, and
+          // the ECU simply did not acknowledge inside the window — routine,
+          // because Mode 04 is the one command that stops the ECU servicing
+          // the bus while it writes flash. Neither "succeeded" nor "connection
+          // failed" is known to be true here, so assume neither: ask the ECU
+          // what its fault memory actually holds now.
+          return await _confirmDtcsCleared();
       }
-      return false;
     } catch (e) {
       debugPrint('[ObdService] clearDtcs exception: $e');
       return false;
     } finally {
       _cmdTimeout = previousTimeout;
       _releasePollLock();
+    }
+  }
+
+  /// Resolve an unacknowledged erase by observing the ECU instead of guessing.
+  ///
+  /// Called only from the [ObdReplyClass.noAnswer] branch, i.e. the link is
+  /// known to be alive and the request is known to have gone out. Mode 03 then
+  /// answers the only question left — did the fault memory actually empty?
+  ///
+  /// Nothing here is charitable: the clear is confirmed ONLY on a reply that
+  /// is a real, parseable Mode 03 answer reporting no stored codes. An empty
+  /// or unparseable reply is not evidence of an empty fault memory and is
+  /// reported as failure, so this cannot turn a broken clear into a green tick.
+  Future<bool> _confirmDtcsCleared() async {
+    final previousTimeout = _cmdTimeout;
+    if (_cmdTimeout < _readDtcsMinTimeout) _cmdTimeout = _readDtcsMinTimeout;
+    try {
+      final response = await _send(ObdPids.readDtcs);
+      if (_classifyReply(response) != ObdReplyClass.answered) return false;
+      if (!_isUsableDtcResponse(response)) return false;
+      if (ObdParser.parseDetailed(response).allCodes.isNotEmpty) return false;
+
+      debugPrint('[ObdService] clearDtcs unacknowledged — '
+          'Mode 03 confirms fault memory is empty');
+      _dtcCodes = [];
+      notifyListeners();
+      return true;
+    } catch (e) {
+      debugPrint('[ObdService] _confirmDtcsCleared exception: $e');
+      return false;
+    } finally {
+      _cmdTimeout = previousTimeout;
     }
   }
 

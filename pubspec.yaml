@@ -70,6 +70,13 @@ dev_dependencies:
   flutter_lints: ^3.0.1
   flutter_launcher_icons: ^0.13.1
 
+  # Used ONLY by tool/make_adaptive_foreground.dart, which derives the adaptive
+  # icon foreground from the brand art. Pinned to the exact version
+  # flutter_launcher_icons 0.13.1 already resolves transitively, so this adds a
+  # direct marker and nothing else to the resolution (verified against
+  # pubspec.lock). Dev-only: it is never bundled into the APK.
+  image: 4.8.0
+
 flutter:
   uses-material-design: true
   generate: true
@@ -83,10 +90,31 @@ flutter:
 flutter_launcher_icons:
   android: "ic_launcher"
   ios: false
+
+  # Legacy square launcher icon (Android 7 and below, and any launcher that
+  # ignores adaptive icons). The brand art already carries its own navy plate
+  # and rounded corners, so it is used here exactly as supplied — no masking is
+  # applied at this layer, which is precisely what this flattened art expects.
   image_path: "assets/images/logo.png"
-  # Adaptive icons let the Android launcher mask the icon to the device shape
-  # (circle on most launchers). White background fills the logo's transparency
-  # so the circular crop stays clean, and the wordmark is not hard-chopped.
+
   min_sdk_android: 21
-  adaptive_icon_background: "#FFFFFF"
-  adaptive_icon_foreground: "assets/images/logo.png"
+
+  # ── Adaptive icon (Android 8+) ───────────────────────────────────────────
+  #
+  # The launcher masks the FOREGROUND layer to whatever shape the device wants
+  # and only guarantees the central 66/108dp circle survives. assets/images/
+  # logo.png cannot serve as that foreground: its artwork runs to 92.4% of the
+  # image height, so 41% of it (the whole DANLITE wordmark) would be sheared
+  # off, and its rounded corners are genuinely transparent — they would leak
+  # the background layer through as pale notches. That is the classic
+  # double-rounding failure, and it is invisible in a plain image viewer.
+  #
+  # So the foreground is a DERIVED asset: the same artwork lifted off its navy
+  # plate and rescaled so that 100% of its ink sits inside the 66/108dp safe
+  # circle. It is crop + scale + pad only — nothing is redrawn. The plate the
+  # art was designed against is reproduced by the background layer below, so
+  # the launcher composites back to the intended look at any mask shape.
+  # Regenerate it with tool/make_adaptive_foreground.dart if the brand art
+  # changes.
+  adaptive_icon_foreground: "assets/launcher/logo_adaptive_foreground.png"
+  adaptive_icon_background: "#0C0F1D"

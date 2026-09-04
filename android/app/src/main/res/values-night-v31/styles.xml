@@ -5,12 +5,13 @@
 
       Mirrors values-v31/styles.xml but swaps the splash background to the app's
       darkest brand surface (#0A0D12 — the gauge bezel/face-edge tone) so the
-      boot splash dissolves smoothly into the dark UI instead of flashing white.
+      boot splash dissolves smoothly into the dark UI.
 
-      The DANLITE wordmark in the logo is dark navy and would vanish on a dark
-      background, so the padded logo is floated on a white icon circle
-      (windowSplashScreenIconBackgroundColor) to keep it fully legible. The same
-      padded @drawable/android12splash is reused, so nothing is cropped.
+      windowSplashScreenIconBackgroundColor floats the icon on the brand plate
+      (@color/ic_launcher_background) — deliberately, and no longer on white.
+      The logo art is white and orange now, so a white icon circle would have
+      swallowed the DANLITE wordmark entirely. Against #0A0D12 the navy plate
+      reads as a barely-there disc, which is the intent: the art carries itself.
     -->
     <style name="LaunchTheme" parent="@android:style/Theme.Black.NoTitleBar">
         <item name="android:windowBackground">@drawable/launch_background</item>

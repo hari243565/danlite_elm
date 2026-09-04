@@ -2,12 +2,18 @@
 <!--
   Android 12+ (API 31+) boot-splash icon.
 
-  On Android 12 the OS builds the boot splash from the launcher icon and masks
-  it to a 240dp circle inside a 288dp canvas. The launcher foreground is a
-  full-bleed wordmark, so its outer edges (top-right of the 'd', bottom of
-  'DANLITE') fell outside that circle and were chopped. Insetting the logo
-  keeps the entire wordmark inside the safe circle so nothing is cropped.
+  The OS renders this drawable into a 288dp canvas and masks it to the inner
+  192dp circle — a visible diameter of 192/288 = 0.667 of the canvas.
+
+  This used to inset the launcher foreground by 26%, because that foreground
+  was a full-bleed wordmark whose outer edges fell outside the splash circle
+  and were chopped. That is no longer true: ic_launcher_foreground is now a
+  purpose-derived adaptive foreground whose ink is guaranteed to sit inside a
+  circle of 66/108 = 0.611 of its canvas. 0.611 < 0.667, so it already fits the
+  splash mask with room to spare and needs no further inset — the padding lives
+  in the asset itself now. The inset wrapper is kept at 0% so the two v31 style
+  files keep a single indirection point if this ever needs retuning.
 -->
 <inset xmlns:android="http://schemas.android.com/apk/res/android"
     android:drawable="@drawable/ic_launcher_foreground"
-    android:inset="26%" />
+    android:inset="0%" />

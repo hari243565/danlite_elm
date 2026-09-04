@@ -5,9 +5,14 @@
 
       On API 31+ the legacy windowBackground splash is ignored and the OS
       generates the boot splash itself. Without these attributes it falls back
-      to the launcher icon (a full-bleed wordmark) and crops it against the
-      circular splash mask. Declaring an explicit white background plus a padded
-      splash icon (@drawable/android12splash) keeps the full logo visible.
+      to the launcher icon and crops it against the circular splash mask.
+
+      Both values track the launcher's own layers, so the boot splash is the
+      launcher icon: the brand plate (@color/ic_launcher_background, the navy
+      the logo art was drawn against) behind the padded logo
+      (@drawable/android12splash). The art is white and orange, so it needs
+      that dark plate — on the white background this used to declare, the
+      DANLITE wordmark would have rendered white-on-white and vanished.
     -->
     <style name="LaunchTheme" parent="@android:style/Theme.Black.NoTitleBar">
         <item name="android:windowBackground">@drawable/launch_background</item>
