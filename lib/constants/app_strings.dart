@@ -185,6 +185,7 @@ class AppStrings {
       // working. These name what actually happened. Only 'en' and 'hi' ship
       // them; AppStrings.get falls every other language back to English,
       // exactly as the ABS strings below already do.
+      'clearSucceeded': 'Codes cleared successfully ✓',
       'clearUnconfirmed': 'Sent, but the ECU did not confirm. '
           'Tap Read Codes to check.',
       'clearRefused': 'The ECU refused the erase. Stop the engine, leave the '
@@ -747,6 +748,7 @@ class AppStrings {
       'connectToRead': 'कोड पढ़ने के लिए एडेप्टर कनेक्ट करें',
       'clearAllQ': 'सभी दोष कोड साफ करें?',
       'clearWarning': 'यह सभी DTC मिटा देगा और चेक इंजन लाइट बंद कर देगा।',
+      'clearSucceeded': 'कोड सफलतापूर्वक साफ हो गए ✓',
       'clearUnconfirmed':
           'भेज दिया गया, पर ECU ने पुष्टि नहीं की। जाँचने के लिए “कोड पढ़ें” दबाएँ।',
       'clearRefused':

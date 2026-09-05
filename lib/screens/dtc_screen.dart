@@ -27,6 +27,34 @@ class _RC {
   static const Color neonGreen = Color(0xFF00E39C);
 }
 
+/// The rider-facing translation key for a Clear Codes attempt.
+///
+/// Clear Codes has exactly two outcomes as far as the rider is concerned, and
+/// this is the single place that decides which one they see: the fault memory
+/// was erased, or it was not. This is the original v1.0–v1.4 behaviour, which
+/// six weeks of real use proved out, restored deliberately.
+///
+/// [ClearDtcsOutcome] keeps all five of its values and the classification in
+/// [ObdService.clearDtcs] that computes them is untouched — a link failure is
+/// still detected as a link failure, a refusal still as a refusal. That detail
+/// simply stops being surfaced beyond the success/not-success distinction, and
+/// remains available internally for Sentry or any future diagnostic tooling.
+@visibleForTesting
+String clearOutcomeMessageKey(bool ok, ClearDtcsOutcome outcome) {
+  if (ok) return 'clearSucceeded';
+  switch (outcome) {
+    // Every non-success outcome — including the three that have nothing to do
+    // with the link — deliberately collapses to the one message.
+    case ClearDtcsOutcome.linkFailure:
+    case ClearDtcsOutcome.refused:
+    case ClearDtcsOutcome.unconfirmed:
+    case ClearDtcsOutcome.notCleared:
+    case ClearDtcsOutcome.idle:
+    case ClearDtcsOutcome.cleared:
+      return 'connectionFailed';
+  }
+}
+
 class DtcScreen extends StatefulWidget {
   const DtcScreen({super.key});
 
@@ -149,13 +177,9 @@ class _DtcScreenState extends State<DtcScreen> {
 
     final outcome = obd.lastClearOutcome;
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      // An unconfirmed clear is not a failure — the codes may well be gone —
-      // so it is not dressed in the failure colour.
-      backgroundColor: ok
-          ? _RC.neonGreen
-          : (outcome == ClearDtcsOutcome.unconfirmed
-              ? _RC.neonAmber
-              : _RC.neonRed),
+      // Two outcomes reach the rider and only two, so there are two colours:
+      // the erase is confirmed, or it is not.
+      backgroundColor: ok ? _RC.neonGreen : _RC.neonRed,
       duration: ok
           ? const Duration(seconds: 2)
           : const Duration(seconds: 6), // long enough to read and act on
@@ -167,29 +191,9 @@ class _DtcScreenState extends State<DtcScreen> {
   }
 
   /// What to tell the rider about a Clear Codes attempt.
-  ///
-  /// Every unsuccessful clear used to render as "Connection Failed" regardless
-  /// of cause. Three of the four failure modes have nothing to do with the
-  /// connection, and saying otherwise sends the rider to re-pair a Bluetooth
-  /// adapter that is working perfectly while the real cause — an ECU that
-  /// refused the erase, or one that simply never answered — goes unaddressed.
   String _clearOutcomeMessage(
-      BuildContext context, bool ok, ClearDtcsOutcome outcome) {
-    if (ok) return '${context.tr('clearCodes')} ✓';
-    switch (outcome) {
-      case ClearDtcsOutcome.unconfirmed:
-        return context.tr('clearUnconfirmed');
-      case ClearDtcsOutcome.refused:
-        return context.tr('clearRefused');
-      case ClearDtcsOutcome.notCleared:
-        return context.tr('clearNotCleared');
-      case ClearDtcsOutcome.linkFailure:
-      case ClearDtcsOutcome.idle:
-      case ClearDtcsOutcome.cleared:
-        // Only a real link failure still says the link failed.
-        return context.tr('connectionFailed');
-    }
-  }
+          BuildContext context, bool ok, ClearDtcsOutcome outcome) =>
+      context.tr(clearOutcomeMessageKey(ok, outcome));
 
   Future<void> _showFreezeFrame() async {
     final obd = context.read<ObdService>();

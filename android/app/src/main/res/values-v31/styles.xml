@@ -7,16 +7,30 @@
       generates the boot splash itself. Without these attributes it falls back
       to the launcher icon and crops it against the circular splash mask.
 
-      Both values track the launcher's own layers, so the boot splash is the
-      launcher icon: the brand plate (@color/ic_launcher_background, the navy
-      the logo art was drawn against) behind the padded logo
-      (@drawable/android12splash). The art is white and orange, so it needs
-      that dark plate — on the white background this used to declare, the
-      DANLITE wordmark would have rendered white-on-white and vanished.
+      Three layers, and the middle one is new:
+
+        windowSplashScreenBackground          @color/brand_plate  (navy)
+        windowSplashScreenIconBackgroundColor @color/ic_launcher_background
+                                              (white — the ground the art
+                                              is drawn on)
+        windowSplashScreenAnimatedIcon        @drawable/android12splash
+
+      The brand art changed from white-and-orange on a navy plate to yellow and
+      blue on WHITE. Its wordmark measures rgb(0,66,143), which on the old navy
+      splash plate is a 1.7:1 contrast ratio — it would have simply vanished.
+      So the icon now floats on a white disc, which is the ground it was drawn
+      against, while the splash field around it stays the navy brand plate so
+      the handoff into splash_screen.dart's navy gradient is still seamless.
+      Making the whole splash white instead would have reinstated exactly the
+      white-flash-then-dark-screen this file was written to remove.
+
+      The white disc is 240dp inside the OS's 288dp canvas and the icon ink
+      sits inside 0.611 x 288 = 176dp, so the disc comfortably contains it.
     -->
     <style name="LaunchTheme" parent="@android:style/Theme.Black.NoTitleBar">
         <item name="android:windowBackground">@drawable/launch_background</item>
-        <item name="android:windowSplashScreenBackground">@color/ic_launcher_background</item>
+        <item name="android:windowSplashScreenBackground">@color/brand_plate</item>
+        <item name="android:windowSplashScreenIconBackgroundColor">@color/ic_launcher_background</item>
         <item name="android:windowSplashScreenAnimatedIcon">@drawable/android12splash</item>
     </style>
     <style name="NormalTheme" parent="@android:style/Theme.Black.NoTitleBar">

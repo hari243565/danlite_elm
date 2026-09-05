@@ -14,10 +14,17 @@ library;
 import 'dart:async';
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:danlite_elm/constants/app_strings.dart';
 import 'package:danlite_elm/constants/obd_pids.dart';
 import 'package:danlite_elm/models/vehicle_data.dart';
+import 'package:danlite_elm/screens/dtc_screen.dart';
 import 'package:danlite_elm/services/bluetooth_classic_service.dart';
 import 'package:danlite_elm/services/obd_service.dart';
+
+/// Exactly what the rider would read in the snackbar for a finished clear,
+/// resolved through the real string table the screen resolves it through.
+String riderSees(bool ok, ClearDtcsOutcome outcome) =>
+    AppStrings.get(clearOutcomeMessageKey(ok, outcome), 'en');
 
 /// A simulated ELM327 sitting on a simulated single-ECU motorcycle.
 class FakeElm extends BluetoothClassicService {
@@ -27,6 +34,21 @@ class FakeElm extends BluetoothClassicService {
   /// acknowledgement common on single-ECU vehicles; `'44'` is the textbook
   /// car response; `'7F 04 22'` is an ECU actively refusing the erase.
   String mode04Payload = '';
+
+  /// Other modules on the same bus that also answer the Mode 04 broadcast.
+  ///
+  /// Mode 04 is addressed functionally (0x7DF on ISO 15765-4), so it is not a
+  /// question to one ECU — every module on the bus hears it and every module
+  /// answers. This motorcycle demonstrably has more than one: the whole of
+  /// `ChassisModuleProfiles` exists because the ABS/chassis controller shares
+  /// the CAN bus with the engine ECU.
+  ///
+  /// A module with no emissions fault memory answers `7F 04 11`
+  /// (serviceNotSupported). Until this field existed the simulator was a
+  /// strictly single-ECU bike and could not produce that reply at all, which
+  /// is why a fully passing suite still shipped a clear path that called a
+  /// genuinely successful erase a refusal.
+  List<String> extraMode04Responders = <String>[];
 
   /// Extra latency before the ECU acknowledges the erase. A real ECU stops
   /// servicing the bus while it writes flash, so Mode 04 is the one command
@@ -94,9 +116,10 @@ class FakeElm extends BluetoothClassicService {
     // The erase lands on the ECU when the request goes out, not when the
     // acknowledgement comes back — which is precisely why a late or thin
     // acknowledgement must not be read as "nothing happened".
-    if (c == '04' &&
-        eraseActuallyWorks &&
-        !mode04Payload.toUpperCase().startsWith('7F')) {
+    // Only the engine ECU's own answer decides whether the erase happened.
+    // Another module answering "not my service" changes nothing on the wire
+    // and must change nothing here either.
+    if (c == '04' && eraseActuallyWorks && !_isRefusal(mode04Payload)) {
       faultMemoryHasCodes = false;
     }
     if (c == '04') _eraseAt = DateTime.now();
@@ -136,6 +159,23 @@ class FakeElm extends BluetoothClassicService {
     '012F': '41 2F 80',
   };
 
+  /// Is this payload a negative response to service 0x04?
+  ///
+  /// Byte-aware on purpose: the header-prefixed frame shapes used below carry
+  /// `7F 04` in the middle of the line, and a naive substring test would also
+  /// fire on unrelated bytes such as `A7 F0 44`.
+  static bool _isRefusal(String payload) {
+    final tokens = payload
+        .toUpperCase()
+        .split(RegExp(r'\s+'))
+        .where((t) => t.isNotEmpty)
+        .toList();
+    for (var i = 0; i + 1 < tokens.length; i++) {
+      if (tokens[i] == '7F' && tokens[i + 1] == '04') return true;
+    }
+    return tokens.length == 1 && tokens.first.contains('7F04');
+  }
+
   String _reply(String c) {
     if (c.isEmpty) return '\r>'; // bare CR -> prompt only
     if (c == 'ATZ') return '\r\rELM327 v1.5\r\r>';
@@ -146,7 +186,12 @@ class FakeElm extends BluetoothClassicService {
       return faultMemoryHasCodes ? '\r43 01 01 72\r\r>' : '\r43 00\r\r>';
     }
     if (c == '04') {
-      return mode04Payload.isEmpty ? '\r>' : '\r$mode04Payload\r\r>';
+      final lines = <String>[
+        if (mode04Payload.isNotEmpty) mode04Payload,
+        ...extraMode04Responders,
+      ];
+      if (lines.isEmpty) return '\r>';
+      return '\r${lines.join('\r')}\r\r>';
     }
     final data = _supported[c];
     if (data != null) return '\r$data\r\r>';
@@ -273,6 +318,83 @@ void main() {
       await elm.close();
     }, timeout: const Timeout(Duration(seconds: 90)));
 
+    test(
+        'REGRESSION (client report): a second module on the bus answers '
+        '"7F 04 11" while the engine ECU acknowledges — the codes really were '
+        'cleared, so this is a success, not a refusal',
+        () async {
+      // ── The gap this suite could not previously express ──────────────────
+      // Every test above models a bike with exactly ONE module answering.
+      // Mode 04 is not addressed to one module: it goes to the functional
+      // address, so every controller on the bus answers it. This platform has
+      // more than one — ChassisModuleProfiles exists solely because the ABS
+      // controller shares the bus with the engine ECU.
+      //
+      // The ABS module holds no emissions fault memory, so it answers the
+      // broadcast "7F 04 11" — serviceNotSupported. That is not a refusal of
+      // the erase; it is a module saying Mode 04 is not its service. The
+      // engine ECU on the same reply answers 44 and genuinely wipes its codes.
+      //
+      // The old scan returned false on the first line containing 7F 04, so
+      // this exact reply reported ClearDtcsOutcome.refused and told the rider
+      // to stop the engine and try again — while their codes were already
+      // gone. That is the client's report, reproduced.
+      final elm = FakeElm()
+        ..mode04Payload = '44'
+        ..extraMode04Responders = <String>['7F 04 11'];
+      final obd = await connectedService(elm);
+      await Future.delayed(const Duration(milliseconds: 600));
+
+      final ok = await obd.clearDtcs();
+
+      expect(elm.faultMemoryHasCodes, isFalse,
+          reason: 'the engine ECU genuinely erased its fault memory');
+      expect(ok, isTrue,
+          reason: 'one module answering "not my service" does not undo an '
+              'erase another module positively acknowledged');
+      expect(obd.lastClearOutcome, ClearDtcsOutcome.cleared);
+      expect(obd.status, ConnectionStatus.connected);
+
+      await obd.disconnect();
+      await elm.close();
+    }, timeout: const Timeout(Duration(seconds: 60)));
+
+    test(
+        'the same multi-module reply in header form (ATH1/ATS0) is also a '
+        'success', () async {
+      // The live baseline is ATS0, so a frame arrives as one unbroken hex run,
+      // and with headers on it is prefixed by an 11-bit CAN header the ELM327
+      // prints as THREE nibbles. Reading that in pairs from index 0 puts every
+      // byte after the header one nibble out of alignment.
+      final elm = FakeElm()
+        ..mode04Payload = '7E8034400000000'
+        ..extraMode04Responders = <String>['7E9037F0411000000'];
+      final obd = await connectedService(elm);
+      await Future.delayed(const Duration(milliseconds: 600));
+
+      expect(await obd.clearDtcs(), isTrue);
+      expect(obd.lastClearOutcome, ClearDtcsOutcome.cleared);
+      expect(elm.faultMemoryHasCodes, isFalse);
+
+      await obd.disconnect();
+      await elm.close();
+    }, timeout: const Timeout(Duration(seconds: 60)));
+
+    test('bytes that merely spell "7F04" across a boundary are not a refusal',
+        () async {
+      // "A7 F0 44" contains the characters 7F04 but no such byte pair. The
+      // guard is asserted here rather than left to a code comment.
+      final elm = FakeElm()..mode04Payload = 'A7 F0 44';
+      final obd = await connectedService(elm);
+      await Future.delayed(const Duration(milliseconds: 600));
+
+      expect(await obd.clearDtcs(), isTrue);
+      expect(obd.lastClearOutcome, ClearDtcsOutcome.cleared);
+
+      await obd.disconnect();
+      await elm.close();
+    }, timeout: const Timeout(Duration(seconds: 60)));
+
     test('a run of empty-payload replies does not age the link out', () async {
       // Most of ObdPids.allPids is unsupported on this bike, so most poll
       // replies are a bare prompt. Those are delivered replies and must keep
@@ -365,6 +487,46 @@ void main() {
       await elm.close();
     }, timeout: const Timeout(Duration(seconds: 60)));
 
+    test('an erase every responding module refuses still fails', () async {
+      // The counterpart to the multi-module success above, and the reason that
+      // fix cannot be "ignore 7F 04 when there is more than one line". Here
+      // NO module acknowledged: the engine ECU refused and the second module
+      // does not implement the service. Nothing was cleared and the rider must
+      // still be told so.
+      final elm = FakeElm()
+        ..mode04Payload = '7F 04 22'
+        ..extraMode04Responders = <String>['7F 04 11'];
+      final obd = await connectedService(elm);
+      await Future.delayed(const Duration(milliseconds: 600));
+
+      expect(await obd.clearDtcs(), isFalse);
+      expect(obd.lastClearOutcome, ClearDtcsOutcome.refused);
+      expect(elm.faultMemoryHasCodes, isTrue);
+
+      await obd.disconnect();
+      await elm.close();
+    }, timeout: const Timeout(Duration(seconds: 60)));
+
+    test('a refusal carried in a header-prefixed frame is now detected',
+        () async {
+      // Direction check on the alignment fix. With ATH1/ATS0 the refusal
+      // arrives as "7E8 03 7F 04 22 …" run together, and the old pair-scan
+      // starting at index 0 stepped straight past it — a genuine refusal was
+      // reported to the rider as a successful clear. Byte-aligned parsing
+      // catches it.
+      final elm = FakeElm()..mode04Payload = '7E8037F0422000000';
+      final obd = await connectedService(elm);
+      await Future.delayed(const Duration(milliseconds: 600));
+
+      expect(await obd.clearDtcs(), isFalse,
+          reason: 'the ECU refused; a header prefix does not make it a success');
+      expect(obd.lastClearOutcome, ClearDtcsOutcome.refused);
+      expect(elm.faultMemoryHasCodes, isTrue);
+
+      await obd.disconnect();
+      await elm.close();
+    }, timeout: const Timeout(Duration(seconds: 60)));
+
     test('an unacknowledged clear that did NOT erase is not rubber-stamped',
         () async {
       // Link alive, request sent, no acknowledgement inside the window — but
@@ -404,10 +566,12 @@ void main() {
       elm.linkDead = true;
       await Future.delayed(const Duration(seconds: 8));
 
-      expect(await obd.clearDtcs(), isFalse);
+      final ok = await obd.clearDtcs();
+      expect(ok, isFalse);
       expect(obd.lastClearOutcome, ClearDtcsOutcome.linkFailure,
           reason: 'the real "Connection Failed" message must still be the one '
               'a rider sees when the adapter is genuinely gone');
+      expect(riderSees(ok, obd.lastClearOutcome), 'Connection Failed');
       expect(elm.wire.where((c) => c == '04'), isEmpty,
           reason: 'a link already known to be stale is reported immediately, '
               'rather than after another four seconds of waiting');
@@ -422,10 +586,13 @@ void main() {
       final obd = await connectedService(elm);
       await Future.delayed(const Duration(milliseconds: 600));
 
-      expect(await obd.clearDtcs(), isFalse);
+      final ok = await obd.clearDtcs();
+      expect(ok, isFalse);
       expect(obd.lastClearOutcome, ClearDtcsOutcome.refused,
           reason: 'the ECU answered — the link is fine, the erase was refused');
       expect(obd.status, ConnectionStatus.connected);
+      // Internally still a refusal; the rider sees the one failure message.
+      expect(riderSees(ok, obd.lastClearOutcome), 'Connection Failed');
 
       await obd.disconnect();
       await elm.close();
@@ -439,9 +606,11 @@ void main() {
       final obd = await connectedService(elm);
       await Future.delayed(const Duration(milliseconds: 600));
 
-      expect(await obd.clearDtcs(), isFalse);
+      final ok = await obd.clearDtcs();
+      expect(ok, isFalse);
       expect(obd.lastClearOutcome, ClearDtcsOutcome.notCleared,
           reason: 'Mode 03 answered and still reports a stored code');
+      expect(riderSees(ok, obd.lastClearOutcome), 'Connection Failed');
 
       await obd.disconnect();
       await elm.close();
@@ -457,10 +626,12 @@ void main() {
       final obd = await connectedService(elm);
       await Future.delayed(const Duration(milliseconds: 600));
 
-      expect(await obd.clearDtcs(), isFalse,
+      final ok = await obd.clearDtcs();
+      expect(ok, isFalse,
           reason: 'an unconfirmed clear is never reported as a success');
       expect(obd.lastClearOutcome, ClearDtcsOutcome.unconfirmed,
           reason: 'the link was alive throughout — this is unknown, not failed');
+      expect(riderSees(ok, obd.lastClearOutcome), 'Connection Failed');
 
       await obd.disconnect();
       await elm.close();
@@ -471,8 +642,10 @@ void main() {
       final obd = await connectedService(elm);
       await Future.delayed(const Duration(milliseconds: 600));
 
-      expect(await obd.clearDtcs(), isTrue);
+      final ok = await obd.clearDtcs();
+      expect(ok, isTrue);
       expect(obd.lastClearOutcome, ClearDtcsOutcome.cleared);
+      expect(riderSees(ok, obd.lastClearOutcome), 'Codes cleared successfully ✓');
 
       await obd.disconnect();
       await elm.close();
@@ -494,6 +667,57 @@ void main() {
       await obd.disconnect();
       await elm.close();
     }, timeout: const Timeout(Duration(seconds: 120)));
+  });
+
+  // ══════════════════════════════════════════════════════════════════════════
+  // Five internal outcomes, exactly two rider-facing messages
+  //
+  // The classification above stays as detailed as it is — Sentry and any future
+  // diagnostic tooling still get the real reason. What the rider is shown is
+  // deliberately the original v1.0–v1.4 pair: cleared, or "Connection Failed".
+  // ══════════════════════════════════════════════════════════════════════════
+  group('Clear Codes shows the rider exactly two outcomes', () {
+    test('a confirmed erase is the only thing that reads as success', () {
+      expect(riderSees(true, ClearDtcsOutcome.cleared),
+          'Codes cleared successfully ✓');
+    });
+
+    for (final outcome in const [
+      ClearDtcsOutcome.linkFailure,
+      ClearDtcsOutcome.refused,
+      ClearDtcsOutcome.unconfirmed,
+      ClearDtcsOutcome.notCleared,
+    ]) {
+      test('${outcome.name} reaches the rider as "Connection Failed"', () {
+        expect(riderSees(false, outcome), 'Connection Failed');
+      });
+    }
+
+    test('no ClearDtcsOutcome can produce a third message', () {
+      final shown = <String>{
+        for (final o in ClearDtcsOutcome.values) riderSees(false, o),
+        for (final o in ClearDtcsOutcome.values) riderSees(true, o),
+      };
+      expect(shown, {'Codes cleared successfully ✓', 'Connection Failed'});
+    });
+
+    test('the collapse holds in every shipped language', () {
+      for (final code in const [
+        'en', 'hi', 'bn', 'te', 'mr', 'ta', 'gu', 'kn', 'ml', 'pa', 'ne',
+      ]) {
+        final failures = <String>{
+          for (final o in const [
+            ClearDtcsOutcome.linkFailure,
+            ClearDtcsOutcome.refused,
+            ClearDtcsOutcome.unconfirmed,
+            ClearDtcsOutcome.notCleared,
+          ])
+            AppStrings.get(clearOutcomeMessageKey(false, o), code),
+        };
+        expect(failures, hasLength(1),
+            reason: '$code must show one failure message, not four');
+      }
+    });
   });
 
   // ══════════════════════════════════════════════════════════════════════════

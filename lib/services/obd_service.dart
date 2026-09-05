@@ -1697,11 +1697,37 @@ class ObdService extends ChangeNotifier {
   /// Matching only "44"/"OK"/"NO DATA" caused a false "Connection Failed"
   /// on bikes even though the codes were cleared.
   ///
+  /// ── Why a `7F 04` anywhere in the reply is NOT enough to call it refused ──
+  /// Mode 04 is sent to the OBD **functional** address (0x7DF on ISO 15765-4),
+  /// not to one module. Every module on the bus therefore sees it and every
+  /// module answers. On this platform that is demonstrably more than one
+  /// module — see `ChassisModuleProfiles`, which exists precisely because the
+  /// ABS/chassis controller sits on the same CAN bus as the engine ECU.
+  ///
+  /// A module that holds no emissions fault memory answers the broadcast with
+  /// `7F 04 11` (serviceNotSupported) or `7F 04 12`. That is not a refusal of
+  /// anything: it is a module correctly saying "Mode 04 is not mine". The
+  /// engine ECU on the very same reply answers `44` and really does erase.
+  ///
+  /// The previous scan returned false on the FIRST line containing `7F 04`,
+  /// so this two-line reply
+  ///
+  ///     44
+  ///     7F0411
+  ///
+  /// — a genuinely successful erase — was classified as
+  /// [ClearDtcsOutcome.refused] and the rider was told to stop the engine and
+  /// try again, while their codes had in fact just been wiped. The rule is now
+  /// the one every scan tool uses: **the erase is refused only if every module
+  /// that answered refused it.** One positive acknowledgement outranks another
+  /// module's "not my service".
+  ///
   /// Still returns false for genuine failures:
   ///   - adapter/bus errors: TIMEOUT, ERROR, UNABLE, DISCONNECTED, STOPPED,
   ///     BUS INIT, BUS BUSY, BUFFER FULL
-  ///   - ECU negative response "7F 04" — the ECU actively refused the clear
-  ///     (engine running, security lockout); the codes were NOT cleared
+  ///   - a reply in which every responding module answered `7F 04` — the ECU
+  ///     actively refused the clear (engine running, security lockout) and the
+  ///     codes were NOT cleared
   ///   - a reply consisting only of "SEARCHING" chatter, which means no ECU
   ///     acknowledgement was ever received
   bool _isClearDtcsSuccess(String r) {
@@ -1716,27 +1742,92 @@ class ObdService extends ChangeNotifier {
     if (upper.contains('BUS BUSY')) return false;
     if (upper.contains('BUFFER FULL')) return false;
 
-    // Scan per line so a byte-pair boundary cannot create a phantom "7F04"
-    // match (e.g. "A7 F0 44"), and so a line that is only protocol chatter
-    // is not mistaken for an acknowledgement.
-    var sawRealLine = false;
+    // Judged per line, because one line is one responding module. A line that
+    // is only protocol chatter is not a responder, and neither is the adapter
+    // echoing the request back at us.
+    var sawResponder = false;
+    var sawRefusal = false;
+    var sawAcknowledgement = false;
+
     for (final rawLine in upper.split(RegExp(r'[\r\n]+'))) {
       final line = rawLine.trim();
       if (line.isEmpty) continue;
       if (line.contains('SEARCHING')) continue; // chatter, not an ack
-      sawRealLine = true;
 
-      // ECU negative response frame "7F 04", checked on byte-pair boundaries.
-      final compact = line.replaceAll(RegExp(r'[^0-9A-F]'), '');
-      for (var i = 0; i + 4 <= compact.length; i += 2) {
-        if (compact.substring(i, i + 4) == '7F04') return false;
+      final bytes = _responseBytes(line);
+      if (bytes.isEmpty) continue; // not a hex data line — proves nothing
+      // The adapter echoing "04" back is the request, not an answer to it.
+      if (bytes.length == 1 && bytes.first == 0x04) continue;
+
+      sawResponder = true;
+      if (_containsNegativeMode04(bytes)) {
+        sawRefusal = true;
+      } else {
+        sawAcknowledgement = true;
       }
     }
 
+    // Every module that answered refused. This is the real refusal, and it
+    // must keep reaching the rider as one.
+    if (sawRefusal && !sawAcknowledgement) return false;
+
     // Nothing but SEARCHING chatter — no acknowledgement was received.
-    if (!sawRealLine && upper.contains('SEARCHING')) return false;
+    if (!sawResponder && upper.contains('SEARCHING')) return false;
 
     return true;
+  }
+
+  /// Split one adapter response line into its bytes.
+  ///
+  /// With the live baseline `ATS0` (spaces off) a whole frame arrives as one
+  /// unbroken hex run, and with `ATH1` that run is prefixed by an 11-bit CAN
+  /// header the ELM327 prints as **three** nibbles — an odd count. Reading
+  /// such a line in pairs from index 0 puts every byte after the header one
+  /// nibble out of alignment, which both hides a real `7F 04` and can
+  /// manufacture a phantom one out of unrelated bytes. This is the same
+  /// alignment rule [_stripCanHeaderForLivePid] already applies to live PIDs.
+  ///
+  /// A 3-nibble header stays a single entry (0x7E8, never 0xFF or below), so
+  /// it can never be mistaken for a `7F` service byte. Returns an empty list
+  /// for a line that is not hex at all.
+  List<int> _responseBytes(String line) {
+    var tokens = line.split(RegExp(r'\s+')).where((t) => t.isNotEmpty).toList();
+    if (tokens.isEmpty) return const <int>[];
+
+    final hexToken = RegExp(r'^[0-9A-F]+$');
+    if (tokens.length == 1 && hexToken.hasMatch(tokens.first)) {
+      final h = tokens.first;
+      if (h.length.isOdd && h.length >= 5) {
+        tokens = <String>[
+          h.substring(0, 3),
+          for (var i = 3; i + 2 <= h.length; i += 2) h.substring(i, i + 2),
+        ];
+      } else {
+        tokens = <String>[
+          for (var i = 0; i + 2 <= h.length; i += 2) h.substring(i, i + 2),
+        ];
+      }
+    }
+
+    final out = <int>[];
+    for (final t in tokens) {
+      if (!hexToken.hasMatch(t)) return const <int>[];
+      final v = int.tryParse(t, radix: 16);
+      if (v == null) return const <int>[];
+      out.add(v);
+    }
+    return out;
+  }
+
+  /// Is this line a UDS/OBD negative response to service 0x04?
+  ///
+  /// Matched on real byte boundaries, so "A7 F0 44" — which contains the
+  /// characters `7F04` but no such byte pair — is not a refusal.
+  bool _containsNegativeMode04(List<int> bytes) {
+    for (var i = 0; i + 1 < bytes.length; i++) {
+      if (bytes[i] == 0x7F && bytes[i + 1] == 0x04) return true;
+    }
+    return false;
   }
 
   // ══════════════════════════════════════════════════════════════════════════

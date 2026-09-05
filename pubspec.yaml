@@ -92,9 +92,15 @@ flutter_launcher_icons:
   ios: false
 
   # Legacy square launcher icon (Android 7 and below, and any launcher that
-  # ignores adaptive icons). The brand art already carries its own navy plate
-  # and rounded corners, so it is used here exactly as supplied — no masking is
-  # applied at this layer, which is precisely what this flattened art expects.
+  # ignores adaptive icons). The brand art carries its own flat WHITE ground
+  # and is fully opaque, so it is used here exactly as supplied — no masking is
+  # applied at this layer, which is what this flattened art expects.
+  #
+  # Note the file is a progressive JPEG carrying a .png name. Every consumer
+  # here sniffs the content rather than the extension (Android's BitmapFactory,
+  # Flutter's Image.asset, and the `image` package's decodeImage), so this is
+  # cosmetic — but tool/make_adaptive_foreground.dart had to move off
+  # decodePng, which is extension-shaped and returned null for it.
   image_path: "assets/images/logo.png"
 
   min_sdk_android: 21
@@ -103,18 +109,29 @@ flutter_launcher_icons:
   #
   # The launcher masks the FOREGROUND layer to whatever shape the device wants
   # and only guarantees the central 66/108dp circle survives. assets/images/
-  # logo.png cannot serve as that foreground: its artwork runs to 92.4% of the
-  # image height, so 41% of it (the whole DANLITE wordmark) would be sheared
-  # off, and its rounded corners are genuinely transparent — they would leak
-  # the background layer through as pale notches. That is the classic
-  # double-rounding failure, and it is invisible in a plain image viewer.
+  # logo.png cannot serve as that foreground: its artwork spans 99.8% of the
+  # image width, so the outer thirds of the engine silhouette would be sheared
+  # off at any mask shape, and its ground is an opaque white rectangle that
+  # would be visibly clipped into a square-cornered slab.
   #
-  # So the foreground is a DERIVED asset: the same artwork lifted off its navy
-  # plate and rescaled so that 100% of its ink sits inside the 66/108dp safe
-  # circle. It is crop + scale + pad only — nothing is redrawn. The plate the
-  # art was designed against is reproduced by the background layer below, so
-  # the launcher composites back to the intended look at any mask shape.
+  # So the foreground is a DERIVED asset: the same artwork lifted off its white
+  # ground and rescaled so that 100% of its ink sits inside the 66/108dp safe
+  # circle (measured, not assumed — the tool prints the figure). It is crop +
+  # scale + pad only, nothing is redrawn. The ground the art was designed
+  # against is reproduced by the background layer below, so the launcher
+  # composites back to the intended look at any mask shape.
   # Regenerate it with tool/make_adaptive_foreground.dart if the brand art
   # changes.
   adaptive_icon_foreground: "assets/launcher/logo_adaptive_foreground.png"
-  adaptive_icon_background: "#0C0F1D"
+
+  # WHITE, because that is the ground this art was drawn on — the same rule the
+  # navy #0C0F1D followed for the previous, navy-plated art. This is not a
+  # style preference: the DANLITE wordmark is measured at rgb(0,66,143), which
+  # against the old #0C0F1D plate is a contrast ratio of 1.7:1 and effectively
+  # invisible. Against white it is 10.9:1.
+  #
+  # The navy brand plate has not gone away — it moved to @color/brand_plate in
+  # android/app/src/main/res/values/brand_colors.xml, which is what the boot
+  # window and the API 31+ splash background still use. Keeping it out of
+  # colors.xml matters because flutter_launcher_icons rewrites that file.
+  adaptive_icon_background: "#FFFFFF"

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Brand colours that are NOT the launcher icon's own background.
+
+  Deliberately a separate file from colors.xml: flutter_launcher_icons rewrites
+  colors.xml on every run to carry `adaptive_icon_background`, so anything kept
+  there is at the mercy of the next icon regeneration.
+
+  brand_plate is the dark navy the Flutter UI paints (AppColors.navyGradient in
+  splash_screen.dart). It used to double as the launcher icon background,
+  because the previous brand art was drawn on exactly that navy. The current
+  art is drawn on WHITE, so @color/ic_launcher_background is now #FFFFFF and
+  the two roles have separated. The boot window and the API 31+ splash still
+  want the navy, so it lives here.
+-->
+<resources>
+    <color name="brand_plate">#0C0F1D</color>
+</resources>

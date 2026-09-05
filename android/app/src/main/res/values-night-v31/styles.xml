@@ -7,11 +7,13 @@
       darkest brand surface (#0A0D12 — the gauge bezel/face-edge tone) so the
       boot splash dissolves smoothly into the dark UI.
 
-      windowSplashScreenIconBackgroundColor floats the icon on the brand plate
-      (@color/ic_launcher_background) — deliberately, and no longer on white.
-      The logo art is white and orange now, so a white icon circle would have
-      swallowed the DANLITE wordmark entirely. Against #0A0D12 the navy plate
-      reads as a barely-there disc, which is the intent: the art carries itself.
+      windowSplashScreenIconBackgroundColor floats the icon on
+      @color/ic_launcher_background, which is now WHITE rather than the navy
+      plate it was when the brand art was white-and-orange. The current art is
+      yellow and blue on white, and its wordmark measures rgb(0,66,143): on the
+      navy disc it would be a 1.7:1 contrast ratio and would disappear. On its
+      own white ground it is 10.9:1, and the white disc reads as a clean brand
+      mark against #0A0D12.
     -->
     <style name="LaunchTheme" parent="@android:style/Theme.Black.NoTitleBar">
         <item name="android:windowBackground">@drawable/launch_background</item>

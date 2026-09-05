@@ -154,7 +154,11 @@ class _DashAppBar extends StatelessWidget implements PreferredSizeWidget {
                       child: ClipOval(
                         child: Padding(
                           padding: const EdgeInsets.all(5),
-                          child: Image.asset('assets/images/logo.png',
+                          // The circular badge, not the raw brand art: assets/images/logo.png is an
+                          // opaque white SQUARE whose artwork fills only 63% of its height, so inside
+                          // this ClipOval it renders as a white square rather than a badge. Derived by
+                          // tool/make_in_app_badge.dart.
+                          child: Image.asset('assets/images/logo_badge.png',
                               fit: BoxFit.contain),
                         ),
                       ),

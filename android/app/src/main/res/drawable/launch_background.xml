@@ -3,10 +3,15 @@
   Pre-Android-12 boot window background (API < 31). No logo is drawn here — it
   is the flat colour the window holds while Flutter starts up.
 
-  Matched to the brand plate (@color/ic_launcher_background) rather than white:
-  splash_screen.dart paints AppColors.navyGradient, so a white window here
-  produced a white flash before a dark screen. This makes the handoff seamless.
+  Matched to the brand plate rather than white: splash_screen.dart paints
+  AppColors.navyGradient, so a white window here produced a white flash before
+  a dark screen. This makes the handoff seamless.
+
+  Points at @color/brand_plate, not @color/ic_launcher_background. Those were
+  the same navy while the brand art was navy-plated; the current art is drawn
+  on white, so the launcher icon background is now #FFFFFF and this window
+  would have flashed white again had it kept following it.
 -->
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:drawable="@color/ic_launcher_background" />
+    <item android:drawable="@color/brand_plate" />
 </layer-list>
