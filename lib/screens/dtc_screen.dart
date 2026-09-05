@@ -147,13 +147,48 @@ class _DtcScreenState extends State<DtcScreen> {
       _lastReadAt = DateTime.now();
     });
 
+    final outcome = obd.lastClearOutcome;
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      backgroundColor: ok ? _RC.neonGreen : _RC.neonRed,
+      // An unconfirmed clear is not a failure — the codes may well be gone —
+      // so it is not dressed in the failure colour.
+      backgroundColor: ok
+          ? _RC.neonGreen
+          : (outcome == ClearDtcsOutcome.unconfirmed
+              ? _RC.neonAmber
+              : _RC.neonRed),
+      duration: ok
+          ? const Duration(seconds: 2)
+          : const Duration(seconds: 6), // long enough to read and act on
       content: Text(
-        ok ? '${context.tr('clearCodes')} ✓' : context.tr('connectionFailed'),
+        _clearOutcomeMessage(context, ok, outcome),
         style: const TextStyle(color: Colors.black, fontWeight: FontWeight.w700),
       ),
     ));
+  }
+
+  /// What to tell the rider about a Clear Codes attempt.
+  ///
+  /// Every unsuccessful clear used to render as "Connection Failed" regardless
+  /// of cause. Three of the four failure modes have nothing to do with the
+  /// connection, and saying otherwise sends the rider to re-pair a Bluetooth
+  /// adapter that is working perfectly while the real cause — an ECU that
+  /// refused the erase, or one that simply never answered — goes unaddressed.
+  String _clearOutcomeMessage(
+      BuildContext context, bool ok, ClearDtcsOutcome outcome) {
+    if (ok) return '${context.tr('clearCodes')} ✓';
+    switch (outcome) {
+      case ClearDtcsOutcome.unconfirmed:
+        return context.tr('clearUnconfirmed');
+      case ClearDtcsOutcome.refused:
+        return context.tr('clearRefused');
+      case ClearDtcsOutcome.notCleared:
+        return context.tr('clearNotCleared');
+      case ClearDtcsOutcome.linkFailure:
+      case ClearDtcsOutcome.idle:
+      case ClearDtcsOutcome.cleared:
+        // Only a real link failure still says the link failed.
+        return context.tr('connectionFailed');
+    }
   }
 
   Future<void> _showFreezeFrame() async {

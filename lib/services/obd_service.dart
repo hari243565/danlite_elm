@@ -41,6 +41,44 @@ enum ObdReplyClass {
   linkFailure,
 }
 
+/// Why a Clear Codes attempt ended the way it did.
+///
+/// [ObdService.clearDtcs] still answers the only question its caller must act
+/// on — did the codes go? — with a bool. This says *why*, because "false" has
+/// never meant one thing: a dead Bluetooth link, an ECU that refused the
+/// erase, and an erase that probably worked but could not be confirmed are
+/// three different events, and the screen was reporting all three to the rider
+/// as "Connection Failed". Telling a rider their connection failed when the
+/// adapter is sitting there connected sends them to debug the wrong thing.
+enum ClearDtcsOutcome {
+  /// No attempt has been made in this session.
+  idle,
+
+  /// The fault memory was erased, and that is either acknowledged or confirmed.
+  cleared,
+
+  /// The link was genuinely gone — the real "Connection Failed".
+  linkFailure,
+
+  /// The ECU actively refused the erase (negative response `7F 04`), or
+  /// answered with a bus/adapter error. The codes were NOT cleared, and the
+  /// connection is not the problem. Most commonly the engine is running or the
+  /// module is in a security lockout.
+  refused,
+
+  /// The erase went out over a link that was demonstrably alive, but the ECU
+  /// never acknowledged it and never answered the follow-up Mode 03 either.
+  ///
+  /// This is genuinely unknown, not a failure: the codes may well be gone. It
+  /// is the state a module that is slow to come back from a flash write lands
+  /// in, and it must not be reported as a connection failure.
+  unconfirmed,
+
+  /// The link was alive and the ECU answered the follow-up Mode 03 — and its
+  /// fault memory still holds codes. The erase demonstrably did not take.
+  notCleared,
+}
+
 /// Static sensor snapshot captured by the ECU at the moment a DTC was set
 /// (OBD2 Mode 02). Any field may be null if that PID isn't supported by the
 /// vehicle or its response didn't parse.
@@ -160,6 +198,37 @@ class ObdService extends ChangeNotifier {
   // announced it.
   static const Duration _linkProofWindow = Duration(seconds: 6);
 
+  // ── Proof-of-life credit, for multi-command foreground sequences ─────────
+  // _linkProofWindow is sized for ONE slow command; that is exactly what its
+  // comment above claims, and it is true. clearDtcs() is not one command. It
+  // is a sequence — wait for the link to go idle, Mode 04 (4s), let the ECU
+  // come back, Mode 03 (3s) — whose total wall-clock legitimately exceeds six
+  // seconds with the link perfectly healthy throughout. The window then aged
+  // the link out mid-sequence and the erase was reported as a dead connection.
+  //
+  // The fix is NOT to widen _linkProofWindow globally: that would slow the
+  // detection of a genuinely dead link for every command in the app. Instead a
+  // sequence that has ALREADY proven the link alive on evidence may carry that
+  // proof forward for a bounded time.
+  //
+  // This is a credit, not a forgery. It is only ever granted after
+  // _classifyReply has returned something other than linkFailure, i.e. after
+  // the link was just judged alive on real evidence; it expires on a wall
+  // clock; and it deliberately does NOT override the _deadLinkTimeouts count,
+  // which remains the hard backstop. A link that answers nothing still trips
+  // that counter and is still declared dead, credit or no credit.
+  DateTime? _linkProofCreditUntil;
+
+  void _creditLinkProof(Duration window) =>
+      _linkProofCreditUntil = DateTime.now().add(window);
+
+  void _revokeLinkProofCredit() => _linkProofCreditUntil = null;
+
+  bool get _linkProofCredited {
+    final until = _linkProofCreditUntil;
+    return until != null && DateTime.now().isBefore(until);
+  }
+
   // ── WiFi transport ────────────────────────────────────────────────────────
   Socket? _wifiSocket;
   StreamSubscription<List<int>>? _wifiSub;
@@ -199,6 +268,28 @@ class ObdService extends ChangeNotifier {
   // ECU flash-memory erasure (04) needs more time to respond than a live
   // PID read does.
   static const Duration _clearDtcsMinTimeout = Duration(milliseconds: 4000);
+
+  // How long the whole clear sequence may carry its proof of life. Sized to
+  // cover the worst case it actually has to survive — Mode 04 (4s) + the
+  // post-erase settle (1.2s) + two confirmation attempts (3s each) + the pause
+  // between them (0.8s) ≈ 12s — with headroom, and no more. It is a ceiling on
+  // how long a healthy-but-silent link may be presumed alive, not a target.
+  static const Duration _clearSequenceProofWindow = Duration(seconds: 15);
+
+  // Breathing room between the erase request and the first confirmation query.
+  //
+  // A real ECU stops servicing the bus while it writes flash and a fair number
+  // reset afterwards. Firing Mode 03 the instant the Mode 04 window expires
+  // asks the module a question at the exact moment it is least able to answer,
+  // and burns the confirmation's only attempt doing it. The simulated ECU this
+  // path was built against answered Mode 03 in about a millisecond, so nothing
+  // in the test suite ever exercised the wait a real module needs.
+  static const Duration _postEraseSettle = Duration(milliseconds: 1200);
+
+  // Pause before the second and final confirmation attempt. A module that was
+  // still booting for the first query is usually back for the second; a module
+  // that answers neither leaves the clear honestly unconfirmed.
+  static const Duration _confirmRetryDelay = Duration(milliseconds: 800);
 
   // A Mode 03 read can span several ISO-TP frames (up to ~half a second of
   // wire time on a busy CAN bus), so it needs a longer window than a
@@ -572,7 +663,15 @@ class ObdService extends ChangeNotifier {
     }
     if (upper != 'TIMEOUT') return ObdReplyClass.answered;
 
+    // The hard backstop, checked first and never bypassed: a link that has
+    // missed this many replies in a row is dead regardless of any credit a
+    // foreground sequence is holding.
     if (_consecutiveTimeouts >= _deadLinkTimeouts) return ObdReplyClass.linkFailure;
+
+    // A foreground sequence that already proved the link alive carries that
+    // proof across its own remaining commands — see _linkProofCreditUntil.
+    if (_linkProofCredited) return ObdReplyClass.noAnswer;
+
     final last = _lastGoodResponseAt;
     if (last == null) return ObdReplyClass.linkFailure;
     if (DateTime.now().difference(last) > _linkProofWindow) {
@@ -1050,14 +1149,37 @@ class ObdService extends ChangeNotifier {
     }
   }
 
+  /// Why the last [clearDtcs] call ended as it did. See [ClearDtcsOutcome].
+  ClearDtcsOutcome _lastClearOutcome = ClearDtcsOutcome.idle;
+  ClearDtcsOutcome get lastClearOutcome => _lastClearOutcome;
+
   Future<bool> clearDtcs() async {
-    if (!isConnected) return false;
+    if (!isConnected) {
+      _lastClearOutcome = ClearDtcsOutcome.linkFailure;
+      return false;
+    }
+
+    // Judge the link ONCE, here, before the sequence spends any wall clock.
+    //
+    // Everything below — waiting for the link to go idle, a 4s erase, the
+    // settle, up to two 3s confirmations — takes far longer than the
+    // proof-of-life window is sized for, so asking "is the link alive?" again
+    // part-way through answers "no" on a perfectly healthy connection purely
+    // because this sequence has been running. Ask before starting, when the
+    // answer still means something, and act on that one verdict.
+    if (_classifyReply('TIMEOUT') == ObdReplyClass.linkFailure) {
+      debugPrint('[ObdService] clearDtcs: link already stale — not attempted');
+      _lastClearOutcome = ClearDtcsOutcome.linkFailure;
+      return false;
+    }
 
     // Lock the poll loop out of the socket, then wait for whatever PID
     // request it may already have in flight to finish, so 04 never lands
     // on the wire concurrently with a live poll (the serial collision that
     // caused "Connection Failed" on real vehicles).
     _acquirePollLock();
+    // The link was just proven alive; carry that proof across the sequence.
+    _creditLinkProof(_clearSequenceProofWindow);
     await _waitForLinkIdle();
 
     final previousTimeout = _cmdTimeout;
@@ -1070,16 +1192,22 @@ class ObdService extends ChangeNotifier {
 
       switch (_classifyReply(response)) {
         case ObdReplyClass.linkFailure:
-          // The connection really is gone. Report it — this is the path the
+          // The connection really is gone — the credit does not mask this,
+          // because the dead-link counter overrides it. This is the path the
           // user must still see when Bluetooth is switched off or the bike is
           // walked away from mid-clear.
+          _lastClearOutcome = ClearDtcsOutcome.linkFailure;
           return false;
 
         case ObdReplyClass.answered:
           // Includes the empty-payload acknowledgement. _isClearDtcsSuccess()
           // still vetoes a genuine ECU refusal (negative response 7F 04).
-          if (!_isClearDtcsSuccess(response)) return false;
+          if (!_isClearDtcsSuccess(response)) {
+            _lastClearOutcome = ClearDtcsOutcome.refused;
+            return false;
+          }
           _dtcCodes = [];
+          _lastClearOutcome = ClearDtcsOutcome.cleared;
           notifyListeners();
           return true;
 
@@ -1094,9 +1222,11 @@ class ObdService extends ChangeNotifier {
       }
     } catch (e) {
       debugPrint('[ObdService] clearDtcs exception: $e');
+      _lastClearOutcome = ClearDtcsOutcome.linkFailure;
       return false;
     } finally {
       _cmdTimeout = previousTimeout;
+      _revokeLinkProofCredit();
       _releasePollLock();
     }
   }
@@ -1115,18 +1245,66 @@ class ObdService extends ChangeNotifier {
     final previousTimeout = _cmdTimeout;
     if (_cmdTimeout < _readDtcsMinTimeout) _cmdTimeout = _readDtcsMinTimeout;
     try {
-      final response = await _send(ObdPids.readDtcs);
-      if (_classifyReply(response) != ObdReplyClass.answered) return false;
-      if (!_isUsableDtcResponse(response)) return false;
-      if (ObdParser.parseDetailed(response).allCodes.isNotEmpty) return false;
+      // Let the module come back before asking it anything. The erase it was
+      // just given is the one request that stops it servicing the bus, so the
+      // instant the Mode 04 window expires is the worst possible moment to
+      // query it — and doing so spends the confirmation's attempt on a module
+      // that was never going to answer.
+      await Future.delayed(_postEraseSettle);
 
+      for (var attempt = 0; attempt < 2; attempt++) {
+        if (attempt > 0) await Future.delayed(_confirmRetryDelay);
+
+        final response = await _send(ObdPids.readDtcs);
+
+        // Not answered: the module is still away. Try once more before giving
+        // up — a slow module is not a broken one, and it is certainly not a
+        // broken connection.
+        if (_classifyReply(response) != ObdReplyClass.answered) continue;
+
+        // Answered but unreadable is not evidence of an empty fault memory.
+        if (!_isUsableDtcResponse(response)) continue;
+
+        // A real, parseable answer. Nothing here is charitable: this is the
+        // one path that can confirm the clear, and it confirms it only on the
+        // ECU's own report of an empty fault memory.
+        if (ObdParser.parseDetailed(response).allCodes.isNotEmpty) {
+          debugPrint('[ObdService] clearDtcs unacknowledged — '
+              'Mode 03 reports codes still stored; the erase did not take');
+          _lastClearOutcome = ClearDtcsOutcome.notCleared;
+          return false;
+        }
+
+        debugPrint('[ObdService] clearDtcs unacknowledged — '
+            'Mode 03 confirms fault memory is empty');
+        _dtcCodes = [];
+        _lastClearOutcome = ClearDtcsOutcome.cleared;
+        notifyListeners();
+        return true;
+      }
+
+      // Nothing came back. Before calling this unknown, check the one signal
+      // that is still trustworthy here: the missed-reply counter. The elapsed
+      // clock is not usable — the poll loop is locked out for the duration of
+      // this sequence, so the link has had no opportunity to prove itself
+      // either way — but a counter that has run to _deadLinkTimeouts means the
+      // adapter has genuinely stopped answering, and that IS a link failure.
+      if (_consecutiveTimeouts >= _deadLinkTimeouts) {
+        debugPrint('[ObdService] clearDtcs — link stopped answering entirely');
+        _lastClearOutcome = ClearDtcsOutcome.linkFailure;
+        return false;
+      }
+
+      // The erase went out over a link that was alive, and the module never
+      // came back to say what happened. That is genuinely unknown — and it is
+      // NOT a connection failure, which is what it used to be reported as.
       debugPrint('[ObdService] clearDtcs unacknowledged — '
-          'Mode 03 confirms fault memory is empty');
-      _dtcCodes = [];
-      notifyListeners();
-      return true;
+          'ECU did not answer Mode 03; outcome unconfirmed');
+      _lastClearOutcome = ClearDtcsOutcome.unconfirmed;
+      return false;
     } catch (e) {
       debugPrint('[ObdService] _confirmDtcsCleared exception: $e');
+      _lastClearOutcome = ClearDtcsOutcome.unconfirmed;
       return false;
     } finally {
       _cmdTimeout = previousTimeout;
@@ -1217,13 +1395,17 @@ class ObdService extends ChangeNotifier {
       final candidates = ChassisModuleProfiles.candidatesFor(manufacturerKey);
       List<DtcCode>? found;
 
-      for (final target in candidates) {
-        if (found != null) break;
-
+      /// Point the adapter at one specific module: transmit header, receive
+      /// filter, and flow control. False means the adapter refused the
+      /// addressing commands themselves, so this candidate cannot be probed.
+      ///
+      /// Extracted so it can be re-applied after an adapter recovery — see the
+      /// TIMEOUT branch below for why that is not optional.
+      Future<bool> applyAddressing(ChassisModuleTarget target) async {
         final shResp = await _send(target.headerCommand);
         if (_isDeadResponse(shResp) || shResp.contains('?')) {
           log.add('${target.label}: adapter rejected ${target.headerCommand}.');
-          continue;
+          return false;
         }
         addressingChanged = true;
         addressingAccepted = true;
@@ -1240,13 +1422,45 @@ class ObdService extends ChangeNotifier {
         for (final cmd in target.flowControlCommands) {
           await _send(cmd);
         }
+        return true;
+      }
+
+      for (final target in candidates) {
+        if (found != null) break;
+
+        if (!await applyAddressing(target)) continue;
 
         for (final request in target.requests) {
           final response = await _send(request);
 
           if (response == 'TIMEOUT') {
             log.add('${target.label} · $request: timeout.');
-            await _recoverAdapter();
+
+            // _recoverAdapter() may re-run the init sequence, and that restores
+            // the adapter's LIVE baseline — which silently wipes the ATSH,
+            // ATCRA, flow control and DTC headers this scan just set up.
+            //
+            // Continuing without re-establishing them sends the next request
+            // (the Mode 03 fallback) out on the functional broadcast instead of
+            // at this module. On that address the ENGINE ECU answers — and the
+            // Mode 03 branch below would accept that reply and file engine
+            // faults as ABS faults. That is precisely the outcome
+            // ChassisModuleProfiles excludes 0x7E0-0x7E7 to prevent, and it is
+            // documented there as worse than returning nothing.
+            final recovered = await _recoverAdapter();
+            if (!recovered) {
+              log.add('${target.label}: adapter did not recover — '
+                  'candidate abandoned.');
+              break;
+            }
+            headersOn = await _enableDtcHeaders();
+            final stRetry = await _send('ATST7D');
+            stWidened = !_isDeadResponse(stRetry);
+            if (!await applyAddressing(target)) {
+              log.add('${target.label}: addressing could not be restored after '
+                  'recovery — candidate abandoned.');
+              break;
+            }
             continue;
           }
           if (_isChassisNoReply(response)) {

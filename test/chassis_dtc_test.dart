@@ -12,6 +12,8 @@
 /// neither of which any test on a developer machine can establish.
 library;
 
+import 'dart:async';
+
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:danlite_elm/constants/chassis_dtc_dictionary.dart';
@@ -19,7 +21,9 @@ import 'package:danlite_elm/constants/chassis_dtc_dictionary_hi.dart';
 import 'package:danlite_elm/constants/chassis_modules.dart';
 import 'package:danlite_elm/constants/obd_pids.dart';
 import 'package:danlite_elm/models/vehicle_data.dart';
+import 'package:danlite_elm/services/bluetooth_classic_service.dart';
 import 'package:danlite_elm/services/dtc_service.dart';
+import 'package:danlite_elm/services/obd_service.dart';
 
 void main() {
   // ══════════════════════════════════════════════════════════════════════════
@@ -887,4 +891,147 @@ void main() {
       expect(card.severity, 'unknown');
     });
   });
+
+  // ════════════════════════════════════════════════════════════════════════
+  // 8. PROBE STATE across an adapter recovery
+  // ════════════════════════════════════════════════════════════════════════
+  group('a mid-probe adapter recovery does not un-address the module', () {
+    test('addressing is re-applied before the next request goes out', () async {
+      final elm = FakeChassisElm();
+      final obd = ObdService(elm);
+      expect(
+          await obd.connectBluetooth(const BtDevice(
+              name: 'OBDII', address: '00:11:22:33:44:55', bonded: true)),
+          isTrue);
+
+      await obd.readChassisDtcs(
+          vehicleMake: 'Royal Enfield', vehicleModel: 'Classic 350');
+
+      final wire = elm.wire;
+      final firstUds = wire.indexOf(ChassisModuleProfiles.udsReadDtcByStatusMask);
+      expect(firstUds, greaterThanOrEqualTo(0),
+          reason: 'the UDS request must have been attempted');
+
+      final modeThree = wire.indexOf(ChassisModuleProfiles.obdModeThree, firstUds);
+      expect(modeThree, greaterThan(firstUds),
+          reason: 'the Mode 03 fallback is still tried after the UDS timeout');
+
+      // The recovery between those two requests re-runs the init sequence,
+      // which restores the adapter's live baseline and drops ATSH. Unless the
+      // addressing is put back, this Mode 03 goes out on the functional
+      // broadcast where the engine ECU answers it.
+      final reAddressed =
+          wire.lastIndexOf(ObdPids.setHeader('7B0'), modeThree);
+      expect(reAddressed, greaterThan(firstUds),
+          reason: 'ATSH7B0 must be re-sent after the recovery and before the '
+              'Mode 03 fallback, or that request is no longer addressed at the '
+              'ABS module at all');
+
+      // The decisive assertion: no engine code may surface as a chassis fault.
+      expect(obd.chassisDtcCodes, isEmpty,
+          reason: 'no ABS module answered, so nothing may be reported');
+      expect(obd.chassisScanOutcome, ChassisScanOutcome.noModuleResponse,
+          reason: 'the honest outcome is "nothing answered", not a fake read');
+
+      await obd.disconnect();
+      await elm.close();
+    }, timeout: const Timeout(Duration(seconds: 120)));
+  });
+}
+
+// ══════════════════════════════════════════════════════════════════════════
+// 8. PROBE STATE — an adapter recovery must not silently un-address the module
+// ══════════════════════════════════════════════════════════════════════════
+/// A simulated ELM327 on a bike whose ABS module is at neither probed address.
+///
+/// It models the one thing that makes the recovery path dangerous: **the
+/// adapter's addressing state**. `03` is answered only when no ATSH is set,
+/// because that is the functional broadcast the engine ECU listens on. Ask it
+/// while addressed at a chassis ID and nothing answers, exactly as on a bike
+/// with no module there.
+///
+/// The first recovery is forced down the ATZ path (a bare CR is ignored twice),
+/// because only that path re-runs the init sequence — which restores the live
+/// baseline and wipes the ATSH/ATCRA the probe had just set.
+class FakeChassisElm extends BluetoothClassicService {
+  final _ctrl = StreamController<String>.broadcast();
+  final List<String> wire = <String>[];
+  bool _connected = false;
+
+  /// The adapter's current transmit header — null means the functional
+  /// broadcast, which is where the engine ECU answers.
+  String? _header;
+
+  /// A bare CR is ignored this many more times, to wedge the first recovery
+  /// hard enough that it has to reset the adapter.
+  int _crIgnoresLeft = 2;
+
+  @override
+  Stream<String> get dataStream => _ctrl.stream;
+
+  @override
+  bool get isConnected => _connected;
+
+  @override
+  Future<bool> connect(BtDevice device) async {
+    _connected = true;
+    return true;
+  }
+
+  @override
+  Future<void> disconnect() async {
+    _connected = false;
+  }
+
+  @override
+  Future<bool> write(String cmd) async {
+    if (!_connected) return false;
+    final c = cmd.trim().toUpperCase();
+    wire.add(c);
+
+    if (c.isEmpty) {
+      if (_crIgnoresLeft > 0) {
+        _crIgnoresLeft--;
+        return true; // wedged: no prompt comes back
+      }
+      scheduleMicrotask(() => _ctrl.add('\r>'));
+      return true;
+    }
+
+    // Addressing state, tracked exactly as a real adapter holds it.
+    if (c.startsWith('ATSH')) {
+      _header = c.substring(4);
+    } else if (c == 'ATZ' || c == 'ATSP0' || c == 'ATAR') {
+      _header = null; // reset / auto — back to the functional broadcast
+    }
+
+    // The ABS module is not at any probed address, so a physically-addressed
+    // request is met with silence.
+    if (_header != null && !c.startsWith('AT')) return true;
+
+    late final String reply;
+    if (c == 'ATZ') {
+      reply = '\r\rELM327 v1.5\r\r>';
+    } else if (c == 'ATDPN') {
+      reply = '\r6\r\r>';
+    } else if (c.startsWith('AT')) {
+      reply = '\rOK\r\r>';
+    } else if (c == '0100') {
+      reply = '\r41 00 BE 3E B8 11\r\r>';
+    } else if (c == '03') {
+      // The ENGINE ECU's stored code, on the functional broadcast. If this
+      // ever lands in the chassis list, an engine fault has been relabelled a
+      // braking fault — the exact outcome ChassisModuleProfiles excludes the
+      // 0x7E0-0x7E7 addresses to prevent.
+      reply = '\r7E8 06 43 01 01 72\r\r>';
+    } else {
+      reply = '\r>';
+    }
+    scheduleMicrotask(() => _ctrl.add(reply));
+    return true;
+  }
+
+  Future<void> close() async {
+    if (!_ctrl.isClosed) await _ctrl.close();
+  }
 }

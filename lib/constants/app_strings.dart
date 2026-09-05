@@ -178,6 +178,18 @@ class AppStrings {
       'clearAllQ': 'Clear All Fault Codes?',
       'clearWarning':
           'This will erase all stored DTCs and turn off the Check Engine light.',
+
+      // ── Clear Codes outcomes ────────────────────────────────────────────
+      // A failed clear used to render as 'connectionFailed' whatever the
+      // reason, which sent riders off to debug a Bluetooth link that was
+      // working. These name what actually happened. Only 'en' and 'hi' ship
+      // them; AppStrings.get falls every other language back to English,
+      // exactly as the ABS strings below already do.
+      'clearUnconfirmed': 'Sent, but the ECU did not confirm. '
+          'Tap Read Codes to check.',
+      'clearRefused': 'The ECU refused the erase. Stop the engine, leave the '
+          'ignition on, then try again.',
+      'clearNotCleared': 'The codes are still stored — the erase did not take.',
       'possibleCause': 'Possible Cause',
       'recommendedAction': 'Recommended Action',
       'severityCritical': '🔴 Critical',
@@ -735,6 +747,11 @@ class AppStrings {
       'connectToRead': 'कोड पढ़ने के लिए एडेप्टर कनेक्ट करें',
       'clearAllQ': 'सभी दोष कोड साफ करें?',
       'clearWarning': 'यह सभी DTC मिटा देगा और चेक इंजन लाइट बंद कर देगा।',
+      'clearUnconfirmed':
+          'भेज दिया गया, पर ECU ने पुष्टि नहीं की। जाँचने के लिए “कोड पढ़ें” दबाएँ।',
+      'clearRefused':
+          'ECU ने मिटाने से मना किया। इंजन बंद करें, इग्निशन चालू रखें, फिर पुनः प्रयास करें।',
+      'clearNotCleared': 'कोड अब भी संग्रहीत हैं — मिटाना पूरा नहीं हुआ।',
       'possibleCause': 'संभावित कारण',
       'recommendedAction': 'अनुशंसित कार्रवाई',
       'performanceTests': 'प्रदर्शन परीक्षण',

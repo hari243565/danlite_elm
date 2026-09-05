@@ -46,6 +46,23 @@ class FakeElm extends BluetoothClassicService {
   /// prove the confirmation step cannot rubber-stamp a clear that failed.
   bool eraseActuallyWorks = true;
 
+  /// How long the ECU stays unable to service the bus AFTER the Mode 04
+  /// request lands — the single most important thing the original simulator
+  /// did not model.
+  ///
+  /// Until this was added, [mode04Latency] delayed the Mode 04 reply but every
+  /// other command still answered in about a millisecond, including the Mode
+  /// 03 the service sends to confirm an unacknowledged erase. A real ECU does
+  /// not behave that way: it stops servicing the bus while it writes flash and
+  /// frequently resets afterwards, so the confirmation query is issued at the
+  /// exact moment the module is least able to answer it. That divergence is
+  /// what let a fully passing test suite ship a clear path that still reported
+  /// a false failure on a real motorcycle.
+  Duration postEraseRecovery = Duration.zero;
+
+  /// When the erase request landed, used to apply [postEraseRecovery].
+  DateTime? _eraseAt;
+
   final _ctrl = StreamController<String>.broadcast();
   final List<String> wire = <String>[];
   bool _connected = false;
@@ -82,6 +99,12 @@ class FakeElm extends BluetoothClassicService {
         !mode04Payload.toUpperCase().startsWith('7F')) {
       faultMemoryHasCodes = false;
     }
+    if (c == '04') _eraseAt = DateTime.now();
+
+    // While the ECU is writing flash it is not listening. The request is
+    // accepted by the adapter and simply never answered — which is what a
+    // confirmation query issued too early actually runs into on a real bike.
+    if (c != '04' && _stillRecoveringFromErase) return true;
 
     final reply = _reply(c);
     final latency = (c == '04') ? mode04Latency : Duration.zero;
@@ -93,6 +116,13 @@ class FakeElm extends BluetoothClassicService {
       scheduleMicrotask(() => _ctrl.add(reply));
     }
     return true;
+  }
+
+  /// True while the ECU is still writing flash and cannot answer anything.
+  bool get _stillRecoveringFromErase {
+    final erasedAt = _eraseAt;
+    if (erasedAt == null || postEraseRecovery == Duration.zero) return false;
+    return DateTime.now().isBefore(erasedAt.add(postEraseRecovery));
   }
 
   /// PIDs this simulated bike's single ECU actually implements. Everything
@@ -199,6 +229,49 @@ void main() {
       await obd.disconnect();
       await elm.close();
     }, timeout: const Timeout(Duration(seconds: 60)));
+
+    test(
+        'REGRESSION (real hardware): the ECU is still busy when the '
+        'confirmation query goes out — the clear is still not a link failure',
+        () async {
+      // ── The gap the previous fix left, modelled ──────────────────────────
+      // Every earlier test let the confirmation Mode 03 answer in about a
+      // millisecond, because only Mode 04 was ever given latency. A real ECU
+      // stops servicing the bus while it writes flash, so the confirmation
+      // lands on a module that is not listening yet.
+      //
+      // Two things then go wrong at once with the un-widened logic:
+      //   * the confirmation's own timeout is spent while the module is still
+      //     recovering, so it never gets a second chance; and
+      //   * Mode 04 (4s) plus Mode 03 (3s) is seven seconds of wall clock,
+      //     which is longer than the six-second proof-of-life window — so the
+      //     link is declared FAILED purely because a two-command sequence
+      //     outlasted a window sized for one command.
+      //
+      // The codes really were erased. Reporting "Connection Failed" here is
+      // the exact symptom the client is seeing.
+      final elm = FakeElm()
+        ..mode04Payload = '44'
+        ..mode04Latency = const Duration(seconds: 30) // never acks in window
+        ..postEraseRecovery = const Duration(milliseconds: 7500);
+      final obd = await connectedService(elm);
+      await Future.delayed(const Duration(milliseconds: 800));
+
+      final ok = await obd.clearDtcs();
+
+      expect(elm.faultMemoryHasCodes, isFalse,
+          reason: 'the erase genuinely happened — the ECU was simply busy');
+      expect(ok, isTrue,
+          reason: 'a busy ECU after a flash write is not a dead connection');
+      expect(obd.lastClearOutcome, ClearDtcsOutcome.cleared);
+      expect(obd.status, ConnectionStatus.connected,
+          reason: 'the link was never actually lost');
+      expect(obd.linkSynced, isTrue,
+          reason: 'the write gate must not be slammed shut by a slow erase');
+
+      await obd.disconnect();
+      await elm.close();
+    }, timeout: const Timeout(Duration(seconds: 90)));
 
     test('a run of empty-payload replies does not age the link out', () async {
       // Most of ObdPids.allPids is unsupported on this bike, so most poll
@@ -312,6 +385,115 @@ void main() {
       await obd.disconnect();
       await elm.close();
     }, timeout: const Timeout(Duration(seconds: 90)));
+  });
+
+  // ══════════════════════════════════════════════════════════════════════════
+  // WHY it failed, not just THAT it failed
+  //
+  // Every unsuccessful clear used to reach the rider as "Connection Failed".
+  // Three of these four outcomes have nothing to do with the connection, and
+  // telling a rider their link is broken when it is not sends them to re-pair a
+  // working adapter instead of addressing the real cause.
+  // ══════════════════════════════════════════════════════════════════════════
+  group('the reason a clear failed is reported accurately', () {
+    test('a genuinely dead link is still reported as a link failure', () async {
+      final elm = FakeElm();
+      final obd = await connectedService(elm);
+      await Future.delayed(const Duration(milliseconds: 600));
+
+      elm.linkDead = true;
+      await Future.delayed(const Duration(seconds: 8));
+
+      expect(await obd.clearDtcs(), isFalse);
+      expect(obd.lastClearOutcome, ClearDtcsOutcome.linkFailure,
+          reason: 'the real "Connection Failed" message must still be the one '
+              'a rider sees when the adapter is genuinely gone');
+      expect(elm.wire.where((c) => c == '04'), isEmpty,
+          reason: 'a link already known to be stale is reported immediately, '
+              'rather than after another four seconds of waiting');
+
+      await obd.disconnect();
+      await elm.close();
+    }, timeout: const Timeout(Duration(seconds: 90)));
+
+    test('an ECU refusing the erase is not called a connection failure',
+        () async {
+      final elm = FakeElm()..mode04Payload = '7F 04 22';
+      final obd = await connectedService(elm);
+      await Future.delayed(const Duration(milliseconds: 600));
+
+      expect(await obd.clearDtcs(), isFalse);
+      expect(obd.lastClearOutcome, ClearDtcsOutcome.refused,
+          reason: 'the ECU answered — the link is fine, the erase was refused');
+      expect(obd.status, ConnectionStatus.connected);
+
+      await obd.disconnect();
+      await elm.close();
+    }, timeout: const Timeout(Duration(seconds: 60)));
+
+    test('an erase that demonstrably did not take is reported as such',
+        () async {
+      final elm = FakeElm()
+        ..eraseActuallyWorks = false
+        ..mode04Latency = const Duration(seconds: 30);
+      final obd = await connectedService(elm);
+      await Future.delayed(const Duration(milliseconds: 600));
+
+      expect(await obd.clearDtcs(), isFalse);
+      expect(obd.lastClearOutcome, ClearDtcsOutcome.notCleared,
+          reason: 'Mode 03 answered and still reports a stored code');
+
+      await obd.disconnect();
+      await elm.close();
+    }, timeout: const Timeout(Duration(seconds: 90)));
+
+    test('an ECU that never comes back leaves the clear unconfirmed, not failed',
+        () async {
+      // The module accepts the erase and then stays away past every attempt.
+      // Nothing is known, and "nothing is known" is not "the link is broken".
+      final elm = FakeElm()
+        ..mode04Latency = const Duration(seconds: 30)
+        ..postEraseRecovery = const Duration(seconds: 30);
+      final obd = await connectedService(elm);
+      await Future.delayed(const Duration(milliseconds: 600));
+
+      expect(await obd.clearDtcs(), isFalse,
+          reason: 'an unconfirmed clear is never reported as a success');
+      expect(obd.lastClearOutcome, ClearDtcsOutcome.unconfirmed,
+          reason: 'the link was alive throughout — this is unknown, not failed');
+
+      await obd.disconnect();
+      await elm.close();
+    }, timeout: const Timeout(Duration(seconds: 120)));
+
+    test('a successful clear reports the cleared outcome', () async {
+      final elm = FakeElm()..mode04Payload = '44';
+      final obd = await connectedService(elm);
+      await Future.delayed(const Duration(milliseconds: 600));
+
+      expect(await obd.clearDtcs(), isTrue);
+      expect(obd.lastClearOutcome, ClearDtcsOutcome.cleared);
+
+      await obd.disconnect();
+      await elm.close();
+    }, timeout: const Timeout(Duration(seconds: 60)));
+
+    test('the confirmation retries before giving up', () async {
+      // One attempt is not enough for a module that is still booting. Two are.
+      final elm = FakeElm()
+        ..mode04Latency = const Duration(seconds: 30)
+        ..postEraseRecovery = const Duration(milliseconds: 7500);
+      final obd = await connectedService(elm);
+      await Future.delayed(const Duration(milliseconds: 600));
+
+      expect(await obd.clearDtcs(), isTrue);
+      expect(elm.wire.where((c) => c == '03').length, greaterThanOrEqualTo(2),
+          reason: 'the first confirmation landed on a busy ECU; the clear is '
+              'resolved by asking again, not by reporting a dead connection');
+
+      await obd.disconnect();
+      await elm.close();
+    }, timeout: const Timeout(Duration(seconds: 120)));
   });
 
   // ══════════════════════════════════════════════════════════════════════════
