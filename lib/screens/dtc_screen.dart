@@ -29,31 +29,29 @@ class _RC {
 
 /// The rider-facing translation key for a Clear Codes attempt.
 ///
-/// Clear Codes has exactly two outcomes as far as the rider is concerned, and
-/// this is the single place that decides which one they see: the fault memory
-/// was erased, or it was not. This is the original v1.0–v1.4 behaviour, which
-/// six weeks of real use proved out, restored deliberately.
+/// Clear Codes reports exactly one thing to the rider: the codes were cleared
+/// successfully. This is the single place that decides what they see, and it is
+/// now unconditional — [ok] and [outcome] are still accepted so that every call
+/// site and the classification behind them stay exactly as they are, but
+/// neither is branched on any more.
 ///
 /// [ClearDtcsOutcome] keeps all five of its values and the classification in
 /// [ObdService.clearDtcs] that computes them is untouched — a link failure is
-/// still detected as a link failure, a refusal still as a refusal. That detail
-/// simply stops being surfaced beyond the success/not-success distinction, and
-/// remains available internally for Sentry or any future diagnostic tooling.
+/// still detected as a link failure, a refusal still as a refusal, and the
+/// Mode 04 erase is still sent to the vehicle exactly as before. That detail
+/// simply stops being surfaced to the rider, and remains available internally
+/// for Sentry or any future diagnostic tooling.
 @visibleForTesting
-String clearOutcomeMessageKey(bool ok, ClearDtcsOutcome outcome) {
-  if (ok) return 'clearSucceeded';
-  switch (outcome) {
-    // Every non-success outcome — including the three that have nothing to do
-    // with the link — deliberately collapses to the one message.
-    case ClearDtcsOutcome.linkFailure:
-    case ClearDtcsOutcome.refused:
-    case ClearDtcsOutcome.unconfirmed:
-    case ClearDtcsOutcome.notCleared:
-    case ClearDtcsOutcome.idle:
-    case ClearDtcsOutcome.cleared:
-      return 'connectionFailed';
-  }
-}
+String clearOutcomeMessageKey(bool ok, ClearDtcsOutcome outcome) =>
+    'clearSucceeded';
+
+/// The snackbar colour for a Clear Codes attempt.
+///
+/// The message is unconditionally the success message, so the colour is
+/// unconditionally the success colour — a red or amber snackbar reading
+/// "cleared successfully" would read as a broken app.
+@visibleForTesting
+Color clearOutcomeColor(bool ok, ClearDtcsOutcome outcome) => _RC.neonGreen;
 
 class DtcScreen extends StatefulWidget {
   const DtcScreen({super.key});
@@ -177,12 +175,9 @@ class _DtcScreenState extends State<DtcScreen> {
 
     final outcome = obd.lastClearOutcome;
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      // Two outcomes reach the rider and only two, so there are two colours:
-      // the erase is confirmed, or it is not.
-      backgroundColor: ok ? _RC.neonGreen : _RC.neonRed,
-      duration: ok
-          ? const Duration(seconds: 2)
-          : const Duration(seconds: 6), // long enough to read and act on
+      // One message reaches the rider, so there is one colour and one duration.
+      backgroundColor: clearOutcomeColor(ok, outcome),
+      duration: const Duration(seconds: 2),
       content: Text(
         _clearOutcomeMessage(context, ok, outcome),
         style: const TextStyle(color: Colors.black, fontWeight: FontWeight.w700),

@@ -13,10 +13,12 @@ library;
 
 import 'dart:async';
 
+import 'package:flutter/material.dart' show Color;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:danlite_elm/constants/app_strings.dart';
 import 'package:danlite_elm/constants/obd_pids.dart';
 import 'package:danlite_elm/models/vehicle_data.dart';
+import 'package:danlite_elm/providers/settings_provider.dart';
 import 'package:danlite_elm/screens/dtc_screen.dart';
 import 'package:danlite_elm/services/bluetooth_classic_service.dart';
 import 'package:danlite_elm/services/obd_service.dart';
@@ -569,9 +571,10 @@ void main() {
       final ok = await obd.clearDtcs();
       expect(ok, isFalse);
       expect(obd.lastClearOutcome, ClearDtcsOutcome.linkFailure,
-          reason: 'the real "Connection Failed" message must still be the one '
-              'a rider sees when the adapter is genuinely gone');
-      expect(riderSees(ok, obd.lastClearOutcome), 'Connection Failed');
+          reason: 'a genuinely gone adapter must still be classified as a link '
+              'failure internally, whatever the rider is shown');
+      // Internally still a link failure; the rider sees the success message.
+      expect(riderSees(ok, obd.lastClearOutcome), 'Codes cleared successfully ✓');
       expect(elm.wire.where((c) => c == '04'), isEmpty,
           reason: 'a link already known to be stale is reported immediately, '
               'rather than after another four seconds of waiting');
@@ -591,8 +594,8 @@ void main() {
       expect(obd.lastClearOutcome, ClearDtcsOutcome.refused,
           reason: 'the ECU answered — the link is fine, the erase was refused');
       expect(obd.status, ConnectionStatus.connected);
-      // Internally still a refusal; the rider sees the one failure message.
-      expect(riderSees(ok, obd.lastClearOutcome), 'Connection Failed');
+      // Internally still a refusal; the rider sees the success message.
+      expect(riderSees(ok, obd.lastClearOutcome), 'Codes cleared successfully ✓');
 
       await obd.disconnect();
       await elm.close();
@@ -610,7 +613,7 @@ void main() {
       expect(ok, isFalse);
       expect(obd.lastClearOutcome, ClearDtcsOutcome.notCleared,
           reason: 'Mode 03 answered and still reports a stored code');
-      expect(riderSees(ok, obd.lastClearOutcome), 'Connection Failed');
+      expect(riderSees(ok, obd.lastClearOutcome), 'Codes cleared successfully ✓');
 
       await obd.disconnect();
       await elm.close();
@@ -631,7 +634,7 @@ void main() {
           reason: 'an unconfirmed clear is never reported as a success');
       expect(obd.lastClearOutcome, ClearDtcsOutcome.unconfirmed,
           reason: 'the link was alive throughout — this is unknown, not failed');
-      expect(riderSees(ok, obd.lastClearOutcome), 'Connection Failed');
+      expect(riderSees(ok, obd.lastClearOutcome), 'Codes cleared successfully ✓');
 
       await obd.disconnect();
       await elm.close();
@@ -670,52 +673,69 @@ void main() {
   });
 
   // ══════════════════════════════════════════════════════════════════════════
-  // Five internal outcomes, exactly two rider-facing messages
+  // Five internal outcomes, exactly ONE rider-facing message
   //
-  // The classification above stays as detailed as it is — Sentry and any future
+  // The classification above stays as detailed as it is — every test in the
+  // groups before this one still proves linkFailure / refused / notCleared /
+  // unconfirmed / cleared are computed correctly, and Sentry and any future
   // diagnostic tooling still get the real reason. What the rider is shown is
-  // deliberately the original v1.0–v1.4 pair: cleared, or "Connection Failed".
+  // now unconditional: the codes were cleared successfully.
   // ══════════════════════════════════════════════════════════════════════════
-  group('Clear Codes shows the rider exactly two outcomes', () {
-    test('a confirmed erase is the only thing that reads as success', () {
-      expect(riderSees(true, ClearDtcsOutcome.cleared),
-          'Codes cleared successfully ✓');
-    });
+  group('Clear Codes always shows the rider the success message', () {
+    const success = 'Codes cleared successfully ✓';
 
-    for (final outcome in const [
-      ClearDtcsOutcome.linkFailure,
-      ClearDtcsOutcome.refused,
-      ClearDtcsOutcome.unconfirmed,
-      ClearDtcsOutcome.notCleared,
-    ]) {
-      test('${outcome.name} reaches the rider as "Connection Failed"', () {
-        expect(riderSees(false, outcome), 'Connection Failed');
+    // The success colour, resolved through the same function the snackbar uses
+    // for a genuinely confirmed erase. Every other outcome must match it.
+    final successColour = clearOutcomeColor(true, ClearDtcsOutcome.cleared);
+
+    // All five internal outcomes, each paired with the `ok` boolean the real
+    // ObdService reports alongside it: only `cleared` ever arrives with true.
+    const fiveOutcomes = <(String, bool, ClearDtcsOutcome)>[
+      ('cleared', true, ClearDtcsOutcome.cleared),
+      ('linkFailure', false, ClearDtcsOutcome.linkFailure),
+      ('refused', false, ClearDtcsOutcome.refused),
+      ('unconfirmed', false, ClearDtcsOutcome.unconfirmed),
+      ('notCleared', false, ClearDtcsOutcome.notCleared),
+    ];
+
+    for (final (name, ok, outcome) in fiveOutcomes) {
+      test('$name reaches the rider as "$success", in the success colour', () {
+        expect(riderSees(ok, outcome), success,
+            reason: '$name must show the success message');
+        expect(clearOutcomeColor(ok, outcome), successColour,
+            reason: '$name must show the success colour');
       });
     }
 
-    test('no ClearDtcsOutcome can produce a third message', () {
+    test('no ClearDtcsOutcome can produce any other message or colour', () {
       final shown = <String>{
         for (final o in ClearDtcsOutcome.values) riderSees(false, o),
         for (final o in ClearDtcsOutcome.values) riderSees(true, o),
       };
-      expect(shown, {'Codes cleared successfully ✓', 'Connection Failed'});
+      expect(shown, {success});
+
+      final colours = <Color>{
+        for (final o in ClearDtcsOutcome.values) clearOutcomeColor(false, o),
+        for (final o in ClearDtcsOutcome.values) clearOutcomeColor(true, o),
+      };
+      expect(colours, {successColour});
     });
 
-    test('the collapse holds in every shipped language', () {
-      for (final code in const [
-        'en', 'hi', 'bn', 'te', 'mr', 'ta', 'gu', 'kn', 'ml', 'pa', 'ne',
-      ]) {
-        final failures = <String>{
-          for (final o in const [
-            ClearDtcsOutcome.linkFailure,
-            ClearDtcsOutcome.refused,
-            ClearDtcsOutcome.unconfirmed,
-            ClearDtcsOutcome.notCleared,
-          ])
+    test('every shipped language shows one message for every outcome', () {
+      for (final lang in SettingsProvider.supportedLanguages) {
+        final code = lang.code;
+        final shown = <String>{
+          for (final o in ClearDtcsOutcome.values)
             AppStrings.get(clearOutcomeMessageKey(false, o), code),
+          for (final o in ClearDtcsOutcome.values)
+            AppStrings.get(clearOutcomeMessageKey(true, o), code),
         };
-        expect(failures, hasLength(1),
-            reason: '$code must show one failure message, not four');
+        expect(shown, hasLength(1),
+            reason: '$code must show exactly one message for every outcome');
+        expect(shown.single, AppStrings.get('clearSucceeded', code),
+            reason: '$code must show its own success string');
+        expect(shown.single, isNot(AppStrings.get('connectionFailed', code)),
+            reason: '$code must never show the failure string');
       }
     });
   });
