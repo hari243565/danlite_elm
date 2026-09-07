@@ -773,10 +773,31 @@ class _DtcScreenState extends State<DtcScreen> {
         body = context.tr('absNoFaultsDesc');
         break;
       case ChassisScanOutcome.noModuleResponse:
-        icon = Icons.help_outline_rounded;
-        color = _RC.neonAmber;
-        title = context.tr('absNoModule');
-        body = context.tr('absNoModuleDesc');
+        // Two genuinely different things can produce "nothing answered", and
+        // collapsing them sends the rider to debug the wrong thing. If the
+        // probe timings were themselves implausible, the adapter is the more
+        // likely explanation than the motorcycle — said as a possibility,
+        // because timing is inference and cannot prove hardware capability.
+        if (obd.chassisAdapterCapability ==
+            ChassisAdapterCapability.timingSuggestsLimited) {
+          icon = Icons.usb_rounded;
+          color = _RC.neonAmber;
+          title = context.tr('absAdapterMayBeLimited');
+          body = context.tr('absAdapterMayBeLimitedDesc');
+        } else {
+          icon = Icons.help_outline_rounded;
+          color = _RC.neonAmber;
+          title = context.tr('absNoModule');
+          // The converse is worth saying too: when the adapter demonstrably
+          // did wait for the bus, silence is much more likely to be about the
+          // vehicle, and the rider should not go buy another adapter.
+          final timingWasNormal = obd.chassisAdapterCapability ==
+              ChassisAdapterCapability.timingLooksGenuine;
+          body = timingWasNormal
+              ? '${context.tr('absNoModuleDesc')}\n\n'
+                  '${context.tr('absAdapterTimingNormal')}'
+              : context.tr('absNoModuleDesc');
+        }
         break;
       case ChassisScanOutcome.addressingUnsupported:
         icon = Icons.usb_off_rounded;
@@ -800,6 +821,7 @@ class _DtcScreenState extends State<DtcScreen> {
     }
 
     final log = obd.chassisScanLog;
+    final learned = obd.chassisLearnedModule;
 
     return ListView(
       physics: const AlwaysScrollableScrollPhysics(),
@@ -817,6 +839,17 @@ class _DtcScreenState extends State<DtcScreen> {
             textAlign: TextAlign.center,
             style: const TextStyle(
                 color: _RC.textMuted, fontSize: 13, height: 1.5)),
+        // Surfaced above the log, not buried in it: this is the one line that
+        // tells a returning rider the app is not re-guessing from scratch.
+        if (learned.isNotEmpty) ...[
+          const SizedBox(height: 16),
+          Text('${context.tr('absLearnedAddress')}: $learned',
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                  color: _RC.textMuted,
+                  fontSize: 11.5,
+                  fontWeight: FontWeight.w700)),
+        ],
         if (log.isNotEmpty) ...[
           const SizedBox(height: 20),
           Theme(

@@ -247,6 +247,19 @@ class ObdPids {
 
   /// `ATFCSM1` — use the user-supplied flow-control header and data above.
   static const String flowControlMode = 'ATFCSM1';
+
+  /// `ATCP 18` — set the CAN priority byte used for 29-bit headers.
+  ///
+  /// On 29-bit CAN the ELM327 takes only the low three bytes from `ATSH`
+  /// (six hex digits); the top byte comes from this register, whose power-on
+  /// value is already 0x18. ISO 15765-4 extended-addressing diagnostic IDs
+  /// are of the form `18DA<target><tester>`, so 0x18 is the correct priority.
+  /// It is sent explicitly rather than assumed, because a previous scan or a
+  /// protocol switch may have left the register elsewhere.
+  static String setCanPriority(String priorityByte) => 'ATCP$priorityByte';
+
+  /// The ISO 15765-4 extended-addressing priority byte, 0x18.
+  static const String canPriorityDiagnostic = '18';
 }
 
 // ═══════════════════════════════════════════════════════════════════════════

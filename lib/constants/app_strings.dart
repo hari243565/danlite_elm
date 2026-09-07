@@ -227,6 +227,22 @@ class AppStrings {
           'this ELM327 adapter cannot reach non-engine modules at all — many '
           'adapters that read engine codes perfectly still cannot read ABS. '
           'It does not by itself mean the ABS system is faulty.',
+      'absAdapterMayBeLimited': 'This adapter may not be able to reach the '
+          'ABS module',
+      'absAdapterMayBeLimitedDesc':
+          'No address answered, and the replies came back in a pattern that is '
+          'not consistent with the adapter really waiting for the bus — they '
+          'were either far too fast to be a real round trip, or never returned '
+          'at all. That points at the adapter as a likely explanation rather '
+          'than the motorcycle, though timing alone cannot prove it. Many '
+          'low-cost ELM327 adapters read engine codes perfectly and still '
+          'cannot reach a non-engine module; that is a hardware limit no app '
+          'can work around. If ABS scanning matters to you, an adapter built '
+          'on an STN11xx chip (for example an OBDLink) documents support for '
+          'reaching non-engine modules. Engine codes are unaffected either way.',
+      'absAdapterTimingNormal':
+          'Adapter response timing looked normal during this scan.',
+      'absLearnedAddress': 'Remembered address',
       'absAddressingUnsupported': 'Adapter cannot address the ABS module',
       'absAddressingUnsupportedDesc':
           'This adapter rejected the commands needed to talk to a specific '
@@ -878,6 +894,20 @@ class AppStrings {
           'यह हो सकता है कि इस वाहन में मॉड्यूल का पता अलग है, या यह ELM327 एडाप्टर '
           'इंजन के अलावा किसी मॉड्यूल तक पहुँच ही नहीं सकता — कई एडाप्टर इंजन कोड ठीक '
           'पढ़ते हैं फिर भी ABS नहीं पढ़ पाते। इससे यह सिद्ध नहीं होता कि ABS सिस्टम खराब है।',
+      'absAdapterMayBeLimited': 'यह एडाप्टर शायद ABS मॉड्यूल तक नहीं पहुँच पा रहा',
+      'absAdapterMayBeLimitedDesc':
+          'किसी भी पते ने उत्तर नहीं दिया, और उत्तरों का समय ऐसा था जो यह नहीं दर्शाता कि '
+          'एडाप्टर वास्तव में बस का इंतज़ार कर रहा था — वे या तो असली राउंड ट्रिप के लिए '
+          'बहुत तेज़ थे, या बिल्कुल लौटे ही नहीं। इससे संकेत मिलता है कि समस्या मोटरसाइकिल '
+          'की नहीं, एडाप्टर की हो सकती है, हालाँकि केवल समय से यह सिद्ध नहीं होता। कई सस्ते '
+          'ELM327 एडाप्टर इंजन कोड ठीक पढ़ते हैं फिर भी इंजन के अलावा किसी मॉड्यूल तक नहीं '
+          'पहुँच पाते; यह हार्डवेयर की सीमा है जिसे कोई ऐप दूर नहीं कर सकता। यदि ABS स्कैन '
+          'आपके लिए ज़रूरी है, तो STN11xx चिप वाला एडाप्टर (जैसे OBDLink) इंजन के अलावा '
+          'मॉड्यूल तक पहुँचने का दस्तावेज़ी समर्थन देता है। इंजन कोड दोनों ही स्थितियों में '
+          'प्रभावित नहीं होते।',
+      'absAdapterTimingNormal':
+          'इस स्कैन में एडाप्टर के उत्तरों का समय सामान्य लगा।',
+      'absLearnedAddress': 'याद रखा गया पता',
       'absAddressingUnsupported': 'एडाप्टर ABS मॉड्यूल को संबोधित नहीं कर सकता',
       'absAddressingUnsupportedDesc':
           'इस एडाप्टर ने किसी विशिष्ट मॉड्यूल से बात करने वाले कमांड (ATSH / ATCRA) '

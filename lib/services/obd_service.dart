@@ -8,6 +8,7 @@ import '../constants/dtc_descriptions.dart';
 import '../constants/obd_pids.dart';
 import '../models/vehicle_data.dart';
 import 'bluetooth_classic_service.dart';
+import 'chassis_address_memory.dart';
 
 enum ConnectionType { wifi, bluetooth }
 
@@ -104,11 +105,19 @@ class FreezeFrameData {
 }
 
 class ObdService extends ChangeNotifier {
-  ObdService(this._btService) {
+  ObdService(this._btService, {ChassisAddressMemory? chassisAddressMemory})
+      : chassisAddressMemory = chassisAddressMemory ?? ChassisAddressMemory() {
     _btService.addListener(_onBtServiceChanged);
   }
 
   final BluetoothClassicService _btService;
+
+  /// Which chassis address a given make + model is already known to answer at.
+  ///
+  /// Injectable so tests can drive the real memory logic against an in-memory
+  /// store instead of a platform channel. See `chassis_address_memory.dart`
+  /// for what its scope is, and honestly is not.
+  final ChassisAddressMemory chassisAddressMemory;
 
   // ── State ─────────────────────────────────────────────────────────────────
   ConnectionStatus _status = ConnectionStatus.disconnected;
@@ -150,6 +159,45 @@ class ObdService extends ChangeNotifier {
 
   bool _chassisScanInFlight = false;
   bool get chassisScanInFlight => _chassisScanInFlight;
+
+  /// What the last scan's own probe timings suggest about the adapter.
+  ///
+  /// Inference, not a capability query — see [ChassisAdapterCapability] for
+  /// the published numbers the thresholds are derived from, and for why this
+  /// is never stated to the rider as a certainty.
+  ChassisAdapterCapability _chassisAdapterCapability =
+      ChassisAdapterCapability.unknown;
+  ChassisAdapterCapability get chassisAdapterCapability =>
+      _chassisAdapterCapability;
+
+  /// Median latency, in ms, of the probes the last scan counted as genuine
+  /// no-replies. Null when the scan measured none.
+  int? _chassisProbeMedianMs;
+  int? get chassisProbeMedianMs => _chassisProbeMedianMs;
+
+  /// Label of the remembered address the last scan tried first, or empty when
+  /// nothing was remembered for that vehicle.
+  String _chassisLearnedModule = '';
+  String get chassisLearnedModule => _chassisLearnedModule;
+
+  /// Wall-clock ceiling on the widened address sweep.
+  ///
+  /// The two originally-shipped candidates and any remembered address are
+  /// exempt, so this can only ever cut the addresses that were *added* when
+  /// the list was widened — it can never make a scan that used to work stop
+  /// working. Settable so tests can exercise the limit without waiting on it.
+  @visibleForTesting
+  Duration chassisScanBudget = const Duration(seconds: 60);
+
+  /// How many probes in a row may fail to return at all before the sweep is
+  /// abandoned.
+  ///
+  /// A probe that times out has not told us the module is absent — it has told
+  /// us the adapter never handed control back. Grinding through another ten
+  /// addresses at five seconds each learns nothing and leaves the rider
+  /// staring at a spinner for a minute. The protected candidates are exempt,
+  /// so this cannot curtail the original probe order.
+  static const int _chassisAbortAfterConsecutiveTimeouts = 3;
 
   String _lastError = '';
   String get lastError => _lastError;
@@ -1355,6 +1403,9 @@ class ObdService extends ChangeNotifier {
     if (_chassisScanInFlight) return _chassisDtcCodes;
 
     _chassisScanInFlight = true;
+    _chassisAdapterCapability = ChassisAdapterCapability.unknown;
+    _chassisProbeMedianMs = null;
+    _chassisLearnedModule = '';
     notifyListeners();
 
     // Two different keys, deliberately: the module probe order is a
@@ -1366,6 +1417,14 @@ class ObdService extends ChangeNotifier {
     final log = <String>[];
     final previousTimeout = _cmdTimeout;
 
+    // Adapter-capability evidence, gathered from the probes this scan runs
+    // anyway. Only genuine no-reply outcomes are sampled: a module that
+    // refuses with an NRC, or answers with something unparseable, has
+    // demonstrably been reached, which says nothing about adapter timing.
+    final negativeLatenciesMs = <int>[];
+    var timedOutProbes = 0;
+    var consecutiveTimeouts = 0;
+
     var headersOn = false;
     var stWidened = false;
     var addressingChanged = false;
@@ -1373,6 +1432,8 @@ class ObdService extends ChangeNotifier {
 
     _acquirePollLock();
     await _waitForLinkIdle();
+
+    final scanClock = Stopwatch()..start();
 
     try {
       if (!_linkSynced) {
@@ -1392,16 +1453,56 @@ class ObdService extends ChangeNotifier {
       final stResp = await _send('ATST7D');
       stWidened = !_isDeadResponse(stResp);
 
-      final candidates = ChassisModuleProfiles.candidatesFor(manufacturerKey);
+      // 29-bit candidates are only meaningful on a 29-bit bus. Asking the
+      // adapter which protocol it settled on costs one command and saves
+      // probing addresses the adapter would simply reject.
+      final wide = await _busUsesTwentyNineBitIds();
+      if (wide) log.add('Bus reports 29-bit CAN — extended addresses included.');
+
+      // Load whatever a previous successful scan learned for this vehicle, and
+      // put that address first. Reordering only: the full sweep still follows.
+      try {
+        if (!chassisAddressMemory.isLoaded) await chassisAddressMemory.load();
+      } catch (e) {
+        debugPrint('[ObdService] chassis address memory unavailable: $e');
+      }
+      final learned =
+          chassisAddressMemory.knownTarget(vehicleMake, vehicleModel);
+
+      final candidates = chassisAddressMemory.ordered(
+        ChassisModuleProfiles.candidatesFor(manufacturerKey,
+            supportsTwentyNineBit: wide),
+        make: vehicleMake,
+        model: vehicleModel,
+      );
+      if (learned != null) {
+        _chassisLearnedModule = learned.label;
+        log.add('Trying remembered address for this make and model first: '
+            '${learned.label}.');
+      }
+
       List<DtcCode>? found;
 
-      /// Point the adapter at one specific module: transmit header, receive
-      /// filter, and flow control. False means the adapter refused the
-      /// addressing commands themselves, so this candidate cannot be probed.
+      /// Candidates that must be probed no matter what: the two that shipped
+      /// before the list was widened, and the one this vehicle is known to
+      /// answer at. Neither the time budget nor the timeout abort may skip
+      /// them, so widening the list cannot make a previously-working scan
+      /// stop working.
+      bool isProtected(ChassisModuleTarget t) =>
+          t.core || (learned != null && t.id == learned.id);
+
+      /// Point the adapter at one specific module: CAN priority (29-bit only),
+      /// transmit header, receive filter, and flow control. False means the
+      /// adapter refused the addressing commands themselves, so this candidate
+      /// cannot be probed.
       ///
       /// Extracted so it can be re-applied after an adapter recovery — see the
       /// TIMEOUT branch below for why that is not optional.
       Future<bool> applyAddressing(ChassisModuleTarget target) async {
+        for (final cmd in target.priorityCommands) {
+          await _send(cmd);
+        }
+
         final shResp = await _send(target.headerCommand);
         if (_isDeadResponse(shResp) || shResp.contains('?')) {
           log.add('${target.label}: adapter rejected ${target.headerCommand}.');
@@ -1428,13 +1529,35 @@ class ObdService extends ChangeNotifier {
       for (final target in candidates) {
         if (found != null) break;
 
+        if (!isProtected(target)) {
+          // Two independent reasons to stop sweeping, both honest and both
+          // reported rather than silent.
+          if (consecutiveTimeouts >= _chassisAbortAfterConsecutiveTimeouts) {
+            log.add('Sweep stopped after $consecutiveTimeouts consecutive '
+                'probes that never returned — the adapter is not handing '
+                'control back. Remaining addresses were not tried.');
+            break;
+          }
+          if (scanClock.elapsed >= chassisScanBudget) {
+            log.add('Sweep stopped at the '
+                '${chassisScanBudget.inSeconds}s scan time limit. Remaining '
+                'addresses were not tried.');
+            break;
+          }
+        }
+
         if (!await applyAddressing(target)) continue;
 
         for (final request in target.requests) {
+          final probeClock = Stopwatch()..start();
           final response = await _send(request);
+          probeClock.stop();
+          final elapsedMs = probeClock.elapsedMilliseconds;
 
           if (response == 'TIMEOUT') {
-            log.add('${target.label} · $request: timeout.');
+            timedOutProbes++;
+            consecutiveTimeouts++;
+            log.add('${target.label} · $request: timeout after ${elapsedMs}ms.');
 
             // _recoverAdapter() may re-run the init sequence, and that restores
             // the adapter's LIVE baseline — which silently wipes the ATSH,
@@ -1464,9 +1587,19 @@ class ObdService extends ChangeNotifier {
             continue;
           }
           if (_isChassisNoReply(response)) {
-            log.add('${target.label} · $request: no reply from module.');
+            // The one outcome that carries adapter-timing information: the
+            // adapter claims nothing answered, so how long it took to reach
+            // that conclusion is meaningful. See ChassisTiming.
+            negativeLatenciesMs.add(elapsedMs);
+            consecutiveTimeouts = 0;
+            log.add('${target.label} · $request: no reply from module '
+                '(${elapsedMs}ms).');
             continue;
           }
+
+          // Anything past this point is a reply from something, so the adapter
+          // demonstrably reached the bus. Reset the timeout run.
+          consecutiveTimeouts = 0;
 
           if (request.startsWith('19')) {
             final uds = ObdParser.parseUdsDtcDetailed(response);
@@ -1479,9 +1612,14 @@ class ObdService extends ChangeNotifier {
               log.add('${target.label} · $request: reply not a 59 02 response.');
               continue;
             }
-            log.add('${target.label} · $request: answered — '
+            log.add('${target.label} · $request: answered in ${elapsedMs}ms — '
                 '${uds.records.length} code(s).');
             _chassisRespondingModule = target.label;
+            await _rememberChassisAddress(
+                target: target,
+                make: vehicleMake,
+                model: vehicleModel,
+                log: log);
             found = <DtcCode>[
               for (final r in uds.records)
                 _buildChassisDtc(
@@ -1500,9 +1638,14 @@ class ObdService extends ChangeNotifier {
             continue;
           }
           final parsed = ObdParser.parseDetailed(response);
-          log.add('${target.label} · $request (Mode 03): answered — '
-              '${parsed.allCodes.length} code(s).');
+          log.add('${target.label} · $request (Mode 03): answered in '
+              '${elapsedMs}ms — ${parsed.allCodes.length} code(s).');
           _chassisRespondingModule = target.label;
+          await _rememberChassisAddress(
+              target: target,
+              make: vehicleMake,
+              model: vehicleModel,
+              log: log);
           found = <DtcCode>[
             for (final code in parsed.allCodes)
               _buildChassisDtc(code: code, platformKey: platformKey),
@@ -1511,7 +1654,21 @@ class ObdService extends ChangeNotifier {
         }
       }
 
+      // The capability verdict is only about scans that found nothing. When a
+      // module answered, the adapter has proved it can reach one, and guessing
+      // about its hardware from timing would be noise.
       if (found == null) {
+        _chassisProbeMedianMs = ChassisTiming.medianMs(negativeLatenciesMs);
+        _chassisAdapterCapability = ChassisTiming.classify(
+          negativeLatenciesMs: negativeLatenciesMs,
+          timedOut: timedOutProbes,
+        );
+        log.add(_capabilityLogLine(
+          capability: _chassisAdapterCapability,
+          medianMs: _chassisProbeMedianMs,
+          samples: negativeLatenciesMs.length + timedOutProbes,
+        ));
+
         _chassisDtcCodes = <DtcCode>[];
         _chassisScanOutcome = addressingAccepted
             ? ChassisScanOutcome.noModuleResponse
@@ -1548,6 +1705,79 @@ class ObdService extends ChangeNotifier {
       _releasePollLock();
       _chassisScanInFlight = false;
       notifyListeners();
+    }
+  }
+
+  /// Ask the adapter which protocol it actually settled on, and report whether
+  /// that protocol uses 29-bit CAN identifiers.
+  ///
+  /// `ATDPN` answers with the ISO 15765-4 protocol number, optionally prefixed
+  /// with `A` when the protocol was reached automatically. Numbers 7 and 9 are
+  /// the 29-bit variants (500 kbit and 250 kbit); 6 and 8 are their 11-bit
+  /// counterparts. Anything unrecognised — including a silent or wedged
+  /// adapter — is treated as 11-bit, which is the conservative answer: it
+  /// means the extended candidates are skipped rather than probed with a
+  /// header width the bus cannot carry.
+  Future<bool> _busUsesTwentyNineBitIds() async {
+    final reply = await _send('ATDPN');
+    if (_isDeadResponse(reply)) return false;
+    final cleaned =
+        reply.toUpperCase().replaceAll(RegExp(r'[^0-9A-F]'), '');
+    if (cleaned.isEmpty) return false;
+    final number = cleaned.substring(cleaned.length - 1);
+    return number == '7' || number == '9';
+  }
+
+  /// Write down that [target] genuinely answered for this vehicle, so the next
+  /// scan of the same make and model tries it first.
+  ///
+  /// Called only from the two branches that have decoded a real positive
+  /// reply, never on a timeout, a refusal or an unparseable answer — a
+  /// remembered address has to mean "this address really produced fault data
+  /// on this vehicle", or the memory is worse than no memory at all.
+  Future<void> _rememberChassisAddress({
+    required ChassisModuleTarget target,
+    required String? make,
+    required String? model,
+    required List<String> log,
+  }) async {
+    try {
+      final stored = await chassisAddressMemory.remember(
+        make: make,
+        model: model,
+        target: target,
+      );
+      if (stored) {
+        log.add('Remembered ${target.label} for this make and model — future '
+            'scans will try it first.');
+      }
+    } catch (e) {
+      // Failing to remember must never fail the scan that just succeeded.
+      debugPrint('[ObdService] could not remember chassis address: $e');
+    }
+  }
+
+  /// The scan-log line describing what the probe timings suggest, worded as a
+  /// possibility because that is all timing can establish.
+  String _capabilityLogLine({
+    required ChassisAdapterCapability capability,
+    required int? medianMs,
+    required int samples,
+  }) {
+    switch (capability) {
+      case ChassisAdapterCapability.unknown:
+        return 'Adapter timing: not enough measured probes ($samples) to '
+            'judge.';
+      case ChassisAdapterCapability.timingLooksGenuine:
+        return 'Adapter timing: normal '
+            '(${medianMs ?? 0}ms median over $samples probes) — the adapter '
+            'waited for the bus, so silence here most likely means no module '
+            'at these addresses.';
+      case ChassisAdapterCapability.timingSuggestsLimited:
+        return 'Adapter timing: unusual '
+            '(${medianMs ?? 0}ms median over $samples probes) — replies came '
+            'back too fast, or not at all, to be real bus round trips. This '
+            'may point at the adapter rather than the motorcycle.';
     }
   }
 
