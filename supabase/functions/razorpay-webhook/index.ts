@@ -452,6 +452,57 @@ Deno.serve(async (req: Request): Promise<Response> => {
         console.log(
           `${eventType} processed (payment=${paymentId}, revoked=${revoked})`,
         );
+
+        // ── AUDIT THE REVOCATION ─────────────────────────────────────────
+        // Added by the 2026-09-19 security audit. Every OTHER consequential
+        // path through this function already writes an audit_log row —
+        // malformed bodies, unknown orders, user mismatches, amount
+        // mismatches, failed payments — and so does every admin action
+        // (admin.licence_revoked, admin.force_signout). The one path that
+        // takes paid access away automatically did not, which made it the
+        // least investigable event in the system despite being the most
+        // consequential.
+        //
+        // licences.revoked_at / revoke_reason were the only durable record,
+        // and activate_licence_from_payment() CLEARS both on a later
+        // purchase — by design, so an active row does not also read as
+        // revoked. The effect was that buy -> refund -> buy again erased the
+        // evidence that the refund cycle ever happened, leaving only
+        // payments.status='refunded' and a function log with short retention.
+        //
+        // Best-effort, exactly like every other audit() call here: it is
+        // placed AFTER the RPC and cannot change the outcome, the status code
+        // or the response. A failed audit write must never turn a processed
+        // refund into a Razorpay retry.
+        //
+        // Identifiers only, per this function's logging policy: payment id,
+        // refund id, event type, and the amount already stored on the
+        // payments row. No card, VPA, bank or customer detail.
+        //
+        // The affected user is resolved for the audit row specifically
+        // because audit_log.user_id is what admin-audit-log filters and
+        // joins on to show an email — a null there would make the entry
+        // unfindable from the one tool built to read this trail. Read after
+        // the RPC (the payments row exists either way), and its failure is
+        // swallowed into a null rather than allowed to affect the response.
+        const { data: refundedPayment } = await admin
+          .from("payments")
+          .select("user_id")
+          .eq("gateway", "razorpay")
+          .eq("gateway_payment_id", paymentId)
+          .maybeSingle();
+
+        await audit(admin, (refundedPayment?.user_id as string) ?? null, "webhook.refund_revocation", {
+          eventType,
+          eventId,
+          paymentId,
+          refundId: r?.id ?? null,
+          refundAmountMinor: r?.amount ?? null,
+          // false === "no such payment on record"; true === handled, which
+          // includes an already-refunded payment the idempotency guard
+          // correctly declined to re-process.
+          licenceRevoked: revoked === true,
+        });
         // revoked === false means "no such payment on record" — a real and
         // acceptable state (e.g. a dashboard refund of a payment this system
         // never captured). 200 either way; retrying would not change it.

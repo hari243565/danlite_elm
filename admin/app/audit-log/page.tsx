@@ -159,7 +159,7 @@ export default async function AuditLogPage({
         </form>
 
         <Table
-          headers={['When', 'Action', 'User', 'IP', 'Detail']}
+          headers={['When', 'Action', 'User', 'Actor', 'IP', 'Detail']}
           isEmpty={entries.length === 0}
           empty={action || userId ? 'No entries match that filter.' : 'The audit log is empty.'}
         >
@@ -178,6 +178,20 @@ export default async function AuditLogPage({
                   </Link>
                 ) : (
                   <span style={{ color: C.muted }}>—</span>
+                )}
+              </td>
+              {/* WHO DID IT, as distinct from who it was about. Null here
+                  means the system acted (a webhook, the entitlement
+                  function); an address means a named human did. Rendered
+                  from actor_email rather than actor_user_id on purpose —
+                  the email is the denormalised historical record and
+                  survives that person leaving the allowlist, which is the
+                  whole reason 20260823160000 stored both. */}
+              <td style={{ ...tdStyle, fontSize: 12 }}>
+                {e.actor_email ? (
+                  <span style={{ color: C.text }}>{e.actor_email}</span>
+                ) : (
+                  <span style={{ color: C.muted }}>system</span>
                 )}
               </td>
               <td style={{ ...tdStyle, fontFamily: MONO, fontSize: 11, color: C.muted }}>

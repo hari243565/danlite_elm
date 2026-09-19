@@ -160,8 +160,13 @@ class EntitlementService {
     SupabaseService? service,
     FlutterSecureStorage? storage,
     SessionService? sessions,
+    @visibleForTesting SimplePublicKey? publicKey,
+    @visibleForTesting String? Function()? currentUserId,
   })  : _svc = service ?? SupabaseService.instance,
         _sessions = sessions ?? SessionService(),
+        _verifyKey = publicKey ?? _publicKey,
+        _currentUserId = currentUserId ??
+            (() => (service ?? SupabaseService.instance).currentUser?.id),
         _storage = storage ??
             const FlutterSecureStorage(
               // Same options as the auth session store: an AndroidX
@@ -173,6 +178,23 @@ class EntitlementService {
   final SupabaseService _svc;
   final SessionService _sessions;
   final FlutterSecureStorage _storage;
+
+  /// The key every signature is checked against.
+  ///
+  /// Always [_publicKey] in a shipped build — the constructor parameter that
+  /// can override it is annotated `@visibleForTesting` and there is no code
+  /// path, asset, environment variable or runtime input that reaches it. It
+  /// exists so the test suite can sign tokens with a throwaway key it
+  /// generates itself, which is the only way to test the verification logic
+  /// adversarially: the real private key lives solely in Supabase Edge
+  /// Function secrets and must never be obtainable here.
+  final SimplePublicKey _verifyKey;
+
+  /// Who is signed in, as an id. Indirected through a function purely because
+  /// [SupabaseService] has a private constructor and so cannot be faked by a
+  /// test; in a shipped build this always reads
+  /// `SupabaseService.instance.currentUser?.id`.
+  final String? Function() _currentUserId;
 
   /// The Edge Function name, as deployed.
   static const String _functionName = 'entitlement';
@@ -245,6 +267,19 @@ class EntitlementService {
           : Map<String, dynamic>.from(data as Map);
 
       final verified = await _verifyPayload(payload);
+      if (verified != null && !_belongsToCurrentUser(verified.sub)) {
+        // A validly-signed token naming a DIFFERENT account. See
+        // [_belongsToCurrentUser]. Discarded exactly like a bad signature:
+        // not cached, not trusted, not used for this call.
+        debugPrint('[entitlement] token subject is not the signed-in user — '
+            'discarding');
+        ErrorReportingService.reportError(
+          'entitlement token subject did not match the signed-in user',
+          StackTrace.current,
+          context: {'stage': 'network_payload'},
+        );
+        return readCached(reason: 'token subject mismatch');
+      }
       if (verified == null) {
         // A response that does not verify is discarded ENTIRELY — not cached,
         // not partially trusted, not used for this call. An unverified payload
@@ -394,6 +429,37 @@ class EntitlementService {
       return const EntitlementResult.none('cached token tampered');
     }
 
+    // ── Subject binding ──────────────────────────────────────────────────
+    //
+    // THIS IS WHAT STOPS A TRANSPLANTED TOKEN.
+    //
+    // A signature proves the SERVER issued this token. It does not prove the
+    // server issued it to the person now holding the phone. Before this
+    // check, a token lifted off a paying account and dropped into this
+    // device's secure storage verified perfectly, was unexpired, and came
+    // back as offlineGraceActive — which auth_gate.dart allows regardless of
+    // the licence string inside it. One paid account could therefore entitle
+    // any number of unpaid signed-in accounts, each for up to 14 days, simply
+    // by keeping the network unreachable so the cached path is the one taken.
+    //
+    // Acting ONLY on a non-null, genuinely-different uid is deliberate, and
+    // follows the same rule as the 409 handling above: a destructive outcome
+    // needs an unambiguous signal. A null uid means "nobody is signed in",
+    // which is not evidence of theft — and the gate sends a signed-out user
+    // to /login long before entitlement matters. So it is left alone rather
+    // than turned into a denial.
+    if (!_belongsToCurrentUser(verified.sub)) {
+      debugPrint('[entitlement] cached token belongs to another account — '
+          'clearing');
+      await _clearToken();
+      ErrorReportingService.reportError(
+        'cached entitlement token subject did not match the signed-in user',
+        StackTrace.current,
+        context: {'stage': 'cache'},
+      );
+      return const EntitlementResult.none('cached token subject mismatch');
+    }
+
     final now = _nowUnix();
 
     // ── Clock-rollback defence ────────────────────────────────────────────
@@ -476,6 +542,25 @@ class EntitlementService {
   }
 
   // ── Internals ─────────────────────────────────────────────────────────────
+
+  /// Does this token's `sub` claim name the user who is signed in right now?
+  ///
+  /// True when it matches, and ALSO true when there is no signed-in user to
+  /// compare against — see the call site in [readCached] for why that
+  /// leniency is the correct direction. Only a real, present, different user
+  /// id returns false.
+  ///
+  /// `sub` is covered by the Ed25519 signature, so it cannot be edited to
+  /// pass this check without invalidating the token. `currentUser.id` comes
+  /// from the Supabase session, which is itself a signed JWT. Defeating this
+  /// therefore means holding the other account's actual credentials — at
+  /// which point single-session enforcement takes over — rather than merely
+  /// copying a file.
+  bool _belongsToCurrentUser(String sub) {
+    final uid = _currentUserId();
+    if (uid == null) return true;
+    return sub == uid;
+  }
 
   Future<void> _clearToken() async {
     try {
@@ -573,7 +658,7 @@ class EntitlementService {
 
       final signature = Signature(
         _base64UrlDecode(sig),
-        publicKey: _publicKey,
+        publicKey: _verifyKey,
       );
 
       final ok = await _ed25519.verify(message, signature: signature);

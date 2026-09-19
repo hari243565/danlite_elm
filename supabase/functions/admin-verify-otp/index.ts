@@ -76,8 +76,43 @@ Deno.serve(async (req: Request): Promise<Response> => {
       return json({ error: "Could not verify admin access. Try again shortly." }, 503);
     }
     if (!allowRow) {
+      // ── SECURITY FIX, 2026-09-19 — do NOT say "not an admin" here. ─────
+      //
+      // THE ORACLE THIS CLOSES. /admin-request-otp answers honestly about
+      // allowlist membership, which is a reasoned, documented inversion of
+      // the customer-facing design — and its stated compensating control is
+      // the DB-backed rate-limit ledger: "Being honest about membership
+      // makes rate limiting more important, not less, because a truthful
+      // yes/no is exactly what a bulk prober wants."
+      //
+      // This endpoint leaked the identical fact with NO ledger, NO per-IP
+      // budget, no email sent and no row written. An unauthenticated caller
+      // could post {email: <guess>, token: "000000"} and read the status
+      // code: 403 meant "not an admin", 401 meant "IS an admin". Free,
+      // unlimited, and silent. Every rate-limit argument made for the
+      // request endpoint applied here and none of it had been applied.
+      //
+      // WHY A UNIFORM RESPONSE RATHER THAN A RATE LIMIT. The honest 403 was
+      // argued for on operational grounds that belong entirely to the
+      // REQUEST step — an admin who mistypes their address needs to be told,
+      // instead of waiting for mail that will never arrive. That is still
+      // exactly what /admin-request-otp does, and it is untouched. By the
+      // time someone is typing a 6-digit code they have already been told.
+      // So at this step the honest answer buys nothing and leaks everything,
+      // and collapsing it into the generic code-rejection message removes
+      // the oracle outright instead of merely metering it.
+      //
+      // GATE ORDERING IS DELIBERATELY UNCHANGED. The allowlist is still
+      // checked BEFORE verifyOtp, so a non-admin holding a valid code for
+      // their own account still never reaches the auth server through this
+      // endpoint and still never has that code consumed. Only the response
+      // text and status change — 401 with the same string the wrong-code
+      // branch below returns, so the two are indistinguishable.
+      //
+      // The log line stays specific: the distinction is useful to an
+      // operator reading logs and is not visible to the caller.
       console.warn("admin-verify-otp: rejected non-allowlisted address");
-      return json({ error: "This email is not authorized for admin access." }, 403);
+      return json({ error: "That code is incorrect or has expired." }, 401);
     }
 
     // ── GATE 2: is the code real? ────────────────────────────────────────

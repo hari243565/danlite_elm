@@ -261,6 +261,19 @@ export type AuditEntry = {
   detail: unknown;
   ip: string | null;
   created_at: string;
+  // ── Added by the 2026-09-19 security audit ────────────────────────────
+  // admin-audit-log has returned both of these since 20260823160000 added
+  // them, but this type omitted them, so the audit-log page could not render
+  // who performed an action — only who it was about. That is the precise
+  // failure 20260823160000 warned against in its own header ("an audit log
+  // that silently omits who performed an action is worse than no viewer at
+  // all, because it looks complete"), and it was live.
+  //
+  // Null on every system-generated row (webhook, entitlement). actor_email
+  // is the historical record and stays readable even after that person is
+  // removed from admin_users — see the column comments in that migration.
+  actor_user_id: string | null;
+  actor_email: string | null;
 };
 
 export type AuditList = {
