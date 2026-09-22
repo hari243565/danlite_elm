@@ -29,7 +29,10 @@ import { C, cardStyle, pageStyle, legalLinkStyle, MONO } from '@/lib/theme';
 import { createClient } from '@/lib/supabase/server';
 import { priceFor, formatMinor, GST_TREATMENT } from '@/lib/gst';
 import { rateLimit, clientIpFrom } from '@/lib/rate-limit';
-import PayButton, { type CreateOrderResult } from './pay-button';
+import PayButton, {
+  type CreateOrderInput,
+  type CreateOrderResult,
+} from './pay-button';
 
 export const dynamic = 'force-dynamic';
 
@@ -47,12 +50,18 @@ const ORDER_WINDOW_MS = 60_000;
 // runs on the server, where the cookie is readable, and forwards the caller's
 // own token. The portal still never holds a service-role key.
 // ══════════════════════════════════════════════════════════════════════════
-async function createOrderAction(): Promise<CreateOrderResult> {
+async function createOrderAction(input: CreateOrderInput): Promise<CreateOrderResult> {
   'use server';
 
   // Carried over from the Phase 4 stub rather than quietly dropped when the
   // endpoint moved. Single-instance and in-process — honest about its scope,
   // exactly as portal/lib/rate-limit.ts says.
+  //
+  // This is NOT the card-testing limiter. It is unchanged, it applies to both
+  // rails as it always has, and it resets on every cold start, which is why
+  // it cannot be the control that guards a card-testing target. The durable
+  // one lives in the Edge Function against public.intl_order_attempts and
+  // fires only on the international rail.
   const ip = clientIpFrom(await headers());
   const limit = rateLimit(`create-order:${ip}`, MAX_ORDER_ATTEMPTS, ORDER_WINDOW_MS);
   if (!limit.ok) {
@@ -97,6 +106,15 @@ async function createOrderAction(): Promise<CreateOrderResult> {
         apikey: anonKey,
         'Content-Type': 'application/json',
       },
+      // Forwarded, not trusted. The Edge Function re-normalises all three and
+      // uses them only as evidence and soft signals — the amount it charges
+      // comes from profiles.country_code, which is not in this body and
+      // cannot be put there.
+      body: JSON.stringify({
+        billing_country: input.billingCountry,
+        billing_postal_code: input.billingPostalCode,
+        bot_token: input.botToken,
+      }),
       cache: 'no-store',
     });
 
@@ -111,18 +129,23 @@ async function createOrderAction(): Promise<CreateOrderResult> {
       };
     }
 
+    // The card-testing limiter. Its own kind rather than a generic error, so
+    // the customer is told to wait rather than told something broke — and so
+    // this stays visually distinct from a payment failure.
+    if (res.status === 429) {
+      return {
+        kind: 'rate_limited',
+        message:
+          (body.message as string) ??
+          'Too many checkout attempts. Please wait a few minutes and try again.',
+      };
+    }
+
     if (!res.ok) {
       console.error(`create-order failed ${res.status}`);
       return {
         kind: 'error',
         message: (body.error as string) ?? 'Could not start checkout. Please try again.',
-      };
-    }
-
-    if (body.available === false) {
-      return {
-        kind: 'unavailable',
-        message: (body.message as string) ?? 'International checkout is coming soon.',
       };
     }
 
@@ -172,6 +195,11 @@ export default async function CheckoutPage() {
   // profiles table itself, so the two cannot disagree.
   const country = profile?.country_code ?? 'IN';
   const price = priceFor(country);
+
+  // The one place the rail is decided for this page, from the same value
+  // priceFor() just used. Kept as a named constant rather than repeating the
+  // comparison, so the price shown and the fields shown cannot disagree.
+  const isIndia = country.toUpperCase() === 'IN';
 
   const rows: Array<{ label: string; value: string; strong?: boolean }> = [
     {
@@ -238,9 +266,21 @@ export default async function CheckoutPage() {
             {price.note} Billed in {price.currency}.
           </p>
 
+          {/* The billing-address fields appear on the international rail
+              only. `country` here is profiles.country_code — the same value
+              that selected the price above — so this cannot be turned on by
+              anything the browser sends. A domestic customer sees exactly the
+              checkout they saw before this rail existed. */}
           <PayButton
             label={`Pay ${price.symbol}${formatMinor(price.totalMinor)}`}
             createOrder={createOrderAction}
+            collectBillingAddress={!isIndia}
+            defaultBillingCountry={isIndia ? '' : country.toUpperCase()}
+            // Public by design — a reCAPTCHA site key identifies the site in
+            // the browser and authorises nothing; the API key that reads an
+            // assessment lives only in the Edge Function's secrets. null when
+            // unset, which makes the whole check fail open.
+            recaptchaSiteKey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY ?? null}
           />
 
           <p style={{ color: C.muted, fontSize: 12, lineHeight: 1.6, margin: '18px 0 0' }}>

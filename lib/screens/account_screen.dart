@@ -28,15 +28,23 @@ import 'paywall_screen.dart' show kPaywallSupportContact;
 // ══════════════════════════════════════════════════════════════════════════
 
 // ══════════════════════════════════════════════════════════════════════════
-// [DRAFT] BILLING DOMAIN — PLACEHOLDER, NOT THE FINAL HOST.
+// BILLING DOMAIN — the real production host.
 //
-// Mirrors the `BILLING_DOMAIN` / `NEXT_PUBLIC_BILLING_DOMAIN` convention the
-// send-activation Edge Function and the portal already use, including their
-// `http://localhost:3000` default. The three pages it addresses are themselves
-// still marked DRAFT (see portal/app/legal/layout.tsx). One line to change
-// when the real host is provisioned.
+// Holds the SAME value, byte for byte, as the `BILLING_DOMAIN` secret on the
+// Edge Functions and `NEXT_PUBLIC_BILLING_DOMAIN` in the portal build
+// environment: https, no trailing slash. There is no central Dart definition
+// to point at — this file is the only place the Flutter app names the billing
+// host at all — so this constant IS that definition for the app, and the two
+// deployed copies are what it must not drift from.
+//
+// It read `http://localhost:3000` until 2026-09-22. That was not a cosmetic
+// placeholder. The three /legal/* addresses below are rendered to the
+// customer as literal, selectable text, so every installed build printed
+// three URLs that resolve to the customer's own handset and can never load.
+// Google Play requires a reachable privacy policy; that was the copy of it
+// customers were actually given.
 // ══════════════════════════════════════════════════════════════════════════
-const String kBillingDomain = 'http://localhost:3000'; // [DRAFT]
+const String kBillingDomain = 'https://billing.danlite.in';
 
 // ══════════════════════════════════════════════════════════════════════════
 // APP VERSION — RESOLVED. Now read at runtime, no longer hand-mirrored.
@@ -64,9 +72,9 @@ const String kBillingDomain = 'http://localhost:3000'; // [DRAFT]
 /// the top-level package would introduce no new native surface and no AGP
 /// change. It is still not used, for two reasons that outlive that finding:
 /// a tap would open a browser on the billing host, one address-bar edit from
-/// /checkout; and while [kBillingDomain] is a localhost placeholder a tappable
-/// link is an affordance that cannot work at all. Revisit when the real host
-/// lands — the plumbing is already there.
+/// /checkout. That reason stands on its own now that [kBillingDomain] is the
+/// real host and these three addresses do resolve; the plumbing is already
+/// there if the no-checkout-path constraint above is ever revisited.
 const Map<String, String> _kLegalPaths = {
   'account_legal_privacy': '/legal/privacy',
   'account_legal_terms': '/legal/terms',

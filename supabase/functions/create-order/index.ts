@@ -12,32 +12,63 @@
 //     is NEVER taken from the request body; otherwise any signed-in user could
 //     open an order in somebody else's name and have the webhook activate it.
 //   • The AMOUNT is decided here, server-side, from the country stored in
-//     public.profiles. The request body is not read at all. A client-chosen
-//     amount is a client-chosen price.
+//     public.profiles, via railFor() in ../_shared/intl_pricing.ts. A
+//     client-chosen amount is a client-chosen price. This holds identically on
+//     both rails — see "WHAT THE BODY MAY AND MAY NOT DO" below.
 //   • RAZORPAY_KEY_SECRET is used only to sign the outbound Basic auth header.
 //     It is never returned, never logged, and never included in an error path.
 //   • RAZORPAY_KEY_ID *is* returned. That is safe and unavoidable — Razorpay's
 //     Checkout.js needs it in the browser to identify the account, and it can
 //     authorise nothing on its own without the secret. It is returned in this
 //     response only; it is not baked into any committed file.
+//
+// ── WHAT THE BODY MAY AND MAY NOT DO (new with the international rail) ────
+// This function used not to read the request body at all, and that was the
+// cleanest possible statement of "the client cannot influence the price".
+// The international rail needs a billing address, which by its nature the
+// customer has to type, so the body is now read. The guarantee is preserved
+// structurally rather than by care:
+//
+//   • `railFor()` takes ONE argument, a country code, and there is no
+//     overload that accepts an amount. The body is never in scope when the
+//     amount is chosen.
+//   • The country passed to it comes from profiles.country_code under the
+//     service role. The Phase 1 protect_profile_fields trigger silently
+//     reverts any client attempt to change it.
+//   • The three fields read from the body — billing_country,
+//     billing_postal_code, bot_token — are written to the order row as
+//     evidence and passed to the soft-signal assessors. None of them is read
+//     by any code that computes money, and none of them can cause a refusal.
+//
+// The adversarial cases for all of that live in
+// ../_shared/intl_pricing.test.ts and run under `node --test`.
+//
+// ── THE DOMESTIC RAIL IS UNCHANGED ───────────────────────────────────────
+// The India branch below opens the same order, for the same 12_900 INR, with
+// the same receipt, the same notes and the same response shape it did before
+// this file learned about a second rail. It does not touch the new rate-limit
+// ledger, does not read the billing address, and leaves the three new
+// orders columns NULL. Deliberate: the international rail's risk profile is
+// genuinely different and the controls added for it are not free, so they are
+// not imposed on a path that does not need them.
 // ══════════════════════════════════════════════════════════════════════════
 
 import { createClient } from "jsr:@supabase/supabase-js@2";
 import { captureFunctionError } from "../_shared/sentry.ts";
-
-// ── PRICE ─────────────────────────────────────────────────────────────────
-// ₹129.00 in paise. Phase 5 is the India rail only.
-//
-// ⚠ THIS MUST STAY IN STEP WITH portal/lib/gst.ts.
-// That module is the source of truth for what the customer is SHOWN; this
-// constant is the source of truth for what the customer is CHARGED. They agree
-// today because GST_TREATMENT is 'inclusive', which makes the total ₹129.
-// If GST_TREATMENT is ever flipped to 'exclusive' the portal would display
-// ₹152.22 while this function still charged ₹129 — a silent divergence between
-// the price on screen and the price on the card. Flagged in phase5-report.json
-// as an open item rather than left as a comment nobody reads.
-const PRICE_MINOR_IN = 12_900;
-const CURRENCY_IN = "INR";
+import { type Rail, railFor, taxFor } from "../_shared/intl_pricing.ts";
+import {
+  BURST_WINDOW_MS,
+  decideIntlOrderLimit,
+  HOUR_WINDOW_MS,
+  RATE_LIMITED_MESSAGE,
+} from "../_shared/intl_rate_limit.ts";
+import { assessBillingAddress, normalizeCountry } from "../_shared/avs.ts";
+import {
+  assessBotScore,
+  type BotAssessment,
+  CHECKOUT_ACTION,
+  parseEnterpriseAssessment,
+} from "../_shared/bot_score.ts";
 
 const CORS_HEADERS: Record<string, string> = {
   "Access-Control-Allow-Origin": "*",
@@ -61,6 +92,123 @@ function buildReceipt(userId: string): string {
   return `dl_${userId.replaceAll("-", "").slice(0, 12)}_${
     Date.now().toString(36)
   }`;
+}
+
+/**
+ * Same header order as /send-activation, so the two agree on what "the
+ * client's IP" means. cf-connecting-ip first because it is set by the edge
+ * and cannot be spoofed by the caller; x-forwarded-for is a fallback and its
+ * FIRST entry is the original client.
+ */
+function clientIp(req: Request): string | null {
+  return req.headers.get("cf-connecting-ip") ??
+    req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ??
+    null;
+}
+
+/**
+ * The request body, read defensively.
+ *
+ * Every field is optional and every field is untrusted. A body that is
+ * absent, empty, not JSON, or JSON of the wrong shape yields all-nulls and
+ * the request proceeds — because none of this is required to take a payment,
+ * and failing a real customer's checkout over a malformed optional field
+ * would be the false-decline mistake this whole path is trying to avoid.
+ */
+async function readBody(req: Request): Promise<{
+  billingCountry: string | null;
+  billingPostalCode: string | null;
+  botToken: string | null;
+  deviceHash: string | null;
+}> {
+  let raw: Record<string, unknown> = {};
+  try {
+    const text = await req.text();
+    if (text.trim()) {
+      const parsed = JSON.parse(text);
+      if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) {
+        raw = parsed as Record<string, unknown>;
+      }
+    }
+  } catch {
+    // Not JSON. Treated exactly like an absent body.
+  }
+
+  const str = (v: unknown, max: number): string | null => {
+    if (typeof v !== "string") return null;
+    const t = v.trim();
+    return t.length > 0 && t.length <= max ? t : null;
+  };
+
+  return {
+    // Normalised to the ISO alpha-2 the CHECK constraint on
+    // orders.billing_country accepts. Anything else becomes null rather than
+    // failing the insert — "US of A" is a typo, not an attack.
+    billingCountry: normalizeCountry(str(raw.billing_country, 64)) || null,
+    billingPostalCode: str(raw.billing_postal_code, 32),
+    botToken: str(raw.bot_token, 4096),
+    deviceHash: str(raw.device_hash, 128),
+  };
+}
+
+/**
+ * Score the payment-submission action with reCAPTCHA Enterprise.
+ *
+ * ⚠ RETURNS "not configured" TODAY. No reCAPTCHA Enterprise project exists on
+ * this account yet; RECAPTCHA_PROJECT_ID / RECAPTCHA_API_KEY /
+ * RECAPTCHA_SITE_KEY are unset, so this fails open and every caller is
+ * allowed. That is the only safe default — an unconfigured anti-fraud control
+ * that silently refused payments would be an outage wearing a fraud policy's
+ * clothes. The moment the three secrets are set, the assessment goes live
+ * with no code change.
+ *
+ * Note the catch: a provider outage returns "no signal", never "bot". Google
+ * being down is not evidence about our customer.
+ */
+async function scoreCheckout(
+  botToken: string | null,
+): Promise<BotAssessment> {
+  const projectId = Deno.env.get("RECAPTCHA_PROJECT_ID");
+  const apiKey = Deno.env.get("RECAPTCHA_API_KEY");
+  const siteKey = Deno.env.get("RECAPTCHA_SITE_KEY");
+
+  if (!projectId || !apiKey || !siteKey) {
+    return assessBotScore({ configured: false });
+  }
+  if (!botToken) {
+    return assessBotScore({ configured: true, assessment: null });
+  }
+
+  try {
+    const res = await fetch(
+      `https://recaptchaenterprise.googleapis.com/v1/projects/${projectId}/assessments?key=${apiKey}`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          event: {
+            token: botToken,
+            siteKey,
+            expectedAction: CHECKOUT_ACTION,
+          },
+        }),
+      },
+    );
+    if (!res.ok) {
+      console.error(`recaptcha assessment failed ${res.status}`);
+      return assessBotScore({ configured: true, assessment: null });
+    }
+    return assessBotScore({
+      configured: true,
+      assessment: parseEnterpriseAssessment(await res.json()),
+    });
+  } catch (e) {
+    console.error(
+      "recaptcha assessment unreachable:",
+      e instanceof Error ? e.message : String(e),
+    );
+    return assessBotScore({ configured: true, assessment: null });
+  }
 }
 
 Deno.serve(async (req: Request): Promise<Response> => {
@@ -139,16 +287,105 @@ Deno.serve(async (req: Request): Promise<Response> => {
     // disagree.
     const country = (profile?.country_code ?? "IN").toUpperCase();
 
-    if (country !== "IN") {
-      // A friendly 200, not an error: this is a supported state of the world
-      // in Phase 5, not a failure. Phase 6 adds the international rail.
-      return json({
-        available: false,
-        message: "International checkout is coming soon.",
-      }, 200);
+    // THE amount decision. One call, one argument, and that argument came
+    // from the database. Everything downstream uses `pricing.amountMinor` and
+    // `pricing.currency`; no other amount exists in this function's scope.
+    const pricing = railFor(country);
+    const rail: Rail = pricing.rail;
+    const tax = taxFor(rail, pricing.amountMinor);
+
+    // ── 4. International-only controls ────────────────────────────────────
+    // Read the body ONLY on the international rail. On the domestic rail the
+    // body is still never read, so the domestic path's "the request body is
+    // not read at all" property survives this change intact.
+    let body = {
+      billingCountry: null as string | null,
+      billingPostalCode: null as string | null,
+      botToken: null as string | null,
+      deviceHash: null as string | null,
+    };
+    let bot: BotAssessment = {
+      verdict: "allow",
+      score: null,
+      note: "Domestic rail — not assessed.",
+    };
+    let avs = assessBillingAddress({});
+
+    if (rail === "INTL") {
+      body = await readBody(req);
+      const ip = clientIp(req);
+
+      // Scored BEFORE the limiter, because a `throttle` verdict is an input
+      // to the limiter rather than a veto of its own. See bot_score.ts.
+      bot = await scoreCheckout(body.botToken);
+
+      // AVS at this point can only compare against what we already know; the
+      // card's issuing country does not exist until the payment is attempted.
+      // The webhook re-assesses with `payment.card.country` in hand, which is
+      // where the real comparison happens.
+      avs = assessBillingAddress({ billingCountry: body.billingCountry });
+
+      const now = Date.now();
+      const burstStart = new Date(now - BURST_WINDOW_MS).toISOString();
+      const hourStart = new Date(now - HOUR_WINDOW_MS).toISOString();
+
+      // Counted BEFORE this attempt is logged, so the thresholds read as
+      // "they have already had N goes".
+      const countWhere = async (
+        column: "ip" | "user_id",
+        value: string,
+        since: string,
+      ): Promise<number> => {
+        const { count } = await admin
+          .from("intl_order_attempts")
+          .select("id", { count: "exact", head: true })
+          .eq(column, value)
+          .gte("created_at", since);
+        return count ?? 0;
+      };
+
+      // An absent IP cannot be counted against an IP window. It is NOT
+      // treated as a shared bucket: lumping every unknown-IP caller together
+      // would let one abuser lock out every other customer whose IP header
+      // happened to be missing. The per-account limit still applies.
+      const ipBurst = ip ? await countWhere("ip", ip, burstStart) : 0;
+      const ipHour = ip ? await countWhere("ip", ip, hourStart) : 0;
+      const userHour = await countWhere("user_id", userId, hourStart);
+
+      const decision = decideIntlOrderLimit({
+        // The one consequence a low bot score has: it spends budget faster.
+        // It cannot refuse on its own, and at +1 it cannot turn a first
+        // legitimate attempt into a refusal either.
+        ipBurst: ipBurst + (bot.verdict === "throttle" ? 1 : 0),
+        ipHour,
+        userHour,
+      });
+
+      // Logged whether or not the attempt is served. A refused attempt that
+      // did not extend the window would make the limit unreachable — every
+      // rejection would age out and the attacker could hammer forever.
+      await admin.from("intl_order_attempts").insert({
+        user_id: userId,
+        ip,
+        device_hash: body.deviceHash,
+        outcome: decision.allowed ? "allowed" : "rate_limited",
+      });
+
+      if (!decision.allowed) {
+        console.warn(
+          `intl order rate-limited (user=${userId}, rule=${decision.rule})`,
+        );
+        // 429 with a uniform message. Which rule tripped is in the log and
+        // the ledger, not in the response — telling the caller which axis
+        // they exhausted tells them which one to rotate.
+        return json(
+          { available: false, error: "rate_limited", message: RATE_LIMITED_MESSAGE },
+          429,
+        );
+      }
     }
 
-    // ── 4. Open the order at Razorpay ─────────────────────────────────────
+    // ── 5. Open the order at Razorpay ─────────────────────────────────────
     const keyId = Deno.env.get("RAZORPAY_KEY_ID");
     const keySecret = Deno.env.get("RAZORPAY_KEY_SECRET");
     if (!keyId || !keySecret) {
@@ -165,14 +402,35 @@ Deno.serve(async (req: Request): Promise<Response> => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        amount: PRICE_MINOR_IN,
-        currency: CURRENCY_IN,
+        amount: pricing.amountMinor,
+        currency: pricing.currency,
         receipt: buildReceipt(userId),
         // notes are echoed back in the webhook payload. They are a
         // CONVENIENCE, not evidence: the webhook cross-checks this against the
         // orders row it looks up independently, and refuses to activate if the
         // two disagree.
-        notes: { user_id: userId },
+        //
+        // On the international rail the billing country rides along so it
+        // appears in Razorpay's own dashboard next to the payment, where
+        // whoever is fighting a chargeback will actually look for it. It is
+        // evidence, not input — the webhook reads the ORDER ROW for it, never
+        // the notes.
+        //
+        // A DOMESTIC order's notes are `{ user_id }` and nothing else, byte
+        // for byte what they were before this file learned about a second
+        // rail. Not because an extra note would break anything, but because
+        // "the domestic path is unchanged" should be checkable by reading
+        // this object rather than by reasoning about what the webhook happens
+        // to ignore.
+        notes: rail === "INTL"
+          ? {
+            user_id: userId,
+            rail,
+            ...(body.billingCountry
+              ? { billing_country: body.billingCountry }
+              : {}),
+          }
+          : { user_id: userId },
       }),
     });
 
@@ -195,19 +453,45 @@ Deno.serve(async (req: Request): Promise<Response> => {
       return json({ error: "could not start checkout. Please try again." }, 502);
     }
 
-    // ── 5. Record it ──────────────────────────────────────────────────────
+    // ── 6. Record it ──────────────────────────────────────────────────────
     // Written BEFORE the id is handed to the browser. If this insert fails we
     // must not proceed: the webhook's independent cross-check reads this row,
     // so an order that exists at Razorpay but not here would arrive as a
     // payment we refuse to honour. Failing now is recoverable (the customer
     // retries and has not paid); failing later is a paid customer with no
     // licence.
+    //
+    // amount_minor and currency are written from `pricing`, the same object
+    // that was sent to Razorpay — so the row the webhook cross-checks against
+    // and the order Razorpay holds are derived from one value, not two that
+    // have to be kept in step.
+    //
+    // The three risk columns are attached ONLY on the international rail. A
+    // domestic insert names the same five columns it always has, so the new
+    // columns take their table defaults (NULL, NULL, '{}') exactly as every
+    // domestic order written before this migration did.
     const { error: ordErr } = await admin.from("orders").insert({
       user_id: userId,
       gateway_order_id: order.id,
-      amount_minor: PRICE_MINOR_IN,
-      currency: CURRENCY_IN,
+      amount_minor: pricing.amountMinor,
+      currency: pricing.currency,
       status: "created",
+      ...(rail === "INTL"
+        ? {
+          billing_country: body.billingCountry,
+          billing_postal_code: body.billingPostalCode,
+          risk_signals: {
+            rail,
+            tax_code: tax.code,
+            avs: {
+              signal: avs.signal,
+              flagged: avs.flagged,
+              coverage: avs.coverage,
+            },
+            bot: { verdict: bot.verdict, score: bot.score },
+          },
+        }
+        : {}),
     });
 
     if (ordErr) {
@@ -215,12 +499,12 @@ Deno.serve(async (req: Request): Promise<Response> => {
       return json({ error: "could not start checkout. Please try again." }, 500);
     }
 
-    // ── 6. Hand back only what Checkout.js needs ──────────────────────────
+    // ── 7. Hand back only what Checkout.js needs ──────────────────────────
     return json({
       available: true,
       order_id: order.id,
-      amount: PRICE_MINOR_IN,
-      currency: CURRENCY_IN,
+      amount: pricing.amountMinor,
+      currency: pricing.currency,
       key_id: keyId,
       prefill: {
         email: profile?.email ?? userData.user.email ?? "",

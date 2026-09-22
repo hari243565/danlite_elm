@@ -39,6 +39,8 @@
 
 import { createClient, type SupabaseClient } from "jsr:@supabase/supabase-js@2";
 import { captureFunctionError } from "../_shared/sentry.ts";
+import { assessBillingAddress } from "../_shared/avs.ts";
+import { matchOrder } from "../_shared/order_match.ts";
 
 const enc = new TextEncoder();
 
@@ -309,7 +311,10 @@ Deno.serve(async (req: Request): Promise<Response> => {
         // agreement with a row the attacker can neither see nor influence.
         const { data: order, error: ordErr } = await admin
           .from("orders")
-          .select("user_id, amount_minor, currency, status")
+          // billing_country is read from the ORDER ROW, never from the
+          // webhook's notes. The row is the witness the attacker cannot see
+          // or influence; the notes travel in the body they control.
+          .select("user_id, amount_minor, currency, status, billing_country")
           .eq("gateway_order_id", orderId)
           .maybeSingle();
 
@@ -345,11 +350,61 @@ Deno.serve(async (req: Request): Promise<Response> => {
           return json({ status: "ignored_user_mismatch" }, 200);
         }
 
-        // Amount/currency must match what we opened the order for. Cheap, and
-        // it catches a whole class of tampering and misconfiguration.
-        if (Number(order.amount_minor) !== amount || order.currency !== currency) {
+        // ── Amount and currency, checked SEPARATELY ──────────────────────
+        // These were one `||` condition until the international rail went
+        // live. The security property was already correct — a mismatch on
+        // either field refused to activate — but a single condition with a
+        // single audit action cannot tell you WHICH field disagreed, and with
+        // two currencies in play that distinction now matters operationally.
+        //
+        // A bare number is not a price. 129 is $1.29 and it is also ₹1.29,
+        // and the difference between them is a factor of about 88. The
+        // failure this splits out is a payment captured for the right NUMBER
+        // in the wrong CURRENCY — which is exactly what a misconfigured rail,
+        // a currency-conversion plugin, or a crafted webhook aimed at the new
+        // path would produce, and which the amount check alone would wave
+        // through if the minor units happened to line up. On this product
+        // they do line up: PRICE_MINOR.IN is 12_900 and PRICE_MINOR.INTL is
+        // 129, so a $129.00 capture against a ₹129.00 order agrees on
+        // neither, but a $1.29 capture against a ₹1.29 order would agree on
+        // both. The currency check is what makes that unrepresentable.
+        //
+        // Ordered currency-first because currency is the coarser error: if
+        // the currency is wrong the amount comparison is meaningless anyway,
+        // and reporting "amount mismatch" for what is really a currency fault
+        // sends whoever reads the audit row looking in the wrong place.
+        //
+        // The comparison itself lives in ../_shared/order_match.ts so that
+        // both directions of it are executed by a test instead of reviewed by
+        // eye. The branches below turn its verdict into the log line, the
+        // audit action and the response — that shaping is what stays here.
+        const match = matchOrder({
+          orderAmountMinor: order.amount_minor as number | string,
+          orderCurrency: order.currency as string,
+          paidAmountMinor: amount,
+          paidCurrency: currency,
+        });
+
+        if (match.reason === "currency_mismatch") {
           console.error(
-            `DISCREPANCY: amount/currency mismatch (payment=${paymentId}, ` +
+            `DISCREPANCY: currency mismatch (payment=${paymentId}, ` +
+              `order=${orderId}, expected=${order.currency}, got=${currency}) ` +
+              `— not activating`,
+          );
+          await audit(admin, order.user_id as string, "webhook.currency_mismatch", {
+            paymentId,
+            orderId,
+            expected_currency: order.currency,
+            received_currency: currency,
+            expected_amount_minor: order.amount_minor,
+            received_amount_minor: amount,
+          });
+          return json({ status: "ignored_currency_mismatch" }, 200);
+        }
+
+        if (match.reason === "amount_mismatch") {
+          console.error(
+            `DISCREPANCY: amount mismatch (payment=${paymentId}, ` +
               `order=${orderId}, expected=${order.amount_minor} ${order.currency}, ` +
               `got=${amount} ${currency}) — not activating`,
           );
@@ -391,6 +446,49 @@ Deno.serve(async (req: Request): Promise<Response> => {
           `payment.captured processed (payment=${paymentId}, order=${orderId}, ` +
             `already_processed=${row?.already_processed})`,
         );
+
+        // ── AVS, assessed AFTER the licence is already active ────────────
+        // Position is the guarantee. This runs downstream of the only call
+        // that activates anything, and its result is not read by any branch.
+        // There is therefore no arrangement of billing address, card country
+        // or AVS verdict that can stop a customer who has paid from being
+        // licensed — the soft-signal promise is enforced by control flow, not
+        // by remembering not to write an `if`.
+        //
+        // This is also the first point at which the comparison is possible at
+        // all: `payment.card.country` is the issuing country, and it does not
+        // exist until a card has actually been presented.
+        //
+        // Wrapped because an audit write must never turn a successful
+        // activation into a 500 that makes Razorpay redeliver a payment we
+        // have already honoured.
+        try {
+          const avs = assessBillingAddress({
+            billingCountry: order.billing_country as string | null,
+            cardCountry:
+              (e.card as Record<string, unknown> | undefined)?.country as
+                | string
+                | undefined,
+          });
+          if (avs.signal !== "not_provided") {
+            await audit(admin, order.user_id as string, "webhook.avs_signal", {
+              paymentId,
+              orderId,
+              signal: avs.signal,
+              flagged: avs.flagged,
+              coverage: avs.coverage,
+              note: avs.note,
+              // Stated in the row itself so nobody reading this audit trail
+              // later has to go and check whether it gated anything.
+              enforced: false,
+            });
+          }
+        } catch (avsErr) {
+          console.error(
+            "avs assessment failed (non-fatal):",
+            avsErr instanceof Error ? avsErr.message : String(avsErr),
+          );
+        }
 
         return json({
           status: row?.already_processed ? "already_processed" : "activated",

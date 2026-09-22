@@ -24,7 +24,7 @@ import { redirect } from 'next/navigation';
 import { NOINDEX } from '@/lib/seo';
 import { C, cardStyle, pageStyle, legalLinkStyle, MONO } from '@/lib/theme';
 import { createClient } from '@/lib/supabase/server';
-import { billedTo, formatMinor } from '@/lib/gst';
+import { billedTo, formatMinor, GST_RATE_PERCENT } from '@/lib/gst';
 import StatusPoller from './status-poller';
 
 export const dynamic = 'force-dynamic';
@@ -110,6 +110,24 @@ export default async function ConfirmationPage({
         .maybeSingle()
     : { data: null };
 
+  // The GST line for this invoice, decided by the CAPTURED currency.
+  //
+  // WHY CURRENCY AND NOT THE PROFILE'S COUNTRY. The profile can change after
+  // a sale — a customer moves, or an admin corrects the field. The invoice
+  // must keep saying what was true at the moment of the transaction, and the
+  // captured currency is the durable record of which rail the sale went down.
+  //
+  // The domestic branch reproduces exactly what portal/lib/gst.ts has always
+  // computed for an inclusive ₹129: the tax sits inside the total, so the
+  // line reads "included", and the total on the invoice is unchanged.
+  const taxLine = payment && payment.currency !== 'INR'
+    ? {
+      value: 'Nil — zero-rated export of service',
+    }
+    : {
+      value: `Included (${GST_RATE_PERCENT}%)`,
+    };
+
   // The poller's read. Returns a boolean and nothing else: no payment detail
   // crosses this boundary, so the client cannot be handed a receipt it might
   // render before the server has confirmed one exists.
@@ -169,6 +187,24 @@ export default async function ConfirmationPage({
                   {
                     k: 'Amount',
                     v: `${payment.currency} ${formatMinor(payment.amount_minor)}`,
+                  },
+                  // ── TAX TREATMENT ─────────────────────────────────────
+                  // Derived from payment.currency, which is the CAPTURED
+                  // currency written by the webhook after it cross-checked
+                  // the order row. Not from a query string, not from the
+                  // profile as it reads today, and not from anything the
+                  // browser can influence — an invoice is a tax document and
+                  // the number on it has to come from the transaction, not
+                  // from the page's opinion of the transaction.
+                  //
+                  // A sale to a customer outside India is an export of
+                  // service, which the IGST Act zero-rates. Stating that on
+                  // the invoice is the point: a GST invoice for an export
+                  // that simply omits any mention of tax is incomplete, and
+                  // one that shows 18% is wrong.
+                  {
+                    k: 'GST',
+                    v: taxLine.value,
                   },
                   { k: 'Payment reference', v: payment.gateway_payment_id },
                   { k: 'Invoice number', v: payment.gst_invoice_no ?? 'Pending' },

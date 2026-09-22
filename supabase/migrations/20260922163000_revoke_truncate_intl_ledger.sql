@@ -1,0 +1,48 @@
+-- ════════════════════════════════════════════════════════════════════════
+-- CLOSE THE TRUNCATE HOLE IN THE RATE-LIMIT LEDGER.
+--
+-- 20260922120000 withheld UPDATE and DELETE from service_role on
+-- public.intl_order_attempts and stated the consequence plainly:
+--
+--   "Withholding DELETE and UPDATE below means no code path, including a
+--    future buggy one, can erase its own rate-limit history to escape a
+--    window."
+--
+-- That was not true as written, and it was verified not-true against the
+-- real production table on 2026-09-22, immediately after that migration was
+-- applied:
+--
+--   set local role service_role;
+--   truncate public.intl_order_attempts;   -- succeeded
+--
+-- TRUNCATE is a distinct privilege from DELETE. It was never granted by
+-- 20260922120000, but it was never revoked either, and on this project it
+-- arrives via the default privileges that also hand service_role TRIGGER and
+-- REFERENCES on every new table. `grant select, insert` does not displace
+-- it — a grant adds, it does not restrict.
+--
+-- One TRUNCATE empties the entire ledger, which is a strictly larger erasure
+-- than the DELETE that migration correctly blocked. The append-only property
+-- the limiter's whole design rests on — that a refused attempt stays in the
+-- window and cannot be waited out or wiped — was therefore one statement
+-- away from being defeated by any code running under the service role.
+--
+-- WHY THIS IS WORTH A MIGRATION RATHER THAN A COMMENT FIX. The threat is not
+-- an attacker who has already stolen the service key; at that point the
+-- ledger is not the asset worth worrying about. It is a future edit to an
+-- Edge Function — a cleanup job, a test helper, a "reset the limiter"
+-- convenience — that truncates this table without anyone noticing the
+-- limiter now has a reachable reset. Revoking the privilege makes that edit
+-- fail loudly at 42501 instead of silently removing the control.
+--
+-- The matching adversarial case is TEST 18 in
+-- supabase/tests/intl_rail_regression.sql, so this cannot regress unnoticed.
+-- ════════════════════════════════════════════════════════════════════════
+
+revoke truncate on public.intl_order_attempts from service_role;
+
+-- The client roles never had anything here (20260922120000 revoked all from
+-- anon and authenticated, and the table has no policies). Repeated so this
+-- migration is a complete statement of the intended privilege set rather
+-- than a diff against one that has to be read alongside it.
+revoke all on public.intl_order_attempts from anon, authenticated;
