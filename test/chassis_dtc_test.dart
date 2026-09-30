@@ -236,7 +236,17 @@ void main() {
       expect(ChassisManufacturers.resolveKey(null), isNull);
       expect(ChassisManufacturers.resolveKey(''), isNull);
       expect(ChassisManufacturers.resolveKey('   '), isNull);
-      expect(ChassisManufacturers.resolveKey('Bajaj'), isNull);
+      // TVS and Hero are the two makes the research explicitly found no usable
+      // data for: TVS runs Continental ABS with no public DTC information of
+      // any kind, and Hero's supplier is unconfirmed per model. Neither may be
+      // quietly absorbed into the Bosch group on the strength of being an
+      // Indian motorcycle brand — that would put an unverified hex value on a
+      // braking fault card for hardware we know nothing about.
+      expect(ChassisManufacturers.resolveKey('TVS'), isNull);
+      expect(ChassisManufacturers.resolveKey('Hero'), isNull);
+      expect(ChassisManufacturers.resolveKey('Hero MotoCorp'), isNull);
+      expect(ChassisPlatforms.resolve('TVS', 'Apache RTR 160 4V'), isNull);
+      expect(ChassisPlatforms.resolve('Hero', 'Xtreme 160R'), isNull);
     });
 
     test('Classic 350 spellings resolve to the Classic 350 platform', () {
@@ -276,9 +286,37 @@ void main() {
       }
     });
 
-    test('a correct model under the wrong make still resolves to null', () {
-      expect(ChassisPlatforms.resolve('Bajaj', 'Classic 350'), isNull);
+    test('a model name never reaches another make\'s table', () {
+      // The property that matters is not that the result is null — it is that
+      // a Royal Enfield model name typed under another make can never select
+      // a Royal Enfield dictionary. Bajaj is now a supported (Bosch) make, so
+      // "Classic 350" under it lands on Bajaj's own platform, which describes
+      // nothing and says so; what it must never do is describe the fault from
+      // Royal Enfield's Classic 350 table.
+      final crossMake = ChassisPlatforms.resolve('Bajaj', 'Classic 350');
+      expect(crossMake, isNot(ChassisPlatforms.royalEnfieldClassic350));
+      expect(crossMake, isNot(ChassisPlatforms.royalEnfieldBulletEfi));
+      expect(crossMake, ChassisPlatforms.bajajBoschAbs);
+      expect(DtcLocalizations.chassisEntry(crossMake, 'C1015', 'en'), isNull,
+          reason: 'a Classic 350 code must not be described under Bajaj');
+
+      // No make at all still resolves to nothing, unchanged.
       expect(ChassisPlatforms.resolve(null, 'Classic 350'), isNull);
+    });
+
+    test('Royal Enfield resolution is byte-for-byte what it always was', () {
+      // The make-level fallback added for Honda and the Bosch makes must not
+      // reach Royal Enfield: its two platforms disagree about what the same
+      // number means, so an unidentified model has to stay unidentified rather
+      // than defaulting to either table.
+      expect(
+          ChassisPlatforms.hasModelIndependentFallback(
+              ChassisManufacturers.royalEnfield),
+          isFalse);
+      for (final model in <String>['Himalayan', 'Meteor', 'Hunter 350', 'x']) {
+        expect(ChassisPlatforms.resolve('Royal Enfield', model), isNull,
+            reason: '"$model" must not fall back to a Royal Enfield table');
+      }
     });
 
     test('"Bullet Classic EFI" never leaks into the Classic 350 table', () {
@@ -736,11 +774,19 @@ void main() {
     test('adding a code stays a data-only change: the shape is uniform', () {
       final saeCode = RegExp(r'^[PCBU][0-3][0-9A-F]{3}$');
       final hexCode = RegExp(r'^[0-9A-F]{4}H$');
+      // Honda's table is keyed by blink pattern — long flashes, dash, short
+      // flashes — because that is literally what the rider counts. It is a
+      // third real notation, not a malformed code.
+      final blinkCode = RegExp(r'^[0-9]-[0-9]$');
 
       ChassisDtcDatabase.byPlatform.forEach((platform, table) {
         expect(table, isNotEmpty, reason: '$platform is empty');
         table.forEach((code, entry) {
-          expect(saeCode.hasMatch(code) || hexCode.hasMatch(code), isTrue,
+          expect(
+              saeCode.hasMatch(code) ||
+                  hexCode.hasMatch(code) ||
+                  blinkCode.hasMatch(code),
+              isTrue,
               reason: '$platform/$code is not a recognised code notation');
           // Description is the one field every real source row always has.
           expect(entry.description, isNotEmpty,

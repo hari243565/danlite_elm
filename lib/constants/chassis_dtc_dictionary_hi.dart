@@ -51,6 +51,17 @@ class ChassisDtcDictionaryHi {
   static const String bulletEfiGenericRemedyHi =
       'इसकी जाँच किसी अधिकृत Royal Enfield सर्विस सेंटर से कराएँ';
 
+  /// Hindi rendering of [ChassisDtcDatabase.hondaBlinkRemedy].
+  ///
+  /// "30 km/h" stays in Latin digits and Latin unit text for the same reason
+  /// gauge units are never translated in this app: it is a number a rider
+  /// reads off a speedometer, and re-scripting it makes it harder to act on.
+  static const String hondaBlinkRemedyHi =
+      'इस तालिका के लिए दर्ज उपाय: व्हील स्पीड सेंसर का एयर गैप जाँचें, ABS '
+      'मॉड्यूलेटर कनेक्टर पर सर्किट की कंटीन्यूटी जाँचें, संबंधित फ़्यूज़ '
+      'जाँचें, और ज़रूरत होने पर मॉड्यूलेटर बदलें। इसके बाद कोड मिटाएँ और '
+      '30 km/h से अधिक गति पर टेस्ट राइड करके दोबारा जाँचें।';
+
   static const Map<String, Map<String, ChassisDtcText>> byPlatform =
       <String, Map<String, ChassisDtcText>>{
     // ══════════════════════════════════════════════════════════════════════
@@ -231,6 +242,122 @@ class ChassisDtcDictionaryHi {
         remedy: bulletEfiGenericRemedyHi,
       ),
     },
+
+    // ══════════════════════════════════════════════════════════════════════
+    // Honda — ABS blink-code table
+    // Keys are blink patterns (long flashes - short flashes), identical to the
+    // English master's keys. Numerals stay Latin: the rider is matching them
+    // against a count of lamp flashes and, on the bike, against Honda's own
+    // printed table.
+    // ══════════════════════════════════════════════════════════════════════
+    ChassisPlatforms.hondaAbsBlink: <String, ChassisDtcText>{
+      '1-1': ChassisDtcText(
+        description: 'अगला व्हील स्पीड सेंसर सर्किट',
+        remedy: hondaBlinkRemedyHi,
+      ),
+      '1-2': ChassisDtcText(
+        description: 'अगला व्हील स्पीड सेंसर',
+        remedy: hondaBlinkRemedyHi,
+      ),
+      '1-3': ChassisDtcText(
+        description: 'पिछला व्हील स्पीड सेंसर सर्किट',
+        remedy: hondaBlinkRemedyHi,
+      ),
+      '1-4': ChassisDtcText(
+        description: 'पिछला व्हील स्पीड सेंसर',
+        remedy: hondaBlinkRemedyHi,
+      ),
+      '1-5': ChassisDtcText(
+        description: 'अगले या पिछले व्हील स्पीड सेंसर सर्किट में शॉर्ट',
+        remedy: hondaBlinkRemedyHi,
+      ),
+      '2-1': ChassisDtcText(
+        description: 'अगला पल्सर रिंग',
+        remedy: hondaBlinkRemedyHi,
+      ),
+      '2-3': ChassisDtcText(
+        description: 'पिछला पल्सर रिंग',
+        remedy: hondaBlinkRemedyHi,
+      ),
+      '3-1': ChassisDtcText(
+        description: 'सोलेनॉइड वाल्व (ABS मॉड्यूलेटर) की खराबी',
+        remedy: hondaBlinkRemedyHi,
+      ),
+      '3-2': ChassisDtcText(
+        description: 'सोलेनॉइड वाल्व (ABS मॉड्यूलेटर) की खराबी',
+        remedy: hondaBlinkRemedyHi,
+      ),
+      '3-3': ChassisDtcText(
+        description: 'सोलेनॉइड वाल्व (ABS मॉड्यूलेटर) की खराबी',
+        remedy: hondaBlinkRemedyHi,
+      ),
+      '3-4': ChassisDtcText(
+        description: 'सोलेनॉइड वाल्व (ABS मॉड्यूलेटर) की खराबी',
+        remedy: hondaBlinkRemedyHi,
+      ),
+      '4-1': ChassisDtcText(
+        description: 'अगला पहिया लॉक',
+        remedy: hondaBlinkRemedyHi,
+      ),
+      // The English master marks this one meaningVerified: false. The Hindi
+      // text says exactly the same thing — that the source lists the code
+      // without describing it — and claims nothing further.
+      '4-2': ChassisDtcText(
+        description:
+            'स्रोत में अगले व्हील स्पीड सेंसर वाले कोड के साथ दर्ज है, पर '
+            'इसका अपना कोई विवरण नहीं दिया गया',
+        remedy: hondaBlinkRemedyHi,
+      ),
+      '4-3': ChassisDtcText(
+        description: 'पिछला पहिया लॉक',
+        remedy: hondaBlinkRemedyHi,
+      ),
+      '5-1': ChassisDtcText(
+        description: 'ABS पंप मोटर लॉक',
+        remedy: hondaBlinkRemedyHi,
+      ),
+      '5-4': ChassisDtcText(
+        description: 'ABS पावर सप्लाई रिले',
+        remedy: hondaBlinkRemedyHi,
+      ),
+      '6-1': ChassisDtcText(
+        description: 'सप्लाई वोल्टेज बहुत कम',
+        remedy: hondaBlinkRemedyHi,
+      ),
+      '6-2': ChassisDtcText(
+        description: 'सप्लाई वोल्टेज बहुत अधिक',
+        remedy: hondaBlinkRemedyHi,
+      ),
+      '7-1': ChassisDtcText(
+        description: 'टायर साइज़ का मेल नहीं',
+        remedy: hondaBlinkRemedyHi,
+      ),
+      '8-1': ChassisDtcText(
+        description: 'ABS कंट्रोल यूनिट की खराबी',
+        remedy: hondaBlinkRemedyHi,
+      ),
+    },
+
+    // ══════════════════════════════════════════════════════════════════════
+    // Bosch-supplied platforms — Bajaj / Yamaha / Suzuki / KTM
+    // One shared code, so one shared Hindi map, mirroring exactly how the
+    // English master points all four platforms at the same table.
+    // ══════════════════════════════════════════════════════════════════════
+    ChassisPlatforms.bajajBoschAbs: _boschSharedCodesHi,
+    ChassisPlatforms.yamahaBoschAbs: _boschSharedCodesHi,
+    ChassisPlatforms.suzukiBoschAbs: _boschSharedCodesHi,
+    ChassisPlatforms.ktmBoschAbs: _boschSharedCodesHi,
+  };
+
+  /// Hindi for [ChassisDtcDatabase.boschSharedCodes]. No remedy, because the
+  /// English master has none to translate.
+  static const Map<String, ChassisDtcText> _boschSharedCodesHi =
+      <String, ChassisDtcText>{
+    '5200H': ChassisDtcText(
+      description:
+          'ABS ECU EEPROM / वेरिएंट रीड त्रुटि (checksum या access byte '
+          'खराब)',
+    ),
   };
 
   /// Hindi entry for [code] under [platformKey], or null when untranslated.

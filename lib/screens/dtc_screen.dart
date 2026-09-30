@@ -10,6 +10,7 @@ import '../providers/vehicle_provider.dart';
 import '../services/dtc_service.dart';
 import '../services/obd_service.dart';
 import '../models/vehicle_data.dart';
+import 'honda_blink_reference_screen.dart';
 
 // Unified Telemetry Design System Palette (matches home_screen._NC / realtime_screen._RC)
 class _RC {
@@ -77,6 +78,21 @@ class _DtcScreenState extends State<DtcScreen> {
   /// same fault card, so adding a further module later (SRS, EPS…) is a new
   /// enum value plus a dictionary, not another screen.
   DtcModule _module = DtcModule.engine;
+
+  /// The platform key whose capability gate the rider has chosen to look past.
+  ///
+  /// Two gates replace the scan UI entirely rather than decorating it: a CBS
+  /// model has no fault memory to read, and a blink-code Honda cannot be
+  /// reached over Bluetooth at all. Both are conclusions drawn from the model
+  /// the rider typed, so both offer a way through — the CBS classification is
+  /// inferred rather than measured, and a rider who knows their Honda is a
+  /// 2024+ OBD2B model should not be stuck behind a notice aimed at older
+  /// ones.
+  ///
+  /// Keyed by platform rather than a bare bool so that changing the vehicle
+  /// profile to a different model re-gates automatically instead of silently
+  /// inheriting a decision made about another bike.
+  String? _gateBypassedForPlatform;
 
   @override
   void initState() {
@@ -590,12 +606,31 @@ class _DtcScreenState extends State<DtcScreen> {
     final model = vehicle?.model;
     final manufacturerKey = ChassisManufacturers.resolveKey(make);
     final platformKey = ChassisPlatforms.resolve(make, model);
+    final platform = ChassisPlatforms.byKey(platformKey);
     final codes = obd.chassisDtcCodes;
     final scanning = obd.chassisScanInFlight;
+
+    // Capability gates come before anything else, and replace the scan UI
+    // rather than sitting above it. Showing a Scan button to a rider whose
+    // motorcycle has no ABS ECU — or whose ABS cannot be reached over
+    // Bluetooth by any adapter — invites them to run a scan whose only
+    // possible outcome is a misleading "nothing answered".
+    if (platform != null && _gateBypassedForPlatform != platformKey) {
+      if (platform.isCbsOnly) return _buildCbsGate(context, platformKey!);
+      if (platform.isBlinkCodeOnly) {
+        return _buildBlinkCodeGate(context, platformKey!);
+      }
+    }
 
     return Column(
       children: [
         if (platformKey == null) _platformNotice(context, make, manufacturerKey),
+        // Honest about completeness before the rider reads a single code: a
+        // Bosch platform's values are real, and their meanings are not known.
+        if (platform?.showsRawUnverifiedCodes ?? false)
+          _makeNotice(context,
+              title: context.tr('absRawBanner'),
+              body: context.tr('absRawBannerDesc')),
         _buildChassisSummaryBar(context, obd, codes),
         _buildChassisActionBar(context, scanning),
         Expanded(
@@ -620,6 +655,166 @@ class _DtcScreenState extends State<DtcScreen> {
     );
   }
 
+  /// "This vehicle uses CBS, not ABS — there are no chassis fault codes."
+  ///
+  /// CBS is mechanical linked braking: no control unit, no wheel speed
+  /// sensors, no fault memory. A scan of one can only ever come back empty,
+  /// and the app's empty-scan wording ("no module answered", "this may be your
+  /// adapter") would describe a perfectly healthy motorcycle as a possible
+  /// hardware problem.
+  ///
+  /// It still offers a way through, deliberately. The classification comes
+  /// from the model's engine size against India's braking regulation, not from
+  /// anything measured on this bike, so it is a strong inference rather than a
+  /// certainty — and the cost of being wrong must be one extra tap, not a
+  /// feature the rider cannot reach.
+  Widget _buildCbsGate(BuildContext context, String platformKey) =>
+      _capabilityGate(
+        context,
+        icon: Icons.link_rounded,
+        color: _RC.textMuted,
+        title: context.tr('absCbsTitle'),
+        body: context.tr('absCbsDesc'),
+        footnote: context.tr('absCbsProvenance'),
+        actionIcon: Icons.radar_rounded,
+        actionLabel: context.tr('absCbsScanAnyway'),
+        onAction: () =>
+            setState(() => _gateBypassedForPlatform = platformKey),
+      );
+
+  /// "This Honda's ABS is read by blink code, not over Bluetooth."
+  ///
+  /// The one place in this app where the honest answer is that no adapter can
+  /// do this. The blink code is flashed on the ABS warning lamp with the DLC
+  /// bridged and never reaches the CAN bus, so there is nothing to scan — and
+  /// the primary action is therefore the reference tool, not a scan button.
+  ///
+  /// The secondary action exists because "Honda" is not one situation: the
+  /// 2024-onward OBD2B models genuinely do expose ABS over CAN, and a rider on
+  /// one whose model name we did not recognise must not be dead-ended by a
+  /// notice about older bikes.
+  Widget _buildBlinkCodeGate(BuildContext context, String platformKey) =>
+      _capabilityGate(
+        context,
+        icon: Icons.lightbulb_outline_rounded,
+        color: _RC.neonAmber,
+        title: context.tr('absBlinkOnlyTitle'),
+        body: context.tr('absBlinkOnlyDesc'),
+        actionIcon: Icons.menu_book_rounded,
+        actionLabel: context.tr('absOpenBlinkReference'),
+        onAction: () => Navigator.of(context).push(
+          MaterialPageRoute<void>(
+              builder: (_) => const HondaBlinkReferenceScreen()),
+        ),
+        secondaryLabel: context.tr('absBlinkTryLiveScan'),
+        secondaryBody: context.tr('absBlinkTryLiveScanDesc'),
+        onSecondary: () =>
+            setState(() => _gateBypassedForPlatform = platformKey),
+      );
+
+  /// Shared layout for the two capability gates: what this vehicle's braking
+  /// system actually allows, the reason, and the way forward.
+  Widget _capabilityGate(
+    BuildContext context, {
+    required IconData icon,
+    required Color color,
+    required String title,
+    required String body,
+    required IconData actionIcon,
+    required String actionLabel,
+    required VoidCallback onAction,
+    String footnote = '',
+    String secondaryLabel = '',
+    String secondaryBody = '',
+    VoidCallback? onSecondary,
+  }) {
+    return ListView(
+      physics: const AlwaysScrollableScrollPhysics(),
+      padding: const EdgeInsets.fromLTRB(22, 26, 22, 28),
+      children: [
+        Icon(icon, size: 56, color: color),
+        const SizedBox(height: 16),
+        Text(title,
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+                color: _RC.textMain, fontSize: 17, fontWeight: FontWeight.w800)),
+        const SizedBox(height: 10),
+        Text(body,
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+                color: _RC.textMuted, fontSize: 13, height: 1.55)),
+        const SizedBox(height: 22),
+        ElevatedButton.icon(
+          onPressed: onAction,
+          icon: Icon(actionIcon, size: 18),
+          label: Text(actionLabel,
+              style: const TextStyle(
+                  fontWeight: FontWeight.w800, fontSize: 12.5)),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: _RC.neonCyan,
+            foregroundColor: Colors.black,
+            padding: const EdgeInsets.symmetric(vertical: 13),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          ),
+        ),
+        if (footnote.isNotEmpty) ...[
+          const SizedBox(height: 14),
+          Text(footnote,
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                  color: _RC.textMuted, fontSize: 11, height: 1.5)),
+        ],
+        if (onSecondary != null && secondaryLabel.isNotEmpty) ...[
+          const SizedBox(height: 20),
+          Container(
+            padding: const EdgeInsets.all(13),
+            decoration: BoxDecoration(
+              color: _RC.card,
+              borderRadius: BorderRadius.circular(11),
+              border: Border.all(color: _RC.border),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(secondaryLabel,
+                    style: const TextStyle(
+                        color: _RC.textMain,
+                        fontSize: 12.5,
+                        fontWeight: FontWeight.w800)),
+                if (secondaryBody.isNotEmpty) ...[
+                  const SizedBox(height: 6),
+                  Text(secondaryBody,
+                      style: const TextStyle(
+                          color: _RC.textMuted, fontSize: 11.5, height: 1.5)),
+                ],
+                const SizedBox(height: 10),
+                SizedBox(
+                  width: double.infinity,
+                  child: OutlinedButton.icon(
+                    onPressed: onSecondary,
+                    icon: const Icon(Icons.radar_rounded, size: 16),
+                    label: Text(context.tr('scanAbsModule'),
+                        style: const TextStyle(
+                            fontWeight: FontWeight.w800, fontSize: 12)),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: _RC.neonCyan,
+                      side: BorderSide(
+                          color: _RC.neonCyan.withValues(alpha: 0.45)),
+                      padding: const EdgeInsets.symmetric(vertical: 11),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(9)),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ],
+    );
+  }
+
   /// Why no platform dictionary is in play, said honestly.
   ///
   /// Three genuinely different reasons, and the rider can act on each one
@@ -639,8 +834,19 @@ class _DtcScreenState extends State<DtcScreen> {
           title: context.tr('absMakeUnsupported'),
           body: context.tr('absMakeUnsupportedDesc'));
     }
-    // Make is known, model is not. Name the models we can identify, so the
-    // rider knows exactly what to type rather than guessing at spellings.
+    // Make is known, model is not.
+    //
+    // Two genuinely different situations. A make with a model-independent
+    // fallback (Honda, and the Bosch makes) resolves every non-blank model, so
+    // listing "models recognised" would be actively wrong — the model is asked
+    // for there only to tell an ABS bike apart from a CBS-only one. A make
+    // like Royal Enfield really does have a closed list of identifiable
+    // platforms, and naming them saves the rider guessing at spellings.
+    if (ChassisPlatforms.hasModelIndependentFallback(manufacturerKey)) {
+      return _makeNotice(context,
+          title: context.tr('absSetModel'),
+          body: context.tr('absSetModelAnyModelDesc'));
+    }
     final known = ChassisPlatforms.forManufacturer(manufacturerKey)
         .map((p) => p.displayName)
         .join(', ');
@@ -944,6 +1150,14 @@ class _HazardCard extends StatelessWidget {
     if (code.isChassis) {
       final entry = _chassisText(context);
       if (entry != null && entry.description.isNotEmpty) return entry.description;
+      // Two different sentences, because they are two different facts. "This
+      // make's codes are read but undecoded" tells the rider the value on
+      // screen is real and worth quoting to a dealer; "no manufacturer
+      // description available" is the older, weaker statement that applies
+      // when there is no table for this platform at all.
+      if (_platform?.showsRawUnverifiedCodes ?? false) {
+        return context.tr('absRawUnverifiedDesc');
+      }
       return context.tr('absNoDictionary');
     }
 
@@ -953,6 +1167,24 @@ class _HazardCard extends StatelessWidget {
       englishFallback: code.description,
     );
     return resolved.isEmpty ? '—' : resolved;
+  }
+
+  /// The resolved platform record, for its capability flags. Null for engine
+  /// codes and whenever the platform could not be identified.
+  ChassisPlatform? get _platform => ChassisPlatforms.byKey(platformKey);
+
+  /// True when nothing verified is being claimed about what this code means.
+  ///
+  /// Covers both real cases: a dictionary entry the source listed without
+  /// describing (Honda blink 4-2), and any code read from a Bosch platform
+  /// that is not the independently-sourced 0x5200. Both must be visibly
+  /// flagged, because the alternative is a rider reading a braking-fault
+  /// description that nobody has actually verified.
+  bool _meaningIsUnverified(BuildContext context) {
+    if (!code.isChassis) return false;
+    final entry = _chassisText(context);
+    if (entry != null) return !entry.meaningVerified;
+    return _platform?.showsRawUnverifiedCodes ?? false;
   }
 
   /// The chassis dictionary entry for this code, already resolved into the
@@ -1106,6 +1338,25 @@ class _HazardCard extends StatelessWidget {
                                     fontWeight: FontWeight.w700)),
                           ),
                         ],
+                        // A separate claim from "unconfirmed", and not a
+                        // weaker one: unconfirmed is the module's own view of
+                        // whether the fault is stored, this is Danlite saying
+                        // it does not know what the fault means.
+                        if (_meaningIsUnverified(context)) ...[
+                          const SizedBox(width: 6),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 8, vertical: 3),
+                            decoration: BoxDecoration(
+                                color: _RC.neonAmber.withValues(alpha: 0.16),
+                                borderRadius: BorderRadius.circular(6)),
+                            child: Text(context.tr('absRawUnverified'),
+                                style: const TextStyle(
+                                    color: _RC.neonAmber,
+                                    fontSize: 9.5,
+                                    fontWeight: FontWeight.w800)),
+                          ),
+                        ],
                       ],
                     ),
                     const SizedBox(height: 6),
@@ -1123,19 +1374,49 @@ class _HazardCard extends StatelessWidget {
                     if (code.isChassis) ...[
                       Builder(builder: (context) {
                         final entry = _chassisText(context);
-                        if (entry == null) return const SizedBox.shrink();
+                        // On an undecoded Bosch platform the SAE rendering is
+                        // the least useful thing on the card — it looks like a
+                        // key into a table that does not exist. The module's
+                        // own number is the value Bosch documentation prints
+                        // and the one a dealer tool shows, so it is what gets
+                        // surfaced and what is worth quoting. Shown for every
+                        // code on such a platform, 0x5200 included, so the
+                        // rider always has it to hand.
+                        final rawLabel =
+                            (_platform?.showsRawUnverifiedCodes ?? false)
+                                ? ChassisDtcDatabase.rawModuleLabel(code.code)
+                                : null;
+                        if (entry == null && rawLabel == null) {
+                          return const SizedBox.shrink();
+                        }
                         return Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            if (entry.component.isNotEmpty)
-                              _detailRow(context.tr('absComponent'),
-                                  entry.component, _RC.textMain),
-                            if (entry.query.isNotEmpty)
-                              _detailRow(context.tr('absQuery'), entry.query,
-                                  _RC.textMuted),
-                            if (entry.remedy.isNotEmpty)
-                              _detailRow(context.tr('absRemedy'), entry.remedy,
-                                  _RC.neonCyan),
+                            if (rawLabel != null)
+                              _detailRow(context.tr('absRawModuleCode'),
+                                  rawLabel, _RC.textMain),
+                            if (entry != null) ...[
+                              if (entry.component.isNotEmpty)
+                                _detailRow(context.tr('absComponent'),
+                                    entry.component, _RC.textMain),
+                              if (entry.query.isNotEmpty)
+                                _detailRow(context.tr('absQuery'), entry.query,
+                                    _RC.textMuted),
+                              if (entry.remedy.isNotEmpty)
+                                _detailRow(context.tr('absRemedy'),
+                                    entry.remedy, _RC.neonCyan),
+                            ],
+                            // Only when nothing is known: 0x5200 has a real
+                            // sourced meaning and must not be undermined by a
+                            // note saying its meaning is unknown.
+                            if (entry == null && rawLabel != null) ...[
+                              const SizedBox(height: 10),
+                              Text(context.tr('absRawUnverifiedNote'),
+                                  style: const TextStyle(
+                                      color: _RC.textMuted,
+                                      fontSize: 11.5,
+                                      height: 1.5)),
+                            ],
                           ],
                         );
                       }),

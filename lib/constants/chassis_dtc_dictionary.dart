@@ -85,12 +85,29 @@ class ChassisDtcEntry {
   /// is a display classification, never presented to the rider as manual data.
   final String severity;
 
+  /// False when the source lists this code but does not state what it means.
+  ///
+  /// The braking-system honesty rule in this file's header says an invented
+  /// description is worse than none. This flag is how a code can be listed —
+  /// so the rider learns it is a real, documented code rather than garbage —
+  /// without any meaning being claimed for it. The UI must render such an
+  /// entry with an explicit "meaning not verified" treatment.
+  ///
+  /// Two real situations produce it, both genuine gaps in a real source and
+  /// neither a placeholder for work not done:
+  ///   • Honda blink code 4-2, which the source lists in the front
+  ///     wheel-speed-sensor group without giving it its own description.
+  ///   • Any code read from a generic Bosch platform other than 0x5200 — see
+  ///     [ChassisDtcDatabase.boschSharedCodes].
+  final bool meaningVerified;
+
   const ChassisDtcEntry({
     required this.description,
     this.component = '',
     this.query = '',
     this.remedy = '',
     this.severity = 'critical',
+    this.meaningVerified = true,
   });
 }
 
@@ -105,6 +122,22 @@ class ChassisManufacturers {
   ChassisManufacturers._();
 
   static const String royalEnfield = 'royal_enfield';
+  static const String honda = 'honda';
+
+  // ── Bosch-supplied ABS platforms ───────────────────────────────────────────
+  // Bajaj, Yamaha, Suzuki and KTM all source their motorcycle ABS modulator
+  // from Bosch, and their fault values sit in the same hexadecimal 0x5xxx
+  // module-number family already confirmed on Royal Enfield's Bosch platform
+  // (the `H`-suffix codes in the Bullet EFI table below). That shared
+  // hardware family is the entire basis on which these makes are supported —
+  // it is NOT a claim that any particular value means the same thing on each
+  // of them. See [ChassisDtcDatabase.boschSharedCodes] for the single value
+  // that is independently sourced, and [ChassisDictionaryKind.rawUnverifiedHex]
+  // for how everything else is honestly presented.
+  static const String bajaj = 'bajaj';
+  static const String yamaha = 'yamaha';
+  static const String suzuki = 'suzuki';
+  static const String ktm = 'ktm';
 
   /// Normalised free-text spellings → canonical key. Extend this when adding a
   /// manufacturer; nothing else needs to change.
@@ -112,11 +145,29 @@ class ChassisManufacturers {
     'royalenfield': royalEnfield,
     'royalenfieldmotors': royalEnfield,
     're': royalEnfield,
+    'honda': honda,
+    'hondamotorcycle': honda,
+    'hondamotorcycleandscooterindia': honda,
+    'hmsi': honda,
+    'bajaj': bajaj,
+    'bajajauto': bajaj,
+    'yamaha': yamaha,
+    'yamahamotor': yamaha,
+    'indiayamahamotor': yamaha,
+    'suzuki': suzuki,
+    'suzukimotorcycle': suzuki,
+    'suzukimotorcycleindia': suzuki,
+    'ktm': ktm,
   };
 
   /// Human-readable label for a canonical key, for UI display.
   static const Map<String, String> displayNames = <String, String>{
     royalEnfield: 'Royal Enfield',
+    honda: 'Honda',
+    bajaj: 'Bajaj',
+    yamaha: 'Yamaha',
+    suzuki: 'Suzuki',
+    ktm: 'KTM',
   };
 
   /// Resolve a free-text vehicle make (e.g. `"Royal Enfield"`) to a canonical
@@ -145,6 +196,70 @@ class ChassisManufacturers {
       .toList(growable: false);
 }
 
+/// What braking hardware a platform actually has.
+///
+/// This is not a pedantic distinction. India's braking regulation requires ABS
+/// only from 125cc upwards; below that a Combi-Brake System is fitted instead.
+/// CBS is purely mechanical — a linked front/rear brake with no ECU, no wheel
+/// speed sensors and no fault memory whatsoever. There is nothing on such a
+/// bike for a scan tool to talk to, so probing one and reporting "no module
+/// answered" describes the vehicle as possibly broken when it is in fact
+/// working exactly as designed.
+///
+/// Marketing copy is not evidence for this: "combi-brake" is often sold
+/// alongside language that reads like ABS. Every [ChassisBrakeSystem.cbs]
+/// entry below has to carry its own provenance note.
+enum ChassisBrakeSystem {
+  /// Electronic anti-lock braking with a fault-storing ECU.
+  abs,
+
+  /// Combi-Brake System: mechanical linked braking, no ECU, no fault codes.
+  cbs,
+}
+
+/// How this platform's stored faults can physically be reached.
+///
+/// The honest centre of this whole file. Two platforms can both have real,
+/// fully documented ABS fault tables and still be worlds apart in what this
+/// app can do with them, because the readout mechanism differs.
+enum ChassisReadMethod {
+  /// Reachable over the adapter: a physically-addressed UDS `19 02` request,
+  /// exactly as [ChassisModuleProfiles] describes. This is the only value that
+  /// may ever be presented to the rider as a scan.
+  udsLiveScan,
+
+  /// Read by bridging the DLC with a jumper and counting flashes of the ABS
+  /// warning lamp — a manual, visual, physical procedure performed on the
+  /// motorcycle. There is no electrical path from a Bluetooth OBD adapter to
+  /// this data at all: it never travels over CAN, so no adapter, protocol or
+  /// app can retrieve it. A platform marked this way must be offered ONLY as a
+  /// manual reference lookup, never wired to a scan button.
+  dlcBlinkCodeManual,
+
+  /// No fault memory exists to read (a [ChassisBrakeSystem.cbs] platform).
+  notApplicable,
+}
+
+/// How much is actually known about what this platform's codes mean.
+///
+/// Kept separate from [ChassisReadMethod] because the two are genuinely
+/// independent: a platform can be live-scannable with no decoded table, or
+/// fully decoded with no way to scan it.
+enum ChassisDictionaryKind {
+  /// Every listed code carries a description transcribed from a real source.
+  decoded,
+
+  /// Codes can be read, but no public source decodes what they mean on this
+  /// make. They must be displayed as the raw module value with an explicit
+  /// "meaning not independently verified" treatment — never a guess. The one
+  /// exception is [ChassisDtcDatabase.boschSharedCodes], which is sourced at
+  /// the Bosch-module level rather than per brand.
+  rawUnverifiedHex,
+
+  /// No table at all for this platform.
+  none,
+}
+
 /// One vehicle platform: a manufacturer plus a model family that shares a
 /// single ABS ECU and therefore a single fault-code system.
 class ChassisPlatform {
@@ -165,12 +280,51 @@ class ChassisPlatform {
   /// would describe a braking fault using the wrong platform's table.
   final List<String> modelAliases;
 
+  /// Whether this model actually has an ABS ECU, or a mechanical CBS with
+  /// nothing to scan. Defaults to [ChassisBrakeSystem.abs] so every platform
+  /// that shipped before this flag existed keeps its exact previous behaviour.
+  final ChassisBrakeSystem brakeSystem;
+
+  /// How this platform's faults can be reached. Defaults to
+  /// [ChassisReadMethod.udsLiveScan] — the behaviour of every platform that
+  /// shipped before this flag existed.
+  final ChassisReadMethod readMethod;
+
+  /// How much is known about what this platform's codes mean. Defaults to
+  /// [ChassisDictionaryKind.decoded], again preserving prior behaviour.
+  final ChassisDictionaryKind dictionaryKind;
+
+  /// Why this platform carries the capability flags it does, in one line, for
+  /// a reader checking the claim rather than taking it on trust. Empty for the
+  /// platforms that predate the flags and simply use every default.
+  final String capabilityProvenance;
+
   const ChassisPlatform({
     required this.key,
     required this.manufacturerKey,
     required this.displayName,
     required this.modelAliases,
+    this.brakeSystem = ChassisBrakeSystem.abs,
+    this.readMethod = ChassisReadMethod.udsLiveScan,
+    this.dictionaryKind = ChassisDictionaryKind.decoded,
+    this.capabilityProvenance = '',
   });
+
+  /// True when this platform may be offered to the rider as a live scan.
+  bool get isLiveScannable => readMethod == ChassisReadMethod.udsLiveScan;
+
+  /// True when the only route to this platform's codes is the manual
+  /// blink-code procedure on the motorcycle itself.
+  bool get isBlinkCodeOnly =>
+      readMethod == ChassisReadMethod.dlcBlinkCodeManual;
+
+  /// True when this model has no fault memory to read at all.
+  bool get isCbsOnly => brakeSystem == ChassisBrakeSystem.cbs;
+
+  /// True when a code read from this platform must be shown as a raw module
+  /// value with its meaning explicitly marked unverified.
+  bool get showsRawUnverifiedCodes =>
+      dictionaryKind == ChassisDictionaryKind.rawUnverifiedHex;
 }
 
 /// Platform registry and the make+model resolution that selects a dataset.
@@ -179,6 +333,24 @@ class ChassisPlatforms {
 
   static const String royalEnfieldClassic350 = 'royal_enfield_classic350';
   static const String royalEnfieldBulletEfi = 'royal_enfield_bullet_efi';
+
+  /// Honda ABS models read by DLC jumper + counting warning-lamp flashes.
+  /// Fully decoded, and completely unreachable over Bluetooth. See
+  /// [ChassisReadMethod.dlcBlinkCodeManual].
+  static const String hondaAbsBlink = 'honda_abs_blink';
+
+  /// Honda's 2024-onward OBD2B-compliant models, which expose diagnostics over
+  /// CAN/UDS the way Royal Enfield's platform does. Scannable, but with no
+  /// decoded table — see the entry's own provenance note.
+  static const String hondaObd2b = 'honda_obd2b';
+
+  /// Honda models fitted with CBS instead of ABS: nothing to scan at all.
+  static const String hondaCbs = 'honda_cbs';
+
+  static const String bajajBoschAbs = 'bajaj_bosch_abs';
+  static const String yamahaBoschAbs = 'yamaha_bosch_abs';
+  static const String suzukiBoschAbs = 'suzuki_bosch_abs';
+  static const String ktmBoschAbs = 'ktm_bosch_abs';
 
   static const List<ChassisPlatform> all = <ChassisPlatform>[
     ChassisPlatform(
@@ -205,7 +377,187 @@ class ChassisPlatforms {
         'continentalgt535',
       ],
     ),
+
+    // ══════════════════════════════════════════════════════════════════════
+    // Honda — three genuinely different situations under one make
+    // ══════════════════════════════════════════════════════════════════════
+    // Honda is the reason [ChassisReadMethod] exists. Honda publishes a real,
+    // portable ABS fault table that is consistent across its ABS models — and
+    // on the majority of that lineup the table is read by bridging the DLC and
+    // counting flashes of the ABS warning lamp. That data never travels over
+    // CAN. No adapter and no app can fetch it. Only the 2024-onward OBD2B
+    // models expose ABS diagnostics electronically.
+    //
+    // Listing "Honda" as supported without separating those two would be the
+    // single most misleading thing this file could do, so they are separate
+    // platforms with separate capabilities rather than one averaged entry.
+
+    // The CBS models are listed first purely for readability; resolution is by
+    // exact alias match, so list order does not affect which one is picked.
+    ChassisPlatform(
+      key: hondaCbs,
+      manufacturerKey: ChassisManufacturers.honda,
+      displayName: 'Honda CBS models (no ABS)',
+      brakeSystem: ChassisBrakeSystem.cbs,
+      readMethod: ChassisReadMethod.notApplicable,
+      dictionaryKind: ChassisDictionaryKind.none,
+      capabilityProvenance:
+          'Sub-125cc Honda models, where India\'s braking regulation requires '
+          'CBS rather than ABS and no ABS variant is offered. Derived from the '
+          'regulatory threshold plus published engine displacement, not from a '
+          'dealer-tool readout — which is why the CBS notice offers a "scan '
+          'anyway" action rather than blocking the scan outright. Remove an '
+          'alias here if a variant of that model with real ABS ever appears.',
+      modelAliases: <String>[
+        // Activa — every variant is sub-125cc and none is offered with ABS.
+        'activa',
+        'activa5g',
+        'activa6g',
+        'activa125',
+        // Dio (109cc).
+        'dio',
+        // Shine 100 (99cc).
+        'shine100',
+      ],
+    ),
+    ChassisPlatform(
+      key: hondaObd2b,
+      manufacturerKey: ChassisManufacturers.honda,
+      displayName: 'Honda 2024+ (OBD2B)',
+      readMethod: ChassisReadMethod.udsLiveScan,
+      // Deliberately NOT decoded. The blink-code table below is a *blink*
+      // table: its keys are flash patterns, not the numeric DTCs a UDS reply
+      // carries, and no source maps one onto the other. Pointing this platform
+      // at that table would silently relabel a scanned number with a blink
+      // code's meaning — a guess about a braking fault, which this file
+      // forbids. So the scan runs, and reports what it read honestly
+      // undescribed.
+      dictionaryKind: ChassisDictionaryKind.none,
+      capabilityProvenance:
+          'OBD2B compliance from 2024 makes ABS diagnostics reachable over '
+          'CAN/UDS on these models. No public source decodes the numeric DTCs '
+          'they return, and the blink-code table is not a mapping for them.',
+      modelAliases: <String>[
+        'hornet20',
+        'hornet2',
+        'cbhornet20',
+        'hondahornet20',
+      ],
+    ),
+    ChassisPlatform(
+      key: hondaAbsBlink,
+      manufacturerKey: ChassisManufacturers.honda,
+      displayName: 'Honda ABS (blink-code models)',
+      readMethod: ChassisReadMethod.dlcBlinkCodeManual,
+      dictionaryKind: ChassisDictionaryKind.decoded,
+      capabilityProvenance:
+          'Honda service manuals publish this table and it is consistent '
+          'across Honda ABS models, which is why it is a make-level default. '
+          'Retrieval is by DLC jumper and warning-lamp flash count — a manual '
+          'procedure on the motorcycle, with no CAN path a scan tool could '
+          'use.',
+      // No aliases: this is the manufacturer fallback (see
+      // [_fallbackPlatformByManufacturer]), reached by any Honda model that is
+      // not one of the explicitly-listed CBS or OBD2B models above.
+      modelAliases: <String>[],
+    ),
+
+    // ══════════════════════════════════════════════════════════════════════
+    // Bosch-supplied platforms — Bajaj / Yamaha / Suzuki / KTM
+    // ══════════════════════════════════════════════════════════════════════
+    // One entry per make, with no model dimension, because there is no
+    // per-model data to distinguish: what is known is hardware-level (a Bosch
+    // modulator using the 0x5xxx module-number family) and applies to the
+    // make's whole ABS lineup equally.
+    //
+    // These are [ChassisDictionaryKind.rawUnverifiedHex], and that is the
+    // whole point of them. The probe can reach the module and read real
+    // values; what it cannot do is say what those values mean, because no
+    // public source decodes them per brand. The one value that IS sourced —
+    // 0x5200 — is sourced at the Bosch-module level, so it applies to all four
+    // equally and lives in [ChassisDtcDatabase.boschSharedCodes].
+    ChassisPlatform(
+      key: bajajBoschAbs,
+      manufacturerKey: ChassisManufacturers.bajaj,
+      displayName: 'Bajaj (Bosch ABS)',
+      dictionaryKind: ChassisDictionaryKind.rawUnverifiedHex,
+      capabilityProvenance: _boschProvenance,
+      modelAliases: <String>[],
+    ),
+    ChassisPlatform(
+      key: yamahaBoschAbs,
+      manufacturerKey: ChassisManufacturers.yamaha,
+      displayName: 'Yamaha (Bosch ABS)',
+      dictionaryKind: ChassisDictionaryKind.rawUnverifiedHex,
+      capabilityProvenance: _boschProvenance,
+      modelAliases: <String>[],
+    ),
+    ChassisPlatform(
+      key: suzukiBoschAbs,
+      manufacturerKey: ChassisManufacturers.suzuki,
+      displayName: 'Suzuki (Bosch ABS)',
+      dictionaryKind: ChassisDictionaryKind.rawUnverifiedHex,
+      capabilityProvenance: _boschProvenance,
+      modelAliases: <String>[],
+    ),
+    ChassisPlatform(
+      key: ktmBoschAbs,
+      manufacturerKey: ChassisManufacturers.ktm,
+      displayName: 'KTM (Bosch ABS)',
+      dictionaryKind: ChassisDictionaryKind.rawUnverifiedHex,
+      capabilityProvenance: _boschProvenance,
+      modelAliases: <String>[],
+    ),
   ];
+
+  static const String _boschProvenance =
+      'ABS modulator supplied by Bosch, using the same hexadecimal 0x5xxx '
+      'module-number family confirmed on Royal Enfield\'s Bosch platform. '
+      'Shared hardware family only — no public source decodes these values '
+      'per brand, so every code except the Bosch-level 0x5200 is shown raw '
+      'and explicitly unverified.';
+
+  /// The platform a make falls back to when the model is that make's but
+  /// matches no specific alias.
+  ///
+  /// ── Why this exists, and why Royal Enfield is deliberately not in it ─────
+  /// Royal Enfield genuinely needs the model: its Classic 350 and Bullet EFI
+  /// platforms disagree about what the same number means, so falling back to
+  /// either would describe a braking fault from the wrong table. It has no
+  /// entry here, and its resolution is byte-for-byte what it was before this
+  /// map existed — an unrecognised Royal Enfield model still resolves to null.
+  ///
+  /// The makes below are the opposite case, for two different reasons:
+  ///   • Honda's blink table is published as consistent across its ABS models,
+  ///     so a make-level default is what the source itself supports. The
+  ///     models that must NOT reach it — CBS models with no ABS, and the 2024+
+  ///     OBD2B models — carry explicit aliases, and an exact alias match is
+  ///     always tried first.
+  ///   • The Bosch makes have no per-model dimension at all: what is known
+  ///     about them is a hardware fact about the modulator, identical across
+  ///     the make's lineup.
+  ///
+  /// A blank model still resolves to null for every make, unchanged. That is
+  /// what keeps the "set your model" nudge working, and for Honda it genuinely
+  /// matters — without a model there is no way to tell an ABS bike from a CBS
+  /// one.
+  static const Map<String, String> _fallbackPlatformByManufacturer =
+      <String, String>{
+    ChassisManufacturers.honda: hondaAbsBlink,
+    ChassisManufacturers.bajaj: bajajBoschAbs,
+    ChassisManufacturers.yamaha: yamahaBoschAbs,
+    ChassisManufacturers.suzuki: suzukiBoschAbs,
+    ChassisManufacturers.ktm: ktmBoschAbs,
+  };
+
+  /// True when [manufacturerKey] resolves any non-blank model to a platform.
+  ///
+  /// Used by the UI to word the "set your model" nudge correctly: listing the
+  /// models we recognise only helps for a make that actually discriminates by
+  /// model.
+  static bool hasModelIndependentFallback(String? manufacturerKey) =>
+      manufacturerKey != null &&
+      _fallbackPlatformByManufacturer.containsKey(manufacturerKey);
 
   /// Resolve a free-text make + model to a platform key.
   ///
@@ -222,7 +574,10 @@ class ChassisPlatforms {
       if (platform.manufacturerKey != manufacturerKey) continue;
       if (platform.modelAliases.contains(normalised)) return platform.key;
     }
-    return null;
+    // Exact aliases always win. Only once none has matched does a make-level
+    // default apply, and only for the makes that genuinely have one — see
+    // [_fallbackPlatformByManufacturer].
+    return _fallbackPlatformByManufacturer[manufacturerKey];
   }
 
   /// The platform record for [platformKey], or null.
@@ -253,6 +608,24 @@ class ChassisDtcDatabase {
   /// supports — every entry in that dataset carries this one safe instruction.
   static const String bulletEfiGenericRemedy =
       'Have this inspected by an authorised Royal Enfield service center';
+
+  /// The Honda blink table's remedy guidance.
+  ///
+  /// The source gives its remedy guidance for the table as a whole — air-gap
+  /// inspection, continuity checks against the ABS modulator connector, fuse
+  /// checks, modulator replacement where indicated, then erase and re-verify
+  /// on a test ride above 30 km/h — rather than one specific fix per code.
+  /// Splitting that pool across twenty codes would mean deciding, per code,
+  /// which step applies; nothing in the source supports those decisions, and
+  /// guessing them on a braking system is exactly what this file forbids. So
+  /// it is stored once, verbatim in substance, and shown on every entry — the
+  /// same choice already made for [bulletEfiGenericRemedy].
+  static const String hondaBlinkRemedy =
+      'Documented remedy guidance for this table: inspect the wheel speed '
+      'sensor air gap, check circuit continuity against the ABS modulator '
+      'connector, check the related fuses, and replace the modulator where '
+      'indicated. Then erase the code and re-verify on a test ride above '
+      '30 km/h.';
 
   static const Map<String, Map<String, ChassisDtcEntry>> byPlatform =
       <String, Map<String, ChassisDtcEntry>>{
@@ -472,6 +845,162 @@ class ChassisDtcDatabase {
         remedy: bulletEfiGenericRemedy,
       ),
     },
+
+    // ══════════════════════════════════════════════════════════════════════
+    // Honda — ABS blink-code table
+    // Source: Honda service manuals' ABS DTC table, published and consistent
+    // across Honda ABS models.
+    //
+    // ── Read this before touching anything here ─────────────────────────────
+    // The keys are NOT fault codes in the SAE sense and are not what any scan
+    // returns. They are blink patterns: the number of long flashes of the ABS
+    // warning lamp, a dash, then the number of short flashes, counted by eye
+    // with the DLC bridged. Nothing in this table ever travels over CAN, which
+    // is why [ChassisPlatforms.hondaAbsBlink] is marked
+    // [ChassisReadMethod.dlcBlinkCodeManual] and is never wired to a scan.
+    //
+    // The notation also means [deriveSaeCode] cannot and must not match these:
+    // its regex requires four hex digits and an H suffix, so a blink key falls
+    // straight through it. A scanned numeric code can therefore never collide
+    // with a blink pattern, which is the property that keeps this table from
+    // leaking into a live read.
+    //
+    // Front/rear pairing: the source states the rear set explicitly and
+    // completely (1-3 circuit, 1-4 sensor, 2-3 pulser ring, 4-3 wheel lock),
+    // and the front set is its direct positional counterpart. 4-2 is the one
+    // code the source lists without giving it a description of its own — see
+    // its entry.
+    // ══════════════════════════════════════════════════════════════════════
+    ChassisPlatforms.hondaAbsBlink: <String, ChassisDtcEntry>{
+      '1-1': ChassisDtcEntry(
+        description: 'Front wheel speed sensor circuit',
+        remedy: hondaBlinkRemedy,
+      ),
+      '1-2': ChassisDtcEntry(
+        description: 'Front wheel speed sensor',
+        remedy: hondaBlinkRemedy,
+      ),
+      '1-3': ChassisDtcEntry(
+        description: 'Rear wheel speed sensor circuit',
+        remedy: hondaBlinkRemedy,
+      ),
+      '1-4': ChassisDtcEntry(
+        description: 'Rear wheel speed sensor',
+        remedy: hondaBlinkRemedy,
+      ),
+      '1-5': ChassisDtcEntry(
+        description: 'Front or rear wheel speed sensor circuit short',
+        remedy: hondaBlinkRemedy,
+      ),
+      '2-1': ChassisDtcEntry(
+        description: 'Front pulser ring',
+        remedy: hondaBlinkRemedy,
+      ),
+      '2-3': ChassisDtcEntry(
+        description: 'Rear pulser ring',
+        remedy: hondaBlinkRemedy,
+      ),
+      // The source gives all four 3-x codes the same meaning rather than
+      // distinguishing them. Reproduced as printed; inventing four different
+      // modulator faults to fill the gap is not an option.
+      '3-1': ChassisDtcEntry(
+        description: 'Solenoid valve (ABS modulator) fault',
+        remedy: hondaBlinkRemedy,
+      ),
+      '3-2': ChassisDtcEntry(
+        description: 'Solenoid valve (ABS modulator) fault',
+        remedy: hondaBlinkRemedy,
+      ),
+      '3-3': ChassisDtcEntry(
+        description: 'Solenoid valve (ABS modulator) fault',
+        remedy: hondaBlinkRemedy,
+      ),
+      '3-4': ChassisDtcEntry(
+        description: 'Solenoid valve (ABS modulator) fault',
+        remedy: hondaBlinkRemedy,
+      ),
+      '4-1': ChassisDtcEntry(
+        description: 'Front wheel lock',
+        remedy: hondaBlinkRemedy,
+      ),
+      // The one genuine gap in this table. The source lists 4-2 among the
+      // front wheel-speed-sensor / wheel-lock codes but gives it no
+      // description of its own, so none is claimed here. Listing it still
+      // helps: a rider who counts four long and two short flashes learns that
+      // this is a real, documented Honda code rather than a miscount, and that
+      // its meaning must come from a dealer.
+      '4-2': ChassisDtcEntry(
+        description:
+            'Listed in the source among the front wheel-speed-sensor codes, '
+            'without a description of its own',
+        remedy: hondaBlinkRemedy,
+        meaningVerified: false,
+      ),
+      '4-3': ChassisDtcEntry(
+        description: 'Rear wheel lock',
+        remedy: hondaBlinkRemedy,
+      ),
+      '5-1': ChassisDtcEntry(
+        description: 'ABS pump motor lock',
+        remedy: hondaBlinkRemedy,
+      ),
+      '5-4': ChassisDtcEntry(
+        description: 'ABS power supply relay',
+        remedy: hondaBlinkRemedy,
+      ),
+      '6-1': ChassisDtcEntry(
+        description: 'Supply voltage too low (under-voltage)',
+        remedy: hondaBlinkRemedy,
+      ),
+      '6-2': ChassisDtcEntry(
+        description: 'Supply voltage too high (over-voltage)',
+        remedy: hondaBlinkRemedy,
+      ),
+      '7-1': ChassisDtcEntry(
+        description: 'Tire size mismatch',
+        remedy: hondaBlinkRemedy,
+      ),
+      '8-1': ChassisDtcEntry(
+        description: 'ABS control unit fault',
+        remedy: hondaBlinkRemedy,
+      ),
+    },
+
+    // ══════════════════════════════════════════════════════════════════════
+    // Bosch-supplied platforms — the ONE independently sourced shared code
+    // ══════════════════════════════════════════════════════════════════════
+    // Every Bosch platform points at the same [boschSharedCodes] map. That is
+    // not a shortcut: 0x5200 is sourced from a real dealer-tool readout as a
+    // Bosch *module-level* fault, i.e. a property of the modulator itself
+    // rather than of the motorcycle wrapped around it, so it means the same
+    // thing on a Bajaj, a Yamaha, a Suzuki and a KTM alike.
+    //
+    // Nothing else goes in here. Any other value read from these platforms is
+    // shown as a raw module number with its meaning explicitly marked
+    // unverified — see [ChassisDictionaryKind.rawUnverifiedHex] and
+    // [rawModuleLabel].
+    ChassisPlatforms.bajajBoschAbs: boschSharedCodes,
+    ChassisPlatforms.yamahaBoschAbs: boschSharedCodes,
+    ChassisPlatforms.suzukiBoschAbs: boschSharedCodes,
+    ChassisPlatforms.ktmBoschAbs: boschSharedCodes,
+  };
+
+  /// The only Bosch-platform code whose meaning is independently sourced.
+  ///
+  /// Written in the same hex-suffix notation the Bullet EFI manual uses, so
+  /// the existing [deriveSaeCode] machinery matches a scanned SAE-format code
+  /// (0x5200 decodes to `C1200`) back onto it with no new mechanism.
+  ///
+  /// There is deliberately no remedy: the source states what the fault is, not
+  /// how to fix it. The UI's own "show this value to your dealer" guidance is
+  /// app copy and is rendered as such, never dressed up as manufacturer data.
+  static const Map<String, ChassisDtcEntry> boschSharedCodes =
+      <String, ChassisDtcEntry>{
+    '5200H': ChassisDtcEntry(
+      description:
+          'ABS ECU EEPROM / variant read error (checksum or access byte '
+          'corrupted)',
+    ),
   };
 
   // ── Hex-notation ↔ SAE code matching ──────────────────────────────────────
@@ -537,6 +1066,44 @@ class ChassisDtcDatabase {
     final canonical = canonicalCode(platformKey, code);
     if (canonical == null) return null;
     return byPlatform[platformKey]![canonical];
+  }
+
+  // ── SAE code → raw module value (the inverse of [deriveSaeCode]) ──────────
+  /// The two DTC bytes behind an SAE-format code, as a single 16-bit value, or
+  /// null when [code] is not a five-character SAE code.
+  ///
+  /// WHY THIS EXISTS: on a Bosch platform whose codes are undecoded, the SAE
+  /// rendering is the least useful thing to put in front of a rider. `C1043`
+  /// looks like a code from a table that does not exist. The module's own
+  /// number — 0x5043 — is the value printed in Bosch documentation and the one
+  /// a dealer tool would show, so it is what gets displayed and what is worth
+  /// reading out over the phone to a service centre.
+  ///
+  /// This invents nothing. It is the exact arithmetic inverse of the standard
+  /// bit-packing [ObdParser.decodeDtcPair] already performs, run backwards:
+  /// the letter is the top two bits, the second character the next two, and
+  /// the remaining three characters are the low nibbles.
+  static int? rawModuleValue(String code) {
+    final match = RegExp(r'^([PCBU])([0-3])([0-9A-F])([0-9A-F])([0-9A-F])$')
+        .firstMatch(code.toUpperCase());
+    if (match == null) return null;
+    final letter = const <String, int>{'P': 0, 'C': 1, 'B': 2, 'U': 3}[
+        match.group(1)!]!;
+    final second = int.parse(match.group(2)!);
+    final third = int.parse(match.group(3)!, radix: 16);
+    final fourth = int.parse(match.group(4)!, radix: 16);
+    final fifth = int.parse(match.group(5)!, radix: 16);
+    final b1 = (letter << 6) | (second << 4) | third;
+    final b2 = (fourth << 4) | fifth;
+    return (b1 << 8) | b2;
+  }
+
+  /// [rawModuleValue] formatted the way Bosch documentation prints it
+  /// (`0x5200`), or null when [code] is not an SAE-format code.
+  static String? rawModuleLabel(String code) {
+    final value = rawModuleValue(code);
+    if (value == null) return null;
+    return '0x${value.toRadixString(16).toUpperCase().padLeft(4, '0')}';
   }
 
   /// True when this platform ships a chassis dictionary at all — lets the UI

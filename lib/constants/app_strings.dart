@@ -265,6 +265,91 @@ class AppStrings {
           'means different faults on each — so the model is needed before a '
           'code can be described. Codes are still read and shown without it. '
           'Models recognised:',
+      'absSetModelAnyModelDesc':
+          'Add your model to the vehicle profile. For this make the codes are '
+          'read the same way on every model, but the model is what tells an '
+          'ABS bike apart from a CBS-only one.',
+
+      // ── CBS gating ───────────────────────────────────────────────────────
+      // A CBS bike has no ABS ECU at all. Probing one and reporting "nothing
+      // answered" describes a healthy motorcycle as possibly broken.
+      'absCbsTitle': 'This vehicle uses CBS, not ABS',
+      'absCbsDesc':
+          'Danlite has this model recorded as fitted with CBS (Combi-Brake '
+          'System) rather than ABS. CBS is a purely mechanical linked front '
+          'and rear brake: there is no ABS control unit, no wheel speed '
+          'sensors and no fault memory, so there are no chassis fault codes '
+          'to read on this vehicle. That is normal for this model and is not '
+          'a fault.\n\nEngine fault codes are unaffected — use the Engine '
+          'category.',
+      'absCbsProvenance':
+          'This classification comes from the model\'s engine size and India\'s '
+          'braking regulation, not from a reading taken off your bike. If your '
+          'model really does have ABS, scan anyway.',
+      'absCbsScanAnyway': 'Scan anyway',
+
+      // ── Honda blink-code models ──────────────────────────────────────────
+      'absBlinkOnlyTitle': 'This Honda\'s ABS is read by blink code, not over '
+          'Bluetooth',
+      'absBlinkOnlyDesc':
+          'On most Honda ABS motorcycles the ABS fault code is retrieved by '
+          'bridging the DLC connector and counting flashes of the ABS warning '
+          'lamp. That code never travels over the vehicle\'s CAN bus, so no '
+          'Bluetooth adapter and no app — including this one — can read it. '
+          'It is a physical, visual procedure done on the motorcycle.\n\n'
+          'What Danlite can do is decode the pattern once you have counted '
+          'it. Honda\'s published ABS code table is built in.',
+      'absOpenBlinkReference': 'Open blink code reference',
+      'absBlinkTryLiveScan': 'My Honda is a 2024 or newer OBD2B model',
+      'absBlinkTryLiveScanDesc':
+          'Honda\'s 2024-onward OBD2B models do expose ABS diagnostics '
+          'electronically. Tap to try a live scan instead.',
+
+      // ── Raw, undecoded Bosch codes ───────────────────────────────────────
+      'absRawUnverified': 'MEANING NOT VERIFIED',
+      'absRawModuleCode': 'Module code',
+      'absRawUnverifiedDesc':
+          'Meaning not independently verified for this make.',
+      'absRawUnverifiedNote':
+          'This is a real value read from your ABS module, shown exactly as '
+          'the module reported it. Danlite has no verified description of what '
+          'it means on this make, and will not guess about a braking fault. '
+          'Quote the module code above to your service centre.',
+      'absRawBanner': 'Limited data for this make',
+      'absRawBannerDesc':
+          'This make uses a Bosch ABS module. Danlite can read the module\'s '
+          'stored fault values, but no public source decodes what most of them '
+          'mean on this make, so they are shown as raw module codes rather '
+          'than descriptions. This is less complete than the Royal Enfield and '
+          'Honda tables.',
+
+      // ── Honda blink code reference screen ────────────────────────────────
+      'blinkRefTitle': 'Honda ABS Blink Codes',
+      'blinkRefManualBadge': 'MANUAL REFERENCE — NOT A LIVE SCAN',
+      'blinkRefIntro':
+          'This screen does not read anything from your motorcycle. It is a '
+          'lookup table for a code you have already counted by eye. Danlite '
+          'cannot retrieve Honda blink codes over Bluetooth.',
+      'blinkRefHowTo': 'How the code is read on the motorcycle',
+      'blinkRefHowToBody':
+          'The ABS warning lamp flashes the stored code as a number of long '
+          'flashes, then a number of short flashes, with the DLC connector '
+          'bridged. Count the long flashes first, then the short ones — four '
+          'long and three short is code 4-3. This is a workshop procedure; if '
+          'you are not sure, have a Honda service centre read it.',
+      'blinkRefLongFlashes': 'Long flashes',
+      'blinkRefShortFlashes': 'Short flashes',
+      'blinkRefPattern': 'Pattern',
+      'blinkRefNoMatch': 'No documented code for this pattern',
+      'blinkRefNoMatchDesc':
+          'Honda\'s published table has no entry for this combination. Re-count '
+          'the flashes, or have a Honda service centre read the code.',
+      'blinkRefFullTable': 'Full documented table',
+      'blinkRefSource':
+          'Source: Honda service manual ABS DTC table, consistent across Honda '
+          'ABS models. The remedy guidance is published for the table as a '
+          'whole rather than per code, so the same guidance is shown on every '
+          'entry.',
 
       'emissionReadiness': 'Emission Readiness',
       'freezeFrameTitle': 'Freeze Frame Data',
@@ -927,6 +1012,85 @@ class AppStrings {
           'इस मेक में एक से अधिक ABS प्लेटफ़ॉर्म हैं, और एक ही कोड नंबर हर प्लेटफ़ॉर्म पर '
           'अलग फॉल्ट दर्शाता है — इसलिए कोड का विवरण दिखाने से पहले मॉडल जानना ज़रूरी है। '
           'मॉडल के बिना भी कोड पढ़े और दिखाए जाएँगे। पहचाने जाने वाले मॉडल:',
+      'absSetModelAnyModelDesc':
+          'वाहन प्रोफ़ाइल में अपना मॉडल जोड़ें। इस मेक में कोड हर मॉडल पर एक ही तरीक़े से '
+          'पढ़े जाते हैं, पर ABS वाली बाइक और सिर्फ़ CBS वाली बाइक में फ़र्क़ मॉडल से ही '
+          'पता चलता है।',
+
+      // ── CBS gating ───────────────────────────────────────────────────────
+      'absCbsTitle': 'इस वाहन में ABS नहीं, CBS है',
+      'absCbsDesc':
+          'Danlite के रिकॉर्ड में यह मॉडल ABS के बजाय CBS (Combi-Brake System) के साथ '
+          'दर्ज है। CBS पूरी तरह मैकेनिकल लिंक्ड ब्रेक है: इसमें न ABS कंट्रोल यूनिट होती '
+          'है, न व्हील स्पीड सेंसर, और न कोई फॉल्ट मेमोरी — इसलिए इस वाहन में पढ़ने के '
+          'लिए कोई चेसिस फॉल्ट कोड होता ही नहीं। यह इस मॉडल के लिए सामान्य है, कोई '
+          'खराबी नहीं।\n\nइंजन के फॉल्ट कोड इससे प्रभावित नहीं होते — इंजन कैटेगरी '
+          'इस्तेमाल करें।',
+      'absCbsProvenance':
+          'यह वर्गीकरण मॉडल के इंजन साइज़ और भारत के ब्रेकिंग नियम से निकला है, आपकी '
+          'बाइक से ली गई किसी रीडिंग से नहीं। यदि आपके मॉडल में सचमुच ABS है, तो फिर भी '
+          'स्कैन करें।',
+      'absCbsScanAnyway': 'फिर भी स्कैन करें',
+
+      // ── Honda blink-code models ──────────────────────────────────────────
+      'absBlinkOnlyTitle': 'इस Honda का ABS ब्लिंक कोड से पढ़ा जाता है, '
+          'ब्लूटूथ से नहीं',
+      'absBlinkOnlyDesc':
+          'ज़्यादातर Honda ABS मोटरसाइकिलों में ABS फॉल्ट कोड DLC कनेक्टर को जोड़कर और '
+          'ABS वार्निंग लैंप की चमक गिनकर निकाला जाता है। यह कोड वाहन के CAN बस पर जाता '
+          'ही नहीं, इसलिए कोई भी ब्लूटूथ एडाप्टर या ऐप — यह ऐप भी — उसे नहीं पढ़ सकता। '
+          'यह मोटरसाइकिल पर की जाने वाली एक भौतिक, आँखों से देखी जाने वाली प्रक्रिया '
+          'है।\n\nDanlite इतना कर सकता है कि गिनने के बाद उस पैटर्न का मतलब बता दे। '
+          'Honda की प्रकाशित ABS कोड तालिका ऐप में मौजूद है।',
+      'absOpenBlinkReference': 'ब्लिंक कोड संदर्भ खोलें',
+      'absBlinkTryLiveScan': 'मेरी Honda 2024 या उसके बाद का OBD2B मॉडल है',
+      'absBlinkTryLiveScanDesc':
+          'Honda के 2024 और उसके बाद के OBD2B मॉडल ABS डायग्नोस्टिक्स इलेक्ट्रॉनिक रूप '
+          'से देते हैं। लाइव स्कैन आज़माने के लिए टैप करें।',
+
+      // ── Raw, undecoded Bosch codes ───────────────────────────────────────
+      'absRawUnverified': 'मतलब सत्यापित नहीं',
+      'absRawModuleCode': 'मॉड्यूल कोड',
+      'absRawUnverifiedDesc':
+          'इस मेक के लिए इसका मतलब स्वतंत्र रूप से सत्यापित नहीं है।',
+      'absRawUnverifiedNote':
+          'यह आपके ABS मॉड्यूल से पढ़ा गया असली मान है, ठीक वैसा ही दिखाया गया जैसा '
+          'मॉड्यूल ने बताया। इस मेक पर इसका क्या मतलब है, इसका सत्यापित विवरण Danlite '
+          'के पास नहीं है, और ब्रेकिंग फॉल्ट के बारे में अंदाज़ा नहीं लगाया जाएगा। ऊपर '
+          'दिया मॉड्यूल कोड अपने सर्विस सेंटर को बताएँ।',
+      'absRawBanner': 'इस मेक के लिए सीमित डेटा',
+      'absRawBannerDesc':
+          'इस मेक में Bosch का ABS मॉड्यूल लगता है। Danlite मॉड्यूल में दर्ज फॉल्ट मान '
+          'पढ़ सकता है, पर इनमें से ज़्यादातर का इस मेक पर क्या मतलब है, यह किसी '
+          'सार्वजनिक स्रोत में दर्ज नहीं है — इसलिए वे विवरण के बजाय कच्चे मॉड्यूल कोड '
+          'के रूप में दिखाए जाते हैं। यह Royal Enfield और Honda की तालिकाओं जितना '
+          'पूरा नहीं है।',
+
+      // ── Honda blink code reference screen ────────────────────────────────
+      'blinkRefTitle': 'Honda ABS ब्लिंक कोड',
+      'blinkRefManualBadge': 'मैनुअल संदर्भ — लाइव स्कैन नहीं',
+      'blinkRefIntro':
+          'यह स्क्रीन आपकी मोटरसाइकिल से कुछ भी नहीं पढ़ती। यह उस कोड के लिए एक लुकअप '
+          'तालिका है जिसे आप पहले ही आँखों से गिन चुके हैं। Danlite ब्लूटूथ से Honda '
+          'ब्लिंक कोड नहीं ला सकता।',
+      'blinkRefHowTo': 'मोटरसाइकिल पर कोड कैसे पढ़ा जाता है',
+      'blinkRefHowToBody':
+          'DLC कनेक्टर जुड़ा होने पर ABS वार्निंग लैंप दर्ज कोड को पहले कुछ लंबी चमक और '
+          'फिर कुछ छोटी चमक के रूप में दिखाता है। पहले लंबी चमक गिनें, फिर छोटी — चार '
+          'लंबी और तीन छोटी यानी कोड 4-3। यह वर्कशॉप की प्रक्रिया है; संदेह हो तो Honda '
+          'सर्विस सेंटर से पढ़वाएँ।',
+      'blinkRefLongFlashes': 'लंबी चमक',
+      'blinkRefShortFlashes': 'छोटी चमक',
+      'blinkRefPattern': 'पैटर्न',
+      'blinkRefNoMatch': 'इस पैटर्न के लिए कोई दर्ज कोड नहीं',
+      'blinkRefNoMatchDesc':
+          'Honda की प्रकाशित तालिका में इस संयोजन के लिए कोई प्रविष्टि नहीं है। चमक '
+          'दोबारा गिनें, या Honda सर्विस सेंटर से कोड पढ़वाएँ।',
+      'blinkRefFullTable': 'पूरी दर्ज तालिका',
+      'blinkRefSource':
+          'स्रोत: Honda सर्विस मैनुअल की ABS DTC तालिका, जो Honda के ABS मॉडलों में एक '
+          'जैसी है। उपाय संबंधी मार्गदर्शन हर कोड के लिए अलग नहीं, बल्कि पूरी तालिका के '
+          'लिए एक साथ प्रकाशित है, इसलिए वही मार्गदर्शन हर प्रविष्टि पर दिखाया जाता है।',
 
       'emissionReadiness': 'उत्सर्जन तत्परता',
       'freezeFrameDesc':

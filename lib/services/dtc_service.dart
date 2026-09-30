@@ -154,6 +154,11 @@ class DtcLocalizations {
       query: pick(hi?.query, master.query),
       remedy: pick(hi?.remedy, master.remedy),
       severity: master.severity,
+      // Carried from the English master only. Whether a source states a
+      // code's meaning is a fact about the source, not about the language it
+      // is being read in, so a translation can never upgrade an unverified
+      // entry into a verified one.
+      meaningVerified: master.meaningVerified,
     );
   }
 
@@ -296,11 +301,19 @@ class ChassisDtcResolved {
   final String remedy;
   final String severity;
 
+  /// False when the source lists this code but does not state what it means —
+  /// see [ChassisDtcEntry.meaningVerified]. The fault card must render such an
+  /// entry with an explicit "meaning not verified" treatment rather than
+  /// presenting the description text as a manufacturer's statement of the
+  /// fault.
+  final bool meaningVerified;
+
   const ChassisDtcResolved({
     required this.component,
     required this.description,
     required this.query,
     required this.remedy,
     required this.severity,
+    this.meaningVerified = true,
   });
 }
