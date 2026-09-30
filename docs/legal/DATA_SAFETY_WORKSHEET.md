@@ -54,7 +54,7 @@ breadcrumbs (T9). If the privacy policy says "stays on your phone", ship B-11 fi
 | Is all user data encrypted in transit? | **Yes** — Supabase, Sentry, Google Fonts and the portal are HTTPS; the portal adds `upgrade-insecure-requests` | E-090, E-099. Caveat: the ELM327 **Wi-Fi adapter** link (plain TCP to 192.168.0.10:35000) is local vehicle data, not user data sent off-device |
 | Can users request that data be deleted? | **No — not today.** Must become Yes before submission (Play requirement) | T3, E-066 |
 | Account-deletion in-app path | **None** | B-06 |
-| Account-deletion web link (for the form) | **None**. Proposed: `https://billing.danlite.in/account/delete` (does not exist yet) | B-06 |
+| Account-deletion web link (for the form) | **Drafted, not yet live**: `https://billing.danlite.in/legal/delete-account` (branch `chore/legal-drafts`; describes the manual email request that exists today). Not `/account/delete`: `proxy.ts` sends signed-out visitors on `/account/*` to `/activate`, and Play needs the page reachable without signing in. | B-06, B-26 |
 | Data deleted vs retained on account deletion (to disclose) | Proposed: account, profile, devices, sessions, licence deleted within 30 days; payment and invoice records kept **8 years** for GST (R5a); security/audit identifiers kept up to [N] months; encrypted backups roll off within 90 days | T3, T4, T5 — needs Q-07/Q-08/Q-09 |
 | Committed to Play Families policy? | Not applicable — app should be declared 18+ (not directed at children) | T11, Q-10 |
 | Independent security review? | Not evidenced | — |
@@ -66,7 +66,7 @@ breadcrumbs (T9). If the privacy policy says "stays on your phone", ship B-11 fi
 | Does the app allow account creation? | **Yes** — email OTP (E-055, E-064) |
 | Login methods | Username/email + OTP (no password, no OAuth) |
 | Can accounts be created outside the app? | No (the portal signs in existing accounts via activation link; it does not create them) — confirm (E-035) |
-| Deletion URL | **Required, does not exist yet** |
+| Deletion URL | `https://billing.danlite.in/legal/delete-account` once merged and deployed (draft). The in-app path is still missing (B-06). |
 
 ## 4. Consistency checklist before submitting
 

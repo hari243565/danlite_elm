@@ -30,6 +30,16 @@ import { siteUrl } from '@/lib/site-url';
 const ROBOTS_HEADER = 'noindex, nofollow';
 
 /**
+ * The ONE exception to layer 3: the public policy pages under /legal, which
+ * Razorpay's website review and Google Play need to be able to read. Matched
+ * exactly (`/legal` or `/legal/...`), so `/legalese` or `/checkout?x=/legal`
+ * still get the header. Nothing else about the request is treated differently.
+ */
+function isIndexablePath(path: string): boolean {
+  return path === '/legal' || path.startsWith('/legal/');
+}
+
+/**
  * Routes that require a session.
  *
  * The pages themselves ALSO check, with getUser(), and that check remains the
@@ -108,7 +118,9 @@ export async function proxy(request: NextRequest) {
     }
   }
 
-  response.headers.set('X-Robots-Tag', ROBOTS_HEADER);
+  if (!isIndexablePath(request.nextUrl.pathname)) {
+    response.headers.set('X-Robots-Tag', ROBOTS_HEADER);
+  }
   return response;
 }
 

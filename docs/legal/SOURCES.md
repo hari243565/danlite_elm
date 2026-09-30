@@ -176,3 +176,28 @@ Paths are repo-relative at commit `71e2783` (identical in the owner's folder, wh
 - Hostinger access-log retention; Supabase platform log retention for this plan — UNKNOWN.
 - Admin portal production URL and hosting — UNKNOWN (not found in repo or DNS probes).
 - Google Play listing: developer/entity name, current Data Safety answers, whether any build is published — UNKNOWN.
+
+## Part D — Evidence added while drafting the legal pages (30 Sep 2026)
+
+Collected read-only during the legal-drafting task (branch `chore/legal-drafts`). Same rules as Part C.
+
+### Vendor facts
+| ID | Fact | Source | Accessed | Status |
+|---|---|---|---|---|
+| V-07 | Razorpay's privacy policy is published by **Razorpay Software Limited**, registered in **Bengaluru, Karnataka, India**; it says it "will not transfer personal data to any country prohibited by Government notification". It does not state where personal data is stored. | razorpay.com/privacy/ | 30 Sep 2026 | VERIFIED (text) |
+| V-08 | Razorpay refunds: "money is refunded to the payment method that the customer used to make the payment"; normal refunds "within 5-7 working days". | razorpay.com/docs/payments/refunds/ | 30 Sep 2026 | VERIFIED (text) |
+
+### Code
+| ID | Evidence |
+|---|---|
+| E-104 | `portal/app/checkout/pay-button.tsx` L301-348: on the international rail the billing country is prefilled from the account country; the postcode field is labelled "(optional)"; helper text "Used to help your bank verify the card. It does not change your price, and a mismatch will not stop your payment." Resolves UNKNOWN #15. |
+| E-105 | `supabase/functions/razorpay-webhook/index.ts` L7, L54-62: webhook authenticity rests on an HMAC-SHA256 signature verified over the raw body (constant-time comparison, L69-90). |
+| E-106 | `supabase/migrations/20260818163000_refund_revocation_idempotency.sql` L83-91: on a refund, `payments.status='refunded'` and **the user's licence row is set to `revoked`** (`where user_id = v_user`) — so refunding a *duplicate* payment also revokes the customer's only licence, which must then be re-granted by an admin (E-023). |
+| E-107 | `lib/screens/auth/auth_gate.dart` L30-45: for a signed-in user, `inactive`, `revoked/refunded` and `expired` licences are **blocked at the paywall**; the app's features are unavailable without a licence. |
+| E-108 | `portal/app/account/page.tsx` L192-270, L388-420: the portal account page shows licence status, email, mobile, country, signed-in device(s) and "Sign out all devices"; "Download invoice" is shown as "Not yet available"; no receipt or purchase history is shown. `portal/app/confirmation/page.tsx` L64-76 shows the signed-in user's **most recent** captured payment as a receipt; nothing links to it from the account page. |
+| E-109 | `supabase/functions/send-activation/index.ts` L183-229: the activation email (text and HTML) contains the link, the 15-minute expiry and "If you did not sign up…" — **no link to Terms, Refund or Privacy, and no seller identity**. |
+| E-110 | `portal/app/checkout/page.tsx` L229-231: product copy "One payment. No subscription, no renewal. Unlocks the full app on your Android device, **permanently**."; L288-300: passive "By paying you accept the Terms and Refund policy" (no checkbox, no Privacy link except the footer). |
+| E-111 | Product names: `android/app/src/main/AndroidManifest.xml` L32 `android:label="OBD Danlite"`; `pubspec.yaml` L2 description "OBD Danlite – …"; portal pages and the activation email say "**Danlite ELM**" (E-034 subject "Activate your Danlite ELM licence"). Two customer-facing names. |
+| E-112 | `portal/app/activate/page.tsx` L1-9, L79-82 and `request-form.tsx` L84-89: the activation link is redeemed by `/api/activate`, which sends the customer to `/checkout` or `/account` depending on the licence; the public "Get your activation link" form still says "Enter the email address **or mobile number**" (auth is email-only — E-024). |
+| E-113 | `lib/screens/account_screen.dart` L66-81: the app shows `/legal/privacy`, `/legal/terms`, `/legal/refund` on the billing host as non-tappable text; these routes must stay stable. Its labels are "Privacy Policy", "Terms of Service", "Refund Policy" (E-071 L737-739). |
+| E-114 | Stale price comments (not customer-facing): `lib/screens/auth/signup_screen.dart` L23-24 "₹109 India vs $1.10"; `20260815105545_orders_and_payment_rpc.sql` L200 "₹109". The live constants are ₹129 / US$1.29 (E-086). |
