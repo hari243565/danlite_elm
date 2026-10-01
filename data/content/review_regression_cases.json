@@ -1,0 +1,43 @@
+{
+  "source": "docs/content/REVIEW_REPORT_20261001.md section 4 on branch content/review-20261001 (independent review, 2026-10-01). Each case is the reviewer's defective field set; the test applies it on top of the current good entry for that code and requires the validator to reject it with the named rule.",
+  "cases": [
+    {
+      "name": "Defect 1: wrong direction (P0123 carrying the P0122 meaning)",
+      "code": "P0123",
+      "expect_rule": "R6",
+      "fields": {
+        "title_en": "Throttle position sensor A: voltage below threshold",
+        "meaning_en": "The throttle position sensor signal is lower than the bike's computer (ECU) expects, often from a short to ground.",
+        "likely_causes_en": ["Signal wire short to ground", "Faulty throttle position sensor"]
+      }
+    },
+    {
+      "name": "Defect 2: ABS advice that endangers a rider (C0035)",
+      "code": "C0035",
+      "expect_rule": "R5",
+      "fields": {
+        "rider_action_level": "SERVICE_SOON",
+        "rider_action_basis": "braking unaffected",
+        "rider_advice_en": "Braking is not affected, so ride as normal. The ABS lamp can wait until the next service."
+      }
+    },
+    {
+      "name": "Defect 3: car-only EGR valve as a cause (P0172)",
+      "code": "P0172",
+      "expect_rule": "R7",
+      "fields": {
+        "likely_causes_en": ["Stuck-open EGR valve", "Leaking or stuck-open fuel injector", "Blocked air filter"]
+      }
+    },
+    {
+      "name": "Bonus defect: level contradicts the entry's own text (U0155)",
+      "code": "U0155",
+      "expect_rule": "R3",
+      "fields": {
+        "rider_action_level": "SERVICE_SOON",
+        "rider_action_basis": "engine may stall or not start",
+        "rider_advice_en": "The engine may cut out or refuse to start while riding. Get it checked soon."
+      }
+    }
+  ]
+}

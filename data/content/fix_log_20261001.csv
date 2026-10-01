@@ -1,0 +1,45 @@
+code,check,what_changed,why
+P0120,3 advice (CONCERN),"Circular 'stop and check sooner if the engine stalls or surges' replaced by 'If it stalls more than once or will not restart, do not keep riding; have it taken to a workshop.' can_ride_reason now says avoid traffic and long trips.",If the engine has stalled the rider has already stopped; the real risk is repeated stalls in traffic.
+P0105,2 causes (CONCERN),Cause now 'Loose or cracked hose or seal at the sensor (if hose-fed)'; hint also hedged.,Many bike MAP sensors bolt on with no hose.
+P0195,3 advice (CONCERN),Removed 'the ECU may not notice a hot engine' and 'watch for signs of overheating'. Advice now says the oil temperature reading is lost and to ask a mechanic to check it at the next service.,The source does not state an ECU protection function; bikes may have no oil temperature display.
+P0135,2 causes (CONCERN),Cause hedged: 'Blown heater fuse or faulty relay (if fitted)'. Meaning no longer says 'exhaust' (not in source entry).,Most small bikes drive the heater straight from the ECU with no separate fuse or relay.
+P0335,7 understand (CONCERN),Cause now 'Damaged or dirty toothed ring on the crankshaft'; hint says 'toothed ring (reluctor ring)'.,'Reluctor ring' is a workshop word.
+P0115,3 advice (CONCERN),"Removed 'watch the temperature gauge'. Added: if the engine runs very hot, stop and let it cool. Basis now 'hard cold start or wrong idle'.",Many Indian air-cooled bikes and scooters have no gauge; a hot engine needs an instruction that does not need a gauge.
+P0115,5 parts (CONCERN),Removed 'temperature gauge' from advice and hint (hint now compares the scan tool reading with the real engine temperature).,Gauge is not a source part.
+P0300,3 advice (CONCERN),"'Stop if the warning lamp blinks' removed. Now: 'stop if the engine runs very rough, backfires or loses power badly'.",Many bikes do not blink the lamp for misfire.
+P0301,3 advice (CONCERN),Same fix as P0300.,Same reason.
+P0302,3 advice (CONCERN),Same fix as P0300. Also applies_when {cylinders_min: 2} (D5).,Same reason; code cannot occur on a single-cylinder bike.
+P0172,3 advice (CONCERN),Advice now: 'Expect black smoke or poor mileage; get it checked soon.' plus the strong-petrol-smell stop sentence. needs_independent_review set true.,Leaking injector or line is a fire risk; brief requires conservative wording on fuel leaks.
+P0122,3 advice (CONCERN),"Added the same stall warning as P0120 ('If it stalls more than once or will not restart, do not keep riding...').",A low throttle signal can cause stalls and power changes; the three throttle entries must agree.
+P0122,7 understand (CONCERN),"Meaning now starts 'The throttle position reading is too low for the bike's computer (ECU), often from a short to ground...'.",Plain sentence before workshop phrases (R9).
+P0123,3 advice (CONCERN),Same stall warning as P0122.,Same reason.
+P0123,7 understand (CONCERN),Meaning starts with 'The throttle position reading is too high ...'.,Plain first (R9).
+P0107,7 understand (CONCERN),Meaning starts 'The intake pressure reading is too low ...' before 'short to ground'.,Plain first (R9).
+P0108,7 understand (CONCERN),Meaning starts 'The intake pressure reading is too high ...' before 'short to battery supply'.,Plain first (R9).
+P0117,3 advice (CONCERN),"Basis now 'hard cold start, stumbles until warm' (was 'may overheat'). Gauge advice removed; added 'if it runs very hot, stop and let it cool'.","The ECU thinks the engine is hot, so the real effect is hard cold starting, not overheating; no gauge assumed."
+P0117,5 parts (CONCERN),Removed 'temperature gauge' from advice and hint.,Not a source part.
+P0118,3 advice (CONCERN),"Gauge advice removed; added 'if the engine runs very hot, stop and let it cool'. Basis 'rich running; cooling may not switch on'.",No gauge assumed; a stop instruction was missing. The fan is not named because it is not in the source entry.
+P0118,5 parts (CONCERN),Removed 'temperature gauge'.,Not a source part.
+P0131,7 understand (CONCERN),"Meaning now 'The oxygen sensor reading stays low, which can come from a lean mixture, an exhaust leak or a short to ground.'",Plain sentence leads; workshop phrase comes last.
+P0132,3 advice (CONCERN),Advice now includes the strong-petrol-smell stop sentence. needs_independent_review true.,Fire risk wording.
+P0132,7 understand (CONCERN),Meaning leads with 'The oxygen sensor reading stays high ...'.,Plain first.
+P0500,1 meaning (CONCERN),Title is now 'Vehicle speed sensor A: fault' (not 'circuit fault').,"The standard title is a sensor malfunction, not a circuit code."
+P0500,5 parts (CONCERN),Removed 'idle control may be affected'; advice now says speedometer and other speed-based functions.,Idle control is not supported by the source.
+P0563,3 advice (CONCERN),"Advice rewritten per D1 with explicit stop triggers: battery hot, swollen or smells of rotten eggs, lights very bright, bulbs keep blowing: stop, switch off and do not ride on; otherwise a short daylight ride to a workshop only. Basis records the reasoning.",Owner decision D1; fire and acid risk.
+P0563,4 action level (CONCERN),Level stays SERVICE_SOON (D1). can_ride_to_workshop with_care. needs_independent_review true.,Owner decision D1.
+P0850,5 parts (CONCERN),'Neutral lamp' removed from advice and hint (hint now checks the neutral status on the scan tool). Advice no longer says unconditionally 'may not start'.,Neutral lamp is not a source part; R3.
+P0600,3 advice (CONCERN),"Circular 'stop if the engine cuts out' replaced with 'if the engine stalls or loses power more than once, do not keep riding and have it taken to a workshop'.",Circular advice.
+P0600,7 understand (CONCERN),Meaning now 'The bike's electronic units cannot talk to each other properly over their communication link.',A rider cannot act on 'serial communication link' wording.
+P0340,2 causes (CONCERN),Timing chain cause dropped.,Car-style cause for a sensor circuit code (R7).
+P0340,3 advice (CONCERN),"'if it stalls or will not restart, do not keep riding and have it taken to a workshop'.",Circular advice.
+P0340,7 understand (CONCERN),Meaning now 'so it may not time fuel and spark correctly'.,'Lose track of the engine cycle' is jargon.
+U0100,1 meaning (CONCERN),'or the scan tool' removed from the meaning.,A scan tool is not part of the code.
+U0100,3 advice (CONCERN),"Advice rewritten per D2: 'If the engine runs normally, have it checked soon. If it stalls, loses power or will not start, do not keep riding.' No unconditional stall or no-start claim.",Owner decision D2.
+U0100,4 action level (FAIL),Stays SERVICE_SOON (D2) but both cases are now stated honestly. can_ride_to_workshop with_care (reviewer proposed no; owner decision D2 wins).,Level and advice contradicted each other.
+U0100,5 parts (CONCERN),"Every mention of the scan tool removed from meaning, causes and advice (hints do not mention it either).",Not part of the code (D2).
+U0121,3 advice (CONCERN),"Advice now starts with the plain D3 sentence 'Your normal brakes still work, but ABS is off, so a wheel can lock in hard braking.' Meaning says ABS is likely off. Hint added: some bikes take speed from the ABS unit.",Owner decision D3; no softening 'should' or 'may'.
+C0035,7 understand (CONCERN),Title is 'Wheel speed sensor fault (front or rear wheel)'. 'Tone ring' explained as 'toothed ring (tone ring)'. Advice has the D3 sentence.,Owner decision D3; rider-friendly title.
+P0202,8 can_ride (proposal),can_ride_to_workshop no; applies_when {cylinders_min: 2}.,D4 and D5.
+P0352,8 can_ride (proposal),can_ride_to_workshop no; applies_when {cylinders_min: 2}.,D4 and D5.
+ALL 40,schema,"Migrated to schema_version 2: added standard_title_en, can_ride_to_workshop, can_ride_reason, applies_when, needs_independent_review (renamed from needs_mechanic_review), verification 'ai_authored_from_standard_title' (was 'standards_derived_adapted'), derived_from.title_basis. can_ride values are the reviewer's proposals except U0100 (D2).","Owner decisions D4, D5, D6; verification is never a manufacturer-verified label."
+ALL 40,wording,All can_ride_reason texts rewritten where they made unconditional stall or no-start claims (validator rule R3 also covers can_ride_reason).,A clean validator is not proof of safety; the new rules apply to every text field.

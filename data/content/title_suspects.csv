@@ -1,9 +1,31 @@
-code,obdex_title,concern,confidence_of_concern
-P0139,"O2 Sensor Circuit High Voltage (Bank 1 Sensor 2)","Same wording as P0138; the standard meaning of P0139 is a slow response of this sensor",high
-P0626,"Generator Field/F Terminal Circuit Performance","Neighbouring codes P0625 (low) and P0626 (high) follow a low/high pattern in the standard list",medium
-P0686,"ECM/PCM Power Relay Control Circuit Open","P0685 already covers control circuit open; the standard pattern is P0686 control circuit low",medium
-P0687,"ECM/PCM Power Relay Sense Circuit Open","The standard pattern is P0687 control circuit high; this was judged WRONG in the quality-gate sample",medium
-P0688,"ECM/PCM Power Relay Sense Circuit High","Source gives P0688 and P0690 the same title; P0688 is normally sense circuit open",medium
-U0075,"Control Module Communication Bus ""B"" Performance","Source lists two entries for bus B (U0074 and U0075) and skips bus D; the standard pattern is bus A to F off",medium
-U0076,"Control Module Communication Bus ""C"" Off","Same bus-lettering inconsistency as U0075",medium
-U0077,"Vehicle Communication Bus B Off","Same bus-lettering inconsistency as U0075",medium
+code,obdex_title,title_in_force,problem,action
+P0134,O2 Sensor Circuit No Activity / Slow Response (Bank 1 Sensor 1),O2 Sensor Circuit No Activity / Slow Response (Bank 1 Sensor 1),Title mixes 'No Activity' with 'Slow Response'; P0133 is already slow response and the standard meaning of P0134 is no activity detected. Check before writing.,do not write
+P0686,ECM/PCM Power Relay Control Circuit Open,ECM/PCM Power Relay Control Circuit Low,OBDex title wrong (owner-supplied check),override applied
+P0687,ECM/PCM Power Relay Sense Circuit Open,ECM/PCM Power Relay Control Circuit High,OBDex title wrong (owner-supplied check),override applied
+P0688,ECM/PCM Power Relay Sense Circuit High,ECM/PCM Power Relay Sense Circuit/Open,OBDex title wrong (owner-supplied check),override applied
+P2110,Throttle Actuator Control System — Forced Limited RPM,Throttle Actuator Control System — Forced Limited RPM,duplicate title: same title as P2113: Throttle Actuator Control System Forced Limited RPM,do not write
+P2230,Barometric Pressure Circuit Low,Barometric Pressure Circuit Low,Same wording as P2228 (Barometric Pressure Circuit Low); the standard pattern expects intermittent or erratic here.,do not write
+P0139,O2 Sensor Circuit High Voltage (Bank 1 Sensor 2),"O2 Sensor Circuit Slow Response (Bank 1, Sensor 2)",OBDex title wrong (owner-supplied check),override applied
+P0140,O2 Sensor Circuit No Activity / Slow Response (Bank 1 Sensor 2),O2 Sensor Circuit No Activity / Slow Response (Bank 1 Sensor 2),Same 'No Activity / Slow Response' mix as P0134 (sensor 2).,do not write
+P0141,"O2 Sensor Heater Circuit Malfunction (Bank 1, Sensor 2)","O2 Sensor Heater Circuit Malfunction (Bank 1, Sensor 2)",duplicate title: same title as P0142: O2 Sensor Heater Circuit Malfunction (Bank 1 Sensor 2),do not write
+U0075,"Control Module Communication Bus ""B"" Performance",Control Module Communication Bus C Off,OBDex title wrong (owner-supplied check),override applied
+U0076,"Control Module Communication Bus ""C"" Off",Control Module Communication Bus D Off,OBDex title wrong (owner-supplied check),override applied
+U0077,Vehicle Communication Bus B Off,Control Module Communication Bus E Off,OBDex title wrong (owner-supplied check),override applied
+U0167,Lost Communication with Vehicle Immobiliser Control Module,Lost Communication with Vehicle Immobiliser Control Module,duplicate title: same title as U0168: Lost Communication with Vehicle Immobilizer Control Module,do not write
+U0168,Lost Communication with Vehicle Immobilizer Control Module,Lost Communication with Vehicle Immobilizer Control Module,Same wording as U0167 (immobilizer) with only the spelling changed; the standard U0168 is the vehicle security control module.,do not write
+P0626,Generator Field/F Terminal Circuit Performance,Generator Field/F Terminal Circuit High,OBDex title wrong (owner-supplied check),override applied
+P033F,Crankshaft/Camshaft Loss Of Synchronization,Crankshaft/Camshaft Loss Of Synchronization,Not a clear standard title; cannot be reconciled with P0335 to P0339.,do not write
+C0030,Left Front Wheel Speed Sensor Circuit Range/Performance,Left Front Wheel Speed Sensor Circuit Range/Performance,"Wheel speed circuit titles C0030 to C0036 mix 'Range/Performance', 'Low', 'High', 'Signal Erratic' and 'No Signal' in a pattern that does not match C0040 to C0066; the wheel and failure type cannot be reconciled with the neighbouring codes.",do not write
+C0031,Left Front Wheel Speed Sensor Circuit Low,Left Front Wheel Speed Sensor Circuit Low,See C0030.,do not write
+C0032,Left Front Wheel Speed Sensor Circuit High,Left Front Wheel Speed Sensor Circuit High,See C0030.,do not write
+C0033,Left Front Wheel Speed Sensor Signal Erratic,Left Front Wheel Speed Sensor Signal Erratic,See C0030.,do not write
+C0034,Left Front Wheel Speed Sensor No Signal,Left Front Wheel Speed Sensor No Signal,See C0030.,do not write
+C0036,Left Front Wheel Speed Sensor Circuit Intermittent,Left Front Wheel Speed Sensor Circuit Intermittent,See C0030.,do not write
+C0037,Left Rear Wheel Speed Sensor,Left Rear Wheel Speed Sensor,"Wheel speed titles C0037 to C003F do not follow the C0031 to C0066 pattern (no failure type, 'Supply', 'Tone Wheel' for C003C); the wheel and the failure type cannot be reconciled.",do not write
+C0038,Left Rear Wheel Speed Sensor Supply,Left Rear Wheel Speed Sensor Supply,See C0037.,do not write
+C003A,Right Rear Wheel Speed Sensor,Right Rear Wheel Speed Sensor,See C0037.,do not write
+C003B,Right Rear Wheel Speed Sensor Supply,Right Rear Wheel Speed Sensor Supply,See C0037.,do not write
+C003C,Rear Tone Wheel,Rear Tone Wheel,See C0037.,do not write
+C003D,Rear Wheel Speed Sensor,Rear Wheel Speed Sensor,See C0037.,do not write
+C003E,Rear Wheel Speed Sensor Supply,Rear Wheel Speed Sensor Supply,See C0037.,do not write
+C003F,Wheel Speed Sensors Rotation Direction Correlation,Wheel Speed Sensors Rotation Direction Correlation,See C0037.,do not write

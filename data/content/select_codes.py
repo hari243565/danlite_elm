@@ -4,12 +4,19 @@ Indian fuel-injected motorcycles and scooters.
 
 Usage: python3 select_codes.py /path/to/obdex data/content/relevance_ranking.csv
 
+Version 3 (2026-10-01): extends ecu_power_relay to P0690, applies
+title_overrides.csv, orders tier 3 by how likely a small bike is to raise the
+code (ride-by-wire last), runs a duplicate-title scan and writes
+title_suspects.csv. Codes whose title cannot be reconciled are kept in the
+ranking with write_ok = no and are never written.
+
 The rules are the ones written in docs/content/SELECTION_RULES.md. Code
 ranges are listed by hand (not guessed from titles) and every candidate is
 checked against an exclusion pattern on the OBDex title.
 """
 import csv
 import glob
+import os
 import re
 import sys
 
@@ -33,8 +40,8 @@ TIER2 = ["P0110", "P0115", "P0202", "P0352", "P0300", "P0301", "P0302",
 R = [
     # throttle, idle, ride-by-wire
     ("throttle", "P0120", "P0124", 3), ("throttle", "P0220", "P0224", 4),
-    ("throttle", "P0638", "P0638", 3), ("ride_by_wire", "P2100", "P2112", 3),
-    ("ride_by_wire", "P2118", "P2119", 3), ("throttle", "P2135", "P2135", 3),
+    ("ride_by_wire", "P0638", "P0638", 3), ("ride_by_wire", "P2100", "P2112", 3),
+    ("ride_by_wire", "P2118", "P2119", 3), ("ride_by_wire", "P2135", "P2135", 3),
     ("twist_grip_sensor", "P2122", "P2123", 4), ("twist_grip_sensor", "P2127", "P2128", 4),
     ("twist_grip_sensor", "P2138", "P2138", 4),
     ("idle", "P0505", "P0511", 3), ("idle", "P0518", "P0519", 3),
@@ -90,7 +97,7 @@ R = [
     ("system_voltage", "P0560", "P0563", 3), ("starter_relay", "P0615", "P0617", 3),
     ("charging", "P0620", "P0621", 4), ("charging", "P0625", "P0626", 4),
     ("charging", "P2500", "P2504", 4),
-    ("ecu_power_relay", "P0685", "P0688", 3),
+    ("ecu_power_relay", "P0685", "P0690", 3),
     ("sensor_reference_supply", "P0641", "P0643", 3),
     ("sensor_reference_supply", "P0651", "P0653", 4),
     ("sensor_reference_supply", "P0697", "P0699", 4),
@@ -143,6 +150,80 @@ EXCLUDE_TITLE = re.compile(
 HONDA_FAMILIES = {"map_baro", "ect", "throttle", "iat", "injector"}
 
 
+# Order of reason tags inside a tier: more likely on a small bike first,
+# ride-by-wire and car-style chassis variants last.
+TAG_PRIORITY = [
+    "throttle", "map_baro", "iat", "ect", "oil_temp", "o2_sensor", "o2_heater", "fuel_trim",
+    "injector", "fuel_pump", "misfire", "crankshaft", "camshaft", "ignition_coil", "knock",
+    "vehicle_speed", "neutral_gear", "idle", "system_voltage", "starter_relay",
+    "ecu_power_relay", "sensor_reference_supply", "control_module", "immobiliser",
+    "starter_immobiliser", "can_bus", "lost_comm_engine", "lost_comm_abs", "lost_comm_cluster",
+    "lost_comm_immobiliser", "cooling_fan", "cooling_system", "oil_pressure", "evap",
+    "secondary_air", "catalyst", "software", "invalid_data", "charging", "cam_crank_sync",
+    "engine_speed_input", "overspeed", "fuel_level", "ambient_temp", "brake_switch",
+    "clutch_switch", "twist_grip_sensor", "ride_by_wire", "abs_pump", "wheel_speed",
+    "abs_module", "abs_relay", "abs_lamp",
+]
+
+# Titles checked by hand against the neighbouring codes (2026-10-01). These are
+# NOT overridden: the standard title is uncertain, so no entry is written.
+MANUAL_SUSPECTS = {
+    "P0134": "Title mixes 'No Activity' with 'Slow Response'; P0133 is already slow response and the standard meaning of P0134 is no activity detected. Check before writing.",
+    "P0140": "Same 'No Activity / Slow Response' mix as P0134 (sensor 2).",
+    "P2230": "Same wording as P2228 (Barometric Pressure Circuit Low); the standard pattern expects intermittent or erratic here.",
+    "U0168": "Same wording as U0167 (immobilizer) with only the spelling changed; the standard U0168 is the vehicle security control module.",
+    "C0037": "Wheel speed titles C0037 to C003F do not follow the C0031 to C0066 pattern (no failure type, 'Supply', 'Tone Wheel' for C003C); the wheel and the failure type cannot be reconciled.",
+    "C0038": "See C0037.", "C003A": "See C0037.", "C003B": "See C0037.", "C003C": "See C0037.",
+    "C003D": "See C0037.", "C003E": "See C0037.", "C003F": "See C0037.",
+    "P033F": "Not a clear standard title; cannot be reconciled with P0335 to P0339.",
+    "C0030": "Wheel speed circuit titles C0030 to C0036 mix 'Range/Performance', 'Low', 'High', 'Signal Erratic' and 'No Signal' in a pattern that does not match C0040 to C0066; the wheel and failure type cannot be reconciled with the neighbouring codes.",
+    "C0031": "See C0030.", "C0032": "See C0030.", "C0033": "See C0030.", "C0034": "See C0030.",
+    "C0036": "See C0030.",
+}
+# Checked and confirmed facts (owner-supplied 2026-10-01): not suspects.
+CONFIRMED = {
+    "P0685": "ECM/PCM Power Relay Control Circuit/Open (confirmed standard title)",
+    "U0073": "Control Module Communication Bus A Off (confirmed)",
+    "U0074": "Control Module Communication Bus B Off (confirmed)",
+}
+
+HERE = os.path.dirname(os.path.abspath(__file__))
+
+
+def load_overrides():
+    path = os.path.join(HERE, "title_overrides.csv")
+    return {r["code"]: r for r in csv.DictReader(open(path, encoding="utf-8"))}
+
+
+def norm_title(t):
+    """Title normalised for duplicate detection. Keeps +/- symbols and letters."""
+    t = t.lower()
+    t = re.sub(r"[\"'`/,()\u2014]+|(?<=\w)-(?=\w)", " ", t)
+    t = t.replace("immobilizer", "immobiliser").replace("ecm pcm", "ecm").replace("ecm or pcm", "ecm")
+    t = re.sub(r"\b(sensor|circuit|the|system)\b", " ", t)
+    return re.sub(r"\s+", " ", t).strip()
+
+
+def scan_titles(d, titles, selected):
+    """Return {code: (problem, evidence)} for selected codes whose title duplicates
+    one of the 5 codes before or after it in the source (same family), after
+    normalisation. 'titles' maps code -> the title in force (override applied)."""
+    out = {}
+    codes = sorted(d)
+    idx = {c: i for i, c in enumerate(codes)}
+    for c in selected:
+        i = idx[c]
+        mine = norm_title(titles[c])
+        for j in range(max(0, i - 5), min(len(codes), i + 6)):
+            o = codes[j]
+            if o == c or o[:2] != c[:2]:
+                continue
+            if norm_title(titles.get(o, d[o]["title"]["en"])) == mine:
+                out[c] = ("duplicate title", f"same title as {o}: {titles.get(o, d[o]['title']['en'])}")
+                break
+    return out
+
+
 def load(obdex_dir):
     d = {}
     for f in sorted(glob.glob(f"{obdex_dir}/data/generic/*.yaml")):
@@ -157,6 +238,7 @@ def in_range(code, a, b):
 
 def main(obdex_dir, out_csv):
     d = load(obdex_dir)
+    ov = load_overrides()
     tags, tier = {}, {}
     for tag, a, b, t in R:
         for c in sorted(d):
@@ -170,24 +252,48 @@ def main(obdex_dir, out_csv):
             tier[c] = 3
     for c in ANCHORS + TIER2:
         assert c in tags, f"anchor/tier2 code not selected: {c}"
+    for c in ov:
+        assert c in d, f"override for a code that is not in OBDex: {c}"
     order = list(ANCHORS)
     order += [c for c in TIER2 if c not in order]
-    tag_order = {}
-    for i, (tag, *_rest) in enumerate(R):
-        tag_order.setdefault(tag, i)
+    prio = {t: i for i, t in enumerate(TAG_PRIORITY)}
+    missing = {t for c in tags for t in tags[c]} - set(prio)
+    assert not missing, f"tags without priority: {missing}"
     rest = [c for c in tags if c not in order]
-    rest.sort(key=lambda c: (tier[c], min(tag_order[t] for t in tags[c]), c))
+    rest.sort(key=lambda c: (tier[c], min(prio[t] for t in tags[c]), c))
     order += rest
+    # titles in force: override first, then OBDex
+    titles = {c: ov[c]["verified_title"] if c in ov else d[c]["title"]["en"] for c in d}
+    dup = scan_titles(d, titles, list(order))
+    suspects = []  # (code, obdex_title, title_in_force, problem, action)
+    for c in order:
+        if c in ov:
+            suspects.append((c, d[c]["title"]["en"], titles[c], "OBDex title wrong (owner-supplied check)",
+                             "override applied"))
+        if c in MANUAL_SUSPECTS:
+            suspects.append((c, d[c]["title"]["en"], titles[c], MANUAL_SUSPECTS[c], "do not write"))
+        elif c in dup:
+            suspects.append((c, d[c]["title"]["en"], titles[c], dup[c][0] + ": " + dup[c][1], "do not write"))
+    blocked = {s[0] for s in suspects if s[4] == "do not write"}
     anchors = set(ANCHORS)
     with open(out_csv, "w", newline="", encoding="utf-8") as fh:
         w = csv.writer(fh)
-        w.writerow(["code", "rank", "tier", "reason_tags", "anchor", "honda_family", "title_obdex"])
+        w.writerow(["code", "rank", "tier", "reason_tags", "anchor", "honda_family", "title_obdex",
+                    "title_standard", "title_status", "write_ok"])
         for i, c in enumerate(order, 1):
             t = 1 if c in anchors else (2 if c in TIER2 else tier[c])
+            status = "override" if c in ov else ("suspect" if c in blocked else
+                                                 ("confirmed" if c in CONFIRMED else "obdex"))
             w.writerow([c, i, t, ";".join(tags[c]), "yes" if c in anchors else "no",
                         "yes" if HONDA_FAMILIES & set(tags[c]) else "no",
-                        d[c]["title"]["en"]])
-    print(f"selected {len(order)} codes of {len(d)}")
+                        d[c]["title"]["en"], titles[c], status, "no" if c in blocked else "yes"])
+    with open(os.path.join(os.path.dirname(os.path.abspath(out_csv)), "title_suspects.csv"), "w",
+              newline="", encoding="utf-8") as fh:
+        w = csv.writer(fh)
+        w.writerow(["code", "obdex_title", "title_in_force", "problem", "action"])
+        w.writerows(suspects)
+    print(f"selected {len(order)} codes of {len(d)}; {len(blocked)} not writable (suspect title); "
+          f"{len(ov)} overrides applied")
 
 
 if __name__ == "__main__":

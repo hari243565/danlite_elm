@@ -1,0 +1,9 @@
+code,verified_title,note
+P0139,"O2 Sensor Circuit Slow Response (Bank 1, Sensor 2)","OBDex copied the P0138 title (high voltage). Checked against several independent public sources on 2026-10-01 (owner-supplied)."
+P0626,"Generator Field/F Terminal Circuit High","OBDex says Performance; P0625 is Low and P0626 is High. Owner-supplied check 2026-10-01."
+P0686,"ECM/PCM Power Relay Control Circuit Low","OBDex duplicated the P0685 title (Open). Owner-supplied check 2026-10-01."
+P0687,"ECM/PCM Power Relay Control Circuit High","OBDex gave it a sense-circuit title. Owner-supplied check 2026-10-01."
+P0688,"ECM/PCM Power Relay Sense Circuit/Open","OBDex duplicated the P0690 title (Sense Circuit High). Owner-supplied check 2026-10-01."
+U0075,"Control Module Communication Bus C Off","OBDex repeated bus B (Performance). Owner-supplied check 2026-10-01."
+U0076,"Control Module Communication Bus D Off","OBDex said bus C. Owner-supplied check 2026-10-01."
+U0077,"Control Module Communication Bus E Off","OBDex said Vehicle Communication Bus B Off (a duplicate of U0074). Owner-supplied check 2026-10-01."

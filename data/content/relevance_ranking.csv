@@ -1,384 +1,388 @@
-code,rank,tier,reason_tags,anchor,honda_family,title_obdex
-P0120,1,1,throttle,yes,yes,Throttle Position Sensor / Switch A Circuit Malfunction
-P0105,2,1,map_baro,yes,yes,Manifold Absolute Pressure / Barometric Pressure Circuit Malfunction
-P0195,3,1,oil_temp,yes,no,Engine Oil Temperature Sensor Malfunction
-P0130,4,1,o2_sensor,yes,no,"O2 Sensor Circuit Malfunction (Bank 1, Sensor 1)"
-P0135,5,1,o2_heater,yes,no,"O2 Sensor Heater Circuit Malfunction (Bank 1, Sensor 1)"
-P0201,6,1,injector,yes,yes,Injector Circuit Malfunction — Cylinder 1
-P0351,7,1,ignition_coil,yes,no,"Ignition Coil ""A"" Primary/Secondary Circuit Malfunction (Cylinder 1)"
-P0230,8,1,fuel_pump,yes,no,Fuel Pump Primary Circuit Malfunction
-P0335,9,1,crankshaft,yes,no,"Crankshaft Position Sensor ""A"" Circuit Malfunction"
-P0110,10,2,iat,no,yes,Intake Air Temperature Sensor Circuit Malfunction
-P0115,11,2,ect,no,yes,Engine Coolant Temperature Sensor Circuit Malfunction
-P0202,12,2,injector,no,yes,Injector Circuit Malfunction — Cylinder 2
-P0352,13,2,ignition_coil,no,no,"Ignition Coil ""B"" Primary/Secondary Circuit Malfunction (Cylinder 2)"
-P0300,14,2,misfire,no,no,Random/Multiple Cylinder Misfire Detected
-P0301,15,2,misfire,no,no,Cylinder 1 Misfire Detected
-P0302,16,2,misfire,no,no,Cylinder 2 Misfire Detected
-P0171,17,2,fuel_trim,no,no,System Too Lean (Bank 1)
-P0172,18,2,fuel_trim,no,no,System Too Rich (Bank 1)
-P0420,19,2,catalyst,no,no,Catalyst System Efficiency Below Threshold (Bank 1)
-P0122,20,2,throttle,no,yes,"Throttle/Pedal Position Sensor ""A"" Low Input"
-P0123,21,2,throttle,no,yes,"Throttle/Pedal Position Sensor ""A"" High Input"
-P0107,22,2,map_baro,no,yes,Manifold Absolute Pressure Sensor Low Input
-P0108,23,2,map_baro,no,yes,Manifold Absolute Pressure Sensor High Input
-P0112,24,2,iat,no,yes,Intake Air Temperature Sensor Low Input
-P0113,25,2,iat,no,yes,Intake Air Temperature Sensor High Input
-P0117,26,2,ect,no,yes,Engine Coolant Temperature Sensor Low Input
-P0118,27,2,ect,no,yes,Engine Coolant Temperature Sensor High Input
-P0131,28,2,o2_sensor,no,no,"O2 Sensor Circuit Low Voltage (Bank 1, Sensor 1)"
-P0132,29,2,o2_sensor,no,no,"O2 Sensor Circuit High Voltage (Bank 1, Sensor 1)"
-P0500,30,2,vehicle_speed,no,no,"Vehicle Speed Sensor ""A"" Malfunction"
-P0562,31,2,system_voltage,no,no,System Voltage Low
-P0563,32,2,system_voltage,no,no,System Voltage High
-P0850,33,2,neutral_gear,no,no,Park/Neutral Switch Input Circuit
-P0600,34,2,control_module,no,no,Serial Communication Link
-P0340,35,2,camshaft,no,no,"Camshaft Position Sensor ""A"" Circuit (Bank 1 or Single Sensor)"
-P0505,36,2,idle,no,no,Idle Air Control System Malfunction
-U0100,37,2,lost_comm_engine,no,no,"Lost Communication with ECM/PCM ""A"""
-U0121,38,2,lost_comm_abs,no,no,Lost Communication with ABS Control Module
-U0155,39,2,lost_comm_cluster,no,no,Lost Communication with Instrument Panel Cluster
-C0035,40,2,wheel_speed,no,no,Left Front Wheel Speed Sensor Circuit Malfunction
-P0121,41,3,throttle,no,yes,"Throttle/Pedal Position Sensor ""A"" Range/Performance"
-P0124,42,3,throttle,no,yes,"Throttle/Pedal Position Sensor ""A"" Circuit Intermittent"
-P0638,43,3,throttle,no,yes,Throttle Actuator Control Range or Performance Bank 1
-P2135,44,3,throttle,no,yes,"Throttle/Pedal Position Sensor ""A""/""B"" Voltage Correlation"
-P2100,45,3,ride_by_wire,no,no,Throttle Actuator Control Motor Circuit Open
-P2101,46,3,ride_by_wire,no,no,Throttle Actuator Control Motor Circuit Range/Performance
-P2102,47,3,ride_by_wire,no,no,Throttle Actuator Control Motor Circuit Low
-P2103,48,3,ride_by_wire,no,no,Throttle Actuator Control Motor Circuit High
-P2104,49,3,ride_by_wire,no,no,Throttle Actuator Control System — Forced Idle
-P2105,50,3,ride_by_wire,no,no,Throttle Actuator Control System — Forced Engine Shutdown
-P2106,51,3,ride_by_wire,no,no,Throttle Actuator Control System — Forced Limited Power
-P2107,52,3,ride_by_wire,no,no,Throttle Actuator Control Module Internal Processor
-P2108,53,3,ride_by_wire,no,no,Throttle Actuator Control Module Performance
-P2109,54,3,ride_by_wire,no,no,Throttle/Pedal Position Sensor A Minimum Stop Performance
-P2110,55,3,ride_by_wire,no,no,Throttle Actuator Control System — Forced Limited RPM
-P2111,56,3,ride_by_wire,no,no,Throttle Actuator Control System — Stuck Open
-P2112,57,3,ride_by_wire,no,no,Throttle Actuator Control System — Stuck Closed
-P2118,58,3,ride_by_wire,no,no,Throttle Actuator Control Motor Current Range/Performance
-P2119,59,3,ride_by_wire,no,no,Throttle Closed Position Performance
-P0506,60,3,idle,no,no,Idle Air Control System RPM Lower Than Expected
-P0507,61,3,idle,no,no,Idle Air Control System RPM Higher Than Expected
-P0508,62,3,idle,no,no,Idle Air Control System Circuit Low
-P0509,63,3,idle,no,no,Idle Air Control System Circuit High
-P050A,64,3,idle,no,no,Cold Start Idle Control System Performance
-P050D,65,3,idle,no,no,Cold Start Rough Idle
-P0510,66,3,idle,no,no,Closed Throttle Position Switch
-P0511,67,3,idle,no,no,Idle Air Control Circuit
-P0518,68,3,idle,no,no,Idle Air Control Circuit Intermittent
-P0519,69,3,idle,no,no,Idle Air Control System Performance
-P0512,70,3,starter_immobiliser,no,no,Starter Request Circuit
-P0513,71,3,starter_immobiliser,no,no,Incorrect Immobilizer Key
-P0106,72,3,map_baro,no,yes,Manifold Absolute Pressure Sensor Range/Performance
-P0109,73,3,map_baro,no,yes,Manifold Absolute Pressure / Barometric Pressure Circuit Intermittent
-P0111,74,3,iat,no,yes,Intake Air Temperature Sensor Range/Performance
-P0114,75,3,iat,no,yes,Intake Air Temperature Sensor Intermittent
-P0116,76,3,ect,no,yes,Engine Coolant Temperature Sensor Range/Performance
-P0119,77,3,ect,no,yes,Engine Coolant Temperature Sensor Circuit Intermittent
-P0125,78,3,ect,no,yes,Insufficient Coolant Temperature for Closed Loop Fuel Control
-P0126,79,3,ect,no,yes,Insufficient Coolant Temperature for Stable Operation
-P0128,80,3,ect,no,yes,Coolant Thermostat Below Regulating Temperature
-P0217,81,3,ect,no,yes,Engine Coolant Over Temperature Condition
-P0480,82,3,cooling_fan,no,no,Cooling Fan 1 Control Circuit
-P0691,83,3,cooling_fan,no,no,Cooling Fan 1 Control Circuit Low
-P0692,84,3,cooling_fan,no,no,Cooling Fan 1 Control Circuit High
-P0196,85,3,oil_temp,no,no,Engine Oil Temperature Sensor Range / Performance
-P0197,86,3,oil_temp,no,no,Engine Oil Temperature Sensor Low
-P0198,87,3,oil_temp,no,no,Engine Oil Temperature Sensor High
-P0199,88,3,oil_temp,no,no,Engine Oil Temperature Sensor Intermittent
-P0520,89,3,oil_pressure,no,no,Engine Oil Pressure Sensor or Switch A Circuit
-P0521,90,3,oil_pressure,no,no,Engine Oil Pressure Sensor/Switch Range/Performance
-P0522,91,3,oil_pressure,no,no,Engine Oil Pressure Sensor/Switch Low Voltage
-P0523,92,3,oil_pressure,no,no,Engine Oil Pressure Sensor or Switch A High
-P0524,93,3,oil_pressure,no,no,Engine Oil Pressure Too Low
-P0133,94,3,o2_sensor,no,no,"O2 Sensor Slow Response (Bank 1, Sensor 1)"
-P0134,95,3,o2_sensor,no,no,O2 Sensor Circuit No Activity / Slow Response (Bank 1 Sensor 1)
-P2195,96,3,o2_sensor,no,no,"O2 Sensor Signal Stuck Lean (Bank 1, Sensor 1)"
-P2196,97,3,o2_sensor,no,no,"O2 Sensor Signal Stuck Rich (Bank 1, Sensor 1)"
-P0030,98,3,o2_heater,no,no,HO2S Heater Control Circuit (Bank 1 Sensor 1)
-P0031,99,3,o2_heater,no,no,HO2S Heater Control Circuit Low (Bank 1 Sensor 1)
-P0032,100,3,o2_heater,no,no,HO2S Heater Control Circuit High (Bank 1 Sensor 1)
-P0170,101,3,fuel_trim,no,no,Fuel Trim Malfunction (Bank 1)
-P0421,102,3,catalyst,no,no,Warm Up Catalyst Efficiency Below Threshold (Bank 1)
-P0200,103,3,injector,no,yes,Injector Circuit/Open
-P0261,104,3,injector,no,yes,Cylinder 1 Injector Circuit Low
-P0262,105,3,injector,no,yes,Cylinder 1 Injector Circuit High
-P0263,106,3,injector,no,yes,Cylinder 1 Contribution/Balance Fault
-P0264,107,3,injector,no,yes,Cylinder 2 Injector Circuit Low
-P0265,108,3,injector,no,yes,Cylinder 2 Injector Circuit High
-P0266,109,3,injector,no,yes,Cylinder 2 Contribution/Balance Fault
-P0231,110,3,fuel_pump,no,no,Fuel Pump Secondary Circuit Low
-P0232,111,3,fuel_pump,no,no,Fuel Pump Secondary Circuit High
-P0233,112,3,fuel_pump,no,no,Fuel Pump Secondary Circuit Intermittent
-P0627,113,3,fuel_pump,no,no,"Fuel Pump ""A"" Control Circuit Open"
-P0628,114,3,fuel_pump,no,no,Fuel Pump A Control Circuit Low
-P0629,115,3,fuel_pump,no,no,Fuel Pump A Control Circuit High
-P0336,116,3,crankshaft,no,no,"Crankshaft Position Sensor ""A"" Circuit Range/Performance"
-P0337,117,3,crankshaft,no,no,"Crankshaft Position Sensor ""A"" Circuit Low Input"
-P0338,118,3,crankshaft,no,no,"Crankshaft Position Sensor ""A"" Circuit High Input"
-P0339,119,3,crankshaft,no,no,Crankshaft Position Sensor A Circuit Intermittent
-P0341,120,3,camshaft,no,no,"Camshaft Position Sensor ""A"" Circuit Range/Performance (Bank 1)"
-P0342,121,3,camshaft,no,no,"Camshaft Position Sensor ""A"" Circuit Low Input (Bank 1)"
-P0343,122,3,camshaft,no,no,"Camshaft Position Sensor ""A"" Circuit High Input (Bank 1)"
-P0344,123,3,camshaft,no,no,Camshaft Position Sensor A Circuit Intermittent (Bank 1 or Single Sensor)
-P0350,124,3,ignition_coil,no,no,Ignition Coil Primary/Secondary Circuit/Open
-P0324,125,3,knock,no,no,Knock/Combustion Vibration Control System Error
-P0325,126,3,knock,no,no,Knock Sensor 1 Circuit Malfunction (Bank 1)
-P0326,127,3,knock,no,no,Knock/Combustion Vibration Sensor A Circuit Range/Performance
-P0327,128,3,knock,no,no,Knock Sensor 1 Circuit Low Input (Bank 1)
-P0328,129,3,knock,no,no,Knock Sensor 1 Circuit High Input (Bank 1)
-P0329,130,3,knock,no,no,Knock/Combustion Vibration Sensor A Circuit Intermittent
-P0440,131,3,evap,no,no,Evaporative Emission Control System Malfunction
-P0441,132,3,evap,no,no,Evaporative Emission System Incorrect Purge Flow
-P0442,133,3,evap,no,no,Evaporative Emission System Leak Detected (Small Leak)
-P0443,134,3,evap,no,no,Evaporative Emission System Purge Control Valve Circuit
-P0444,135,3,evap,no,no,Evaporative Emission Purge Control Valve Circuit Open
-P0445,136,3,evap,no,no,Evaporative Emission System Purge Control Valve Circuit Shorted
-P0446,137,3,evap,no,no,Evaporative Emission Vent Control Circuit Malfunction
-P0447,138,3,evap,no,no,Evaporative Emission System Vent Control Circuit Open
-P0448,139,3,evap,no,no,EVAP System Vent Control Circuit Shorted
-P0449,140,3,evap,no,no,Evaporative Emission System Vent Valve/Solenoid Circuit Malfunction
-P0410,141,3,secondary_air,no,no,Secondary Air Injection System Malfunction
-P0411,142,3,secondary_air,no,no,Secondary Air Injection System Incorrect Flow
-P0412,143,3,secondary_air,no,no,Secondary Air Injection System Switching Valve A Circuit
-P0413,144,3,secondary_air,no,no,Secondary Air Injection System Switching Valve A Circuit Open
-P0414,145,3,secondary_air,no,no,"Secondary Air Injection System Switching Valve ""A"" Circuit Shorted"
-P0501,146,3,vehicle_speed,no,no,"Vehicle Speed Sensor ""A"" Range/Performance"
-P0502,147,3,vehicle_speed,no,no,Vehicle Speed Sensor A Circuit Low
-P0503,148,3,vehicle_speed,no,no,Vehicle Speed Sensor A Circuit Intermittent Erratic or High
-P0851,149,3,neutral_gear,no,no,Park/Neutral Switch Input Circuit Low
-P0852,150,3,neutral_gear,no,no,Park/Neutral Switch Input Circuit High
-P0560,151,3,system_voltage,no,no,System Voltage Malfunction
-P0561,152,3,system_voltage,no,no,System Voltage Unstable
-P0615,153,3,starter_relay,no,no,Starter Relay Circuit
-P0616,154,3,starter_relay,no,no,Starter Relay A Circuit Low
-P0617,155,3,starter_relay,no,no,Starter Relay Circuit High
-P0685,156,3,ecu_power_relay,no,no,ECM or PCM Power Relay Control Circuit Open
-P0686,157,3,ecu_power_relay,no,no,ECM/PCM Power Relay Control Circuit Open
-P0687,158,3,ecu_power_relay,no,no,ECM/PCM Power Relay Sense Circuit Open
-P0688,159,3,ecu_power_relay,no,no,ECM/PCM Power Relay Sense Circuit High
-P0641,160,3,sensor_reference_supply,no,no,"Sensor Reference Voltage ""A"" Circuit Open"
-P0642,161,3,sensor_reference_supply,no,no,"Sensor Reference Voltage ""A"" Circuit Low"
-P0643,162,3,sensor_reference_supply,no,no,"Sensor Reference Voltage ""A"" Circuit High"
-P0601,163,3,control_module,no,no,Internal Control Module Memory Check Sum Error
-P0602,164,3,control_module,no,no,Control Module Programming Error
-P0603,165,3,control_module,no,no,Internal Control Module Keep Alive Memory (KAM) Error
-P0604,166,3,control_module,no,no,Internal Control Module Random Access Memory (RAM) Error
-P0605,167,3,control_module,no,no,Internal Control Module Read Only Memory (ROM) Error
-P0606,168,3,control_module,no,no,ECM/PCM Processor Fault
-P0607,169,3,control_module,no,no,Control Module Performance
-P0633,170,3,immobiliser,no,no,Immobiliser Key Not Programmed
-U0001,171,3,can_bus,no,no,High Speed CAN Communication Bus
-U0002,172,3,can_bus,no,no,High Speed CAN Communication Bus Performance
-U0003,173,3,can_bus,no,no,High Speed CAN Communication Bus (+) Open
-U0004,174,3,can_bus,no,no,High Speed CAN Communication Bus (+) Low
-U0005,175,3,can_bus,no,no,High Speed CAN Communication Bus (+) High
-U0006,176,3,can_bus,no,no,High Speed CAN Communication Bus (-) Open
-U0007,177,3,can_bus,no,no,High Speed CAN Communication Bus (-) Low
-U0008,178,3,can_bus,no,no,High Speed CAN Communication Bus (-) High
-U0009,179,3,can_bus,no,no,High Speed CAN Communication Bus (-) Shorted to Bus (+)
-U0010,180,3,can_bus,no,no,Medium Speed CAN Communication Bus
-C0040,181,3,wheel_speed,no,no,Right Front Wheel Speed Sensor Circuit Malfunction
-C0045,182,3,wheel_speed,no,no,Left Rear Wheel Speed Sensor Circuit Malfunction
-C0050,183,3,wheel_speed,no,no,Right Rear Wheel Speed Sensor Circuit Malfunction
-C0099,184,3,abs_module,no,no,ABS Control Module Internal Fault
-P0220,185,4,throttle,no,yes,"Throttle/Pedal Position Sensor/Switch ""B"" Circuit"
-P0221,186,4,throttle,no,yes,"Throttle/Pedal Position Sensor/Switch ""B"" Range/Performance"
-P0222,187,4,throttle,no,yes,"Throttle/Pedal Position Sensor/Switch ""B"" Circuit Low Input"
-P0223,188,4,throttle,no,yes,"Throttle/Pedal Position Sensor/Switch ""B"" Circuit High Input"
-P0224,189,4,throttle,no,yes,Throttle/Pedal Position Sensor/Switch B Circuit Intermittent
-P2122,190,4,twist_grip_sensor,no,no,"Throttle/Pedal Position Sensor ""D"" Circuit Low"
-P2123,191,4,twist_grip_sensor,no,no,"Throttle/Pedal Position Sensor ""D"" Circuit High"
-P2127,192,4,twist_grip_sensor,no,no,"Throttle/Pedal Position Sensor ""E"" Circuit Low"
-P2128,193,4,twist_grip_sensor,no,no,"Throttle/Pedal Position Sensor ""E"" Circuit High"
-P2138,194,4,twist_grip_sensor,no,no,"Throttle/Pedal Position Sensor ""D""/""E"" Voltage Correlation"
-P0068,195,4,map_baro,no,yes,MAP/MAF - Throttle Position Correlation
-P0069,196,4,map_baro,no,yes,Manifold Absolute Pressure - Barometric Pressure Correlation
-P2226,197,4,map_baro,no,yes,Barometric Pressure Circuit
-P2227,198,4,map_baro,no,yes,Barometric Pressure Circuit Range/Performance
-P2228,199,4,map_baro,no,yes,Barometric Pressure Sensor Circuit Low
-P2229,200,4,map_baro,no,yes,Barometric Pressure Sensor Circuit High
-P2230,201,4,map_baro,no,yes,Barometric Pressure Circuit Low
-P0127,202,4,iat,no,yes,Intake Air Temperature Too High
-P0070,203,4,ambient_temp,no,no,Ambient Air Temperature Sensor Circuit A
-P0071,204,4,ambient_temp,no,no,Ambient Air Temperature Sensor Circuit A Range/Performance
-P0072,205,4,ambient_temp,no,no,Ambient Air Temperature Sensor Circuit A Low
-P0073,206,4,ambient_temp,no,no,Ambient Air Temperature Sensor Circuit A High
-P0074,207,4,ambient_temp,no,no,Ambient Air Temperature Sensor Circuit A Intermittent/Erratic
-P0219,208,4,overspeed,no,no,Engine Overspeed Condition
-P0483,209,4,cooling_fan,no,no,Cooling Fan Rationality Check
-P0484,210,4,cooling_fan,no,no,Cooling Fan Current Too High
-P0485,211,4,cooling_fan,no,no,Cooling Fan Power/Ground Circuit
-P2181,212,4,cooling_system,no,no,Cooling System Performance
-P00D5,213,4,o2_sensor,no,no,HO2S Sensor Correlation Bank 1 Sensor 1/Bank 1 Sensor 2
-P0136,214,4,o2_sensor,no,no,"O2 Sensor Circuit Malfunction (Bank 1, Sensor 2)"
-P0137,215,4,o2_sensor,no,no,"O2 Sensor Circuit Low Voltage (Bank 1, Sensor 2)"
-P0138,216,4,o2_sensor,no,no,"O2 Sensor Circuit High Voltage (Bank 1, Sensor 2)"
-P0139,217,4,o2_sensor,no,no,O2 Sensor Circuit High Voltage (Bank 1 Sensor 2)
-P013A,218,4,o2_sensor,no,no,O2 Sensor Slow Response - Rich to Lean Bank 1 Sensor 2
-P013B,219,4,o2_sensor,no,no,O2 Sensor Slow Response - Lean to Rich Bank 1 Sensor 2
-P013E,220,4,o2_sensor,no,no,O2 Sensor Delayed Response - Rich to Lean Bank 1 Sensor 2
-P013F,221,4,o2_sensor,no,no,O2 Sensor Delayed Response - Lean to Rich Bank 1 Sensor 2
-P0140,222,4,o2_sensor,no,no,O2 Sensor Circuit No Activity / Slow Response (Bank 1 Sensor 2)
-P014C,223,4,o2_sensor,no,no,O2 Sensor Slow Response - Rich to Lean Bank 1 Sensor 1
-P014D,224,4,o2_sensor,no,no,O2 Sensor Slow Response - Lean to Rich Bank 1 Sensor 1
-P015A,225,4,o2_sensor,no,no,O2 Sensor Delayed Response - Rich to Lean Bank 1 Sensor 1
-P015B,226,4,o2_sensor,no,no,O2 Sensor Delayed Response - Lean to Rich Bank 1 Sensor 1
-P2270,227,4,o2_sensor,no,no,"O2 Sensor Signal Stuck Lean (Bank 1, Sensor 2)"
-P2271,228,4,o2_sensor,no,no,"O2 Sensor Signal Stuck Rich (Bank 1, Sensor 2)"
-P2A00,229,4,o2_sensor,no,no,O2 Sensor Circuit Range/Performance Bank 1 Sensor 1
-P2A01,230,4,o2_sensor,no,no,O2 Sensor Circuit Range/Performance Bank 1 Sensor 2
-P0036,231,4,o2_heater,no,no,HO2S Heater Control Circuit (Bank 1 Sensor 2)
-P0037,232,4,o2_heater,no,no,HO2S Heater Control Circuit Low (Bank 1 Sensor 2)
-P0038,233,4,o2_heater,no,no,HO2S Heater Control Circuit High (Bank 1 Sensor 2)
-P0053,234,4,o2_heater,no,no,HO2S Heater Resistance Bank 1 Sensor 1
-P0054,235,4,o2_heater,no,no,HO2S Heater Resistance Bank 1 Sensor 2
-P00D1,236,4,o2_heater,no,no,HO2S Heater Control Circuit Range/Performance Bank 1 Sensor 1
-P00D2,237,4,o2_heater,no,no,HO2S Heater Control Circuit Range/Performance Bank 1 Sensor 2
-P0141,238,4,o2_heater,no,no,"O2 Sensor Heater Circuit Malfunction (Bank 1, Sensor 2)"
-P2096,239,4,fuel_trim,no,no,Post Catalyst Fuel Trim System Too Lean (Bank 1)
-P2097,240,4,fuel_trim,no,no,Post Catalyst Fuel Trim System Too Rich (Bank 1)
-P2177,241,4,fuel_trim,no,no,System Too Lean Off Idle Bank 1
-P2178,242,4,fuel_trim,no,no,System Too Rich Off Idle Bank 1
-P2187,243,4,fuel_trim,no,no,System Too Lean at Idle (Bank 1)
-P2188,244,4,fuel_trim,no,no,System Too Rich at Idle (Bank 1)
-P2146,245,4,injector,no,yes,Fuel Injector Group A Supply Voltage Circuit/Open
-P2147,246,4,injector,no,yes,Fuel Injector Group A Supply Voltage Circuit Low
-P2148,247,4,injector,no,yes,Fuel Injector Group A Supply Voltage Circuit High
-P0460,248,4,fuel_level,no,no,Fuel Level Sensor A Circuit
-P0461,249,4,fuel_level,no,no,Fuel Level Sensor A Circuit Range/Performance
-P0462,250,4,fuel_level,no,no,Fuel Level Sensor A Circuit Low
-P0463,251,4,fuel_level,no,no,Fuel Level Sensor A Circuit High
-P0464,252,4,fuel_level,no,no,Fuel Level Sensor A Circuit Intermittent
-P0316,253,4,misfire,no,no,Engine Misfire Detected on Startup (First 1000 Revolutions)
-P0016,254,4,cam_crank_sync,no,no,Crankshaft Position - Camshaft Position Correlation (Bank 1 Sensor A)
-P033F,255,4,cam_crank_sync,no,no,Crankshaft/Camshaft Loss Of Synchronization
-P0320,256,4,engine_speed_input,no,no,Ignition/Distributor Engine Speed Input Circuit
-P0321,257,4,engine_speed_input,no,no,Ignition/Distributor Engine Speed Input Circuit Range/Performance
-P0322,258,4,engine_speed_input,no,no,Ignition/Distributor Engine Speed Input Circuit No Signal
-P0323,259,4,engine_speed_input,no,no,Ignition/Distributor Engine Speed Input Circuit Intermittent
-P2300,260,4,ignition_coil,no,no,Ignition Coil A Primary Control Circuit Low
-P2301,261,4,ignition_coil,no,no,Ignition Coil A Primary Control Circuit High
-P2302,262,4,ignition_coil,no,no,Ignition Coil A Secondary Circuit
-P2303,263,4,ignition_coil,no,no,Ignition Coil B Primary Control Circuit Low
-P2304,264,4,ignition_coil,no,no,Ignition Coil B Primary Control Circuit High
-P2305,265,4,ignition_coil,no,no,Ignition Coil B Secondary Circuit
-P0450,266,4,evap,no,no,EVAP System Pressure Sensor/Switch A Circuit
-P0451,267,4,evap,no,no,Evaporative Emission System Pressure Sensor Range/Performance
-P0452,268,4,evap,no,no,Evaporative Emission System Pressure Sensor Low Input
-P0453,269,4,evap,no,no,Evaporative Emission System Pressure Sensor High Input
-P0454,270,4,evap,no,no,EVAP System Pressure Sensor/Switch A Circuit Intermittent
-P0455,271,4,evap,no,no,Evaporative Emission System Leak Detected (Large Leak)
-P0456,272,4,evap,no,no,Evaporative Emission System Leak Detected (Very Small Leak)
-P0457,273,4,evap,no,no,Evaporative Emission System Leak Detected (Fuel Cap Loose/Off)
-P0496,274,4,evap,no,no,Evaporative Emission System High Purge Flow
-P0497,275,4,evap,no,no,EVAP System Low Purge Flow
-P0498,276,4,evap,no,no,EVAP System Vent Valve Control Circuit Low
-P0499,277,4,evap,no,no,EVAP System Vent Valve Control Circuit High
-P0418,278,4,secondary_air,no,no,"Secondary Air Injection System Relay ""A"" Circuit Malfunction"
-P0491,279,4,secondary_air,no,no,Secondary Air Injection System Insufficient Flow (Bank 1)
-P0504,280,4,brake_switch,no,no,"Brake Switch ""A""/""B"" Correlation"
-P0914,281,4,neutral_gear,no,no,Gear Shift Position Circuit A
-P0915,282,4,neutral_gear,no,no,Gear Shift Position Circuit Range/Performance
-P0916,283,4,neutral_gear,no,no,Gear Shift Position Circuit Low A
-P0917,284,4,neutral_gear,no,no,Gear Shift Position Circuit High A
-P0918,285,4,neutral_gear,no,no,Gear Shift Position Circuit Intermittent A
-P0919,286,4,neutral_gear,no,no,Gear Shift Position Control Error
-P0704,287,4,clutch_switch,no,no,Clutch Switch Input Circuit
-P0620,288,4,charging,no,no,Generator Control Circuit
-P0621,289,4,charging,no,no,Generator Lamp L Control Circuit
-P0625,290,4,charging,no,no,Generator Field Terminal Circuit Low
-P0626,291,4,charging,no,no,Generator Field/F Terminal Circuit Performance
-P2500,292,4,charging,no,no,Generator Lamp/L-Terminal Circuit Low
-P2501,293,4,charging,no,no,Generator Lamp/L-Terminal Circuit High
-P2502,294,4,charging,no,no,Charging System Voltage
-P2503,295,4,charging,no,no,Charging System Voltage Low
-P2504,296,4,charging,no,no,Charging System Voltage High
-P0651,297,4,sensor_reference_supply,no,no,Sensor Reference Voltage B Circuit Open
-P0652,298,4,sensor_reference_supply,no,no,Sensor Reference Voltage B Circuit Low
-P0653,299,4,sensor_reference_supply,no,no,Sensor Reference Voltage B Circuit High
-P0697,300,4,sensor_reference_supply,no,no,Sensor Reference Voltage C Circuit Open
-P0698,301,4,sensor_reference_supply,no,no,Sensor Reference Voltage C Circuit Low
-P0699,302,4,sensor_reference_supply,no,no,Sensor Reference Voltage C Circuit High
-P0608,303,4,control_module,no,no,Control Module VSS Output A
-P0609,304,4,control_module,no,no,Control Module VSS Output B
-P060A,305,4,control_module,no,no,Internal Control Module Monitoring Processor Performance
-P060B,306,4,control_module,no,no,Internal Control Module A and D Processing Performance
-P060C,307,4,control_module,no,no,Internal Control Module Main Processor Performance
-P060D,308,4,control_module,no,no,Internal Control Module Accelerator Pedal Position Performance
-P060E,309,4,control_module,no,no,Internal Control Module Throttle Position Performance
-P060F,310,4,control_module,no,no,Internal Control Module Coolant Temperature Performance
-P0610,311,4,control_module,no,no,Control Module Vehicle Options Error
-P062F,312,4,control_module,no,no,Internal Control Module EEPROM Error
-P0630,313,4,control_module,no,no,VIN Not Programmed or Incompatible ECM or PCM
-P0634,314,4,control_module,no,no,Control Module Internal Temperature A Too High
-P2610,315,4,control_module,no,no,ECM/PCM Internal Engine Off Timer Performance
-U0073,316,4,can_bus,no,no,"Control Module Communication Bus ""A"" Off"
-U0074,317,4,can_bus,no,no,"Control Module Communication Bus ""B"" Off"
-U0075,318,4,can_bus,no,no,"Control Module Communication Bus ""B"" Performance"
-U0076,319,4,can_bus,no,no,"Control Module Communication Bus ""C"" Off"
-U0077,320,4,can_bus,no,no,Vehicle Communication Bus B Off
-U0140,321,4,lost_comm_cluster,no,no,Lost Communication with Body Control Module
-U0146,322,4,lost_comm_cluster,no,no,"Lost Communication with Gateway ""A"""
-U0167,323,4,lost_comm_immobiliser,no,no,Lost Communication with Vehicle Immobiliser Control Module
-U0168,324,4,lost_comm_immobiliser,no,no,Lost Communication with Vehicle Immobilizer Control Module
-U0300,325,4,software,no,no,Internal Control Module Software Incompatibility
-U0301,326,4,software,no,no,Software Incompatibility with ECM/PCM
-U0327,327,4,software,no,no,Software Incompatibility with Powertrain Control Module
-U0401,328,4,invalid_data,no,no,Invalid Data Received from ECM/PCM
-U0408,329,4,invalid_data,no,no,Invalid Data Received from Vehicle Immobilizer Control Module
-U0415,330,4,invalid_data,no,no,Invalid Data Received from ABS Control Module
-U0421,331,4,invalid_data,no,no,Invalid Data Received from Throttle/Pedal Position Sensor
-C0020,332,4,abs_pump,no,no,ABS Pump Motor Circuit
-C0021,333,4,abs_pump,no,no,ABS Pump Motor Circuit Range/Performance
-C0022,334,4,abs_pump,no,no,ABS Pump Motor Circuit Low
-C0023,335,4,abs_pump,no,no,ABS Pump Motor Circuit High
-C0025,336,4,abs_pump,no,no,ABS Pump Motor Stalled
-C0110,337,4,abs_pump,no,no,ABS Pump Motor Circuit Malfunction
-C0111,338,4,abs_pump,no,no,ABS Activation Excessively Long
-C0112,339,4,abs_pump,no,no,ABS Activation Frequency Too High
-C0030,340,4,wheel_speed,no,no,Left Front Wheel Speed Sensor Circuit Range/Performance
-C0031,341,4,wheel_speed,no,no,Left Front Wheel Speed Sensor Circuit Low
-C0032,342,4,wheel_speed,no,no,Left Front Wheel Speed Sensor Circuit High
-C0033,343,4,wheel_speed,no,no,Left Front Wheel Speed Sensor Signal Erratic
-C0034,344,4,wheel_speed,no,no,Left Front Wheel Speed Sensor No Signal
-C0036,345,4,wheel_speed,no,no,Left Front Wheel Speed Sensor Circuit Intermittent
-C0037,346,4,wheel_speed,no,no,Left Rear Wheel Speed Sensor
-C0038,347,4,wheel_speed,no,no,Left Rear Wheel Speed Sensor Supply
-C003A,348,4,wheel_speed,no,no,Right Rear Wheel Speed Sensor
-C003B,349,4,wheel_speed,no,no,Right Rear Wheel Speed Sensor Supply
-C003C,350,4,wheel_speed,no,no,Rear Tone Wheel
-C003D,351,4,wheel_speed,no,no,Rear Wheel Speed Sensor
-C003E,352,4,wheel_speed,no,no,Rear Wheel Speed Sensor Supply
-C003F,353,4,wheel_speed,no,no,Wheel Speed Sensors Rotation Direction Correlation
-C0041,354,4,wheel_speed,no,no,Right Front Wheel Speed Sensor Circuit Range/Performance
-C0042,355,4,wheel_speed,no,no,Right Front Wheel Speed Sensor Circuit Low
-C0043,356,4,wheel_speed,no,no,Right Front Wheel Speed Sensor Circuit High
-C0044,357,4,wheel_speed,no,no,Right Front Wheel Speed Sensor Signal Erratic
-C0046,358,4,wheel_speed,no,no,Right Front Wheel Speed Sensor Circuit Intermittent
-C0052,359,4,wheel_speed,no,no,Left Rear Wheel Speed Sensor Circuit Low
-C0053,360,4,wheel_speed,no,no,Left Rear Wheel Speed Sensor Circuit High
-C0054,361,4,wheel_speed,no,no,Left Rear Wheel Speed Sensor Signal Erratic
-C0055,362,4,wheel_speed,no,no,Left Rear Wheel Speed Sensor No Signal
-C0056,363,4,wheel_speed,no,no,Left Rear Wheel Speed Sensor Circuit Intermittent
-C0060,364,4,wheel_speed,no,no,Right Rear Wheel Speed Sensor Circuit
-C0061,365,4,wheel_speed,no,no,Right Rear Wheel Speed Sensor Circuit Range/Performance
-C0062,366,4,wheel_speed,no,no,Right Rear Wheel Speed Sensor Circuit Low
-C0063,367,4,wheel_speed,no,no,Right Rear Wheel Speed Sensor Circuit High
-C0064,368,4,wheel_speed,no,no,Right Rear Wheel Speed Sensor Signal Erratic
-C0065,369,4,wheel_speed,no,no,Right Rear Wheel Speed Sensor No Signal
-C0066,370,4,wheel_speed,no,no,Right Rear Wheel Speed Sensor Circuit Intermittent
-C0080,371,4,wheel_speed,no,no,Wheel Speed Mismatch (Front Axle)
-C0081,372,4,wheel_speed,no,no,Wheel Speed Mismatch (Rear Axle)
-C0234,373,4,wheel_speed,no,no,Wheel Speed Sensor Frequency Error
-C0235,374,4,wheel_speed,no,no,Wheel Speed Sensor Signal Erratic
-C0238,375,4,wheel_speed,no,no,Speed Wheel-to-Wheel Mismatch
-C0245,376,4,wheel_speed,no,no,Wheel Speed Sensor Frequency Mismatch
-C004F,377,4,abs_module,no,no,ABS Control Module Over Temperature
-C0220,378,4,abs_module,no,no,ABS Valve Block Supply Voltage
-C0246,379,4,abs_module,no,no,ABS/TCS Control Module Internal Performance
-C0121,380,4,abs_relay,no,no,Valve Relay Circuit Malfunction
-C0225,381,4,abs_relay,no,no,ABS Valve Relay Circuit
-C0241,382,4,abs_lamp,no,no,ABS Warning Lamp Control Circuit
-C0242,383,4,abs_lamp,no,no,PCM Indicated ABS Malfunction
+code,rank,tier,reason_tags,anchor,honda_family,title_obdex,title_standard,title_status,write_ok
+P0120,1,1,throttle,yes,yes,Throttle Position Sensor / Switch A Circuit Malfunction,Throttle Position Sensor / Switch A Circuit Malfunction,obdex,yes
+P0105,2,1,map_baro,yes,yes,Manifold Absolute Pressure / Barometric Pressure Circuit Malfunction,Manifold Absolute Pressure / Barometric Pressure Circuit Malfunction,obdex,yes
+P0195,3,1,oil_temp,yes,no,Engine Oil Temperature Sensor Malfunction,Engine Oil Temperature Sensor Malfunction,obdex,yes
+P0130,4,1,o2_sensor,yes,no,"O2 Sensor Circuit Malfunction (Bank 1, Sensor 1)","O2 Sensor Circuit Malfunction (Bank 1, Sensor 1)",obdex,yes
+P0135,5,1,o2_heater,yes,no,"O2 Sensor Heater Circuit Malfunction (Bank 1, Sensor 1)","O2 Sensor Heater Circuit Malfunction (Bank 1, Sensor 1)",obdex,yes
+P0201,6,1,injector,yes,yes,Injector Circuit Malfunction — Cylinder 1,Injector Circuit Malfunction — Cylinder 1,obdex,yes
+P0351,7,1,ignition_coil,yes,no,"Ignition Coil ""A"" Primary/Secondary Circuit Malfunction (Cylinder 1)","Ignition Coil ""A"" Primary/Secondary Circuit Malfunction (Cylinder 1)",obdex,yes
+P0230,8,1,fuel_pump,yes,no,Fuel Pump Primary Circuit Malfunction,Fuel Pump Primary Circuit Malfunction,obdex,yes
+P0335,9,1,crankshaft,yes,no,"Crankshaft Position Sensor ""A"" Circuit Malfunction","Crankshaft Position Sensor ""A"" Circuit Malfunction",obdex,yes
+P0110,10,2,iat,no,yes,Intake Air Temperature Sensor Circuit Malfunction,Intake Air Temperature Sensor Circuit Malfunction,obdex,yes
+P0115,11,2,ect,no,yes,Engine Coolant Temperature Sensor Circuit Malfunction,Engine Coolant Temperature Sensor Circuit Malfunction,obdex,yes
+P0202,12,2,injector,no,yes,Injector Circuit Malfunction — Cylinder 2,Injector Circuit Malfunction — Cylinder 2,obdex,yes
+P0352,13,2,ignition_coil,no,no,"Ignition Coil ""B"" Primary/Secondary Circuit Malfunction (Cylinder 2)","Ignition Coil ""B"" Primary/Secondary Circuit Malfunction (Cylinder 2)",obdex,yes
+P0300,14,2,misfire,no,no,Random/Multiple Cylinder Misfire Detected,Random/Multiple Cylinder Misfire Detected,obdex,yes
+P0301,15,2,misfire,no,no,Cylinder 1 Misfire Detected,Cylinder 1 Misfire Detected,obdex,yes
+P0302,16,2,misfire,no,no,Cylinder 2 Misfire Detected,Cylinder 2 Misfire Detected,obdex,yes
+P0171,17,2,fuel_trim,no,no,System Too Lean (Bank 1),System Too Lean (Bank 1),obdex,yes
+P0172,18,2,fuel_trim,no,no,System Too Rich (Bank 1),System Too Rich (Bank 1),obdex,yes
+P0420,19,2,catalyst,no,no,Catalyst System Efficiency Below Threshold (Bank 1),Catalyst System Efficiency Below Threshold (Bank 1),obdex,yes
+P0122,20,2,throttle,no,yes,"Throttle/Pedal Position Sensor ""A"" Low Input","Throttle/Pedal Position Sensor ""A"" Low Input",obdex,yes
+P0123,21,2,throttle,no,yes,"Throttle/Pedal Position Sensor ""A"" High Input","Throttle/Pedal Position Sensor ""A"" High Input",obdex,yes
+P0107,22,2,map_baro,no,yes,Manifold Absolute Pressure Sensor Low Input,Manifold Absolute Pressure Sensor Low Input,obdex,yes
+P0108,23,2,map_baro,no,yes,Manifold Absolute Pressure Sensor High Input,Manifold Absolute Pressure Sensor High Input,obdex,yes
+P0112,24,2,iat,no,yes,Intake Air Temperature Sensor Low Input,Intake Air Temperature Sensor Low Input,obdex,yes
+P0113,25,2,iat,no,yes,Intake Air Temperature Sensor High Input,Intake Air Temperature Sensor High Input,obdex,yes
+P0117,26,2,ect,no,yes,Engine Coolant Temperature Sensor Low Input,Engine Coolant Temperature Sensor Low Input,obdex,yes
+P0118,27,2,ect,no,yes,Engine Coolant Temperature Sensor High Input,Engine Coolant Temperature Sensor High Input,obdex,yes
+P0131,28,2,o2_sensor,no,no,"O2 Sensor Circuit Low Voltage (Bank 1, Sensor 1)","O2 Sensor Circuit Low Voltage (Bank 1, Sensor 1)",obdex,yes
+P0132,29,2,o2_sensor,no,no,"O2 Sensor Circuit High Voltage (Bank 1, Sensor 1)","O2 Sensor Circuit High Voltage (Bank 1, Sensor 1)",obdex,yes
+P0500,30,2,vehicle_speed,no,no,"Vehicle Speed Sensor ""A"" Malfunction","Vehicle Speed Sensor ""A"" Malfunction",obdex,yes
+P0562,31,2,system_voltage,no,no,System Voltage Low,System Voltage Low,obdex,yes
+P0563,32,2,system_voltage,no,no,System Voltage High,System Voltage High,obdex,yes
+P0850,33,2,neutral_gear,no,no,Park/Neutral Switch Input Circuit,Park/Neutral Switch Input Circuit,obdex,yes
+P0600,34,2,control_module,no,no,Serial Communication Link,Serial Communication Link,obdex,yes
+P0340,35,2,camshaft,no,no,"Camshaft Position Sensor ""A"" Circuit (Bank 1 or Single Sensor)","Camshaft Position Sensor ""A"" Circuit (Bank 1 or Single Sensor)",obdex,yes
+P0505,36,2,idle,no,no,Idle Air Control System Malfunction,Idle Air Control System Malfunction,obdex,yes
+U0100,37,2,lost_comm_engine,no,no,"Lost Communication with ECM/PCM ""A""","Lost Communication with ECM/PCM ""A""",obdex,yes
+U0121,38,2,lost_comm_abs,no,no,Lost Communication with ABS Control Module,Lost Communication with ABS Control Module,obdex,yes
+U0155,39,2,lost_comm_cluster,no,no,Lost Communication with Instrument Panel Cluster,Lost Communication with Instrument Panel Cluster,obdex,yes
+C0035,40,2,wheel_speed,no,no,Left Front Wheel Speed Sensor Circuit Malfunction,Left Front Wheel Speed Sensor Circuit Malfunction,obdex,yes
+P0121,41,3,throttle,no,yes,"Throttle/Pedal Position Sensor ""A"" Range/Performance","Throttle/Pedal Position Sensor ""A"" Range/Performance",obdex,yes
+P0124,42,3,throttle,no,yes,"Throttle/Pedal Position Sensor ""A"" Circuit Intermittent","Throttle/Pedal Position Sensor ""A"" Circuit Intermittent",obdex,yes
+P0106,43,3,map_baro,no,yes,Manifold Absolute Pressure Sensor Range/Performance,Manifold Absolute Pressure Sensor Range/Performance,obdex,yes
+P0109,44,3,map_baro,no,yes,Manifold Absolute Pressure / Barometric Pressure Circuit Intermittent,Manifold Absolute Pressure / Barometric Pressure Circuit Intermittent,obdex,yes
+P0111,45,3,iat,no,yes,Intake Air Temperature Sensor Range/Performance,Intake Air Temperature Sensor Range/Performance,obdex,yes
+P0114,46,3,iat,no,yes,Intake Air Temperature Sensor Intermittent,Intake Air Temperature Sensor Intermittent,obdex,yes
+P0116,47,3,ect,no,yes,Engine Coolant Temperature Sensor Range/Performance,Engine Coolant Temperature Sensor Range/Performance,obdex,yes
+P0119,48,3,ect,no,yes,Engine Coolant Temperature Sensor Circuit Intermittent,Engine Coolant Temperature Sensor Circuit Intermittent,obdex,yes
+P0125,49,3,ect,no,yes,Insufficient Coolant Temperature for Closed Loop Fuel Control,Insufficient Coolant Temperature for Closed Loop Fuel Control,obdex,yes
+P0126,50,3,ect,no,yes,Insufficient Coolant Temperature for Stable Operation,Insufficient Coolant Temperature for Stable Operation,obdex,yes
+P0128,51,3,ect,no,yes,Coolant Thermostat Below Regulating Temperature,Coolant Thermostat Below Regulating Temperature,obdex,yes
+P0217,52,3,ect,no,yes,Engine Coolant Over Temperature Condition,Engine Coolant Over Temperature Condition,obdex,yes
+P0196,53,3,oil_temp,no,no,Engine Oil Temperature Sensor Range / Performance,Engine Oil Temperature Sensor Range / Performance,obdex,yes
+P0197,54,3,oil_temp,no,no,Engine Oil Temperature Sensor Low,Engine Oil Temperature Sensor Low,obdex,yes
+P0198,55,3,oil_temp,no,no,Engine Oil Temperature Sensor High,Engine Oil Temperature Sensor High,obdex,yes
+P0199,56,3,oil_temp,no,no,Engine Oil Temperature Sensor Intermittent,Engine Oil Temperature Sensor Intermittent,obdex,yes
+P0133,57,3,o2_sensor,no,no,"O2 Sensor Slow Response (Bank 1, Sensor 1)","O2 Sensor Slow Response (Bank 1, Sensor 1)",obdex,yes
+P0134,58,3,o2_sensor,no,no,O2 Sensor Circuit No Activity / Slow Response (Bank 1 Sensor 1),O2 Sensor Circuit No Activity / Slow Response (Bank 1 Sensor 1),suspect,no
+P2195,59,3,o2_sensor,no,no,"O2 Sensor Signal Stuck Lean (Bank 1, Sensor 1)","O2 Sensor Signal Stuck Lean (Bank 1, Sensor 1)",obdex,yes
+P2196,60,3,o2_sensor,no,no,"O2 Sensor Signal Stuck Rich (Bank 1, Sensor 1)","O2 Sensor Signal Stuck Rich (Bank 1, Sensor 1)",obdex,yes
+P0030,61,3,o2_heater,no,no,HO2S Heater Control Circuit (Bank 1 Sensor 1),HO2S Heater Control Circuit (Bank 1 Sensor 1),obdex,yes
+P0031,62,3,o2_heater,no,no,HO2S Heater Control Circuit Low (Bank 1 Sensor 1),HO2S Heater Control Circuit Low (Bank 1 Sensor 1),obdex,yes
+P0032,63,3,o2_heater,no,no,HO2S Heater Control Circuit High (Bank 1 Sensor 1),HO2S Heater Control Circuit High (Bank 1 Sensor 1),obdex,yes
+P0170,64,3,fuel_trim,no,no,Fuel Trim Malfunction (Bank 1),Fuel Trim Malfunction (Bank 1),obdex,yes
+P0200,65,3,injector,no,yes,Injector Circuit/Open,Injector Circuit/Open,obdex,yes
+P0261,66,3,injector,no,yes,Cylinder 1 Injector Circuit Low,Cylinder 1 Injector Circuit Low,obdex,yes
+P0262,67,3,injector,no,yes,Cylinder 1 Injector Circuit High,Cylinder 1 Injector Circuit High,obdex,yes
+P0263,68,3,injector,no,yes,Cylinder 1 Contribution/Balance Fault,Cylinder 1 Contribution/Balance Fault,obdex,yes
+P0264,69,3,injector,no,yes,Cylinder 2 Injector Circuit Low,Cylinder 2 Injector Circuit Low,obdex,yes
+P0265,70,3,injector,no,yes,Cylinder 2 Injector Circuit High,Cylinder 2 Injector Circuit High,obdex,yes
+P0266,71,3,injector,no,yes,Cylinder 2 Contribution/Balance Fault,Cylinder 2 Contribution/Balance Fault,obdex,yes
+P0231,72,3,fuel_pump,no,no,Fuel Pump Secondary Circuit Low,Fuel Pump Secondary Circuit Low,obdex,yes
+P0232,73,3,fuel_pump,no,no,Fuel Pump Secondary Circuit High,Fuel Pump Secondary Circuit High,obdex,yes
+P0233,74,3,fuel_pump,no,no,Fuel Pump Secondary Circuit Intermittent,Fuel Pump Secondary Circuit Intermittent,obdex,yes
+P0627,75,3,fuel_pump,no,no,"Fuel Pump ""A"" Control Circuit Open","Fuel Pump ""A"" Control Circuit Open",obdex,yes
+P0628,76,3,fuel_pump,no,no,Fuel Pump A Control Circuit Low,Fuel Pump A Control Circuit Low,obdex,yes
+P0629,77,3,fuel_pump,no,no,Fuel Pump A Control Circuit High,Fuel Pump A Control Circuit High,obdex,yes
+P0336,78,3,crankshaft,no,no,"Crankshaft Position Sensor ""A"" Circuit Range/Performance","Crankshaft Position Sensor ""A"" Circuit Range/Performance",obdex,yes
+P0337,79,3,crankshaft,no,no,"Crankshaft Position Sensor ""A"" Circuit Low Input","Crankshaft Position Sensor ""A"" Circuit Low Input",obdex,yes
+P0338,80,3,crankshaft,no,no,"Crankshaft Position Sensor ""A"" Circuit High Input","Crankshaft Position Sensor ""A"" Circuit High Input",obdex,yes
+P0339,81,3,crankshaft,no,no,Crankshaft Position Sensor A Circuit Intermittent,Crankshaft Position Sensor A Circuit Intermittent,obdex,yes
+P0341,82,3,camshaft,no,no,"Camshaft Position Sensor ""A"" Circuit Range/Performance (Bank 1)","Camshaft Position Sensor ""A"" Circuit Range/Performance (Bank 1)",obdex,yes
+P0342,83,3,camshaft,no,no,"Camshaft Position Sensor ""A"" Circuit Low Input (Bank 1)","Camshaft Position Sensor ""A"" Circuit Low Input (Bank 1)",obdex,yes
+P0343,84,3,camshaft,no,no,"Camshaft Position Sensor ""A"" Circuit High Input (Bank 1)","Camshaft Position Sensor ""A"" Circuit High Input (Bank 1)",obdex,yes
+P0344,85,3,camshaft,no,no,Camshaft Position Sensor A Circuit Intermittent (Bank 1 or Single Sensor),Camshaft Position Sensor A Circuit Intermittent (Bank 1 or Single Sensor),obdex,yes
+P0350,86,3,ignition_coil,no,no,Ignition Coil Primary/Secondary Circuit/Open,Ignition Coil Primary/Secondary Circuit/Open,obdex,yes
+P0324,87,3,knock,no,no,Knock/Combustion Vibration Control System Error,Knock/Combustion Vibration Control System Error,obdex,yes
+P0325,88,3,knock,no,no,Knock Sensor 1 Circuit Malfunction (Bank 1),Knock Sensor 1 Circuit Malfunction (Bank 1),obdex,yes
+P0326,89,3,knock,no,no,Knock/Combustion Vibration Sensor A Circuit Range/Performance,Knock/Combustion Vibration Sensor A Circuit Range/Performance,obdex,yes
+P0327,90,3,knock,no,no,Knock Sensor 1 Circuit Low Input (Bank 1),Knock Sensor 1 Circuit Low Input (Bank 1),obdex,yes
+P0328,91,3,knock,no,no,Knock Sensor 1 Circuit High Input (Bank 1),Knock Sensor 1 Circuit High Input (Bank 1),obdex,yes
+P0329,92,3,knock,no,no,Knock/Combustion Vibration Sensor A Circuit Intermittent,Knock/Combustion Vibration Sensor A Circuit Intermittent,obdex,yes
+P0501,93,3,vehicle_speed,no,no,"Vehicle Speed Sensor ""A"" Range/Performance","Vehicle Speed Sensor ""A"" Range/Performance",obdex,yes
+P0502,94,3,vehicle_speed,no,no,Vehicle Speed Sensor A Circuit Low,Vehicle Speed Sensor A Circuit Low,obdex,yes
+P0503,95,3,vehicle_speed,no,no,Vehicle Speed Sensor A Circuit Intermittent Erratic or High,Vehicle Speed Sensor A Circuit Intermittent Erratic or High,obdex,yes
+P0851,96,3,neutral_gear,no,no,Park/Neutral Switch Input Circuit Low,Park/Neutral Switch Input Circuit Low,obdex,yes
+P0852,97,3,neutral_gear,no,no,Park/Neutral Switch Input Circuit High,Park/Neutral Switch Input Circuit High,obdex,yes
+P0506,98,3,idle,no,no,Idle Air Control System RPM Lower Than Expected,Idle Air Control System RPM Lower Than Expected,obdex,yes
+P0507,99,3,idle,no,no,Idle Air Control System RPM Higher Than Expected,Idle Air Control System RPM Higher Than Expected,obdex,yes
+P0508,100,3,idle,no,no,Idle Air Control System Circuit Low,Idle Air Control System Circuit Low,obdex,yes
+P0509,101,3,idle,no,no,Idle Air Control System Circuit High,Idle Air Control System Circuit High,obdex,yes
+P050A,102,3,idle,no,no,Cold Start Idle Control System Performance,Cold Start Idle Control System Performance,obdex,yes
+P050D,103,3,idle,no,no,Cold Start Rough Idle,Cold Start Rough Idle,obdex,yes
+P0510,104,3,idle,no,no,Closed Throttle Position Switch,Closed Throttle Position Switch,obdex,yes
+P0511,105,3,idle,no,no,Idle Air Control Circuit,Idle Air Control Circuit,obdex,yes
+P0518,106,3,idle,no,no,Idle Air Control Circuit Intermittent,Idle Air Control Circuit Intermittent,obdex,yes
+P0519,107,3,idle,no,no,Idle Air Control System Performance,Idle Air Control System Performance,obdex,yes
+P0560,108,3,system_voltage,no,no,System Voltage Malfunction,System Voltage Malfunction,obdex,yes
+P0561,109,3,system_voltage,no,no,System Voltage Unstable,System Voltage Unstable,obdex,yes
+P0615,110,3,starter_relay,no,no,Starter Relay Circuit,Starter Relay Circuit,obdex,yes
+P0616,111,3,starter_relay,no,no,Starter Relay A Circuit Low,Starter Relay A Circuit Low,obdex,yes
+P0617,112,3,starter_relay,no,no,Starter Relay Circuit High,Starter Relay Circuit High,obdex,yes
+P0685,113,3,ecu_power_relay,no,no,ECM or PCM Power Relay Control Circuit Open,ECM or PCM Power Relay Control Circuit Open,confirmed,yes
+P0686,114,3,ecu_power_relay,no,no,ECM/PCM Power Relay Control Circuit Open,ECM/PCM Power Relay Control Circuit Low,override,yes
+P0687,115,3,ecu_power_relay,no,no,ECM/PCM Power Relay Sense Circuit Open,ECM/PCM Power Relay Control Circuit High,override,yes
+P0688,116,3,ecu_power_relay,no,no,ECM/PCM Power Relay Sense Circuit High,ECM/PCM Power Relay Sense Circuit/Open,override,yes
+P0689,117,3,ecu_power_relay,no,no,ECM or PCM Power Relay Sense Circuit Low,ECM or PCM Power Relay Sense Circuit Low,obdex,yes
+P068A,118,3,ecu_power_relay,no,no,ECM or PCM Power Relay De-Energized Performance Too Early,ECM or PCM Power Relay De-Energized Performance Too Early,obdex,yes
+P068B,119,3,ecu_power_relay,no,no,ECM or PCM Power Relay De-Energized Performance Too Late,ECM or PCM Power Relay De-Energized Performance Too Late,obdex,yes
+P0690,120,3,ecu_power_relay,no,no,ECM or PCM Power Relay Sense Circuit High,ECM or PCM Power Relay Sense Circuit High,obdex,yes
+P0641,121,3,sensor_reference_supply,no,no,"Sensor Reference Voltage ""A"" Circuit Open","Sensor Reference Voltage ""A"" Circuit Open",obdex,yes
+P0642,122,3,sensor_reference_supply,no,no,"Sensor Reference Voltage ""A"" Circuit Low","Sensor Reference Voltage ""A"" Circuit Low",obdex,yes
+P0643,123,3,sensor_reference_supply,no,no,"Sensor Reference Voltage ""A"" Circuit High","Sensor Reference Voltage ""A"" Circuit High",obdex,yes
+P0601,124,3,control_module,no,no,Internal Control Module Memory Check Sum Error,Internal Control Module Memory Check Sum Error,obdex,yes
+P0602,125,3,control_module,no,no,Control Module Programming Error,Control Module Programming Error,obdex,yes
+P0603,126,3,control_module,no,no,Internal Control Module Keep Alive Memory (KAM) Error,Internal Control Module Keep Alive Memory (KAM) Error,obdex,yes
+P0604,127,3,control_module,no,no,Internal Control Module Random Access Memory (RAM) Error,Internal Control Module Random Access Memory (RAM) Error,obdex,yes
+P0605,128,3,control_module,no,no,Internal Control Module Read Only Memory (ROM) Error,Internal Control Module Read Only Memory (ROM) Error,obdex,yes
+P0606,129,3,control_module,no,no,ECM/PCM Processor Fault,ECM/PCM Processor Fault,obdex,yes
+P0607,130,3,control_module,no,no,Control Module Performance,Control Module Performance,obdex,yes
+P0633,131,3,immobiliser,no,no,Immobiliser Key Not Programmed,Immobiliser Key Not Programmed,obdex,yes
+P0512,132,3,starter_immobiliser,no,no,Starter Request Circuit,Starter Request Circuit,obdex,yes
+P0513,133,3,starter_immobiliser,no,no,Incorrect Immobilizer Key,Incorrect Immobilizer Key,obdex,yes
+U0001,134,3,can_bus,no,no,High Speed CAN Communication Bus,High Speed CAN Communication Bus,obdex,yes
+U0002,135,3,can_bus,no,no,High Speed CAN Communication Bus Performance,High Speed CAN Communication Bus Performance,obdex,yes
+U0003,136,3,can_bus,no,no,High Speed CAN Communication Bus (+) Open,High Speed CAN Communication Bus (+) Open,obdex,yes
+U0004,137,3,can_bus,no,no,High Speed CAN Communication Bus (+) Low,High Speed CAN Communication Bus (+) Low,obdex,yes
+U0005,138,3,can_bus,no,no,High Speed CAN Communication Bus (+) High,High Speed CAN Communication Bus (+) High,obdex,yes
+U0006,139,3,can_bus,no,no,High Speed CAN Communication Bus (-) Open,High Speed CAN Communication Bus (-) Open,obdex,yes
+U0007,140,3,can_bus,no,no,High Speed CAN Communication Bus (-) Low,High Speed CAN Communication Bus (-) Low,obdex,yes
+U0008,141,3,can_bus,no,no,High Speed CAN Communication Bus (-) High,High Speed CAN Communication Bus (-) High,obdex,yes
+U0009,142,3,can_bus,no,no,High Speed CAN Communication Bus (-) Shorted to Bus (+),High Speed CAN Communication Bus (-) Shorted to Bus (+),obdex,yes
+U0010,143,3,can_bus,no,no,Medium Speed CAN Communication Bus,Medium Speed CAN Communication Bus,obdex,yes
+P0480,144,3,cooling_fan,no,no,Cooling Fan 1 Control Circuit,Cooling Fan 1 Control Circuit,obdex,yes
+P0691,145,3,cooling_fan,no,no,Cooling Fan 1 Control Circuit Low,Cooling Fan 1 Control Circuit Low,obdex,yes
+P0692,146,3,cooling_fan,no,no,Cooling Fan 1 Control Circuit High,Cooling Fan 1 Control Circuit High,obdex,yes
+P0520,147,3,oil_pressure,no,no,Engine Oil Pressure Sensor or Switch A Circuit,Engine Oil Pressure Sensor or Switch A Circuit,obdex,yes
+P0521,148,3,oil_pressure,no,no,Engine Oil Pressure Sensor/Switch Range/Performance,Engine Oil Pressure Sensor/Switch Range/Performance,obdex,yes
+P0522,149,3,oil_pressure,no,no,Engine Oil Pressure Sensor/Switch Low Voltage,Engine Oil Pressure Sensor/Switch Low Voltage,obdex,yes
+P0523,150,3,oil_pressure,no,no,Engine Oil Pressure Sensor or Switch A High,Engine Oil Pressure Sensor or Switch A High,obdex,yes
+P0524,151,3,oil_pressure,no,no,Engine Oil Pressure Too Low,Engine Oil Pressure Too Low,obdex,yes
+P0440,152,3,evap,no,no,Evaporative Emission Control System Malfunction,Evaporative Emission Control System Malfunction,obdex,yes
+P0441,153,3,evap,no,no,Evaporative Emission System Incorrect Purge Flow,Evaporative Emission System Incorrect Purge Flow,obdex,yes
+P0442,154,3,evap,no,no,Evaporative Emission System Leak Detected (Small Leak),Evaporative Emission System Leak Detected (Small Leak),obdex,yes
+P0443,155,3,evap,no,no,Evaporative Emission System Purge Control Valve Circuit,Evaporative Emission System Purge Control Valve Circuit,obdex,yes
+P0444,156,3,evap,no,no,Evaporative Emission Purge Control Valve Circuit Open,Evaporative Emission Purge Control Valve Circuit Open,obdex,yes
+P0445,157,3,evap,no,no,Evaporative Emission System Purge Control Valve Circuit Shorted,Evaporative Emission System Purge Control Valve Circuit Shorted,obdex,yes
+P0446,158,3,evap,no,no,Evaporative Emission Vent Control Circuit Malfunction,Evaporative Emission Vent Control Circuit Malfunction,obdex,yes
+P0447,159,3,evap,no,no,Evaporative Emission System Vent Control Circuit Open,Evaporative Emission System Vent Control Circuit Open,obdex,yes
+P0448,160,3,evap,no,no,EVAP System Vent Control Circuit Shorted,EVAP System Vent Control Circuit Shorted,obdex,yes
+P0449,161,3,evap,no,no,Evaporative Emission System Vent Valve/Solenoid Circuit Malfunction,Evaporative Emission System Vent Valve/Solenoid Circuit Malfunction,obdex,yes
+P0410,162,3,secondary_air,no,no,Secondary Air Injection System Malfunction,Secondary Air Injection System Malfunction,obdex,yes
+P0411,163,3,secondary_air,no,no,Secondary Air Injection System Incorrect Flow,Secondary Air Injection System Incorrect Flow,obdex,yes
+P0412,164,3,secondary_air,no,no,Secondary Air Injection System Switching Valve A Circuit,Secondary Air Injection System Switching Valve A Circuit,obdex,yes
+P0413,165,3,secondary_air,no,no,Secondary Air Injection System Switching Valve A Circuit Open,Secondary Air Injection System Switching Valve A Circuit Open,obdex,yes
+P0414,166,3,secondary_air,no,no,"Secondary Air Injection System Switching Valve ""A"" Circuit Shorted","Secondary Air Injection System Switching Valve ""A"" Circuit Shorted",obdex,yes
+P0421,167,3,catalyst,no,no,Warm Up Catalyst Efficiency Below Threshold (Bank 1),Warm Up Catalyst Efficiency Below Threshold (Bank 1),obdex,yes
+P0638,168,3,ride_by_wire,no,no,Throttle Actuator Control Range or Performance Bank 1,Throttle Actuator Control Range or Performance Bank 1,obdex,yes
+P2100,169,3,ride_by_wire,no,no,Throttle Actuator Control Motor Circuit Open,Throttle Actuator Control Motor Circuit Open,obdex,yes
+P2101,170,3,ride_by_wire,no,no,Throttle Actuator Control Motor Circuit Range/Performance,Throttle Actuator Control Motor Circuit Range/Performance,obdex,yes
+P2102,171,3,ride_by_wire,no,no,Throttle Actuator Control Motor Circuit Low,Throttle Actuator Control Motor Circuit Low,obdex,yes
+P2103,172,3,ride_by_wire,no,no,Throttle Actuator Control Motor Circuit High,Throttle Actuator Control Motor Circuit High,obdex,yes
+P2104,173,3,ride_by_wire,no,no,Throttle Actuator Control System — Forced Idle,Throttle Actuator Control System — Forced Idle,obdex,yes
+P2105,174,3,ride_by_wire,no,no,Throttle Actuator Control System — Forced Engine Shutdown,Throttle Actuator Control System — Forced Engine Shutdown,obdex,yes
+P2106,175,3,ride_by_wire,no,no,Throttle Actuator Control System — Forced Limited Power,Throttle Actuator Control System — Forced Limited Power,obdex,yes
+P2107,176,3,ride_by_wire,no,no,Throttle Actuator Control Module Internal Processor,Throttle Actuator Control Module Internal Processor,obdex,yes
+P2108,177,3,ride_by_wire,no,no,Throttle Actuator Control Module Performance,Throttle Actuator Control Module Performance,obdex,yes
+P2109,178,3,ride_by_wire,no,no,Throttle/Pedal Position Sensor A Minimum Stop Performance,Throttle/Pedal Position Sensor A Minimum Stop Performance,obdex,yes
+P2110,179,3,ride_by_wire,no,no,Throttle Actuator Control System — Forced Limited RPM,Throttle Actuator Control System — Forced Limited RPM,suspect,no
+P2111,180,3,ride_by_wire,no,no,Throttle Actuator Control System — Stuck Open,Throttle Actuator Control System — Stuck Open,obdex,yes
+P2112,181,3,ride_by_wire,no,no,Throttle Actuator Control System — Stuck Closed,Throttle Actuator Control System — Stuck Closed,obdex,yes
+P2118,182,3,ride_by_wire,no,no,Throttle Actuator Control Motor Current Range/Performance,Throttle Actuator Control Motor Current Range/Performance,obdex,yes
+P2119,183,3,ride_by_wire,no,no,Throttle Closed Position Performance,Throttle Closed Position Performance,obdex,yes
+P2135,184,3,ride_by_wire,no,no,"Throttle/Pedal Position Sensor ""A""/""B"" Voltage Correlation","Throttle/Pedal Position Sensor ""A""/""B"" Voltage Correlation",obdex,yes
+C0040,185,3,wheel_speed,no,no,Right Front Wheel Speed Sensor Circuit Malfunction,Right Front Wheel Speed Sensor Circuit Malfunction,obdex,yes
+C0045,186,3,wheel_speed,no,no,Left Rear Wheel Speed Sensor Circuit Malfunction,Left Rear Wheel Speed Sensor Circuit Malfunction,obdex,yes
+C0050,187,3,wheel_speed,no,no,Right Rear Wheel Speed Sensor Circuit Malfunction,Right Rear Wheel Speed Sensor Circuit Malfunction,obdex,yes
+C0099,188,3,abs_module,no,no,ABS Control Module Internal Fault,ABS Control Module Internal Fault,obdex,yes
+P0220,189,4,throttle,no,yes,"Throttle/Pedal Position Sensor/Switch ""B"" Circuit","Throttle/Pedal Position Sensor/Switch ""B"" Circuit",obdex,yes
+P0221,190,4,throttle,no,yes,"Throttle/Pedal Position Sensor/Switch ""B"" Range/Performance","Throttle/Pedal Position Sensor/Switch ""B"" Range/Performance",obdex,yes
+P0222,191,4,throttle,no,yes,"Throttle/Pedal Position Sensor/Switch ""B"" Circuit Low Input","Throttle/Pedal Position Sensor/Switch ""B"" Circuit Low Input",obdex,yes
+P0223,192,4,throttle,no,yes,"Throttle/Pedal Position Sensor/Switch ""B"" Circuit High Input","Throttle/Pedal Position Sensor/Switch ""B"" Circuit High Input",obdex,yes
+P0224,193,4,throttle,no,yes,Throttle/Pedal Position Sensor/Switch B Circuit Intermittent,Throttle/Pedal Position Sensor/Switch B Circuit Intermittent,obdex,yes
+P0068,194,4,map_baro,no,yes,MAP/MAF - Throttle Position Correlation,MAP/MAF - Throttle Position Correlation,obdex,yes
+P0069,195,4,map_baro,no,yes,Manifold Absolute Pressure - Barometric Pressure Correlation,Manifold Absolute Pressure - Barometric Pressure Correlation,obdex,yes
+P2226,196,4,map_baro,no,yes,Barometric Pressure Circuit,Barometric Pressure Circuit,obdex,yes
+P2227,197,4,map_baro,no,yes,Barometric Pressure Circuit Range/Performance,Barometric Pressure Circuit Range/Performance,obdex,yes
+P2228,198,4,map_baro,no,yes,Barometric Pressure Sensor Circuit Low,Barometric Pressure Sensor Circuit Low,obdex,yes
+P2229,199,4,map_baro,no,yes,Barometric Pressure Sensor Circuit High,Barometric Pressure Sensor Circuit High,obdex,yes
+P2230,200,4,map_baro,no,yes,Barometric Pressure Circuit Low,Barometric Pressure Circuit Low,suspect,no
+P0127,201,4,iat,no,yes,Intake Air Temperature Too High,Intake Air Temperature Too High,obdex,yes
+P00D5,202,4,o2_sensor,no,no,HO2S Sensor Correlation Bank 1 Sensor 1/Bank 1 Sensor 2,HO2S Sensor Correlation Bank 1 Sensor 1/Bank 1 Sensor 2,obdex,yes
+P0136,203,4,o2_sensor,no,no,"O2 Sensor Circuit Malfunction (Bank 1, Sensor 2)","O2 Sensor Circuit Malfunction (Bank 1, Sensor 2)",obdex,yes
+P0137,204,4,o2_sensor,no,no,"O2 Sensor Circuit Low Voltage (Bank 1, Sensor 2)","O2 Sensor Circuit Low Voltage (Bank 1, Sensor 2)",obdex,yes
+P0138,205,4,o2_sensor,no,no,"O2 Sensor Circuit High Voltage (Bank 1, Sensor 2)","O2 Sensor Circuit High Voltage (Bank 1, Sensor 2)",obdex,yes
+P0139,206,4,o2_sensor,no,no,O2 Sensor Circuit High Voltage (Bank 1 Sensor 2),"O2 Sensor Circuit Slow Response (Bank 1, Sensor 2)",override,yes
+P013A,207,4,o2_sensor,no,no,O2 Sensor Slow Response - Rich to Lean Bank 1 Sensor 2,O2 Sensor Slow Response - Rich to Lean Bank 1 Sensor 2,obdex,yes
+P013B,208,4,o2_sensor,no,no,O2 Sensor Slow Response - Lean to Rich Bank 1 Sensor 2,O2 Sensor Slow Response - Lean to Rich Bank 1 Sensor 2,obdex,yes
+P013E,209,4,o2_sensor,no,no,O2 Sensor Delayed Response - Rich to Lean Bank 1 Sensor 2,O2 Sensor Delayed Response - Rich to Lean Bank 1 Sensor 2,obdex,yes
+P013F,210,4,o2_sensor,no,no,O2 Sensor Delayed Response - Lean to Rich Bank 1 Sensor 2,O2 Sensor Delayed Response - Lean to Rich Bank 1 Sensor 2,obdex,yes
+P0140,211,4,o2_sensor,no,no,O2 Sensor Circuit No Activity / Slow Response (Bank 1 Sensor 2),O2 Sensor Circuit No Activity / Slow Response (Bank 1 Sensor 2),suspect,no
+P014C,212,4,o2_sensor,no,no,O2 Sensor Slow Response - Rich to Lean Bank 1 Sensor 1,O2 Sensor Slow Response - Rich to Lean Bank 1 Sensor 1,obdex,yes
+P014D,213,4,o2_sensor,no,no,O2 Sensor Slow Response - Lean to Rich Bank 1 Sensor 1,O2 Sensor Slow Response - Lean to Rich Bank 1 Sensor 1,obdex,yes
+P015A,214,4,o2_sensor,no,no,O2 Sensor Delayed Response - Rich to Lean Bank 1 Sensor 1,O2 Sensor Delayed Response - Rich to Lean Bank 1 Sensor 1,obdex,yes
+P015B,215,4,o2_sensor,no,no,O2 Sensor Delayed Response - Lean to Rich Bank 1 Sensor 1,O2 Sensor Delayed Response - Lean to Rich Bank 1 Sensor 1,obdex,yes
+P2270,216,4,o2_sensor,no,no,"O2 Sensor Signal Stuck Lean (Bank 1, Sensor 2)","O2 Sensor Signal Stuck Lean (Bank 1, Sensor 2)",obdex,yes
+P2271,217,4,o2_sensor,no,no,"O2 Sensor Signal Stuck Rich (Bank 1, Sensor 2)","O2 Sensor Signal Stuck Rich (Bank 1, Sensor 2)",obdex,yes
+P2A00,218,4,o2_sensor,no,no,O2 Sensor Circuit Range/Performance Bank 1 Sensor 1,O2 Sensor Circuit Range/Performance Bank 1 Sensor 1,obdex,yes
+P2A01,219,4,o2_sensor,no,no,O2 Sensor Circuit Range/Performance Bank 1 Sensor 2,O2 Sensor Circuit Range/Performance Bank 1 Sensor 2,obdex,yes
+P0036,220,4,o2_heater,no,no,HO2S Heater Control Circuit (Bank 1 Sensor 2),HO2S Heater Control Circuit (Bank 1 Sensor 2),obdex,yes
+P0037,221,4,o2_heater,no,no,HO2S Heater Control Circuit Low (Bank 1 Sensor 2),HO2S Heater Control Circuit Low (Bank 1 Sensor 2),obdex,yes
+P0038,222,4,o2_heater,no,no,HO2S Heater Control Circuit High (Bank 1 Sensor 2),HO2S Heater Control Circuit High (Bank 1 Sensor 2),obdex,yes
+P0053,223,4,o2_heater,no,no,HO2S Heater Resistance Bank 1 Sensor 1,HO2S Heater Resistance Bank 1 Sensor 1,obdex,yes
+P0054,224,4,o2_heater,no,no,HO2S Heater Resistance Bank 1 Sensor 2,HO2S Heater Resistance Bank 1 Sensor 2,obdex,yes
+P00D1,225,4,o2_heater,no,no,HO2S Heater Control Circuit Range/Performance Bank 1 Sensor 1,HO2S Heater Control Circuit Range/Performance Bank 1 Sensor 1,obdex,yes
+P00D2,226,4,o2_heater,no,no,HO2S Heater Control Circuit Range/Performance Bank 1 Sensor 2,HO2S Heater Control Circuit Range/Performance Bank 1 Sensor 2,obdex,yes
+P0141,227,4,o2_heater,no,no,"O2 Sensor Heater Circuit Malfunction (Bank 1, Sensor 2)","O2 Sensor Heater Circuit Malfunction (Bank 1, Sensor 2)",suspect,no
+P2096,228,4,fuel_trim,no,no,Post Catalyst Fuel Trim System Too Lean (Bank 1),Post Catalyst Fuel Trim System Too Lean (Bank 1),obdex,yes
+P2097,229,4,fuel_trim,no,no,Post Catalyst Fuel Trim System Too Rich (Bank 1),Post Catalyst Fuel Trim System Too Rich (Bank 1),obdex,yes
+P2177,230,4,fuel_trim,no,no,System Too Lean Off Idle Bank 1,System Too Lean Off Idle Bank 1,obdex,yes
+P2178,231,4,fuel_trim,no,no,System Too Rich Off Idle Bank 1,System Too Rich Off Idle Bank 1,obdex,yes
+P2187,232,4,fuel_trim,no,no,System Too Lean at Idle (Bank 1),System Too Lean at Idle (Bank 1),obdex,yes
+P2188,233,4,fuel_trim,no,no,System Too Rich at Idle (Bank 1),System Too Rich at Idle (Bank 1),obdex,yes
+P2146,234,4,injector,no,yes,Fuel Injector Group A Supply Voltage Circuit/Open,Fuel Injector Group A Supply Voltage Circuit/Open,obdex,yes
+P2147,235,4,injector,no,yes,Fuel Injector Group A Supply Voltage Circuit Low,Fuel Injector Group A Supply Voltage Circuit Low,obdex,yes
+P2148,236,4,injector,no,yes,Fuel Injector Group A Supply Voltage Circuit High,Fuel Injector Group A Supply Voltage Circuit High,obdex,yes
+P0316,237,4,misfire,no,no,Engine Misfire Detected on Startup (First 1000 Revolutions),Engine Misfire Detected on Startup (First 1000 Revolutions),obdex,yes
+P2300,238,4,ignition_coil,no,no,Ignition Coil A Primary Control Circuit Low,Ignition Coil A Primary Control Circuit Low,obdex,yes
+P2301,239,4,ignition_coil,no,no,Ignition Coil A Primary Control Circuit High,Ignition Coil A Primary Control Circuit High,obdex,yes
+P2302,240,4,ignition_coil,no,no,Ignition Coil A Secondary Circuit,Ignition Coil A Secondary Circuit,obdex,yes
+P2303,241,4,ignition_coil,no,no,Ignition Coil B Primary Control Circuit Low,Ignition Coil B Primary Control Circuit Low,obdex,yes
+P2304,242,4,ignition_coil,no,no,Ignition Coil B Primary Control Circuit High,Ignition Coil B Primary Control Circuit High,obdex,yes
+P2305,243,4,ignition_coil,no,no,Ignition Coil B Secondary Circuit,Ignition Coil B Secondary Circuit,obdex,yes
+P0914,244,4,neutral_gear,no,no,Gear Shift Position Circuit A,Gear Shift Position Circuit A,obdex,yes
+P0915,245,4,neutral_gear,no,no,Gear Shift Position Circuit Range/Performance,Gear Shift Position Circuit Range/Performance,obdex,yes
+P0916,246,4,neutral_gear,no,no,Gear Shift Position Circuit Low A,Gear Shift Position Circuit Low A,obdex,yes
+P0917,247,4,neutral_gear,no,no,Gear Shift Position Circuit High A,Gear Shift Position Circuit High A,obdex,yes
+P0918,248,4,neutral_gear,no,no,Gear Shift Position Circuit Intermittent A,Gear Shift Position Circuit Intermittent A,obdex,yes
+P0919,249,4,neutral_gear,no,no,Gear Shift Position Control Error,Gear Shift Position Control Error,obdex,yes
+P0651,250,4,sensor_reference_supply,no,no,Sensor Reference Voltage B Circuit Open,Sensor Reference Voltage B Circuit Open,obdex,yes
+P0652,251,4,sensor_reference_supply,no,no,Sensor Reference Voltage B Circuit Low,Sensor Reference Voltage B Circuit Low,obdex,yes
+P0653,252,4,sensor_reference_supply,no,no,Sensor Reference Voltage B Circuit High,Sensor Reference Voltage B Circuit High,obdex,yes
+P0697,253,4,sensor_reference_supply,no,no,Sensor Reference Voltage C Circuit Open,Sensor Reference Voltage C Circuit Open,obdex,yes
+P0698,254,4,sensor_reference_supply,no,no,Sensor Reference Voltage C Circuit Low,Sensor Reference Voltage C Circuit Low,obdex,yes
+P0699,255,4,sensor_reference_supply,no,no,Sensor Reference Voltage C Circuit High,Sensor Reference Voltage C Circuit High,obdex,yes
+P0608,256,4,control_module,no,no,Control Module VSS Output A,Control Module VSS Output A,obdex,yes
+P0609,257,4,control_module,no,no,Control Module VSS Output B,Control Module VSS Output B,obdex,yes
+P060A,258,4,control_module,no,no,Internal Control Module Monitoring Processor Performance,Internal Control Module Monitoring Processor Performance,obdex,yes
+P060B,259,4,control_module,no,no,Internal Control Module A and D Processing Performance,Internal Control Module A and D Processing Performance,obdex,yes
+P060C,260,4,control_module,no,no,Internal Control Module Main Processor Performance,Internal Control Module Main Processor Performance,obdex,yes
+P060D,261,4,control_module,no,no,Internal Control Module Accelerator Pedal Position Performance,Internal Control Module Accelerator Pedal Position Performance,obdex,yes
+P060E,262,4,control_module,no,no,Internal Control Module Throttle Position Performance,Internal Control Module Throttle Position Performance,obdex,yes
+P060F,263,4,control_module,no,no,Internal Control Module Coolant Temperature Performance,Internal Control Module Coolant Temperature Performance,obdex,yes
+P0610,264,4,control_module,no,no,Control Module Vehicle Options Error,Control Module Vehicle Options Error,obdex,yes
+P062F,265,4,control_module,no,no,Internal Control Module EEPROM Error,Internal Control Module EEPROM Error,obdex,yes
+P0630,266,4,control_module,no,no,VIN Not Programmed or Incompatible ECM or PCM,VIN Not Programmed or Incompatible ECM or PCM,obdex,yes
+P0634,267,4,control_module,no,no,Control Module Internal Temperature A Too High,Control Module Internal Temperature A Too High,obdex,yes
+P2610,268,4,control_module,no,no,ECM/PCM Internal Engine Off Timer Performance,ECM/PCM Internal Engine Off Timer Performance,obdex,yes
+U0073,269,4,can_bus,no,no,"Control Module Communication Bus ""A"" Off","Control Module Communication Bus ""A"" Off",confirmed,yes
+U0074,270,4,can_bus,no,no,"Control Module Communication Bus ""B"" Off","Control Module Communication Bus ""B"" Off",confirmed,yes
+U0075,271,4,can_bus,no,no,"Control Module Communication Bus ""B"" Performance",Control Module Communication Bus C Off,override,yes
+U0076,272,4,can_bus,no,no,"Control Module Communication Bus ""C"" Off",Control Module Communication Bus D Off,override,yes
+U0077,273,4,can_bus,no,no,Vehicle Communication Bus B Off,Control Module Communication Bus E Off,override,yes
+U0140,274,4,lost_comm_cluster,no,no,Lost Communication with Body Control Module,Lost Communication with Body Control Module,obdex,yes
+U0146,275,4,lost_comm_cluster,no,no,"Lost Communication with Gateway ""A""","Lost Communication with Gateway ""A""",obdex,yes
+U0167,276,4,lost_comm_immobiliser,no,no,Lost Communication with Vehicle Immobiliser Control Module,Lost Communication with Vehicle Immobiliser Control Module,suspect,no
+U0168,277,4,lost_comm_immobiliser,no,no,Lost Communication with Vehicle Immobilizer Control Module,Lost Communication with Vehicle Immobilizer Control Module,suspect,no
+P0483,278,4,cooling_fan,no,no,Cooling Fan Rationality Check,Cooling Fan Rationality Check,obdex,yes
+P0484,279,4,cooling_fan,no,no,Cooling Fan Current Too High,Cooling Fan Current Too High,obdex,yes
+P0485,280,4,cooling_fan,no,no,Cooling Fan Power/Ground Circuit,Cooling Fan Power/Ground Circuit,obdex,yes
+P2181,281,4,cooling_system,no,no,Cooling System Performance,Cooling System Performance,obdex,yes
+P0450,282,4,evap,no,no,EVAP System Pressure Sensor/Switch A Circuit,EVAP System Pressure Sensor/Switch A Circuit,obdex,yes
+P0451,283,4,evap,no,no,Evaporative Emission System Pressure Sensor Range/Performance,Evaporative Emission System Pressure Sensor Range/Performance,obdex,yes
+P0452,284,4,evap,no,no,Evaporative Emission System Pressure Sensor Low Input,Evaporative Emission System Pressure Sensor Low Input,obdex,yes
+P0453,285,4,evap,no,no,Evaporative Emission System Pressure Sensor High Input,Evaporative Emission System Pressure Sensor High Input,obdex,yes
+P0454,286,4,evap,no,no,EVAP System Pressure Sensor/Switch A Circuit Intermittent,EVAP System Pressure Sensor/Switch A Circuit Intermittent,obdex,yes
+P0455,287,4,evap,no,no,Evaporative Emission System Leak Detected (Large Leak),Evaporative Emission System Leak Detected (Large Leak),obdex,yes
+P0456,288,4,evap,no,no,Evaporative Emission System Leak Detected (Very Small Leak),Evaporative Emission System Leak Detected (Very Small Leak),obdex,yes
+P0457,289,4,evap,no,no,Evaporative Emission System Leak Detected (Fuel Cap Loose/Off),Evaporative Emission System Leak Detected (Fuel Cap Loose/Off),obdex,yes
+P0496,290,4,evap,no,no,Evaporative Emission System High Purge Flow,Evaporative Emission System High Purge Flow,obdex,yes
+P0497,291,4,evap,no,no,EVAP System Low Purge Flow,EVAP System Low Purge Flow,obdex,yes
+P0498,292,4,evap,no,no,EVAP System Vent Valve Control Circuit Low,EVAP System Vent Valve Control Circuit Low,obdex,yes
+P0499,293,4,evap,no,no,EVAP System Vent Valve Control Circuit High,EVAP System Vent Valve Control Circuit High,obdex,yes
+P0418,294,4,secondary_air,no,no,"Secondary Air Injection System Relay ""A"" Circuit Malfunction","Secondary Air Injection System Relay ""A"" Circuit Malfunction",obdex,yes
+P0491,295,4,secondary_air,no,no,Secondary Air Injection System Insufficient Flow (Bank 1),Secondary Air Injection System Insufficient Flow (Bank 1),obdex,yes
+U0300,296,4,software,no,no,Internal Control Module Software Incompatibility,Internal Control Module Software Incompatibility,obdex,yes
+U0301,297,4,software,no,no,Software Incompatibility with ECM/PCM,Software Incompatibility with ECM/PCM,obdex,yes
+U0327,298,4,software,no,no,Software Incompatibility with Powertrain Control Module,Software Incompatibility with Powertrain Control Module,obdex,yes
+U0401,299,4,invalid_data,no,no,Invalid Data Received from ECM/PCM,Invalid Data Received from ECM/PCM,obdex,yes
+U0408,300,4,invalid_data,no,no,Invalid Data Received from Vehicle Immobilizer Control Module,Invalid Data Received from Vehicle Immobilizer Control Module,obdex,yes
+U0415,301,4,invalid_data,no,no,Invalid Data Received from ABS Control Module,Invalid Data Received from ABS Control Module,obdex,yes
+U0421,302,4,invalid_data,no,no,Invalid Data Received from Throttle/Pedal Position Sensor,Invalid Data Received from Throttle/Pedal Position Sensor,obdex,yes
+P0620,303,4,charging,no,no,Generator Control Circuit,Generator Control Circuit,obdex,yes
+P0621,304,4,charging,no,no,Generator Lamp L Control Circuit,Generator Lamp L Control Circuit,obdex,yes
+P0625,305,4,charging,no,no,Generator Field Terminal Circuit Low,Generator Field Terminal Circuit Low,obdex,yes
+P0626,306,4,charging,no,no,Generator Field/F Terminal Circuit Performance,Generator Field/F Terminal Circuit High,override,yes
+P2500,307,4,charging,no,no,Generator Lamp/L-Terminal Circuit Low,Generator Lamp/L-Terminal Circuit Low,obdex,yes
+P2501,308,4,charging,no,no,Generator Lamp/L-Terminal Circuit High,Generator Lamp/L-Terminal Circuit High,obdex,yes
+P2502,309,4,charging,no,no,Charging System Voltage,Charging System Voltage,obdex,yes
+P2503,310,4,charging,no,no,Charging System Voltage Low,Charging System Voltage Low,obdex,yes
+P2504,311,4,charging,no,no,Charging System Voltage High,Charging System Voltage High,obdex,yes
+P0016,312,4,cam_crank_sync,no,no,Crankshaft Position - Camshaft Position Correlation (Bank 1 Sensor A),Crankshaft Position - Camshaft Position Correlation (Bank 1 Sensor A),obdex,yes
+P033F,313,4,cam_crank_sync,no,no,Crankshaft/Camshaft Loss Of Synchronization,Crankshaft/Camshaft Loss Of Synchronization,suspect,no
+P0320,314,4,engine_speed_input,no,no,Ignition/Distributor Engine Speed Input Circuit,Ignition/Distributor Engine Speed Input Circuit,obdex,yes
+P0321,315,4,engine_speed_input,no,no,Ignition/Distributor Engine Speed Input Circuit Range/Performance,Ignition/Distributor Engine Speed Input Circuit Range/Performance,obdex,yes
+P0322,316,4,engine_speed_input,no,no,Ignition/Distributor Engine Speed Input Circuit No Signal,Ignition/Distributor Engine Speed Input Circuit No Signal,obdex,yes
+P0323,317,4,engine_speed_input,no,no,Ignition/Distributor Engine Speed Input Circuit Intermittent,Ignition/Distributor Engine Speed Input Circuit Intermittent,obdex,yes
+P0219,318,4,overspeed,no,no,Engine Overspeed Condition,Engine Overspeed Condition,obdex,yes
+P0460,319,4,fuel_level,no,no,Fuel Level Sensor A Circuit,Fuel Level Sensor A Circuit,obdex,yes
+P0461,320,4,fuel_level,no,no,Fuel Level Sensor A Circuit Range/Performance,Fuel Level Sensor A Circuit Range/Performance,obdex,yes
+P0462,321,4,fuel_level,no,no,Fuel Level Sensor A Circuit Low,Fuel Level Sensor A Circuit Low,obdex,yes
+P0463,322,4,fuel_level,no,no,Fuel Level Sensor A Circuit High,Fuel Level Sensor A Circuit High,obdex,yes
+P0464,323,4,fuel_level,no,no,Fuel Level Sensor A Circuit Intermittent,Fuel Level Sensor A Circuit Intermittent,obdex,yes
+P0070,324,4,ambient_temp,no,no,Ambient Air Temperature Sensor Circuit A,Ambient Air Temperature Sensor Circuit A,obdex,yes
+P0071,325,4,ambient_temp,no,no,Ambient Air Temperature Sensor Circuit A Range/Performance,Ambient Air Temperature Sensor Circuit A Range/Performance,obdex,yes
+P0072,326,4,ambient_temp,no,no,Ambient Air Temperature Sensor Circuit A Low,Ambient Air Temperature Sensor Circuit A Low,obdex,yes
+P0073,327,4,ambient_temp,no,no,Ambient Air Temperature Sensor Circuit A High,Ambient Air Temperature Sensor Circuit A High,obdex,yes
+P0074,328,4,ambient_temp,no,no,Ambient Air Temperature Sensor Circuit A Intermittent/Erratic,Ambient Air Temperature Sensor Circuit A Intermittent/Erratic,obdex,yes
+P0504,329,4,brake_switch,no,no,"Brake Switch ""A""/""B"" Correlation","Brake Switch ""A""/""B"" Correlation",obdex,yes
+P0704,330,4,clutch_switch,no,no,Clutch Switch Input Circuit,Clutch Switch Input Circuit,obdex,yes
+P2122,331,4,twist_grip_sensor,no,no,"Throttle/Pedal Position Sensor ""D"" Circuit Low","Throttle/Pedal Position Sensor ""D"" Circuit Low",obdex,yes
+P2123,332,4,twist_grip_sensor,no,no,"Throttle/Pedal Position Sensor ""D"" Circuit High","Throttle/Pedal Position Sensor ""D"" Circuit High",obdex,yes
+P2127,333,4,twist_grip_sensor,no,no,"Throttle/Pedal Position Sensor ""E"" Circuit Low","Throttle/Pedal Position Sensor ""E"" Circuit Low",obdex,yes
+P2128,334,4,twist_grip_sensor,no,no,"Throttle/Pedal Position Sensor ""E"" Circuit High","Throttle/Pedal Position Sensor ""E"" Circuit High",obdex,yes
+P2138,335,4,twist_grip_sensor,no,no,"Throttle/Pedal Position Sensor ""D""/""E"" Voltage Correlation","Throttle/Pedal Position Sensor ""D""/""E"" Voltage Correlation",obdex,yes
+C0020,336,4,abs_pump,no,no,ABS Pump Motor Circuit,ABS Pump Motor Circuit,obdex,yes
+C0021,337,4,abs_pump,no,no,ABS Pump Motor Circuit Range/Performance,ABS Pump Motor Circuit Range/Performance,obdex,yes
+C0022,338,4,abs_pump,no,no,ABS Pump Motor Circuit Low,ABS Pump Motor Circuit Low,obdex,yes
+C0023,339,4,abs_pump,no,no,ABS Pump Motor Circuit High,ABS Pump Motor Circuit High,obdex,yes
+C0025,340,4,abs_pump,no,no,ABS Pump Motor Stalled,ABS Pump Motor Stalled,obdex,yes
+C0110,341,4,abs_pump,no,no,ABS Pump Motor Circuit Malfunction,ABS Pump Motor Circuit Malfunction,obdex,yes
+C0111,342,4,abs_pump,no,no,ABS Activation Excessively Long,ABS Activation Excessively Long,obdex,yes
+C0112,343,4,abs_pump,no,no,ABS Activation Frequency Too High,ABS Activation Frequency Too High,obdex,yes
+C0030,344,4,wheel_speed,no,no,Left Front Wheel Speed Sensor Circuit Range/Performance,Left Front Wheel Speed Sensor Circuit Range/Performance,suspect,no
+C0031,345,4,wheel_speed,no,no,Left Front Wheel Speed Sensor Circuit Low,Left Front Wheel Speed Sensor Circuit Low,suspect,no
+C0032,346,4,wheel_speed,no,no,Left Front Wheel Speed Sensor Circuit High,Left Front Wheel Speed Sensor Circuit High,suspect,no
+C0033,347,4,wheel_speed,no,no,Left Front Wheel Speed Sensor Signal Erratic,Left Front Wheel Speed Sensor Signal Erratic,suspect,no
+C0034,348,4,wheel_speed,no,no,Left Front Wheel Speed Sensor No Signal,Left Front Wheel Speed Sensor No Signal,suspect,no
+C0036,349,4,wheel_speed,no,no,Left Front Wheel Speed Sensor Circuit Intermittent,Left Front Wheel Speed Sensor Circuit Intermittent,suspect,no
+C0037,350,4,wheel_speed,no,no,Left Rear Wheel Speed Sensor,Left Rear Wheel Speed Sensor,suspect,no
+C0038,351,4,wheel_speed,no,no,Left Rear Wheel Speed Sensor Supply,Left Rear Wheel Speed Sensor Supply,suspect,no
+C003A,352,4,wheel_speed,no,no,Right Rear Wheel Speed Sensor,Right Rear Wheel Speed Sensor,suspect,no
+C003B,353,4,wheel_speed,no,no,Right Rear Wheel Speed Sensor Supply,Right Rear Wheel Speed Sensor Supply,suspect,no
+C003C,354,4,wheel_speed,no,no,Rear Tone Wheel,Rear Tone Wheel,suspect,no
+C003D,355,4,wheel_speed,no,no,Rear Wheel Speed Sensor,Rear Wheel Speed Sensor,suspect,no
+C003E,356,4,wheel_speed,no,no,Rear Wheel Speed Sensor Supply,Rear Wheel Speed Sensor Supply,suspect,no
+C003F,357,4,wheel_speed,no,no,Wheel Speed Sensors Rotation Direction Correlation,Wheel Speed Sensors Rotation Direction Correlation,suspect,no
+C0041,358,4,wheel_speed,no,no,Right Front Wheel Speed Sensor Circuit Range/Performance,Right Front Wheel Speed Sensor Circuit Range/Performance,obdex,yes
+C0042,359,4,wheel_speed,no,no,Right Front Wheel Speed Sensor Circuit Low,Right Front Wheel Speed Sensor Circuit Low,obdex,yes
+C0043,360,4,wheel_speed,no,no,Right Front Wheel Speed Sensor Circuit High,Right Front Wheel Speed Sensor Circuit High,obdex,yes
+C0044,361,4,wheel_speed,no,no,Right Front Wheel Speed Sensor Signal Erratic,Right Front Wheel Speed Sensor Signal Erratic,obdex,yes
+C0046,362,4,wheel_speed,no,no,Right Front Wheel Speed Sensor Circuit Intermittent,Right Front Wheel Speed Sensor Circuit Intermittent,obdex,yes
+C0052,363,4,wheel_speed,no,no,Left Rear Wheel Speed Sensor Circuit Low,Left Rear Wheel Speed Sensor Circuit Low,obdex,yes
+C0053,364,4,wheel_speed,no,no,Left Rear Wheel Speed Sensor Circuit High,Left Rear Wheel Speed Sensor Circuit High,obdex,yes
+C0054,365,4,wheel_speed,no,no,Left Rear Wheel Speed Sensor Signal Erratic,Left Rear Wheel Speed Sensor Signal Erratic,obdex,yes
+C0055,366,4,wheel_speed,no,no,Left Rear Wheel Speed Sensor No Signal,Left Rear Wheel Speed Sensor No Signal,obdex,yes
+C0056,367,4,wheel_speed,no,no,Left Rear Wheel Speed Sensor Circuit Intermittent,Left Rear Wheel Speed Sensor Circuit Intermittent,obdex,yes
+C0060,368,4,wheel_speed,no,no,Right Rear Wheel Speed Sensor Circuit,Right Rear Wheel Speed Sensor Circuit,obdex,yes
+C0061,369,4,wheel_speed,no,no,Right Rear Wheel Speed Sensor Circuit Range/Performance,Right Rear Wheel Speed Sensor Circuit Range/Performance,obdex,yes
+C0062,370,4,wheel_speed,no,no,Right Rear Wheel Speed Sensor Circuit Low,Right Rear Wheel Speed Sensor Circuit Low,obdex,yes
+C0063,371,4,wheel_speed,no,no,Right Rear Wheel Speed Sensor Circuit High,Right Rear Wheel Speed Sensor Circuit High,obdex,yes
+C0064,372,4,wheel_speed,no,no,Right Rear Wheel Speed Sensor Signal Erratic,Right Rear Wheel Speed Sensor Signal Erratic,obdex,yes
+C0065,373,4,wheel_speed,no,no,Right Rear Wheel Speed Sensor No Signal,Right Rear Wheel Speed Sensor No Signal,obdex,yes
+C0066,374,4,wheel_speed,no,no,Right Rear Wheel Speed Sensor Circuit Intermittent,Right Rear Wheel Speed Sensor Circuit Intermittent,obdex,yes
+C0080,375,4,wheel_speed,no,no,Wheel Speed Mismatch (Front Axle),Wheel Speed Mismatch (Front Axle),obdex,yes
+C0081,376,4,wheel_speed,no,no,Wheel Speed Mismatch (Rear Axle),Wheel Speed Mismatch (Rear Axle),obdex,yes
+C0234,377,4,wheel_speed,no,no,Wheel Speed Sensor Frequency Error,Wheel Speed Sensor Frequency Error,obdex,yes
+C0235,378,4,wheel_speed,no,no,Wheel Speed Sensor Signal Erratic,Wheel Speed Sensor Signal Erratic,obdex,yes
+C0238,379,4,wheel_speed,no,no,Speed Wheel-to-Wheel Mismatch,Speed Wheel-to-Wheel Mismatch,obdex,yes
+C0245,380,4,wheel_speed,no,no,Wheel Speed Sensor Frequency Mismatch,Wheel Speed Sensor Frequency Mismatch,obdex,yes
+C004F,381,4,abs_module,no,no,ABS Control Module Over Temperature,ABS Control Module Over Temperature,obdex,yes
+C0220,382,4,abs_module,no,no,ABS Valve Block Supply Voltage,ABS Valve Block Supply Voltage,obdex,yes
+C0246,383,4,abs_module,no,no,ABS/TCS Control Module Internal Performance,ABS/TCS Control Module Internal Performance,obdex,yes
+C0121,384,4,abs_relay,no,no,Valve Relay Circuit Malfunction,Valve Relay Circuit Malfunction,obdex,yes
+C0225,385,4,abs_relay,no,no,ABS Valve Relay Circuit,ABS Valve Relay Circuit,obdex,yes
+C0241,386,4,abs_lamp,no,no,ABS Warning Lamp Control Circuit,ABS Warning Lamp Control Circuit,obdex,yes
+C0242,387,4,abs_lamp,no,no,PCM Indicated ABS Malfunction,PCM Indicated ABS Malfunction,obdex,yes
