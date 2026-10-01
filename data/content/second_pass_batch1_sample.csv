@@ -1,0 +1,31 @@
+code,in_random_sample,result
+P0031,yes,no problem found
+P0106,yes,no problem found
+P0124,yes,no problem found
+P0126,yes,no problem found
+P0128,yes,no problem found
+P0133,yes,problem found and fixed
+P0198,yes,no problem found
+P0264,yes,no problem found
+P0265,yes,no problem found
+P0324,yes,"problem found, open or accepted"
+P0326,yes,no problem found
+P0327,yes,no problem found
+P0336,yes,no problem found
+P0341,yes,no problem found
+P0501,yes,problem found and fixed
+P0507,yes,problem found and fixed
+P050D,yes,no problem found
+P0511,yes,problem found and fixed
+P0519,yes,no problem found
+P0560,yes,no problem found
+P0602,yes,no problem found
+P0605,yes,"problem found, open or accepted"
+P0606,yes,"problem found, open (same STOP-calibration question as P0605)"
+P0616,yes,problem found and fixed
+P0628,yes,no problem found
+P0633,yes,no problem found
+P0688,yes,"problem found, open or accepted"
+P068B,yes,no problem found
+P0690,yes,no problem found
+P2196,yes,no problem found

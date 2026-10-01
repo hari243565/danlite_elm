@@ -73,3 +73,53 @@ Generic "circuit malfunction" codes do not say how the circuit failed. Use **cir
 | mechanic, technician | "mechanic" for the rider text, "technician" for the technician hints | |
 | ride | for the rider advice use "ride", "stop", "pull over" | drive |
 | bike | the vehicle (covers scooter and motorcycle) | motorbike, motorcycle |
+
+## Added 2026-10-01 (pilot fixes and batch 1)
+
+### Fixed sentences (translate once and reuse word for word)
+
+| Id | English | Used in |
+|---|---|---|
+| STALL | If it stalls more than once or will not restart, do not keep riding; have it taken to a workshop. | throttle position sensor codes (P0120 to P0124) and similar |
+| TWO-CASE | If the engine runs normally, have it checked soon; if it stalls, loses power or will not start, do not keep riding. | U0100, ECU power relay sense codes, ECU internal faults, CAN bus codes |
+| STOP-TAIL | Pull over safely, switch off and do not keep riding; have the bike taken to a workshop. | every STOP entry |
+| PETROL | If you smell petrol strongly near the engine or tank, or see fuel dripping, stop and do not ride. | any entry that mentions a petrol smell (rule R4) |
+| ABS | Your normal brakes still work, but ABS is off, so a wheel can lock in hard braking. | every ABS and wheel-speed entry (rule R5) |
+| BATTERY | If the battery is hot, swollen or smells of rotten eggs, or the lights are very bright or bulbs keep blowing, stop, switch off and do not ride on. | P0563 |
+| LATER | Get it checked soon; ride gently and avoid long trips until it is fixed. | MAP sensor codes |
+
+### Hedges (keep the hedge in every language)
+
+| English | Meaning |
+|---|---|
+| (if fitted) | the part exists only on some bikes; mandatory after a fuse or a relay in a cause or hint |
+| (if hose-fed) | the sensor takes its signal through a hose on some bikes only |
+| (liquid-cooled bikes) | the cause applies only to bikes with a coolant system |
+| (less common) | a real but rare cause |
+| if your bike has / shows ... | the rider's bike may not have that display or system; never assume it |
+
+### Terms
+
+| Preferred form | Meaning for the translator | Do not use |
+|---|---|---|
+| performance or incorrect operation | shared failure phrase for "range/performance" codes: the reading is not plausible for the conditions | range error |
+| intermittent circuit fault | the signal drops out or jumps at times | erratic, sporadic |
+| slow response | an oxygen sensor that switches too slowly | lag |
+| signal stuck lean / stuck rich | an oxygen sensor signal that stays on one value | frozen |
+| fuel mixture correction (fuel trim) | the ECU's correction to the fuel amount; the title says it in plain words first | trim (alone) |
+| out of balance (cylinder) | one cylinder does not do its share of the work | contribution fault |
+| CAN bus (+) wire, plus wire; CAN bus (-) wire, minus wire | the two wires of the bike's data network | CAN high, CAN low |
+| safety systems | ABS and similar systems that may switch off when the data network fails; ABS itself is named only in ABS entries | |
+| learned settings | values the ECU stores to adjust idle and fuel (keep-alive memory); lost when the battery is disconnected or weak | KAM, adaptations |
+| immobiliser (key-code anti-theft start lock) | gloss the first time an entry says immobiliser | security module |
+| ECU power relay (if fitted) | the relay that powers the ECU, on bikes that have one | main relay (alone) |
+| sensor supply | the shared reference feed the ECU gives its sensors | 5 V line, VREF |
+| toothed ring (reluctor ring) on the crankshaft; toothed ring (tone ring) on a wheel | toothed ring read by a position or wheel speed sensor; give the workshop word in brackets once | pulse wheel, exciter ring |
+| engine overheating | the engine temperature went above the allowed limit | overtemperature |
+| knocking, pinging | harmful metallic pinging from the engine under load | detonation |
+| workshop | where the bike is repaired; "mechanic" for the person | garage, service centre |
+| pull over | stop safely at the roadside | park up |
+| do not keep riding | stop riding now and do not start again until checked | do not drive |
+| ECU | write "bike's computer (ECU)" the first time in an entry, then "ECU" | ECM, PCM, engine control module |
+
+Rider-facing text never says "scan tool", "gauge", "tachometer" or a blinking lamp unless it is written "if your bike ..." (rules R1 to R3 in RUBRIC.md). Technician hints may say "scan tool".

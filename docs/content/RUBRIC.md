@@ -1,17 +1,22 @@
-# Rider action rubric (Step 2)
+# Rider action rubric (Step 2), revised 2026-10-01 (schema version 2)
 
 | Level | Use when | Rider advice must |
 |---|---|---|
-| STOP | Typically causes stalling, no start, sudden power loss, fuel leakage or fire risk, or loss of the ability to brake or steer normally | tell the rider to pull over safely and check before riding further |
-| SERVICE_SOON | Can damage the engine or catalyst if ignored, or hurts drivability (misfire, O2 sensor, throttle, fuel trim) | say to get it checked soon and how to ride meanwhile |
-| MONITOR | Minor, emissions-only or likely to clear | say it can wait for the next service |
+| STOP | Typically causes stalling, no start, sudden power loss, fuel leakage or fire risk, or loss of the ability to brake or steer normally | tell the rider to pull over safely, switch off and not keep riding (rule R3) |
+| SERVICE_SOON | Can damage the engine or catalyst if ignored, or hurts drivability (misfire, O2 sensor, throttle, fuel trim) | say to get it checked soon and how to ride meanwhile; any stall or no-start wording must be conditional ("if ...") |
+| MONITOR | Minor, emissions-only or likely to clear | say it can wait for the next service; no stall or no-start claim |
 | INFO | Reserved, test not completed, purely diagnostic | not use "pull over" |
 
-`needs_mechanic_review` is true for every STOP, every chassis or braking code and every low-confidence entry. The validator enforces it.
+`needs_independent_review` (renamed from `needs_mechanic_review`: there is no mechanic on this project, so independent review means a separate reviewer session plus rider feedback) is true for every STOP, every chassis or braking code, every ABS or wheel-speed code, every low-confidence entry and every entry that mentions a petrol smell. The author may also set it for any other entry that needs a second pair of eyes. The validator enforces the minimum.
 
-## Interpretation of "touches braking or steering"
+## Owner decisions applied (final, 2026-10-01)
 
-The brief lists "touches braking or steering" under STOP. This run reads it as: the fault can stop the rider from braking or steering normally (for example a stuck valve or lost brake pressure). A wheel speed sensor or ABS communication fault normally switches ABS off while the base brakes still work, so those codes are SERVICE_SOON with explicit "ABS may be off, brake early" advice and a mechanic review flag. If the owner wants every ABS code to be STOP, change the `abs_*`, `wheel_speed` and `lost_comm_abs` rows below to `{STOP}`; the validator will then enforce it.
+- **D1, P0563 system voltage high.** SERVICE_SOON, firm advice with explicit stop triggers (battery hot, swollen or smells of rotten eggs, lights very bright, bulbs keep blowing: stop, switch off and do not ride on; otherwise a short daytime ride to a workshop only). `can_ride_to_workshop` = with_care. The reasoning is in `rider_action_basis`. Review true.
+- **D2, U0100.** SERVICE_SOON, two honest cases ("if the engine runs normally, have it checked soon; if it stalls, loses power or will not start, do not keep riding"). No unconditional stall or no-start claim and no scan tool in the text. The same two-case pattern is used for the other "the ECU or its link may be at fault" entries (ECU power relay sense circuit, ECU internal faults that do not threaten the engine, CAN bus).
+- **D3, ABS and wheel-speed function loss.** SERVICE_SOON. The advice contains: "Your normal brakes still work, but ABS is off, so a wheel can lock in hard braking." (or a close paraphrase with the three facts and no hedge). STOP only for brake fluid loss or hydraulic pressure loss; no such code is selected. Rider titles never name a car wheel position ("Wheel speed sensor fault (front or rear wheel)"). The validator maps `lost_comm_abs`, `wheel_speed`, `abs_pump`, `abs_module`, `abs_relay` and `abs_lamp` to SERVICE_SOON only (rule R5).
+- **D4, `can_ride_to_workshop`.** STOP gives `no`; SERVICE_SOON gives `with_care`, or `yes` when the fault clearly cannot strand the rider (O2 sensor, O2 heater and similar); MONITOR and INFO give `yes`. `can_ride_reason` (max 80 characters) says why. The validator rejects any other combination, so a deviation needs a change to the validator mapping, not just a note.
+- **D5, single-cylinder bikes.** `applies_when: {"cylinders_min": 2}` on every code that needs a second cylinder: any standard title with "cylinder 2", "ignition coil B" or "contribution/balance". The validator enforces it.
+- **D6, honest labels.** `verification` is `ai_authored_from_standard_title` (structure-only mode) or `ai_authored_adapted`. The word "verified" (or "verification") is rejected in every text field.
 
 ## Mapping enforced by the validator (reason tag to allowed levels)
 
@@ -21,24 +26,50 @@ The tags come from `relevance_ranking.csv`. A code with several tags may use any
 |---|---|
 | injector, ignition_coil, crankshaft | STOP |
 | fuel_pump, cam_crank_sync, engine_speed_input, oil_pressure, ecu_power_relay | STOP, SERVICE_SOON |
-| camshaft, misfire, throttle, ride_by_wire, twist_grip_sensor, ect, cooling_fan, cooling_system, system_voltage, starter_relay, charging, sensor_reference_supply, control_module, immobiliser, starter_immobiliser, can_bus, lost_comm_engine, lost_comm_abs, lost_comm_immobiliser, abs_pump, wheel_speed, abs_module, abs_relay, abs_lamp | SERVICE_SOON, STOP |
+| camshaft, misfire, injector_balance, throttle, ride_by_wire, twist_grip_sensor, ect, cooling_fan, cooling_system, system_voltage, starter_relay, charging, sensor_reference_supply, control_module, immobiliser, starter_immobiliser, can_bus, lost_comm_engine | SERVICE_SOON, STOP |
+| lost_comm_abs, wheel_speed, abs_pump, abs_module, abs_relay, abs_lamp | SERVICE_SOON (D3) |
 | idle, map_baro, fuel_trim, knock | SERVICE_SOON |
 | o2_sensor, o2_heater, vehicle_speed, brake_switch, neutral_gear, clutch_switch | SERVICE_SOON, MONITOR |
-| iat, oil_temp, catalyst, overspeed, secondary_air, software, invalid_data, lost_comm_cluster | MONITOR, SERVICE_SOON |
+| iat, oil_temp, catalyst, overspeed, secondary_air, software, invalid_data, lost_comm_cluster, ect_warmup | MONITOR, SERVICE_SOON |
 | evap, fuel_level, ambient_temp | MONITOR |
+
+New in this revision: `injector_balance` (P0263, P0266: one cylinder not doing its share, a drivability fault, not "no fuel") and `ect_warmup` (P0125, P0126, P0128: engine slow to warm up, an emissions and fuel-use fault) were split out of `injector` and `ect` so they are not forced to STOP or SERVICE_SOON.
+
+Judgement calls inside the mapping (for the reviewer to challenge):
+
+- All fuel pump circuit codes (P0230 to P0233, P0627 to P0629) are STOP: a pump that drops out stops the engine without warning, and a "high" reading is often an open circuit.
+- ECU power relay: control circuit open or low (P0685, P0686) is STOP (the ECU can lose power). Control circuit high, the sense circuit codes and the "switched off too early or late" codes are SERVICE_SOON with the two-case advice, because the ECU is powered well enough to store the code.
+- ECU internal processor, RAM and ROM faults (P0604 to P0606) are STOP; checksum, programming, keep-alive and general performance faults (P0601 to P0603, P0607) are SERVICE_SOON. This split is the least certain call in batch 1.
+- Intermittent crankshaft or fuel pump circuit codes (P0339, P0233) are STOP because the loss is sudden.
+- Sensor supply faults (P0641 to P0643) are SERVICE_SOON with the stall condition and `can_ride` with_care.
+
+## Text rules the validator enforces (R1 to R10)
+
+| Rule | What is rejected |
+|---|---|
+| R1 | Circular advice: "stop if the engine stalls, cuts out or dies" (also in reverse order). If it has stalled the rider has already stopped. Use "if it stalls more than once or will not restart, do not keep riding; have it taken to a workshop". |
+| R2 | Assumed hardware in rider text: gauge, tachometer, rev counter, blinking or flashing lamp, scan tool. Allowed only as "if your bike ...". Technician hints may say "scan tool" but not gauge or blinking lamp. |
+| R3 | Below STOP: an unconditional claim that the engine will or may stall, cut out or not start (use "if ..."). At STOP: the advice must say pull over or stop and not to keep riding. Applies to meaning, basis, advice and `can_ride_reason`. |
+| R4 | Any mention of a petrol or fuel smell must come with "If you smell petrol strongly near the engine or tank, or see fuel dripping, stop and do not ride." and needs_independent_review true. |
+| R5 | ABS and wheel-speed codes: brakes work, ABS is off, a wheel can lock (no hedge words), SERVICE_SOON, no "braking is not affected" or "ride as normal". |
+| R6 | Low and high codes: the title says "voltage below threshold" or "voltage above threshold" and the meaning says below/low or above/high, not the opposite. Coolant, oil, intake and ambient air temperature sensors: LOW voltage means the engine, oil or air LOOKS HOTTER; HIGH voltage means it LOOKS COLDER. The direction comes from the standard title (override applied). |
+| R7 | Car-only parts: EGR, MAF, PCV, transmission fluid, turbo or boost, glow plug, diesel, DPF, power steering, cruise control, A/C. A timing chain cause must say "rare". A catalytic converter may be a cause only for catalyst codes. |
+| R8 | A fuse or relay in a cause or hint needs "if fitted" (not required when the code's own standard title names the relay). A hose needs "if hose-fed". |
+| R9 | The first 12 words of the meaning contain no workshop phrase (short to ground, open circuit, voltage below threshold, plausibility, internal fault and similar). |
+| R10 | No "(listed as", no "bank 2" and no duplicate title across codes in a rider title. |
 
 ## Flags
 
-- `mil`: the warning lamp (MIL) normally lights for this code. Chassis and network codes are set false unless the engine unit raises them.
+- `mil`: the warning lamp (MIL) normally lights for this code. Chassis and network codes are set false unless the engine unit raises them; false also means "not known to light it".
 - `emissions_relevant`: the fault can affect exhaust emissions or fuel control.
-- `limp_possible`: the ECU may substitute a default value or limit power.
+- `limp_possible`: the ECU may substitute a default value or limit power. In structure-only mode these three flags are the author's judgement from the code's structure, not copied from OBDex (its flags are generic car values). The independent review noted that nothing checks them; a reviewer should spot-check.
 
 ## Confidence
 
 - high: standard generic meaning, not bike-specific.
-- medium: meaning is standard but the effect depends on the bike (speed source, neutral interlock, camshaft sensor, network units).
-- low: thin or car-oriented source, or the generic code is ambiguous on a bike (serial link, chassis wheel codes).
+- medium: meaning is standard but the effect depends on the bike (speed source, neutral interlock, camshaft sensor, knock sensor, network units).
+- low: thin or car-oriented source, or the generic code is ambiguous on a bike (serial link, chassis wheel codes, ECU relay sense circuits, ECU internal faults, bus-off codes).
 
 ## Wording rules
 
-No absolute words (always, never, guaranteed, definitely, certainly, absolutely). No part numbers, pin numbers, voltages, resistances or cost figures. No brand names. Parts named in an entry must appear in the source entry's title, components or causes (a part found only in the source description gives a validator warning).
+No absolute words (always, never, guaranteed, definitely, certainly, absolutely). No part numbers, pin numbers, voltages, resistances or cost figures. No brand names. Parts named in an entry must appear in the source entry's title, components or causes (a part found only in the source description gives a validator warning). In structure-only mode this is the check that stops the author inventing parts: 24 of the 100 batch 1 first drafts failed it and were rewritten.

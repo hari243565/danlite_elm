@@ -1,5 +1,7 @@
 # Pilot report: English seed for standard (generic) fault codes
 
+> **Historical.** This is the report of the first pilot run. The 40 pilot entries were rewritten on 2026-10-01 after the independent review (schema version 2, fixes in `data/content/fix_log_20261001.csv`); see `BATCH1_REPORT.md` for the current counts, rules and open decisions. Field names below (`needs_mechanic_review`, `verification`) are the version 1 names.
+
 Run: RUN_MODE = write, RUN_SCOPE = pilot. Date: 2026-10-01. Branch: `content/seed-20261001`.
 Source: OBDex commit `bc58b0eb7273226a1aabae98e956b70b8362bda1` (CC0-1.0 data).
 Nothing outside `data/content/` and `docs/content/` was changed.
