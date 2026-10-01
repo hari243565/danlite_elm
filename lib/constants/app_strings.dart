@@ -211,9 +211,10 @@ class AppStrings {
           'connector. Check the battery is healthy. Some older bikes use a '
           'connection type the app cannot read yet. Then try again.',
       'dtcRefusedTitle': 'The bike refused the request',
+      // Phase 1A: the engine-off advice moved to dtcRefusedEngineRunning and
+      // is shown only when the engine is known to be running.
       'dtcRefusedBody': 'The bike\'s computer answered but did not report its '
-          'fault codes. This does not mean there are no faults. Switch the '
-          'engine off, keep the ignition ON, and try again.',
+          'fault codes. This does not mean there are no faults. Try again.',
       'dtcLinkLostTitle': 'Lost contact with the adapter',
       'dtcLinkLostBody': 'No fault codes could be read. Check the adapter is '
           'still plugged in and connected, then try again.',
@@ -238,6 +239,29 @@ class AppStrings {
       'dtcSubNetworkData': 'Network data',
       'dtcSeverityGuidance':
           'Severity is Danlite\'s guidance, not manufacturer data.',
+
+      // ── Fault-code diagnostic core (Phase 1A) ───────────────────────────
+      // English and Hindi; other languages fall back to English, as above.
+      'faultStatusStored': 'Stored',
+      'faultStatusPending': 'Pending',
+      'faultStatusPermanent': 'Permanent',
+      'faultStatusActive': 'Active',
+      'faultStatusHistory': 'History',
+      'faultStatusLamp': 'Lamp on',
+      'faultFailureType': 'Failure type',
+      'dtcEngineLampOn': 'Warning lamp ON',
+      'dtcCountMismatch': 'The bike reports {reported} stored code(s) but sent '
+          '{received}. A code may be missing. Read again.',
+      'dtcRefusedEngineRunning': 'The engine is running. Stop the engine, keep '
+          'the ignition ON, and try again.',
+      'dtcModuleBusyBody': 'The bike\'s computer kept replying that it was busy '
+          'and never sent its fault codes. This does not mean there are no '
+          'faults. Try again in a moment.',
+      'batteryLowBanner': 'Battery voltage is low ({v} V). Low voltage can '
+          'cause false communication codes. Charge or replace the battery, then '
+          'scan again.',
+      'mayBeFalseLowVoltage':
+          'May be a false code caused by low battery voltage',
       'recorderOnTitle': 'Session recorder is on',
       'recorderOnBody': 'Danlite is saving this connection\'s adapter '
           'messages to a file on this phone, to help support more bikes. '
@@ -1017,8 +1041,7 @@ class AppStrings {
           'करती हैं जिसे ऐप अभी नहीं पढ़ सकता। फिर दोबारा कोशिश करें।',
       'dtcRefusedTitle': 'बाइक ने अनुरोध अस्वीकार किया',
       'dtcRefusedBody': 'बाइक के कंप्यूटर ने जवाब दिया, लेकिन अपने फ़ॉल्ट कोड नहीं '
-          'बताए। इसका मतलब यह नहीं कि कोई खराबी नहीं है। इंजन बंद करें, इग्निशन '
-          'चालू (ON) रखें और फिर से कोशिश करें।',
+          'बताए। इसका मतलब यह नहीं कि कोई खराबी नहीं है। फिर से कोशिश करें।',
       'dtcLinkLostTitle': 'अडैप्टर से संपर्क टूट गया',
       'dtcLinkLostBody': 'कोई फ़ॉल्ट कोड नहीं पढ़ा जा सका। देखें कि अडैप्टर अभी भी '
           'लगा और जुड़ा है, फिर दोबारा कोशिश करें।',
@@ -1043,6 +1066,27 @@ class AppStrings {
       'dtcSubNetworkData': 'नेटवर्क डेटा',
       'dtcSeverityGuidance':
           'गंभीरता Danlite का सुझाव है, निर्माता का डेटा नहीं।',
+
+      // ── Fault-code diagnostic core (Phase 1A) — technician register:
+      // workshop loanwords for status and parts, native verbs for actions ──
+      'faultStatusStored': 'स्टोर्ड',
+      'faultStatusPending': 'पेंडिंग',
+      'faultStatusPermanent': 'परमानेंट',
+      'faultStatusActive': 'एक्टिव',
+      'faultStatusHistory': 'हिस्ट्री',
+      'faultStatusLamp': 'लैंप चालू',
+      'faultFailureType': 'खराबी का प्रकार',
+      'dtcEngineLampOn': 'चेतावनी लैंप चालू',
+      'dtcCountMismatch': 'बाइक {reported} स्टोर्ड कोड बता रही है, लेकिन '
+          '{received} कोड भेजे। कोई कोड छूट सकता है। दोबारा पढ़ें।',
+      'dtcRefusedEngineRunning': 'इंजन चल रहा है। इंजन बंद करें, इग्निशन चालू '
+          '(ON) रखें और फिर से कोशिश करें।',
+      'dtcModuleBusyBody': 'बाइक का कंप्यूटर बार-बार व्यस्त बताता रहा और अपने '
+          'फ़ॉल्ट कोड नहीं भेजे। इसका मतलब यह नहीं कि कोई खराबी नहीं है। थोड़ी '
+          'देर बाद फिर से कोशिश करें।',
+      'batteryLowBanner': 'बैटरी वोल्टेज कम है ({v} V)। कम वोल्टेज से झूठे संचार '
+          'कोड आ सकते हैं। बैटरी चार्ज करें या बदलें, फिर दोबारा स्कैन करें।',
+      'mayBeFalseLowVoltage': 'कम बैटरी वोल्टेज के कारण यह कोड गलत हो सकता है',
       'recorderOnTitle': 'सेशन रिकॉर्डर चालू है',
       'recorderOnBody': 'Danlite इस कनेक्शन के अडैप्टर संदेशों को इसी फ़ोन पर एक '
           'फ़ाइल में सहेज रहा है, ताकि और बाइकों को सपोर्ट किया जा सके। कुछ भी अपलोड '

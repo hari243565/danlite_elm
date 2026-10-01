@@ -1,0 +1,24 @@
+# Danlite ELM session recording
+# started: 2026-10-01T09:30:00.000
+# transport: bluetooth
+# format: <time> TX> command | RX< reply (\r = carriage return); # lines are notes
+# FIXTURE: hand-written from documented ELM327 / SAE J1979 / ISO 14229 behaviour.
+# NOT recorded from a real bike.
+# Mode 09 PID 02 over ISO-TP: first frame + two consecutive frames carrying
+# 49 02 01 and the fake VIN MA3FAKE0123456789. A real recording would show
+# "[mode 09 reply masked]" here; this fixture is synthetic, so it is not.
+# expect engine: answered
+# expect vin: valid
+09:30:00.000 TX>ATZ
+09:30:00.300 RX<\r\rELM327 v1.5\r\r
+# 09:30:00.300 adapter identity (ATZ): ELM327 v1.5
+09:30:00.900 TX>ATE0
+09:30:00.910 RX<ATE0\rOK\r\r
+09:30:01.000 TX>0100
+09:30:01.050 RX<\r41 00 BE 3E B8 11\r\r
+09:30:01.100 TX>ATDPN
+09:30:01.110 RX<\rA6\r\r
+09:30:02.000 TX>03
+09:30:02.040 RX<\r7E8 02 43 00\r\r
+09:30:02.500 TX>0902
+09:30:02.600 RX<\r7E8 10 14 49 02 01 4D 41 33\r7E8 21 46 41 4B 45 30 31 32\r7E8 22 33 34 35 36 37 38 39\r\r

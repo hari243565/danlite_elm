@@ -1,0 +1,28 @@
+# Danlite ELM session recording
+# started: 2026-10-01T09:30:00.000
+# transport: bluetooth
+# format: <time> TX> command | RX< reply (\r = carriage return); # lines are notes
+# FIXTURE: hand-written from documented ELM327 / SAE J1979 / ISO 14229 behaviour.
+# NOT recorded from a real bike.
+# One bike, two code formats: the engine reports a two-byte SAE code (Mode
+# 03); the ABS module at 7B0 reports a three-byte UDS code with failure type
+# 0x11 and status 0x2F (19 02 FF).
+# vehicle: Royal Enfield / Classic 350
+# expect engine: answered P0133
+# expect abs: C1058-11
+# expect absStatus: 2F
+09:30:00.000 TX>ATZ
+09:30:00.300 RX<\r\rELM327 v1.5\r\r
+# 09:30:00.300 adapter identity (ATZ): ELM327 v1.5
+09:30:00.900 TX>ATE0
+09:30:00.910 RX<ATE0\rOK\r\r
+09:30:01.000 TX>0100
+09:30:01.050 RX<\r41 00 BE 3E B8 11\r\r
+09:30:01.100 TX>ATDPN
+09:30:01.110 RX<\rA6\r\r
+09:30:02.000 TX>03
+09:30:02.040 RX<\r7E8 04 43 01 01 33\r\r
+09:30:10.000 TX>ATSH7B0
+09:30:10.010 RX<\rOK\r\r
+09:30:10.100 TX>1902FF
+09:30:10.180 RX<\r7B8 07 59 02 FF 50 58 11 2F\r\r

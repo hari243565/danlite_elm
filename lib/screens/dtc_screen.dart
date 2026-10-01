@@ -8,6 +8,7 @@ import '../constants/chassis_modules.dart';
 import '../providers/settings_provider.dart';
 import '../providers/vehicle_provider.dart';
 import '../services/dtc_service.dart';
+import '../services/fault_decoders.dart' show FailureType, UdsStatusByte;
 import '../services/obd_service.dart';
 import '../services/session_recorder.dart';
 import '../models/vehicle_data.dart';
@@ -143,7 +144,11 @@ class _DtcScreenState extends State<DtcScreen> {
     super.dispose();
   }
 
-  Future<void> _readCodes() async {
+  /// [manual] is a rider's tap or pull-to-refresh: it also re-reads the
+  /// extras (pending and permanent codes, lamp, voltage). The automatic
+  /// 5-second re-read leaves running extras alone and lets the service decide
+  /// whether they are due.
+  Future<void> _readCodes({bool manual = false}) async {
     if (!mounted) return;
     // Pause the engine auto-scan while the ABS category is showing: a chassis
     // scan rewrites the adapter's addressing state, and a Mode 03 poll landing
@@ -151,10 +156,11 @@ class _DtcScreenState extends State<DtcScreen> {
     if (_module != DtcModule.engine) return;
     final obd = context.read<ObdService>();
     if (!obd.isConnected || _reading) return;
+    if (!manual && obd.engineExtrasInFlight) return;
     setState(() => _reading = true);
     // What the read established (answered / no answer / refused / link lost /
     // K-line) lives on the service as lastEngineRead, which build() renders.
-    await obd.readEngineDtcs();
+    await obd.readEngineDtcs(forceExtras: manual);
     if (!mounted) return;
     setState(() {
       _reading = false;
@@ -285,6 +291,7 @@ class _DtcScreenState extends State<DtcScreen> {
   @override
   Widget build(BuildContext context) {
     final obd = context.watch<ObdService>();
+    // Mode 03 only: what Clear Codes keys on, and the greyed older list.
     final codes = _sanitize(obd.dtcCodes);
     // Optional so screens and tests built without the recorder still work.
     final recorder = Provider.of<SessionRecorder?>(context);
@@ -452,25 +459,63 @@ class _DtcScreenState extends State<DtcScreen> {
 
   Widget _buildConnected(
       BuildContext context, List<DtcCode> codes, ObdService obd) {
-    final criticalCount =
-        codes.where((c) => c.severity == 'critical' || c.severity == 'high').length;
     final read = obd.lastEngineRead;
     final readAt = obd.dtcCodesReadAt;
+    // Every card for the current answer: Mode 03 plus any pending- or
+    // permanent-only code the extras found, each with its status.
+    final shown = read is EngineAnswered ? _sanitize(obd.engineDisplayCodes) : codes;
+    final criticalCount =
+        shown.where((c) => c.severity == 'critical' || c.severity == 'high').length;
 
     return Column(
       children: [
-        _buildSummaryBar(context, codes, criticalCount,
-            current: read is EngineAnswered, readAt: readAt),
+        _buildSummaryBar(context, shown, criticalCount,
+            current: read is EngineAnswered,
+            readAt: readAt,
+            lampOn: obd.engineReport?.lampOn ?? false),
+        // Clear Codes keys on the Mode 03 list, exactly as before.
         _buildActionBar(context, codes),
+        if (obd.batteryVoltageLow) _batteryBanner(context, obd),
         Expanded(
           child: RefreshIndicator(
             color: _RC.neonCyan,
             backgroundColor: _RC.card,
-            onRefresh: _readCodes,
-            child: _buildEngineResults(context, read, codes, readAt),
+            onRefresh: () => _readCodes(manual: true),
+            child: _buildEngineResults(context, read, shown, readAt, obd),
           ),
         ),
       ],
+    );
+  }
+
+  /// "Battery voltage is low (11.4 V)…" — shown above the results; it never
+  /// blocks a scan.
+  Widget _batteryBanner(BuildContext context, ObdService obd) {
+    final v = obd.latestVoltage?.volts;
+    return Container(
+      width: double.infinity,
+      margin: const EdgeInsets.fromLTRB(14, 10, 14, 0),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: _RC.neonAmber.withValues(alpha: 0.10),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: _RC.neonAmber.withValues(alpha: 0.4)),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Icon(Icons.battery_alert_rounded, size: 18, color: _RC.neonAmber),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              context.trArgs('batteryLowBanner',
+                  {'v': v == null ? '—' : v.toStringAsFixed(1)}),
+              style: const TextStyle(
+                  color: _RC.textMain, fontSize: 12.5, height: 1.45),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -481,35 +526,54 @@ class _DtcScreenState extends State<DtcScreen> {
   /// says what actually happened, and any list from an earlier answered read
   /// is shown greyed out under its read time — never as current.
   Widget _buildEngineResults(BuildContext context, EngineDtcRead? read,
-      List<DtcCode> codes, DateTime? readAt) {
+      List<DtcCode> codes, DateTime? readAt, ObdService obd) {
     if (read == null) return _buildEmptyState(context, answered: false);
+    final lowVoltage = obd.batteryVoltageLow;
     if (read is EngineAnswered) {
       if (codes.isEmpty) return _buildEmptyState(context, answered: true);
-      return ListView.builder(
+      final mismatch = obd.engineCountMismatch;
+      return ListView(
         physics: const AlwaysScrollableScrollPhysics(),
         padding: const EdgeInsets.fromLTRB(14, 12, 14, 20),
-        itemCount: codes.length,
-        itemBuilder: (_, i) => _HazardCard(code: codes[i]),
+        children: [
+          if (mismatch != null) ...[
+            Text(
+              context.trArgs('dtcCountMismatch', {
+                'reported': '${mismatch.reported}',
+                'received': '${mismatch.received}',
+              }),
+              style: const TextStyle(
+                  color: _RC.neonAmber, fontSize: 12, height: 1.4),
+            ),
+            const SizedBox(height: 10),
+          ],
+          for (final c in codes) _HazardCard(code: c, lowVoltage: lowVoltage),
+        ],
       );
     }
 
     final Widget notice;
     switch (read) {
-      case EngineNoAnswer():
+      case EngineNoAnswer(:final reason):
+        final busy = reason == EngineNoAnswerReason.moduleBusy;
         notice = _engineNotice(
           icon: Icons.portable_wifi_off_rounded,
           color: _RC.neonAmber,
           title: context.tr('dtcNoAnswerTitle'),
-          body: context.tr('dtcNoAnswerBody'),
-          detail: context.tr('dtcNoAnswerChecklist'),
+          body: context.tr(busy ? 'dtcModuleBusyBody' : 'dtcNoAnswerBody'),
+          detail: busy ? null : context.tr('dtcNoAnswerChecklist'),
         );
         break;
       case EngineRefused():
+        // "Stop the engine" only when the engine is KNOWN to be running.
+        final running =
+            obd.engineReport?.engineState == EngineState.running;
         notice = _engineNotice(
           icon: Icons.block_rounded,
           color: _RC.neonAmber,
           title: context.tr('dtcRefusedTitle'),
           body: context.tr('dtcRefusedBody'),
+          detail: running ? context.tr('dtcRefusedEngineRunning') : null,
         );
         break;
       case EngineLinkLost():
@@ -601,7 +665,7 @@ class _DtcScreenState extends State<DtcScreen> {
 
   Widget _buildSummaryBar(BuildContext context, List<DtcCode> codes,
       int criticalCount,
-      {required bool current, required DateTime? readAt}) {
+      {required bool current, required DateTime? readAt, bool lampOn = false}) {
     // Counts describe the bike only when the last read actually answered.
     // After a failed read they would describe an older result, so they show
     // a dash, and the stamp is the read time instead of LIVE SCAN.
@@ -624,6 +688,12 @@ class _DtcScreenState extends State<DtcScreen> {
               label: 'CRITICAL',
               value: current ? '$criticalCount' : '—',
               color: current && criticalCount > 0 ? _RC.neonRed : _RC.textMuted),
+          // PID 01 01 says the engine computer has the warning lamp on. Shown
+          // only when known ON; unknown shows nothing.
+          if (current && lampOn) ...[
+            const SizedBox(width: 10),
+            Flexible(child: _statusChip(context.tr('dtcEngineLampOn'), _RC.neonAmber)),
+          ],
           const Spacer(),
           if (current && readAt != null)
             Row(
@@ -658,6 +728,8 @@ class _DtcScreenState extends State<DtcScreen> {
       ),
     );
   }
+
+  Widget _statusChip(String text, Color color) => _StatusLabel(text, color);
 
   Widget _statChip({required String label, required String value, required Color color}) =>
       Container(
@@ -695,7 +767,7 @@ class _DtcScreenState extends State<DtcScreen> {
         children: [
           Expanded(
             child: ElevatedButton.icon(
-              onPressed: _reading ? null : _readCodes,
+              onPressed: _reading ? null : () => _readCodes(manual: true),
               icon: _reading
                   ? const SizedBox(
                       width: 15,
@@ -820,6 +892,7 @@ class _DtcScreenState extends State<DtcScreen> {
               body: context.tr('absRawBannerDesc')),
         _buildChassisSummaryBar(context, obd, codes),
         _buildChassisActionBar(context, scanning),
+        if (obd.batteryVoltageLow) _batteryBanner(context, obd),
         Expanded(
           child: RefreshIndicator(
             color: _RC.neonCyan,
@@ -834,6 +907,7 @@ class _DtcScreenState extends State<DtcScreen> {
                     itemBuilder: (_, i) => _HazardCard(
                       code: codes[i],
                       platformKey: platformKey,
+                      lowVoltage: obd.chassisReadWhileLowVoltage,
                     ),
                   ),
           ),
@@ -1284,7 +1358,43 @@ class _HazardCard extends StatelessWidget {
   /// meanings are make-agnostic, and null when the platform is unidentified.
   final String? platformKey;
 
-  const _HazardCard({required this.code, this.platformKey});
+  /// The battery was LOW when this code was read: a network (U) code is
+  /// marked as possibly false.
+  final bool lowVoltage;
+
+  const _HazardCard(
+      {required this.code, this.platformKey, this.lowVoltage = false});
+
+  /// Small status labels, only for what is KNOWN to be true — an unknown
+  /// flag shows nothing, never "No".
+  ///
+  /// Engine (OBD) cards: Stored (Mode 03), Pending (Mode 07), Permanent
+  /// (Mode 0A), plus Active / Lamp when a UDS status byte says so. ABS cards:
+  /// Active, Pending, History and Lamp from the module's status byte; "not
+  /// confirmed" keeps its existing chip.
+  List<String> _statusLabels(BuildContext context) {
+    final out = <String>[];
+    if (code.isChassis) {
+      final byte = code.statusByte;
+      if (byte == null) return out;
+      final s = UdsStatusByte(byte);
+      if (s.isActive) out.add(context.tr('faultStatusActive'));
+      if (s.isPending) out.add(context.tr('faultStatusPending'));
+      if (s.isHistory) out.add(context.tr('faultStatusHistory'));
+      if (s.isLampRequested) out.add(context.tr('faultStatusLamp'));
+      return out;
+    }
+    final status = code.record?.status;
+    if (status == null) return out;
+    if (status.active == true) out.add(context.tr('faultStatusActive'));
+    if (status.confirmed == true) out.add(context.tr('faultStatusStored'));
+    if (status.pending == true) out.add(context.tr('faultStatusPending'));
+    if (status.permanent == true) out.add(context.tr('faultStatusPermanent'));
+    if (status.lampRequested == true) out.add(context.tr('faultStatusLamp'));
+    return out;
+  }
+
+  bool get _mayBeFalse => lowVoltage && code.code.startsWith('U');
 
   Color get _severityColor {
     switch (code.severity) {
@@ -1566,6 +1676,20 @@ class _HazardCard extends StatelessWidget {
                         ],
                       ],
                     ),
+                    Builder(builder: (context) {
+                      final labels = _statusLabels(context);
+                      if (labels.isEmpty) return const SizedBox.shrink();
+                      return Padding(
+                        padding: const EdgeInsets.only(top: 6),
+                        child: Wrap(
+                          spacing: 6,
+                          runSpacing: 4,
+                          children: [
+                            for (final l in labels) _StatusLabel(l, _RC.neonCyan),
+                          ],
+                        ),
+                      );
+                    }),
                     const SizedBox(height: 6),
                     Text(_localizedDescription(context),
                         style: const TextStyle(
@@ -1573,6 +1697,42 @@ class _HazardCard extends StatelessWidget {
                             fontSize: 14,
                             fontWeight: FontWeight.w600,
                             height: 1.3)),
+                    if (_mayBeFalse) ...[
+                      const SizedBox(height: 6),
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Icon(Icons.battery_alert_rounded,
+                              size: 14, color: _RC.neonAmber),
+                          const SizedBox(width: 6),
+                          Expanded(
+                            child: Text(context.tr('mayBeFalseLowVoltage'),
+                                style: const TextStyle(
+                                    color: _RC.neonAmber,
+                                    fontSize: 11.5,
+                                    fontWeight: FontWeight.w700,
+                                    height: 1.35)),
+                          ),
+                        ],
+                      ),
+                    ],
+                    // The ISO 14229 failure type byte, in plain words, when
+                    // the module sent one other than "no sub-type".
+                    if (code.isChassis &&
+                        code.failureTypeByte != null &&
+                        code.failureTypeByte != 0)
+                      Builder(builder: (context) {
+                        final lang = context
+                            .watch<SettingsProvider>()
+                            .locale
+                            .languageCode;
+                        final ftb = code.failureTypeByte!;
+                        return _detailRow(
+                            context.tr('faultFailureType'),
+                            '${FailureType.hex(ftb)} · '
+                                '${FailureType.describe(ftb, lang)}',
+                            _RC.textMain);
+                      }),
 
                     // Engine codes: structure when there is no verified text,
                     // and the cause and advice the 31-entry table carries.
@@ -1665,6 +1825,32 @@ class _HazardCard extends StatelessWidget {
       ),
     );
   }
+}
+
+/// One small status label (Stored, Pending, Permanent, Active, History, Lamp
+/// on, Warning lamp ON).
+class _StatusLabel extends StatelessWidget {
+  const _StatusLabel(this.text, this.color);
+  final String text;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) => Container(
+        padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
+        decoration: BoxDecoration(
+          color: color.withValues(alpha: 0.12),
+          borderRadius: BorderRadius.circular(6),
+          border: Border.all(color: color.withValues(alpha: 0.35)),
+        ),
+        child: Text(text,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+                color: color,
+                fontSize: 10,
+                fontWeight: FontWeight.w800,
+                letterSpacing: 0.3)),
+      );
 }
 
 // ── Freeze Frame Bottom Sheet ────────────────────────────────────────────────

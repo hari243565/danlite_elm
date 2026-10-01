@@ -734,11 +734,16 @@ class ObdParser {
     return false;
   }
 
+  static const String _oddLengthWarning = 'Odd-length hex run; last digit dropped.';
+
   static List<int> _hexToBytes(String input, List<String> warnings) {
     final cleaned = input.toUpperCase().replaceAll(_nonHex, '');
     if (cleaned.isEmpty) return const <int>[];
     var usable = cleaned;
-    if (usable.length.isOdd) { usable = usable.substring(0, usable.length - 1); }
+    if (usable.length.isOdd) {
+      warnings.add(_oddLengthWarning);
+      usable = usable.substring(0, usable.length - 1);
+    }
     final out = <int>[];
     for (var i = 0; i + 2 <= usable.length; i += 2) {
       final value = int.tryParse(usable.substring(i, i + 2), radix: 16);
@@ -791,9 +796,50 @@ class ObdParser {
       }
     }
     if (declaredLength != null && declaredLength > 0 && out.length > declaredLength) {
-      return _Reassembly(out.sublist(0, declaredLength), sawPci);
+      return _Reassembly(out.sublist(0, declaredLength), sawPci,
+          truncated: truncated);
     }
-    return _Reassembly(out, sawPci);
+    return _Reassembly(out, sawPci,
+        truncated: truncated ||
+            (declaredLength != null && out.length < declaredLength));
+  }
+
+  /// The shared frame tokenizer and ISO-TP reassembly, exposed for the typed
+  /// decoders in `lib/services/fault_decoders.dart`.
+  ///
+  /// Same work [parseDetailed] and [parseUdsDtcDetailed] already do — noise
+  /// lines dropped, frames grouped by the responding module's header, ISO-TP
+  /// single/first/consecutive frames joined — but it also says what those two
+  /// quietly absorb: an odd number of hex digits (a digit was dropped) and a
+  /// multi-frame reply that stopped short (a missing consecutive frame, or
+  /// fewer bytes than the first frame declared). Never throws.
+  static FrameReassembly reassembleFrames(String? response) {
+    final warnings = <String>[];
+    try {
+      if (response == null || response.trim().isEmpty) {
+        return const FrameReassembly(<EcuPayload>[], oddLength: false);
+      }
+      final frames = _tokenizeFrames(response, warnings);
+      final grouped = <String, List<_RawFrame>>{};
+      for (final frame in frames) {
+        grouped.putIfAbsent(frame.ecuId, () => <_RawFrame>[]).add(frame);
+      }
+      final payloads = <EcuPayload>[];
+      for (final entry in grouped.entries) {
+        final assembled = _reassembleIsoTp(entry.value, entry.key, warnings);
+        if (assembled.payload.isEmpty && !assembled.truncated) continue;
+        payloads.add(EcuPayload(
+          ecuId: entry.key,
+          bytes: List<int>.unmodifiable(assembled.payload),
+          sawIsoTpPci: assembled.sawIsoTpPci,
+          truncated: assembled.truncated,
+        ));
+      }
+      return FrameReassembly(List<EcuPayload>.unmodifiable(payloads),
+          oddLength: warnings.contains(_oddLengthWarning));
+    } catch (_) {
+      return const FrameReassembly(<EcuPayload>[], oddLength: false, failed: true);
+    }
   }
 
   static List<int>? _unwrapConcatenatedIsoTp(List<int> raw) {
@@ -1059,7 +1105,44 @@ class _RawFrame {
 class _Reassembly {
   final List<int> payload;
   final bool sawIsoTpPci;
-  const _Reassembly(this.payload, this.sawIsoTpPci);
+
+  /// A consecutive frame was missing, or fewer bytes arrived than the first
+  /// frame declared.
+  final bool truncated;
+  const _Reassembly(this.payload, this.sawIsoTpPci, {this.truncated = false});
+}
+
+/// One responding module's bytes after ISO-TP reassembly.
+class EcuPayload {
+  /// The CAN header the module answered from (`7E8`, `18DAF110`), or empty
+  /// when headers were off.
+  final String ecuId;
+  final List<int> bytes;
+  final bool sawIsoTpPci;
+
+  /// The reply stopped short of what its own framing promised.
+  final bool truncated;
+
+  const EcuPayload({
+    required this.ecuId,
+    required this.bytes,
+    required this.sawIsoTpPci,
+    required this.truncated,
+  });
+}
+
+/// What [ObdParser.reassembleFrames] made of one raw reply.
+class FrameReassembly {
+  final List<EcuPayload> payloads;
+
+  /// A hex run had an odd number of digits, so one digit was dropped.
+  final bool oddLength;
+
+  /// The reassembly itself failed unexpectedly (never seen; kept typed).
+  final bool failed;
+
+  const FrameReassembly(this.payloads,
+      {required this.oddLength, this.failed = false});
 }
 
 class _ServiceDecode {

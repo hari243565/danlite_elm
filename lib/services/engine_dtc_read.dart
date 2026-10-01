@@ -14,6 +14,7 @@ library;
 
 import '../constants/obd_pids.dart';
 import '../models/vehicle_data.dart';
+import 'fault_decoders.dart' show Vin;
 
 /// K-line fault-code reading is switched OFF.
 ///
@@ -126,6 +127,24 @@ class ObdSession {
   /// reply, or a positive Mode 03 answer. Adapter set-up commands answering
   /// `OK` prove nothing about the bike and never set this.
   bool vehicleAnswered = false;
+
+  /// True once a "response pending" frame (`7F xx 78`) reached the app: this
+  /// adapter passes them through instead of waiting internally, so a read
+  /// that gets one must be repeated to get the answer. Learned from what the
+  /// adapter does, never from its version string (clones misreport it).
+  bool adapterPassesPending = false;
+
+  /// The vehicle's VIN, read from Mode 09 PID 02 and validated. Memory only,
+  /// for this connection: never logged unmasked, never stored, never sent.
+  /// [Vin.toString] is masked.
+  Vin? vin;
+
+  /// Calibration IDs from Mode 09 PID 04. Memory only, like [vin].
+  List<String>? calibrationIds;
+
+  /// Mode 09 was asked and this vehicle does not offer it; not asked again in
+  /// this session.
+  bool vehicleInfoUnsupported = false;
 }
 
 /// Why a read produced no fault data. Never shown as "no faults".
@@ -159,6 +178,10 @@ enum EngineNoAnswerReason {
 
   /// Bytes came back but not a positive Mode 03 answer.
   unrecognised,
+
+  /// The engine computer kept answering "response pending" (`7F 03 78`) and
+  /// never sent its answer within the time allowed.
+  moduleBusy,
 }
 
 /// The result of one engine fault-code read.
@@ -239,8 +262,13 @@ final class ReplyLinkLost extends EngineReplyVerdict {
 /// first request after power-up); otherwise a negative response is a refusal;
 /// otherwise every adapter error or silence is "no answer". Nothing that is
 /// not a positive response can ever become an empty fault list.
+///
+/// [countByteMode] comes from the bus: on ISO 15765-4 CAN the response byte is
+/// always followed by a count of codes ([DtcCountByteMode.present]); when the
+/// protocol is not known the parser's original auto-detection is used.
 EngineReplyVerdict classifyEngineDtcReply(String reply,
-    {required bool linkFailed}) {
+    {required bool linkFailed,
+    DtcCountByteMode countByteMode = DtcCountByteMode.auto}) {
   final upper = reply.toUpperCase().trim();
 
   if (linkFailed) return const ReplyLinkLost();
@@ -250,7 +278,8 @@ EngineReplyVerdict classifyEngineDtcReply(String reply,
   }
   if (upper.isEmpty) return const ReplyNoAnswer(EngineNoAnswerReason.emptyReply);
 
-  final parsed = ObdParser.parseDetailed(joinSpacedTwentyNineBitHeaders(reply));
+  final parsed = ObdParser.parseDetailed(joinSpacedTwentyNineBitHeaders(reply),
+      countByteMode: countByteMode);
   if (parsed.positiveResponseSeen) return ReplyPositive(parsed);
 
   final nrc = _negativeResponseTo03(upper);

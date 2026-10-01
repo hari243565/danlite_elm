@@ -1,0 +1,18 @@
+# Danlite ELM session recording
+# started: 2026-10-01T09:30:00.000
+# transport: bluetooth
+# format: <time> TX> command | RX< reply (\r = carriage return); # lines are notes
+# FIXTURE: hand-written from documented ELM327 / SAE J1979 / ISO 14229 behaviour.
+# NOT recorded from a real bike.
+# Adapter powered, ignition off: nothing on the bus answers anything.
+# expect engine: noAnswer unableToConnect
+# expect vehicleAnswered: false
+# expect extras: none
+09:30:00.000 TX>ATZ
+09:30:00.300 RX<\r\rELM327 v1.5\r\r
+09:30:01.000 TX>0100
+09:30:01.400 RX<\rSEARCHING...\rUNABLE TO CONNECT\r\r
+09:30:01.500 TX>ATDPN
+09:30:01.510 RX<\rA0\r\r
+09:30:05.000 TX>03
+09:30:05.050 RX<\rSEARCHING...\rUNABLE TO CONNECT\r\r

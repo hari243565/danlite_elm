@@ -6,14 +6,19 @@ import '../constants/chassis_dtc_dictionary.dart';
 import '../constants/chassis_modules.dart';
 import '../constants/dtc_descriptions.dart';
 import '../constants/obd_pids.dart';
+import '../models/fault_record.dart';
 import '../models/vehicle_data.dart';
 import 'bluetooth_classic_service.dart';
 import 'chassis_address_memory.dart';
 import 'dtc_service.dart' show isManufacturerDefined;
 import 'engine_dtc_read.dart';
+import 'engine_report.dart';
+import 'fault_decoders.dart';
+import 'response_pending.dart';
 import 'session_recorder.dart';
 
 export 'engine_dtc_read.dart';
+export 'engine_report.dart';
 
 enum ConnectionType { wifi, bluetooth }
 
@@ -111,12 +116,19 @@ class FreezeFrameData {
 
 class ObdService extends ChangeNotifier {
   ObdService(this._btService,
-      {ChassisAddressMemory? chassisAddressMemory, this.recorder})
-      : chassisAddressMemory = chassisAddressMemory ?? ChassisAddressMemory() {
+      {ChassisAddressMemory? chassisAddressMemory,
+      this.recorder,
+      FaultReadTiming? faultTiming})
+      : chassisAddressMemory = chassisAddressMemory ?? ChassisAddressMemory(),
+        faultTiming = faultTiming ?? const FaultReadTiming() {
     _btService.addListener(_onBtServiceChanged);
   }
 
   final BluetoothClassicService _btService;
+
+  /// Response-pending, extras and budget timings. Always the real constants
+  /// in the app; tests pass a scaled copy to run the same logic faster.
+  final FaultReadTiming faultTiming;
 
   /// Tester-mode session recorder. Null, or switched off, in normal use —
   /// see `session_recorder.dart`. It is the ONLY place raw adapter traffic is
@@ -173,6 +185,103 @@ class ObdService extends ChangeNotifier {
 
   /// Status line to show once the vehicle answers, saved at connect time.
   String _connectedStatusMessage = '';
+
+  // ── Engine extras (Mode 07 / 0A, PID 01 01, RPM, voltage, VIN) ────────────
+  /// What the optional extras established, for the latest read that ran
+  /// them. Null until one has run this session. See [EngineReport].
+  EngineReport? _engineReport;
+  EngineReport? get engineReport => _engineReport;
+
+  /// True while the extras are still reading, after the core result is out.
+  bool get engineExtrasInFlight => _extrasRunning;
+
+  bool _extrasRunning = false;
+  bool _extrasCancelRequested = false;
+  /// Foreground operations currently waiting for the engine job to hand the
+  /// link back. While any is waiting, extras do not start and stop at the
+  /// next safe point.
+  int _linkWaiters = 0;
+
+  /// The whole engine read job — core, extras and putting the adapter back —
+  /// so another foreground operation can wait for the link to be handed back.
+  Future<void>? _engineJob;
+
+  /// Completes when the current engine read job — core, extras and putting
+  /// the adapter back — has finished. Completes at once when none is running.
+  Future<void> whenEngineReadSettled() => _engineJob ?? Future<void>.value();
+
+  /// Stop the extras at the next safe point. The core result is untouched;
+  /// unfinished extras end as [ExtraCancelled]. Safe to call at any time.
+  void cancelEngineExtras() {
+    if (_extrasRunning) _extrasCancelRequested = true;
+  }
+
+  /// Every engine code as one record each: Mode 03 merged with the extras'
+  /// Mode 07 (pending) and 0A (permanent). The extras are only merged while
+  /// the Mode 03 list is still the one they were read alongside — after a
+  /// clear or a changed list, only Mode 03 is shown until they are re-read.
+  List<FaultRecord> get engineFaultRecords {
+    final stored = <FaultRecord>[
+      for (final c in _dtcCodes)
+        c.record ?? FaultRecord.fromDtcCode(c, readAt: _dtcCodesReadAt ?? DateTime.now()),
+    ];
+    final report = _engineReport;
+    if (report == null || !_sameCodes(report.coreCodes, _dtcCodes)) return stored;
+    return mergeEngineRecords(
+      stored: stored,
+      pending: report.pending.valueOrNull ?? const <FaultRecord>[],
+      permanent: report.permanent.valueOrNull ?? const <FaultRecord>[],
+    );
+  }
+
+  /// The engine cards: [dtcCodes] plus any pending- or permanent-only code,
+  /// each carrying its merged [FaultRecord]. [dtcCodes] itself is unchanged
+  /// (Clear Codes still keys on it).
+  List<DtcCode> get engineDisplayCodes {
+    final byCode = {for (final c in _dtcCodes) c.code: c};
+    return <DtcCode>[
+      for (final r in engineFaultRecords)
+        (byCode[r.code] ?? _buildEngineDtc(r.code)).withRecord(r),
+    ];
+  }
+
+  /// Mode 03's own count byte disagreed with the codes that arrived.
+  CountMismatch? _coreCountMismatch;
+
+  /// A code may be missing from the current engine list: the Mode 03 reply's
+  /// own count byte, or PID 01 01's stored-code count, says more (or fewer)
+  /// codes than were received. Null when nothing disagrees or it is unknown.
+  CountMismatch? get engineCountMismatch {
+    if (_lastEngineRead is! EngineAnswered) return null;
+    final report = _engineReport;
+    final fromPid = report != null && _sameCodes(report.coreCodes, _dtcCodes)
+        ? report.countMismatch
+        : null;
+    return _coreCountMismatch ?? fromPid;
+  }
+
+  static bool _sameCodes(Set<String> a, List<DtcCode> b) =>
+      a.length == b.length && b.every((c) => a.contains(c.code));
+
+  /// The most recent battery voltage reading this session, from the extras.
+  VoltageReading? get latestVoltage =>
+      _engineReport?.voltage.valueOrNull;
+
+  /// True when the latest voltage reading is LOW for the known engine state.
+  bool get batteryVoltageLow => _engineReport?.lowVoltage ?? false;
+
+  /// When the last ABS/chassis scan finished.
+  DateTime? _chassisReadAt;
+  DateTime? get chassisReadAt => _chassisReadAt;
+
+  /// True when the last ABS scan ran within [kVoltageFreshness] of a LOW
+  /// voltage reading, so its network (U) codes may be false.
+  bool get chassisReadWhileLowVoltage {
+    final v = latestVoltage;
+    final at = _chassisReadAt;
+    if (!batteryVoltageLow || v == null || at == null) return false;
+    return at.difference(v.at).abs() <= kVoltageFreshness;
+  }
 
   // ── Chassis / ABS module scan state ───────────────────────────────────────
   // Kept separate from _dtcCodes rather than merged into it: these come from a
@@ -251,6 +360,7 @@ class ObdService extends ChangeNotifier {
 
   final List<String> _wireLog = <String>[];
   static const int _wireLogMax = 200;
+  String _lastWireCommand = '';
   List<String> get wireLog => List.unmodifiable(_wireLog);
 
   /// Record one adapter exchange line.
@@ -261,7 +371,14 @@ class ObdService extends ChangeNotifier {
   /// recorder (local file, rider-initiated share only) are the only sinks.
   void _logWire(String direction, String data) {
     final ts = DateTime.now().toIso8601String().substring(11, 23);
-    final printable = data.replaceAll('\r', r'\r').replaceAll('\n', r'\n');
+    var printable = data.replaceAll('\r', r'\r').replaceAll('\n', r'\n');
+    // Mode 09 replies carry the VIN as hex-encoded text: never kept, even in
+    // this in-memory ring. The recorder applies the same rule to its file.
+    if (direction.startsWith('TX')) {
+      _lastWireCommand = data.trim().toUpperCase();
+    } else if (_lastWireCommand.startsWith('09')) {
+      printable = '[mode 09 reply masked]';
+    }
     _wireLog.add('$ts $direction$printable');
     if (_wireLog.length > _wireLogMax) _wireLog.removeAt(0);
     recorder?.recordExchange(direction, data);
@@ -520,9 +637,13 @@ class ObdService extends ChangeNotifier {
     _dtcCodes = [];
     _dtcCodesReadAt = null;
     _lastEngineRead = null;
+    _engineReport = null;
+    _coreCountMismatch = null;
+    cancelEngineExtras();
     _chassisDtcCodes = [];
     _chassisScanOutcome = ChassisScanOutcome.idle;
     _chassisRespondingModule = '';
+    _chassisReadAt = null;
   }
 
   /// Mark the adapter connected. The status line only says "Connected" once
@@ -1273,8 +1394,10 @@ class ObdService extends ChangeNotifier {
   /// Read engine fault codes and return the codes the engine computer
   /// reported — empty unless it actually answered. Prefer [readEngineDtcs],
   /// which says WHY a read produced no codes.
+  ///
+  /// The Mode 03 core only: the optional extras are not run from here.
   Future<List<DtcCode>> readDtcs() async {
-    final result = await readEngineDtcs();
+    final result = await readEngineDtcs(withExtras: false);
     return result is EngineAnswered ? result.codes : const <DtcCode>[];
   }
 
@@ -1285,46 +1408,210 @@ class ObdService extends ChangeNotifier {
   /// Returns [EngineAnswered] only for a positive `43` response — the one
   /// case in which an empty list means "no stored faults". `NO DATA`,
   /// timeouts, bare prompts, `UNABLE TO CONNECT`, bus errors and `?` are
-  /// [EngineNoAnswer]; `7F 03` is [EngineRefused]; a dead link is
-  /// [EngineLinkLost]; a K-line bus is [EngineKLineGated] while
-  /// [kKLineFaultReadingEnabled] is false.
+  /// [EngineNoAnswer]; a module that keeps answering "response pending" is
+  /// [EngineNoAnswer] with [EngineNoAnswerReason.moduleBusy]; `7F 03` is
+  /// [EngineRefused]; a dead link is [EngineLinkLost]; a K-line bus is
+  /// [EngineKLineGated] while [kKLineFaultReadingEnabled] is false.
   ///
   /// A failed read never touches [dtcCodes]: the last answered list stays,
   /// with [dtcCodesReadAt], for the screen to show as an older result.
-  Future<EngineDtcRead> readEngineDtcs() {
-    if (!isConnected) {
-      return Future.value(EngineLinkLost(DateTime.now()));
-    }
+  ///
+  /// The returned future completes with the CORE result as soon as it is
+  /// known. When the vehicle answered (or refused) and [withExtras] is true,
+  /// the optional extras — Mode 07 and 0A, PID 01 01, RPM, voltage, VIN —
+  /// then run on the same job, inside [kEngineReadBudget], and land in
+  /// [engineReport]. They re-run only when [forceExtras] (a manual read), on
+  /// the first answered read of a connection, when the code list changed, or
+  /// after [kEngineExtrasRefresh]; the 5-second auto-read otherwise leaves
+  /// them alone. [cancelEngineExtras] stops them.
+  ///
+  /// A call made while a CORE read is in progress shares that read. A call
+  /// made while only the previous read's extras are still running asks them
+  /// to hand the link back, then reads afresh — it never gets the previous
+  /// result back as if it were new.
+  Future<EngineDtcRead> readEngineDtcs(
+      {bool withExtras = true, bool forceExtras = false}) async {
+    if (!isConnected) return EngineLinkLost(DateTime.now());
     final inFlight = _engineReadInFlight;
     if (inFlight != null) return inFlight;
-    final future = _runEngineRead();
-    _engineReadInFlight = future;
-    return future.whenComplete(() => _engineReadInFlight = null);
+    if (_engineJob != null) {
+      await _yieldEngineExtras();
+      if (!isConnected) return EngineLinkLost(DateTime.now());
+      final started = _engineReadInFlight;
+      if (started != null) return started;
+    }
+    final core = Completer<EngineDtcRead>();
+    _engineReadInFlight = core.future;
+    core.future.whenComplete(() {
+      if (identical(_engineReadInFlight, core.future)) _engineReadInFlight = null;
+    });
+    late final Future<void> job;
+    job = _runEngineRead(core, withExtras: withExtras, forceExtras: forceExtras)
+        .whenComplete(() {
+      if (identical(_engineJob, job)) _engineJob = null;
+    });
+    _engineJob = job;
+    return core.future;
   }
 
-  Future<EngineDtcRead> _runEngineRead() async {
+  /// Send one request through the shared response-pending helper.
+  ///
+  /// [recoverySelfHandled]: the caller runs its own adapter recovery after a
+  /// timeout (the core read and the ABS sweep do), so the helper only drains
+  /// on a busy give-up and does not interrupt the adapter itself.
+  Future<PendingResult> _sendWithPending(String request,
+      {required PendingPolicy policy,
+      bool recoverySelfHandled = false,
+      bool Function()? isCancelled}) {
+    final serviceId = int.tryParse(request.substring(0, 2), radix: 16) ?? 0;
+    return sendWithPendingHandling(
+      request: request,
+      serviceId: serviceId,
+      policy: policy,
+      isCancelled: isCancelled,
+      send: (cmd, window) async {
+        final saved = _cmdTimeout;
+        _cmdTimeout = window;
+        try {
+          return await _send(cmd);
+        } finally {
+          _cmdTimeout = saved;
+        }
+      },
+      flush: ({required bool afterTimeout}) async {
+        if (afterTimeout && recoverySelfHandled) return;
+        await _flushAdapter(interrupt: afterTimeout);
+      },
+      onAdapterPassesPending: () {
+        final s = _session;
+        if (s == null || s.adapterPassesPending) return;
+        s.adapterPassesPending = true;
+        recorder?.recordNote('adapter passes response-pending frames through');
+      },
+    );
+  }
 
+  /// Make sure nothing from an abandoned request can reach the next command.
+  ///
+  /// After a timeout the adapter may still be waiting on the bus; any
+  /// character stops an ELM327 mid-request and it answers with a prompt, so a
+  /// bare carriage return is sent and its reply consumed. Then a short settle
+  /// lets any late bytes arrive, and both buffers are emptied.
+  Future<void> _flushAdapter({required bool interrupt}) async {
+    if (!isConnected) return;
+    if (interrupt && _linkSynced) {
+      final saved = _cmdTimeout;
+      _cmdTimeout = faultTiming.extraCommandWindow;
+      try {
+        await _sendRaw('');
+      } finally {
+        _cmdTimeout = saved;
+      }
+    }
+    await Future<void>.delayed(faultTiming.flushSettle);
+    _btBuffer.clear();
+    _wifiBuffer.clear();
+  }
+
+  /// Ask a running extras job to stop at its next safe point, and wait —
+  /// bounded — until it has put the adapter back and released the link.
+  /// Called before any other foreground operation takes the link.
+  Future<void> _yieldEngineExtras() async {
+    final job = _engineJob;
+    if (job == null) return;
+    _linkWaiters++;
+    final cap = faultTiming.extraCommandWindow * 4 + const Duration(seconds: 1);
+    try {
+      await job.timeout(cap);
+    } catch (_) {
+      // Bounded on purpose: never let a stuck extra hold another operation.
+    } finally {
+      _linkWaiters--;
+    }
+  }
+
+  Future<void> _runEngineRead(Completer<EngineDtcRead> core,
+      {required bool withExtras, required bool forceExtras}) async {
     _acquirePollLock();
     await _waitForLinkIdle();
 
+    // The budget runs from the moment this read has the adapter to itself.
+    final clock = Stopwatch()..start();
     final previousTimeout = _cmdTimeout;
     var headersOn = false;
     var stWidened = false;
+
+    EngineDtcRead finishCore(EngineDtcRead r) {
+      final result = _finishEngineRead(r);
+      if (!core.isCompleted) core.complete(result);
+      return result;
+    }
+
     try {
+      final result = await _runEngineCore(
+        finish: finishCore,
+        onHeaders: (h) => headersOn = h,
+        onStWidened: (w) => stWidened = w,
+        clock: clock,
+      );
+      if (withExtras && _shouldRunExtras(result, force: forceExtras)) {
+        await _runEngineExtras(clock);
+      }
+    } catch (e) {
+      debugPrint('[ObdService] engine read failed (${e.runtimeType})');
+      if (!core.isCompleted) {
+        finishCore(
+            EngineNoAnswer(EngineNoAnswerReason.adapterError, DateTime.now()));
+      }
+    } finally {
+      _cmdTimeout = previousTimeout;
+      if (stWidened && _linkSynced) await _send('ATST32');
+      if (headersOn) await _restoreLiveHeaders();
+      _cmdTimeout = previousTimeout;
+      _releasePollLock();
+      if (!core.isCompleted) {
+        core.complete(_lastEngineRead ??
+            EngineNoAnswer(EngineNoAnswerReason.adapterError, DateTime.now()));
+      }
+    }
+  }
+
+  /// The Mode 03 core. Returns the result already passed to [finish].
+  Future<EngineDtcRead> _runEngineCore({
+    required EngineDtcRead Function(EngineDtcRead) finish,
+    required void Function(bool) onHeaders,
+    required void Function(bool) onStWidened,
+    required Stopwatch clock,
+  }) async {
       if (!_linkSynced) {
         final recovered = await _recoverAdapter();
-        if (!recovered) return _finishEngineRead(EngineLinkLost(DateTime.now()));
+        if (!recovered) return finish(EngineLinkLost(DateTime.now()));
       }
 
       if (_cmdTimeout < _readDtcsMinTimeout) _cmdTimeout = _readDtcsMinTimeout;
 
-      headersOn = await _enableDtcHeaders();
+      onHeaders(await _enableDtcHeaders());
       final stResp = await _send('ATST7D');
-      stWidened = !_isDeadResponse(stResp);
+      onStWidened(!_isDeadResponse(stResp));
 
-      final response = await _send(ObdPids.readDtcs);
+      // Through the shared response-pending helper: a window long enough for
+      // an adapter that waits internally, and a re-send for one that passes
+      // the pending frame through. Bounded by the read's own budget, and never
+      // by less than one full attempt.
+      PendingPolicy corePolicy() {
+        final left = faultTiming.engineReadBudget - clock.elapsed;
+        return faultTiming.pendingPolicy(
+            overall: left < faultTiming.pendingPerAttempt
+                ? faultTiming.pendingPerAttempt
+                : left);
+      }
+
+      final first = await _sendWithPending(ObdPids.readDtcs,
+          policy: corePolicy(), recoverySelfHandled: true);
+      final busy = first is! PendingAnswered;
+      final response = first is PendingAnswered ? first.reply : '';
       final linkFailed =
-          _classifyReply(response) == ObdReplyClass.linkFailure;
+          !busy && _classifyReply(response) == ObdReplyClass.linkFailure;
 
       if (response == 'TIMEOUT') {
         // Unchanged: a timed-out read still resyncs the adapter. What changed
@@ -1337,7 +1624,7 @@ class ObdService extends ChangeNotifier {
       if (linkFailed ||
           upperResponse == 'DISCONNECTED' ||
           upperResponse == 'ERROR') {
-        return _finishEngineRead(EngineLinkLost(DateTime.now()));
+        return finish(EngineLinkLost(DateTime.now()));
       }
 
       // The protocol is only settled once a request has reached the bus, so
@@ -1358,23 +1645,40 @@ class ObdService extends ChangeNotifier {
       if (!kKLineFaultReadingEnabled &&
           session != null &&
           session.protocol.isKLine) {
-        return _finishEngineRead(
-            EngineKLineGated(session.protocol, DateTime.now()));
+        return finish(EngineKLineGated(session.protocol, DateTime.now()));
       }
 
-      var verdict = classifyEngineDtcReply(response, linkFailed: false);
+      if (busy) {
+        // The engine computer did reply — every time, "busy". That is the
+        // vehicle speaking, and it is not an answer.
+        _markVehicleAnswered();
+        return finish(
+            EngineNoAnswer(EngineNoAnswerReason.moduleBusy, DateTime.now()));
+      }
+
+      // On CAN the response byte is always followed by a count of codes.
+      final countMode = session?.protocol.family == ObdProtocolFamily.can
+          ? DtcCountByteMode.present
+          : DtcCountByteMode.auto;
+      var verdict = classifyEngineDtcReply(response,
+          linkFailed: false, countByteMode: countMode);
+      var verdictReply = response;
 
       if (verdict is ReplyPositive && verdict.parsed.countMismatch) {
         await Future.delayed(const Duration(milliseconds: 300));
-        final retryResp = await _send(ObdPids.readDtcs);
+        final retry = await _sendWithPending(ObdPids.readDtcs,
+            policy: corePolicy(), recoverySelfHandled: true);
+        final retryResp = retry is PendingAnswered ? retry.reply : '';
         final retryVerdict = classifyEngineDtcReply(retryResp,
             linkFailed:
-                _classifyReply(retryResp) == ObdReplyClass.linkFailure);
+                _classifyReply(retryResp) == ObdReplyClass.linkFailure,
+            countByteMode: countMode);
         if (retryVerdict is ReplyPositive) {
-          final retry = retryVerdict.parsed;
-          if (!retry.countMismatch ||
-              retry.allCodes.length > verdict.parsed.allCodes.length) {
+          final retryParsed = retryVerdict.parsed;
+          if (!retryParsed.countMismatch ||
+              retryParsed.allCodes.length > verdict.parsed.allCodes.length) {
             verdict = retryVerdict;
+            verdictReply = retryResp;
           }
         }
       }
@@ -1386,27 +1690,281 @@ class ObdService extends ChangeNotifier {
           // Every system the engine computer reports — P, C, B and U. Only P
           // was kept before, so a network fault (U0100) set by the engine
           // never reached the rider.
-          _dtcCodes = [for (final code in parsed.allCodes) _buildEngineDtc(code)];
+          final modules = _respondingModules(verdictReply, session);
+          _dtcCodes = [
+            for (final code in parsed.allCodes)
+              _buildEngineDtc(code).withRecord(FaultRecord.fromObdCode(code,
+                  source: ReadSource.mode03, readAt: now, module: modules[code])),
+          ];
           _dtcCodesReadAt = now;
-          return _finishEngineRead(EngineAnswered(_dtcCodes, now));
+          // The reply's own count byte disagreeing with what arrived (after
+          // the one retry above) means a code may be missing: say so rather
+          // than present a partial list as complete.
+          // Only on CAN, where the count byte is certain to be one.
+          final reported = countMode == DtcCountByteMode.present
+              ? parsed.reportedCount
+              : null;
+          _coreCountMismatch =
+              reported != null && reported != parsed.allCodes.length
+                  ? CountMismatch(
+                      reported: reported, received: parsed.allCodes.length)
+                  : null;
+          return finish(EngineAnswered(_dtcCodes, now));
         case ReplyRefused(:final nrc):
           // A refusal is still the vehicle speaking.
           _markVehicleAnswered();
-          return _finishEngineRead(EngineRefused(nrc, now));
+          return finish(EngineRefused(nrc, now));
         case ReplyNoAnswer(:final reason):
-          return _finishEngineRead(EngineNoAnswer(reason, now));
+          return finish(EngineNoAnswer(reason, now));
         case ReplyLinkLost():
-          return _finishEngineRead(EngineLinkLost(now));
+          return finish(EngineLinkLost(now));
+      }
+  }
+
+  /// Which module (CAN header) reported each code, when headers were on.
+  Map<String, String> _respondingModules(String reply, ObdSession? session) {
+    final framing =
+        session == null ? DtcFraming.unknown : framingFor(session.protocol);
+    final decoded = decodeObdDtcReply(reply, service: 0x03, framing: framing);
+    return <String, String>{
+      if (decoded is ObdDtcCodes)
+        for (final c in decoded.codes)
+          if (c.ecuId.isNotEmpty) c.code: c.ecuId,
+    };
+  }
+
+  // ══════════════════════════════════════════════════════════════════════════
+  // ENGINE EXTRAS — Mode 07 / 0A, PID 01 01, RPM, voltage, VIN
+  // ══════════════════════════════════════════════════════════════════════════
+
+  /// Run the extras for [result]? Only when the vehicle spoke (answered or
+  /// refused), and then only on a manual read, the first time this
+  /// connection, when the Mode 03 list changed, or when the last run is old.
+  bool _shouldRunExtras(EngineDtcRead result, {required bool force}) {
+    if (result is! EngineAnswered && result is! EngineRefused) return false;
+    if (!isConnected || !_linkSynced || _linkWaiters > 0) return false;
+    final last = _engineReport;
+    if (force || last == null || last.stoppedEarly) return true;
+    if (!_sameCodes(last.coreCodes, _dtcCodes)) return true;
+    return DateTime.now().difference(last.startedAt) >= faultTiming.extrasRefresh;
+  }
+
+  /// Read the optional extras, in order, each bounded by its own window and
+  /// all of them by what is left of [kEngineReadBudget]. Each lands in
+  /// [engineReport] as soon as it is known. Stops early — leaving the core
+  /// result untouched — on [cancelEngineExtras], on a disconnect, or when
+  /// another foreground operation needs the link.
+  Future<void> _runEngineExtras(Stopwatch clock) async {
+    _extrasRunning = true;
+    _extrasCancelRequested = false;
+    final session = _session;
+    final framing =
+        session == null ? DtcFraming.unknown : framingFor(session.protocol);
+    var report = EngineReport(
+      startedAt: DateTime.now(),
+      coreCodes: {for (final c in _dtcCodes) c.code},
+    );
+    _engineReport = report;
+    notifyListeners();
+
+    void publish(EngineReport r) {
+      report = r;
+      _engineReport = r;
+      notifyListeners();
+    }
+
+    Duration left() => faultTiming.engineReadBudget - clock.elapsed;
+    bool stopped() =>
+        _extrasCancelRequested ||
+        _linkWaiters > 0 ||
+        !isConnected ||
+        !_linkSynced;
+
+    /// One extra request: the reply, or null when it was not asked (budget
+    /// gone, or stopped), or [_busyMarker] when the module stayed busy.
+    var budgetGone = false;
+    Future<String?> ask(String request) async {
+      if (stopped()) return null;
+      final remaining = left();
+      if (remaining <= faultTiming.extraCommandWindow ~/ 10) {
+        budgetGone = true;
+        return null;
+      }
+      final window = remaining < faultTiming.extraCommandWindow
+          ? remaining
+          : faultTiming.extraCommandWindow;
+      if (request.startsWith('AT')) {
+        final saved = _cmdTimeout;
+        _cmdTimeout = window;
+        try {
+          return await _send(request);
+        } finally {
+          _cmdTimeout = saved;
+        }
+      }
+      final r = await _sendWithPending(request,
+          policy: faultTiming.pendingPolicy(overall: remaining, perAttempt: window),
+          isCancelled: stopped);
+      return switch (r) {
+        PendingAnswered(:final reply) => reply,
+        PendingBusy() => _busyMarker,
+        PendingCancelled() => null,
+      };
+    }
+
+    ExtraRead<T> notAsked<T>() => budgetGone
+        ? ExtraSkipped<T>('time budget used up')
+        : (stopped() ? ExtraCancelled<T>() : ExtraSkipped<T>('not asked'));
+
+    ExtraRead<T> fromReply<T>(String? reply, Decoded<T> Function(String) decode) {
+      if (reply == null) return notAsked<T>();
+      if (reply == _busyMarker) return ExtraNoAnswer<T>('module kept reporting busy');
+      return extraFromDecoded(decode(reply));
+    }
+
+    ExtraRead<List<FaultRecord>> codesFrom(String? reply, int service, ReadSource source) {
+      if (reply == null) return notAsked<List<FaultRecord>>();
+      if (reply == _busyMarker) {
+        return const ExtraNoAnswer<List<FaultRecord>>('module kept reporting busy');
+      }
+      // Silence is not "not supported": only NO DATA or a not-supported
+      // refusal is.
+      if (isSilentReply(reply)) {
+        return ExtraNoAnswer<List<FaultRecord>>('no reply (${reply.trim()})');
+      }
+      final at = DateTime.now();
+      final d = decodeObdDtcReply(reply, service: service, framing: framing);
+      switch (d) {
+        case ObdDtcCodes(:final codes):
+          return ExtraValue<List<FaultRecord>>(<FaultRecord>[
+            for (final c in codes)
+              FaultRecord.fromDecodedObd(c, source: source, readAt: at),
+          ]);
+        case ObdDtcNoData():
+          // The module answered Mode 03 a moment ago; silence to this is
+          // "not offered", not a failure and not an empty list.
+          return const ExtraUnsupported<List<FaultRecord>>();
+        case ObdDtcNegative(:final nrc):
+          return isNotSupportedNrc(nrc)
+              ? ExtraUnsupported<List<FaultRecord>>(nrc)
+              : ExtraNoAnswer<List<FaultRecord>>('refused (NRC ${FailureType.hex(nrc)})');
+        case ObdDtcTruncated():
+          return const ExtraNoAnswer<List<FaultRecord>>('reply cut short');
+        case ObdDtcUnparseable(:final reason):
+          return ExtraNoAnswer<List<FaultRecord>>('unreadable: $reason');
+      }
+    }
+
+    try {
+      // 1. Lamp and stored-code count.
+      publish(report.copyWith(mil: fromReply(await ask('0101'), decodeMilStatus)));
+      final mismatch = report.countMismatch;
+      if (mismatch != null) {
+        recorder?.recordNote('PID 01 01 count ${mismatch.reported}, '
+            'Mode 03 sent ${mismatch.received}');
+      }
+
+      // 2. Pending (Mode 07) and 3. permanent (Mode 0A) codes.
+      publish(report.copyWith(
+          pending: codesFrom(await ask('07'), 0x07, ReadSource.mode07)));
+      publish(report.copyWith(
+          permanent: codesFrom(await ask('0A'), 0x0A, ReadSource.mode0A)));
+
+      // 4. Engine state.
+      publish(report.copyWith(rpm: fromReply(await ask('010C'), decodeRpm)));
+
+      // 5. Battery voltage: the module's own reading, else the adapter's.
+      final at = DateTime.now();
+      var voltage = _plausibleVoltage(
+          fromReply(await ask('0142'), decodeModuleVoltage),
+          VoltageSource.modulePid42,
+          at);
+      if (voltage is! ExtraValue<VoltageReading> && !stopped() && !budgetGone) {
+        voltage = _plausibleVoltage(
+            fromReply(await ask(ObdPids.readVoltage), decodeAdapterVoltage),
+            VoltageSource.adapterAtRv,
+            at);
+      }
+      publish(report.copyWith(voltage: voltage));
+
+      // 6. VIN and calibration IDs, once per connection.
+      final s = _session;
+      if (s != null && s.vin != null) {
+        publish(report.copyWith(
+            vin: ExtraValue<Vin>(s.vin!),
+            calibrationIds: s.calibrationIds == null
+                ? const ExtraSkipped<List<String>>('not offered')
+                : ExtraValue<List<String>>(s.calibrationIds!)));
+      } else if (s != null && s.vehicleInfoUnsupported) {
+        publish(report.copyWith(
+            vin: const ExtraUnsupported<Vin>(),
+            calibrationIds: const ExtraUnsupported<List<String>>()));
+      } else {
+        final vin = fromReply(await ask('0902'), decodeVinReply);
+        if (vin is ExtraValue<Vin>) s?.vin = vin.value;
+        if (vin is ExtraUnsupported<Vin>) s?.vehicleInfoUnsupported = true;
+        publish(report.copyWith(vin: vin));
+        // Only whether a VIN was read is noted — never the VIN.
+        recorder?.recordNote('vin: ${vin is ExtraValue<Vin> ? 'read' : vin.runtimeType}');
+        if (vin is! ExtraUnsupported<Vin>) {
+          final cal = fromReply(await ask('0904'), decodeCalibrationIds);
+          if (cal is ExtraValue<List<String>>) s?.calibrationIds = cal.value;
+          publish(report.copyWith(calibrationIds: cal));
+        } else {
+          publish(report.copyWith(
+              calibrationIds: const ExtraUnsupported<List<String>>()));
+        }
       }
     } catch (e) {
-      debugPrint('[ObdService] engine read failed (${e.runtimeType})');
-      return _finishEngineRead(
-          EngineNoAnswer(EngineNoAnswerReason.adapterError, DateTime.now()));
+      debugPrint('[ObdService] engine extras stopped (${e.runtimeType})');
     } finally {
-      if (stWidened && _linkSynced) await _send('ATST32');
-      if (headersOn) await _restoreLiveHeaders();
-      _cmdTimeout = previousTimeout;
-      _releasePollLock();
+      final cancelled =
+          _extrasCancelRequested || _linkWaiters > 0 || !isConnected;
+      ExtraRead<T> close<T>(ExtraRead<T> r) =>
+          (r is ExtraSkipped<T> && r.reason == 'not read yet')
+              ? (cancelled ? ExtraCancelled<T>() : ExtraSkipped<T>('time budget used up'))
+              : r;
+      if (identical(_engineReport, report) && _session == session) {
+        publish(report.copyWith(
+          inProgress: false,
+          finishedAt: DateTime.now(),
+          pending: close(report.pending),
+          permanent: close(report.permanent),
+          mil: close(report.mil),
+          rpm: close(report.rpm),
+          voltage: close(report.voltage),
+          vin: close(report.vin),
+          calibrationIds: close(report.calibrationIds),
+        ));
+        recorder?.recordNote('engine extras finished'
+            '${cancelled ? ' (stopped early)' : ''}');
+      }
+      _extrasRunning = false;
+      _extrasCancelRequested = false;
+    }
+  }
+
+  static const String _busyMarker = '\u0000BUSY';
+
+  /// Keep a voltage only inside the same sanity band the live dashboard
+  /// uses; anything outside it is line noise, not a battery.
+  ExtraRead<VoltageReading> _plausibleVoltage(
+      ExtraRead<double> v, VoltageSource source, DateTime at) {
+    switch (v) {
+      case ExtraValue(:final value):
+        if (value < _voltageNoiseFloor || value > _voltageNoiseCeiling) {
+          return const ExtraNoAnswer<VoltageReading>('implausible voltage');
+        }
+        return ExtraValue<VoltageReading>(
+            VoltageReading(volts: value, source: source, at: at));
+      case ExtraUnsupported(:final nrc):
+        return ExtraUnsupported<VoltageReading>(nrc);
+      case ExtraNoAnswer(:final reason):
+        return ExtraNoAnswer<VoltageReading>(reason);
+      case ExtraSkipped(:final reason):
+        return ExtraSkipped<VoltageReading>(reason);
+      case ExtraCancelled():
+        return const ExtraCancelled<VoltageReading>();
     }
   }
 
@@ -1791,9 +2349,25 @@ class ObdService extends ChangeNotifier {
 
         for (final request in target.requests) {
           final probeClock = Stopwatch()..start();
-          final response = await _send(request);
+          // Through the shared response-pending helper, with this scan's own
+          // window per attempt. A module that answers "response pending" is
+          // asked again (adapters that pass the frame through lose the real
+          // answer otherwise); a pending frame and the answer in one buffer
+          // keep the answer. Timeouts still go to the recovery below.
+          final sent = await _sendWithPending(request,
+              policy: faultTiming.pendingPolicy(perAttempt: _cmdTimeout),
+              recoverySelfHandled: true);
           probeClock.stop();
           final elapsedMs = probeClock.elapsedMilliseconds;
+          if (sent is! PendingAnswered) {
+            // The module is there and alive, and never got to its answer.
+            // Not a code list, not "clean", not an adapter-timing sample.
+            consecutiveTimeouts = 0;
+            log.add('${target.label} · $request: module kept reporting busy '
+                '(response pending, ${sent.attempts} attempts) — no answer.');
+            continue;
+          }
+          final response = sent.reply;
 
           if (response == 'TIMEOUT') {
             timedOutProbes++;
@@ -1861,6 +2435,7 @@ class ObdService extends ChangeNotifier {
                 make: vehicleMake,
                 model: vehicleModel,
                 log: log);
+            final readAt = DateTime.now();
             found = <DtcCode>[
               for (final r in uds.records)
                 _buildChassisDtc(
@@ -1868,6 +2443,9 @@ class ObdService extends ChangeNotifier {
                   platformKey: platformKey,
                   failureTypeByte: r.failureTypeByte,
                   isConfirmed: r.isConfirmed,
+                  statusByte: r.statusByte,
+                  record: FaultRecord.fromUdsDtcRecord(r,
+                      readAt: readAt, module: target.label),
                 ),
             ];
             break;
@@ -1887,9 +2465,17 @@ class ObdService extends ChangeNotifier {
               make: vehicleMake,
               model: vehicleModel,
               log: log);
+          final readAt = DateTime.now();
           found = <DtcCode>[
             for (final code in parsed.allCodes)
-              _buildChassisDtc(code: code, platformKey: platformKey),
+              _buildChassisDtc(
+                code: code,
+                platformKey: platformKey,
+                record: FaultRecord.fromObdCode(code,
+                    source: ReadSource.mode03,
+                    readAt: readAt,
+                    module: target.label),
+              ),
           ];
           break;
         }
@@ -1943,6 +2529,7 @@ class ObdService extends ChangeNotifier {
         if (headersOn) await _restoreLiveHeaders();
       }
       _chassisScanLog = List<String>.unmodifiable(log);
+      _chassisReadAt = DateTime.now();
       _releasePollLock();
       _chassisScanInFlight = false;
       notifyListeners();
@@ -2033,6 +2620,8 @@ class ObdService extends ChangeNotifier {
     required String? platformKey,
     int? failureTypeByte,
     bool isConfirmed = true,
+    int? statusByte,
+    FaultRecord? record,
   }) {
     final entry = ChassisDtcDatabase.lookup(platformKey, code);
     return DtcCode(
@@ -2047,6 +2636,8 @@ class ObdService extends ChangeNotifier {
       remedy: entry?.remedy ?? '',
       failureTypeByte: failureTypeByte,
       isConfirmed: isConfirmed,
+      statusByte: statusByte,
+      record: record,
     );
   }
 
@@ -2149,7 +2740,13 @@ class ObdService extends ChangeNotifier {
 
   /// Wait for any PID request the poll loop already had in flight to
   /// complete, capped so a stuck link can't hang clearDtcs() forever.
+  ///
+  /// Also hands the link back from a running engine-extras job first, so the
+  /// extras — which run after the core result is already on screen — can
+  /// never interleave their commands with Clear Codes, an ABS scan or a
+  /// freeze-frame read.
   Future<void> _waitForLinkIdle() async {
+    await _yieldEngineExtras();
     final deadline = DateTime.now().add(_cmdTimeout + const Duration(seconds: 1));
     while ((_wifiPendingCmd != null && !_wifiPendingCmd!.isCompleted) ||
         (_btPendingCmd != null && !_btPendingCmd!.isCompleted)) {

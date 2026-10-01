@@ -1,4 +1,10 @@
 /// Danlite ELM — Vehicle Real-Time Data Model
+library;
+
+import 'fault_record.dart';
+
+export 'fault_record.dart' show FaultRecord, FaultStatus;
+
 class VehicleData {
   final double? rpm;
   final double? speed;
@@ -136,6 +142,14 @@ class DtcCode {
   /// (UDS status bit 3) rather than a single unconfirmed test failure.
   final bool isConfirmed;
 
+  /// The raw ISO 14229 status byte, when the code came from a UDS reply.
+  final int? statusByte;
+
+  /// The observation this card describes: format, status, source, module and
+  /// read time. Optional so every older construction site still compiles; set
+  /// by the engine read and the ABS reader.
+  final FaultRecord? record;
+
   const DtcCode({
     required this.code,
     required this.description,
@@ -149,9 +163,29 @@ class DtcCode {
     this.remedy = '',
     this.failureTypeByte,
     this.isConfirmed = true,
+    this.statusByte,
+    this.record,
   });
 
   bool get isChassis => module == 'chassis';
+
+  /// The same card with its observation attached.
+  DtcCode withRecord(FaultRecord r) => DtcCode(
+        code: code,
+        description: description,
+        possibleCause: possibleCause,
+        severity: severity,
+        action: action,
+        isPending: isPending || (r.status.pending ?? false),
+        module: module,
+        component: component,
+        query: query,
+        remedy: remedy,
+        failureTypeByte: failureTypeByte,
+        isConfirmed: isConfirmed,
+        statusByte: statusByte ?? r.statusByte,
+        record: r,
+      );
 }
 
 /// Connection State

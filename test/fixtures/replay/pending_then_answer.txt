@@ -1,0 +1,23 @@
+# Danlite ELM session recording
+# started: 2026-10-01T09:30:00.000
+# transport: bluetooth
+# format: <time> TX> command | RX< reply (\r = carriage return); # lines are notes
+# FIXTURE: hand-written from documented ELM327 / SAE J1979 / ISO 14229 behaviour.
+# NOT recorded from a real bike.
+# The engine computer answers Mode 03 with "response pending" (7F 03 78);
+# this adapter passes the frame through, and the answer comes on a re-send.
+# expect engine: answered P0133 P0301
+# expect passesPending: true
+09:30:00.000 TX>ATZ
+09:30:00.300 RX<\r\rELM327 v1.5\r\r
+# 09:30:00.300 adapter identity (ATZ): ELM327 v1.5
+09:30:00.900 TX>ATE0
+09:30:00.910 RX<ATE0\rOK\r\r
+09:30:01.000 TX>0100
+09:30:01.050 RX<\r41 00 BE 3E B8 11\r\r
+09:30:01.100 TX>ATDPN
+09:30:01.110 RX<\rA6\r\r
+09:30:02.000 TX>03
+09:30:02.060 RX<\r7E8 03 7F 03 78\r\r
+09:30:02.400 TX>03
+09:30:02.450 RX<\r7E8 06 43 02 01 33 03 01\r\r
