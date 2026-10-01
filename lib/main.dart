@@ -10,6 +10,7 @@ import 'providers/vehicle_provider.dart';
 import 'services/bluetooth_classic_service.dart';
 import 'services/error_reporting_service.dart';
 import 'services/obd_service.dart';
+import 'services/session_recorder.dart';
 import 'services/supabase_service.dart';
 import 'services/trip_logger.dart';
 import 'services/dtc_service.dart';
@@ -86,7 +87,9 @@ void main() {
     final btService = BluetoothClassicService();
 
     // ObdService receives BT service via constructor injection
-    final obdService = ObdService(btService);
+    // Tester-mode recorder: off by default, local file only (S9).
+    final recorder = SessionRecorder();
+    final obdService = ObdService(btService, recorder: recorder);
 
     // Backend auth (Phase 2). Both calls swallow their own failures: a missing
     // or unreachable Supabase config must never stop the diagnostics app from
@@ -115,6 +118,7 @@ void main() {
             ChangeNotifierProvider<TripLogger>.value(value: tripLog),
             ChangeNotifierProvider<BluetoothClassicService>.value(value: btService),
             ChangeNotifierProvider<ObdService>.value(value: obdService),
+            ChangeNotifierProvider<SessionRecorder>.value(value: recorder),
             ChangeNotifierProvider<AuthProvider>.value(value: auth),
             ChangeNotifierProvider<EntitlementProvider>.value(value: entitlement),
           ],

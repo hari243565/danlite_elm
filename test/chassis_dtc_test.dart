@@ -369,7 +369,9 @@ void main() {
           'WSS_GENERIC',
           '(GENERIC) ABS Wheel Speed Difference too high',
           'Signal quality from the front/Rear WSS is not good',
-          'Check the front toner wheel/ Airgap',
+          // Completed from the next manual page (S10, fault-code safety
+          // release); the original transcription stopped at "Airgap".
+          'Check the front toner wheel/ Airgap consistency/WSS bracket',
         ],
       };
 

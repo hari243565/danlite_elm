@@ -653,6 +653,7 @@ class ObdParser {
     final warnings = <String>[];
     final ordered = <String>[];
     int? reportedCount;
+    var positive = false;
     try {
       if (response == null || response.trim().isEmpty) {
         return DtcParseResult(powertrainCodes: const <String>[], allCodes: const <String>[], warnings: const <String>['Empty response.']);
@@ -668,6 +669,7 @@ class ObdParser {
         if (assembled.payload.isEmpty) continue;
         final decoded = _decodeServicePayload(assembled.payload, entry.key, assembled.sawIsoTpPci, countByteMode, warnings);
         reportedCount = _accumulateCount(reportedCount, decoded.reportedCount);
+        if (decoded.positive) positive = true;
         ordered.addAll(decoded.codes);
       }
     } catch (e) { warnings.add('Unrecoverable parser error: $e'); }
@@ -677,7 +679,7 @@ class ObdParser {
     for (final code in ordered) { if (seen.add(code)) unique.add(code); }
     final powertrain = <String>[for (final code in unique) if (_powertrainPattern.hasMatch(code)) code];
 
-    return DtcParseResult(powertrainCodes: List<String>.unmodifiable(powertrain), allCodes: List<String>.unmodifiable(unique), warnings: List<String>.unmodifiable(warnings), reportedCount: reportedCount);
+    return DtcParseResult(powertrainCodes: List<String>.unmodifiable(powertrain), allCodes: List<String>.unmodifiable(unique), warnings: List<String>.unmodifiable(warnings), reportedCount: reportedCount, positiveResponseSeen: positive);
   }
 
   static String? decodeDtcPair(int byte1, int byte2) {
@@ -822,6 +824,11 @@ class ObdParser {
       if (serviceResponseBytes.contains(payload[i])) { start = i; break; }
     }
     if (start < 0) return const _ServiceDecode(<String>[], null);
+    // A positive response is the service byte at the START of a module's
+    // reassembled payload (CAN, headers off or ISO-TP framed), or straight
+    // after a 3-byte K-line header when no ISO-TP framing was seen. A 0x43
+    // that merely occurs somewhere inside other bytes is not one.
+    final positive = start == 0 || (!sawIsoTpPci && start == 3);
     var body = payload.sublist(start + 1);
     int? reported;
     if (body.isNotEmpty) {
@@ -833,7 +840,7 @@ class ObdParser {
       final code = decodeDtcPair(body[i], body[i + 1]);
       if (code != null) codes.add(code);
     }
-    return _ServiceDecode(codes, reported);
+    return _ServiceDecode(codes, reported, positive: positive);
   }
 
   static bool _looksLikeCountByte(List<int> body) {
@@ -1025,11 +1032,18 @@ class DtcParseResult {
   final List<String> warnings;
   final int? reportedCount;
 
+  /// True when at least one module returned a syntactically valid positive
+  /// response (service byte `43`/`47`/`4A` where a response starts) — the
+  /// only evidence that an empty [allCodes] means "no stored faults" rather
+  /// than "nothing answered". See `classifyEngineDtcReply`.
+  final bool positiveResponseSeen;
+
   const DtcParseResult({
     required this.powertrainCodes,
     required this.allCodes,
     required this.warnings,
     this.reportedCount,
+    this.positiveResponseSeen = false,
   });
 
   bool get countMismatch => reportedCount != null && reportedCount != allCodes.length;
@@ -1051,5 +1065,6 @@ class _Reassembly {
 class _ServiceDecode {
   final List<String> codes;
   final int? reportedCount;
-  const _ServiceDecode(this.codes, this.reportedCount);
+  final bool positive;
+  const _ServiceDecode(this.codes, this.reportedCount, {this.positive = false});
 }

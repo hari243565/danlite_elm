@@ -8,6 +8,7 @@ import '../providers/entitlement_provider.dart';
 import '../providers/settings_provider.dart';
 import '../services/app_version_service.dart';
 import '../services/obd_service.dart';
+import '../services/session_recorder.dart';
 // The pill and the identifier helper live with the screen this row opens, so
 // there is one of each rather than two that can drift apart. entitlement_service
 // is no longer imported here: the EntitlementStatus switch moved with the pill.
@@ -96,9 +97,11 @@ class SettingsScreen extends StatelessWidget {
                   ? 'OBD2 Vehicle Diagnostics'
                   : 'Version $v · OBD2 Vehicle Diagnostics',
               onTap: () => Navigator.pushNamed(context, '/about'),
+              onSubtitleTap: () => _recorderTaps.register(context),
             );
           },
         ),
+        const _RecorderNotice(),
         _DisconnectTile(),
         const SizedBox(height: 40),
       ]),
@@ -195,15 +198,108 @@ class _SectionHeader extends StatelessWidget {
       );
 }
 
+/// Seven taps on the version line, each within two seconds of the last,
+/// toggle the tester-mode session recorder. Hidden on purpose: it is a tool
+/// for collecting real-bike fixtures, not a rider feature.
+final _recorderTaps = _HiddenTapCounter();
+
+class _HiddenTapCounter {
+  static const int required = 7;
+  static const Duration window = Duration(seconds: 2);
+  int _count = 0;
+  DateTime? _last;
+
+  void register(BuildContext context) {
+    final now = DateTime.now();
+    final last = _last;
+    _count = (last != null && now.difference(last) <= window) ? _count + 1 : 1;
+    _last = now;
+    if (_count < required) return;
+    _count = 0;
+    final recorder = Provider.of<SessionRecorder?>(context, listen: false);
+    if (recorder == null) return;
+    final turningOn = !recorder.enabled;
+    final messenger = ScaffoldMessenger.of(context);
+    final message =
+        AppStrings.get(turningOn ? 'recorderTurnedOn' : 'recorderTurnedOff',
+            context.read<SettingsProvider>().locale.languageCode);
+    recorder.setEnabled(turningOn).then((_) {
+      messenger.showSnackBar(SnackBar(content: Text(message)));
+    });
+  }
+}
+
+/// Plain notice shown in Settings for as long as the recorder is on, with
+/// the only two actions it has: share the recording, or switch it off.
+class _RecorderNotice extends StatelessWidget {
+  const _RecorderNotice();
+
+  @override
+  Widget build(BuildContext context) {
+    final recorder = Provider.of<SessionRecorder?>(context);
+    if (recorder == null || !recorder.enabled) return const SizedBox.shrink();
+    return Container(
+      margin: const EdgeInsets.fromLTRB(14, 6, 14, 3),
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: AppColors.warning.withValues(alpha: 0.10),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppColors.warning.withValues(alpha: 0.5)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(context.tr('recorderOnTitle'),
+              style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.textPrimary)),
+          const SizedBox(height: 6),
+          Text(context.tr('recorderOnBody'),
+              style: const TextStyle(
+                  fontSize: 12, height: 1.4, color: AppColors.textSecondary)),
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              TextButton.icon(
+                icon: const Icon(Icons.share_outlined, size: 18),
+                label: Text(context.tr('recorderShare')),
+                onPressed: () async {
+                  final messenger = ScaffoldMessenger.of(context);
+                  final nothing = AppStrings.get('recorderNothingToShare',
+                      context.read<SettingsProvider>().locale.languageCode);
+                  final shared = await recorder.shareLastRecording();
+                  if (!shared) {
+                    messenger.showSnackBar(SnackBar(content: Text(nothing)));
+                  }
+                },
+              ),
+              const Spacer(),
+              TextButton(
+                onPressed: () => recorder.setEnabled(false),
+                child: Text(context.tr('recorderTurnOff')),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 class _SettingsTile extends StatelessWidget {
   final IconData icon;
   final String title, subtitle;
   final VoidCallback? onTap;
+
+  /// Optional tap target on the subtitle alone (the version line).
+  final VoidCallback? onSubtitleTap;
   const _SettingsTile(
       {required this.icon,
       required this.title,
       required this.subtitle,
-      this.onTap});
+      this.onTap,
+      this.onSubtitleTap});
   @override
   Widget build(BuildContext context) => Container(
         margin: const EdgeInsets.symmetric(horizontal: 14, vertical: 3),
@@ -232,9 +328,17 @@ class _SettingsTile extends StatelessWidget {
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
                     color: AppColors.textPrimary)),
-            subtitle: Text(subtitle,
-                style: const TextStyle(
-                    fontSize: 12, color: AppColors.textSecondary)),
+            subtitle: onSubtitleTap == null
+                ? Text(subtitle,
+                    style: const TextStyle(
+                        fontSize: 12, color: AppColors.textSecondary))
+                : GestureDetector(
+                    behavior: HitTestBehavior.opaque,
+                    onTap: onSubtitleTap,
+                    child: Text(subtitle,
+                        style: const TextStyle(
+                            fontSize: 12, color: AppColors.textSecondary)),
+                  ),
             trailing:
                 const Icon(Icons.chevron_right, color: AppColors.textHint),
             onTap: onTap,

@@ -9,6 +9,7 @@ import '../providers/settings_provider.dart';
 import '../providers/vehicle_provider.dart';
 import '../services/dtc_service.dart';
 import '../services/obd_service.dart';
+import '../services/session_recorder.dart';
 import '../models/vehicle_data.dart';
 import 'honda_blink_reference_screen.dart';
 
@@ -55,7 +56,13 @@ String clearOutcomeMessageKey(bool ok, ClearDtcsOutcome outcome) =>
 Color clearOutcomeColor(bool ok, ClearDtcsOutcome outcome) => _RC.neonGreen;
 
 class DtcScreen extends StatefulWidget {
-  const DtcScreen({super.key});
+  const DtcScreen({super.key, this.autoScan = true});
+
+  /// Whether the screen reads codes on open and every five seconds. Always
+  /// true in the app; tests switch it off so they can render the screen
+  /// against a service state they produced themselves.
+  @visibleForTesting
+  final bool autoScan;
 
   @override
   State<DtcScreen> createState() => _DtcScreenState();
@@ -68,7 +75,13 @@ class _DtcScreenState extends State<DtcScreen> {
   Timer? _loopTimer;
   bool _reading = false;
   bool _clearing = false;
+  // No longer read: the engine area is now driven by ObdService.lastEngineRead
+  // and dtcCodesReadAt, so a failed read can never refresh a LIVE SCAN stamp.
+  // Kept only because _clearCodes still assigns them, and Clear Codes is
+  // deliberately left exactly as it was.
+  // ignore: unused_field
   bool _hasReadOnce = false;
+  // ignore: unused_field
   DateTime? _lastReadAt;
 
   /// Which diagnostic module the single results list is currently showing.
@@ -100,6 +113,7 @@ class _DtcScreenState extends State<DtcScreen> {
     // "Loop readDtcs()" — continuously re-scan for fault codes while this
     // screen is open and the adapter is connected, in addition to manual
     // reads / pull-to-refresh.
+    if (!widget.autoScan) return;
     _loopTimer = Timer.periodic(_autoScanInterval, (_) => _readCodes());
     WidgetsBinding.instance.addPostFrameCallback((_) => _readCodes());
   }
@@ -138,7 +152,9 @@ class _DtcScreenState extends State<DtcScreen> {
     final obd = context.read<ObdService>();
     if (!obd.isConnected || _reading) return;
     setState(() => _reading = true);
-    await obd.readDtcs();
+    // What the read established (answered / no answer / refused / link lost /
+    // K-line) lives on the service as lastEngineRead, which build() renders.
+    await obd.readEngineDtcs();
     if (!mounted) return;
     setState(() {
       _reading = false;
@@ -258,10 +274,20 @@ class _DtcScreenState extends State<DtcScreen> {
     return '${diff.inMinutes}m ago';
   }
 
+  /// "Read at 14:05:09" — the label every older, no-longer-current result
+  /// carries instead of the LIVE SCAN stamp.
+  String _readAtLabel(BuildContext context, DateTime t) {
+    String two(int n) => n.toString().padLeft(2, '0');
+    return context.trArgs('dtcReadAt',
+        {'time': '${two(t.hour)}:${two(t.minute)}:${two(t.second)}'});
+  }
+
   @override
   Widget build(BuildContext context) {
     final obd = context.watch<ObdService>();
     final codes = _sanitize(obd.dtcCodes);
+    // Optional so screens and tests built without the recorder still work.
+    final recorder = Provider.of<SessionRecorder?>(context);
 
     return Scaffold(
       backgroundColor: _RC.bg,
@@ -285,11 +311,12 @@ class _DtcScreenState extends State<DtcScreen> {
       ),
       body: Column(
         children: [
+          if (recorder?.enabled ?? false) _recorderStrip(context),
           _buildModuleSelector(context),
           Expanded(
             child: obd.isConnected
                 ? (_module == DtcModule.engine
-                    ? _buildConnected(context, codes)
+                    ? _buildConnected(context, codes, obd)
                     : _buildChassis(context, obd))
                 : _buildDisconnected(context),
           ),
@@ -297,6 +324,26 @@ class _DtcScreenState extends State<DtcScreen> {
       ),
     );
   }
+
+  /// One-line reminder that tester mode is recording this session.
+  Widget _recorderStrip(BuildContext context) => Container(
+        width: double.infinity,
+        color: _RC.neonAmber.withValues(alpha: 0.14),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+        child: Row(
+          children: [
+            const Icon(Icons.fiber_manual_record, size: 12, color: _RC.neonAmber),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(context.tr('recorderOnTitle'),
+                  style: const TextStyle(
+                      color: _RC.neonAmber,
+                      fontSize: 11.5,
+                      fontWeight: FontWeight.w700)),
+            ),
+          ],
+        ),
+      );
 
   // ── Module selector ───────────────────────────────────────────────────────
   // One diagnostics screen, module as a selectable category within it — the
@@ -403,34 +450,161 @@ class _DtcScreenState extends State<DtcScreen> {
         ),
       );
 
-  Widget _buildConnected(BuildContext context, List<DtcCode> codes) {
+  Widget _buildConnected(
+      BuildContext context, List<DtcCode> codes, ObdService obd) {
     final criticalCount =
         codes.where((c) => c.severity == 'critical' || c.severity == 'high').length;
+    final read = obd.lastEngineRead;
+    final readAt = obd.dtcCodesReadAt;
 
     return Column(
       children: [
-        _buildSummaryBar(codes, criticalCount),
+        _buildSummaryBar(context, codes, criticalCount,
+            current: read is EngineAnswered, readAt: readAt),
         _buildActionBar(context, codes),
         Expanded(
           child: RefreshIndicator(
             color: _RC.neonCyan,
             backgroundColor: _RC.card,
             onRefresh: _readCodes,
-            child: codes.isEmpty
-                ? _buildEmptyState(context)
-                : ListView.builder(
-                    physics: const AlwaysScrollableScrollPhysics(),
-                    padding: const EdgeInsets.fromLTRB(14, 12, 14, 20),
-                    itemCount: codes.length,
-                    itemBuilder: (_, i) => _HazardCard(code: codes[i]),
-                  ),
+            child: _buildEngineResults(context, read, codes, readAt),
           ),
         ),
       ],
     );
   }
 
-  Widget _buildSummaryBar(List<DtcCode> codes, int criticalCount) {
+  /// The engine list area, decided by what the last read established.
+  ///
+  /// "No Fault Codes Found" is reachable from exactly one branch: the engine
+  /// computer gave a positive answer with no codes in it. Every other outcome
+  /// says what actually happened, and any list from an earlier answered read
+  /// is shown greyed out under its read time — never as current.
+  Widget _buildEngineResults(BuildContext context, EngineDtcRead? read,
+      List<DtcCode> codes, DateTime? readAt) {
+    if (read == null) return _buildEmptyState(context, answered: false);
+    if (read is EngineAnswered) {
+      if (codes.isEmpty) return _buildEmptyState(context, answered: true);
+      return ListView.builder(
+        physics: const AlwaysScrollableScrollPhysics(),
+        padding: const EdgeInsets.fromLTRB(14, 12, 14, 20),
+        itemCount: codes.length,
+        itemBuilder: (_, i) => _HazardCard(code: codes[i]),
+      );
+    }
+
+    final Widget notice;
+    switch (read) {
+      case EngineNoAnswer():
+        notice = _engineNotice(
+          icon: Icons.portable_wifi_off_rounded,
+          color: _RC.neonAmber,
+          title: context.tr('dtcNoAnswerTitle'),
+          body: context.tr('dtcNoAnswerBody'),
+          detail: context.tr('dtcNoAnswerChecklist'),
+        );
+        break;
+      case EngineRefused():
+        notice = _engineNotice(
+          icon: Icons.block_rounded,
+          color: _RC.neonAmber,
+          title: context.tr('dtcRefusedTitle'),
+          body: context.tr('dtcRefusedBody'),
+        );
+        break;
+      case EngineLinkLost():
+        notice = _engineNotice(
+          icon: Icons.link_off_rounded,
+          color: _RC.neonRed,
+          title: context.tr('dtcLinkLostTitle'),
+          body: context.tr('dtcLinkLostBody'),
+        );
+        break;
+      case EngineKLineGated():
+        notice = _engineNotice(
+          icon: Icons.cable_rounded,
+          color: _RC.neonCyan,
+          body: context.tr('dtcKLineGated'),
+        );
+        break;
+      case EngineAnswered():
+        notice = const SizedBox.shrink(); // handled above
+    }
+
+    return ListView(
+      physics: const AlwaysScrollableScrollPhysics(),
+      padding: const EdgeInsets.fromLTRB(14, 12, 14, 20),
+      children: [
+        notice,
+        if (codes.isNotEmpty && readAt != null) ...[
+          const SizedBox(height: 14),
+          Text(_readAtLabel(context, readAt),
+              style: const TextStyle(
+                  color: _RC.textMuted,
+                  fontSize: 11,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: 0.6)),
+          const SizedBox(height: 8),
+          // Greyed: these are what the bike reported earlier, not now.
+          for (final c in codes)
+            Opacity(opacity: 0.45, child: _HazardCard(code: c)),
+        ],
+      ],
+    );
+  }
+
+  Widget _engineNotice({
+    required IconData icon,
+    required Color color,
+    String? title,
+    required String body,
+    String? detail,
+  }) =>
+      Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: _RC.card,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: color.withValues(alpha: 0.45)),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(icon, color: color, size: 22),
+                if (title != null) ...[
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Text(title,
+                        style: const TextStyle(
+                            color: _RC.textMain,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w800)),
+                  ),
+                ],
+              ],
+            ),
+            const SizedBox(height: 10),
+            Text(body,
+                style: const TextStyle(
+                    color: _RC.textMain, fontSize: 13.5, height: 1.45)),
+            if (detail != null) ...[
+              const SizedBox(height: 10),
+              Text(detail,
+                  style: const TextStyle(
+                      color: _RC.textMuted, fontSize: 12.5, height: 1.5)),
+            ],
+          ],
+        ),
+      );
+
+  Widget _buildSummaryBar(BuildContext context, List<DtcCode> codes,
+      int criticalCount,
+      {required bool current, required DateTime? readAt}) {
+    // Counts describe the bike only when the last read actually answered.
+    // After a failed read they would describe an older result, so they show
+    // a dash, and the stamp is the read time instead of LIVE SCAN.
     return Container(
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
       decoration: const BoxDecoration(
@@ -441,35 +615,45 @@ class _DtcScreenState extends State<DtcScreen> {
         children: [
           _statChip(
               label: 'CODES',
-              value: '${codes.length}',
-              color: codes.isEmpty ? _RC.neonGreen : _RC.neonAmber),
+              value: current ? '${codes.length}' : '—',
+              color: !current
+                  ? _RC.textMuted
+                  : (codes.isEmpty ? _RC.neonGreen : _RC.neonAmber)),
           const SizedBox(width: 10),
           _statChip(
               label: 'CRITICAL',
-              value: '$criticalCount',
-              color: criticalCount > 0 ? _RC.neonRed : _RC.textMuted),
+              value: current ? '$criticalCount' : '—',
+              color: current && criticalCount > 0 ? _RC.neonRed : _RC.textMuted),
           const Spacer(),
-          Row(
-            children: [
-              Container(
-                width: 6,
-                height: 6,
-                decoration: const BoxDecoration(
-                    shape: BoxShape.circle, color: _RC.neonCyan),
-              ),
-              const SizedBox(width: 6),
-              Text(
-                _lastReadAt != null
-                    ? 'LIVE SCAN · ${_timeAgo(_lastReadAt!)}'
-                    : 'LIVE SCAN',
-                style: const TextStyle(
-                    color: _RC.textMuted,
-                    fontSize: 10,
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: 0.6),
-              ),
-            ],
-          ),
+          if (current && readAt != null)
+            Row(
+              children: [
+                Container(
+                  width: 6,
+                  height: 6,
+                  decoration: const BoxDecoration(
+                      shape: BoxShape.circle, color: _RC.neonCyan),
+                ),
+                const SizedBox(width: 6),
+                Text(
+                  'LIVE SCAN · ${_timeAgo(readAt)}',
+                  style: const TextStyle(
+                      color: _RC.textMuted,
+                      fontSize: 10,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 0.6),
+                ),
+              ],
+            )
+          else if (readAt != null)
+            Text(
+              _readAtLabel(context, readAt),
+              style: const TextStyle(
+                  color: _RC.textMuted,
+                  fontSize: 10,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: 0.6),
+            ),
         ],
       ),
     );
@@ -558,8 +742,11 @@ class _DtcScreenState extends State<DtcScreen> {
     );
   }
 
-  Widget _buildEmptyState(BuildContext context) {
-    final ready = _hasReadOnce;
+  /// [answered] true is the ONLY way to reach "No Fault Codes Found": the
+  /// engine computer gave a positive answer with no codes. False is the
+  /// first-read state ("Scanning…").
+  Widget _buildEmptyState(BuildContext context, {required bool answered}) {
+    final ready = answered;
     return ListView(
       physics: const AlwaysScrollableScrollPhysics(),
       children: [
@@ -1161,12 +1348,32 @@ class _HazardCard extends StatelessWidget {
       return context.tr('absNoDictionary');
     }
 
+    // A manufacturer-defined code (P1xxx, U1xxx…) means whatever this bike's
+    // maker says it means. No generic table is consulted — not even the 436
+    // P1 entries the engine assets carry, several of them GM wording.
+    if (isManufacturerDefined(code.code)) {
+      return context.tr('dtcManufacturerSpecific');
+    }
+
     final resolved = DtcLocalizations.description(
       code.code,
       languageCode,
       englishFallback: code.description,
     );
-    return resolved.isEmpty ? '—' : resolved;
+    return resolved.isEmpty ? context.tr('dtcNoVerifiedDescription') : resolved;
+  }
+
+  /// Subsystem label for an engine code shown by its structure (no verified
+  /// description). Null when a description exists or the range has no
+  /// grouping the app is confident of.
+  String? _structuralSubsystem(BuildContext context) {
+    if (code.isChassis || isManufacturerDefined(code.code)) return null;
+    final languageCode = context.watch<SettingsProvider>().locale.languageCode;
+    final resolved = DtcLocalizations.description(code.code, languageCode,
+        englishFallback: code.description);
+    if (resolved.isNotEmpty) return null;
+    final key = DtcLocalizations.subsystemKey(code.code);
+    return key == null ? null : context.tr(key);
   }
 
   /// The resolved platform record, for its capability flags. Null for engine
@@ -1366,6 +1573,34 @@ class _HazardCard extends StatelessWidget {
                             fontSize: 14,
                             fontWeight: FontWeight.w600,
                             height: 1.3)),
+
+                    // Engine codes: structure when there is no verified text,
+                    // and the cause and advice the 31-entry table carries.
+                    // Rows are only built when they have content.
+                    if (!code.isChassis) ...[
+                      Builder(builder: (context) {
+                        final subsystem = _structuralSubsystem(context);
+                        return subsystem == null
+                            ? const SizedBox.shrink()
+                            : _detailRow(context.tr('dtcSubsystem'), subsystem,
+                                _RC.textMain);
+                      }),
+                      if (code.possibleCause.isNotEmpty)
+                        _detailRow(context.tr('possibleCause'),
+                            code.possibleCause, _RC.textMuted),
+                      if (code.action.isNotEmpty)
+                        _detailRow(context.tr('recommendedAction'), code.action,
+                            _RC.neonCyan),
+                      if (code.severity != 'unknown') ...[
+                        const SizedBox(height: 8),
+                        Text(context.tr('dtcSeverityGuidance'),
+                            style: const TextStyle(
+                                color: _RC.textMuted,
+                                fontSize: 10.5,
+                                fontStyle: FontStyle.italic,
+                                height: 1.4)),
+                      ],
+                    ],
 
                     // Chassis codes carry the manufacturer's own Component,
                     // Query and Remedy columns — genuinely actionable detail a

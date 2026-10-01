@@ -199,6 +199,57 @@ class AppStrings {
       'severityLow': '🟢 Low',
       'severityUnknown': '⚪ Unknown',
 
+      // ── Fault-code safety release (Phase 0) ─────────────────────────────
+      // English and Hindi only; every other language falls back to English
+      // through AppStrings.get, as the ABS strings do. The Hindi is proposed
+      // text awaiting review by a Hindi speaker.
+      'dtcNoAnswerTitle': 'The bike did not answer',
+      'dtcNoAnswerBody': 'The adapter is connected, but the bike\'s computer '
+          'did not reply. This does not mean there are no faults.',
+      'dtcNoAnswerChecklist': 'Turn the ignition ON. Push the adapter fully '
+          'into the bike\'s socket, using the right cable for your bike\'s '
+          'connector. Check the battery is healthy. Some older bikes use a '
+          'connection type the app cannot read yet. Then try again.',
+      'dtcRefusedTitle': 'The bike refused the request',
+      'dtcRefusedBody': 'The bike\'s computer answered but did not report its '
+          'fault codes. This does not mean there are no faults. Switch the '
+          'engine off, keep the ignition ON, and try again.',
+      'dtcLinkLostTitle': 'Lost contact with the adapter',
+      'dtcLinkLostBody': 'No fault codes could be read. Check the adapter is '
+          'still plugged in and connected, then try again.',
+      'dtcKLineGated': 'This bike appears to use an older connection type. '
+          'Reading its fault codes is not switched on yet, so the app will not '
+          'show codes that might be wrong.',
+      'dtcManufacturerSpecific': 'Manufacturer-specific code. Its exact '
+          'meaning depends on your bike\'s maker and we do not have a verified '
+          'entry for it. Show this code to your dealer.',
+      'dtcNoVerifiedDescription': 'No verified description yet.',
+      'dtcReadAt': 'Read at {time}',
+      'dtcSubsystem': 'Subsystem',
+      'dtcSubFuelAir': 'Fuel and air metering',
+      'dtcSubIgnition': 'Ignition system or misfire',
+      'dtcSubEmission': 'Auxiliary emission controls',
+      'dtcSubSpeedIdle': 'Vehicle speed, idle control and auxiliary inputs',
+      'dtcSubComputer': 'Computer and output circuits',
+      'dtcSubTransmission': 'Transmission',
+      'dtcSubNetworkElectrical': 'Network electrical',
+      'dtcSubNetworkComms': 'Network communication',
+      'dtcSubNetworkSoftware': 'Network software',
+      'dtcSubNetworkData': 'Network data',
+      'dtcSeverityGuidance':
+          'Severity is Danlite\'s guidance, not manufacturer data.',
+      'recorderOnTitle': 'Session recorder is on',
+      'recorderOnBody': 'Danlite is saving this connection\'s adapter '
+          'messages to a file on this phone, to help support more bikes. '
+          'Nothing is uploaded. Vehicle ID numbers are masked. The file leaves '
+          'the phone only if you tap Share.',
+      'recorderShare': 'Share recording',
+      'recorderTurnOff': 'Turn off',
+      'recorderTurnedOn': 'Session recorder turned on',
+      'recorderTurnedOff': 'Session recorder turned off',
+      'recorderNothingToShare':
+          'No recording yet. Connect to the adapter first.',
+
       // ── Module selector (Engine / ABS) ──────────────────────────────────
       // Only 'en' and 'hi' ship these; AppStrings.get falls every other
       // language back to English, exactly as DTC descriptions already do.
@@ -954,6 +1005,55 @@ class AppStrings {
       'severityMedium': '🟡 मध्यम',
       'severityLow': '🟢 कम',
       'severityUnknown': '⚪ अज्ञात',
+
+      // ── Fault-code safety release (Phase 0) — PROPOSED, needs review by a
+      // Hindi speaker before release ───────────────────────────────────────
+      'dtcNoAnswerTitle': 'बाइक से जवाब नहीं मिला',
+      'dtcNoAnswerBody': 'अडैप्टर जुड़ा है, लेकिन बाइक के कंप्यूटर ने जवाब नहीं '
+          'दिया। इसका मतलब यह नहीं कि कोई खराबी नहीं है।',
+      'dtcNoAnswerChecklist': 'इग्निशन चालू (ON) करें। अडैप्टर को बाइक के सॉकेट '
+          'में पूरा लगाएँ और अपनी बाइक के कनेक्टर के हिसाब से सही केबल इस्तेमाल '
+          'करें। बैटरी ठीक है या नहीं देखें। कुछ पुरानी बाइकें ऐसे कनेक्शन का उपयोग '
+          'करती हैं जिसे ऐप अभी नहीं पढ़ सकता। फिर दोबारा कोशिश करें।',
+      'dtcRefusedTitle': 'बाइक ने अनुरोध अस्वीकार किया',
+      'dtcRefusedBody': 'बाइक के कंप्यूटर ने जवाब दिया, लेकिन अपने फ़ॉल्ट कोड नहीं '
+          'बताए। इसका मतलब यह नहीं कि कोई खराबी नहीं है। इंजन बंद करें, इग्निशन '
+          'चालू (ON) रखें और फिर से कोशिश करें।',
+      'dtcLinkLostTitle': 'अडैप्टर से संपर्क टूट गया',
+      'dtcLinkLostBody': 'कोई फ़ॉल्ट कोड नहीं पढ़ा जा सका। देखें कि अडैप्टर अभी भी '
+          'लगा और जुड़ा है, फिर दोबारा कोशिश करें।',
+      'dtcKLineGated': 'यह बाइक पुराने प्रकार के कनेक्शन का उपयोग करती दिखती है। '
+          'इसके फ़ॉल्ट कोड पढ़ना अभी चालू नहीं है, इसलिए ऐप ऐसे कोड नहीं दिखाएगा जो '
+          'गलत हो सकते हैं।',
+      'dtcManufacturerSpecific': 'निर्माता-विशेष कोड। इसका सटीक अर्थ आपकी बाइक के '
+          'निर्माता पर निर्भर करता है और हमारे पास इसकी सत्यापित जानकारी नहीं है। यह '
+          'कोड अपने डीलर को दिखाएँ।',
+      'dtcNoVerifiedDescription': 'अभी कोई सत्यापित विवरण नहीं है।',
+      'dtcReadAt': 'पढ़ा गया: {time}',
+      'dtcSubsystem': 'उप-प्रणाली',
+      'dtcSubFuelAir': 'ईंधन और हवा की मीटरिंग',
+      'dtcSubIgnition': 'इग्निशन सिस्टम या मिसफ़ायर',
+      'dtcSubEmission': 'सहायक उत्सर्जन नियंत्रण',
+      'dtcSubSpeedIdle': 'वाहन गति, आइडल नियंत्रण और सहायक इनपुट',
+      'dtcSubComputer': 'कंप्यूटर और आउटपुट सर्किट',
+      'dtcSubTransmission': 'ट्रांसमिशन',
+      'dtcSubNetworkElectrical': 'नेटवर्क इलेक्ट्रिकल',
+      'dtcSubNetworkComms': 'नेटवर्क संचार',
+      'dtcSubNetworkSoftware': 'नेटवर्क सॉफ़्टवेयर',
+      'dtcSubNetworkData': 'नेटवर्क डेटा',
+      'dtcSeverityGuidance':
+          'गंभीरता Danlite का सुझाव है, निर्माता का डेटा नहीं।',
+      'recorderOnTitle': 'सेशन रिकॉर्डर चालू है',
+      'recorderOnBody': 'Danlite इस कनेक्शन के अडैप्टर संदेशों को इसी फ़ोन पर एक '
+          'फ़ाइल में सहेज रहा है, ताकि और बाइकों को सपोर्ट किया जा सके। कुछ भी अपलोड '
+          'नहीं होता। वाहन पहचान संख्या (VIN) छिपा दी जाती है। फ़ाइल फ़ोन से तभी '
+          'बाहर जाती है जब आप शेयर दबाते हैं।',
+      'recorderShare': 'रिकॉर्डिंग शेयर करें',
+      'recorderTurnOff': 'बंद करें',
+      'recorderTurnedOn': 'सेशन रिकॉर्डर चालू किया गया',
+      'recorderTurnedOff': 'सेशन रिकॉर्डर बंद किया गया',
+      'recorderNothingToShare':
+          'अभी कोई रिकॉर्डिंग नहीं है। पहले अडैप्टर से कनेक्ट करें।',
 
       // ── मॉड्यूल चयन (इंजन / ABS) ────────────────────────────────────────
       'moduleEngine': 'इंजन',

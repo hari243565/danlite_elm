@@ -657,7 +657,9 @@ class ChassisDtcDatabase {
         component: 'WSS_GENERIC',
         description: '(GENERIC) ABS Wheel Speed Difference too high',
         query: 'Signal quality from the front/Rear WSS is not good',
-        remedy: 'Check the front toner wheel/ Airgap',
+        // Full manual text; the earlier transcription stopped at the page
+        // break (owner's photo of the following manual page, 2026-10).
+        remedy: 'Check the front toner wheel/ Airgap consistency/WSS bracket',
       ),
       'C1031': ChassisDtcEntry(
         component: 'WSS_ohmic',

@@ -9,6 +9,11 @@ import '../constants/obd_pids.dart';
 import '../models/vehicle_data.dart';
 import 'bluetooth_classic_service.dart';
 import 'chassis_address_memory.dart';
+import 'dtc_service.dart' show isManufacturerDefined;
+import 'engine_dtc_read.dart';
+import 'session_recorder.dart';
+
+export 'engine_dtc_read.dart';
 
 enum ConnectionType { wifi, bluetooth }
 
@@ -105,12 +110,18 @@ class FreezeFrameData {
 }
 
 class ObdService extends ChangeNotifier {
-  ObdService(this._btService, {ChassisAddressMemory? chassisAddressMemory})
+  ObdService(this._btService,
+      {ChassisAddressMemory? chassisAddressMemory, this.recorder})
       : chassisAddressMemory = chassisAddressMemory ?? ChassisAddressMemory() {
     _btService.addListener(_onBtServiceChanged);
   }
 
   final BluetoothClassicService _btService;
+
+  /// Tester-mode session recorder. Null, or switched off, in normal use —
+  /// see `session_recorder.dart`. It is the ONLY place raw adapter traffic is
+  /// written outside this object's memory.
+  final SessionRecorder? recorder;
 
   /// Which chassis address a given make + model is already known to answer at.
   ///
@@ -133,8 +144,35 @@ class ObdService extends ChangeNotifier {
   VehicleData _data = VehicleData.empty();
   VehicleData get data => _data;
 
+  /// Engine codes from the last read the engine computer actually ANSWERED.
+  ///
+  /// Kept after a later read fails, so the screen can show them greyed out
+  /// with [dtcCodesReadAt]; whether they are current is [lastEngineRead]'s
+  /// call, never this list's. Cleared when the link drops or a new connection
+  /// starts — codes from a previous session may not even be this bike's.
   List<DtcCode> _dtcCodes = [];
   List<DtcCode> get dtcCodes => _dtcCodes;
+
+  /// When [dtcCodes] was read. Null when nothing has answered this session.
+  DateTime? _dtcCodesReadAt;
+  DateTime? get dtcCodesReadAt => _dtcCodesReadAt;
+
+  /// What the most recent engine read established. Null until one finishes in
+  /// this session. See [EngineDtcRead].
+  EngineDtcRead? _lastEngineRead;
+  EngineDtcRead? get lastEngineRead => _lastEngineRead;
+
+  /// The current adapter session: adapter identity, detected protocol, and
+  /// whether the vehicle itself has answered. Null while disconnected.
+  ObdSession? _session;
+  ObdSession? get session => _session;
+
+  /// True only once the VEHICLE has given a positive reply this session — the
+  /// adapter accepting its set-up commands is not enough.
+  bool get vehicleAnswered => _session?.vehicleAnswered ?? false;
+
+  /// Status line to show once the vehicle answers, saved at connect time.
+  String _connectedStatusMessage = '';
 
   // ── Chassis / ABS module scan state ───────────────────────────────────────
   // Kept separate from _dtcCodes rather than merged into it: these come from a
@@ -215,12 +253,18 @@ class ObdService extends ChangeNotifier {
   static const int _wireLogMax = 200;
   List<String> get wireLog => List.unmodifiable(_wireLog);
 
+  /// Record one adapter exchange line.
+  ///
+  /// Deliberately NOT printed. Anything passed to `debugPrint` can become a
+  /// Sentry breadcrumb in a release build, and raw adapter traffic and fault
+  /// bytes must never reach Sentry. The in-memory ring and the tester-mode
+  /// recorder (local file, rider-initiated share only) are the only sinks.
   void _logWire(String direction, String data) {
     final ts = DateTime.now().toIso8601String().substring(11, 23);
     final printable = data.replaceAll('\r', r'\r').replaceAll('\n', r'\n');
     _wireLog.add('$ts $direction$printable');
     if (_wireLog.length > _wireLogMax) _wireLog.removeAt(0);
-    debugPrint('[WIRE] $ts $direction$printable');
+    recorder?.recordExchange(direction, data);
   }
 
   String exportWireLog() => _wireLog.join('\n');
@@ -297,7 +341,6 @@ class ObdService extends ChangeNotifier {
 
   // ── Polling ───────────────────────────────────────────────────────────────
   bool _isPolling = false;
-  bool _dtcReadInFlight = false;
   int _pidIndex = 0;
   // Poll every known PID (not just the 7-PID dashboard subset) so screens
   // like Live Data can surface MAF, MAP, timing advance, fuel trims, etc.
@@ -360,6 +403,7 @@ class ObdService extends ChangeNotifier {
   }) async {
     _setStatus(ConnectionStatus.connecting, 'Connecting to $ip:$port…');
     _resetDiagnostics();
+    _beginSession('wifi');
 
     try {
       _wifiSocket =
@@ -391,7 +435,8 @@ class ObdService extends ChangeNotifier {
         return false;
       }
 
-      _setStatus(ConnectionStatus.connected, 'Connected via Wi-Fi · $ip');
+      _setConnected('Connected via Wi-Fi · $ip',
+          'Adapter connected via Wi-Fi · bike not answering');
       _startPolling();
       return true;
     } on SocketException catch (e) {
@@ -421,6 +466,7 @@ class ObdService extends ChangeNotifier {
   Future<bool> connectBluetooth(BtDevice device) async {
     _setStatus(ConnectionStatus.connecting, 'Connecting via Bluetooth…');
     _resetDiagnostics();
+    _beginSession('bluetooth');
 
     final ok = await _btService.connect(device);
     if (!ok) {
@@ -453,9 +499,53 @@ class ObdService extends ChangeNotifier {
       return false;
     }
 
-    _setStatus(ConnectionStatus.connected, 'Connected via BT · ${device.name}');
+    _setConnected('Connected via BT · ${device.name}',
+        'Adapter connected via BT · bike not answering');
     _startPolling();
     return true;
+  }
+
+  /// Start a fresh session: nothing from a previous connection — fault lists,
+  /// read results, detected protocol — may carry over to this one.
+  void _beginSession(String transport) {
+    _session = ObdSession(transport: transport);
+    _clearFaultResults();
+    recorder?.beginSession(transport: transport);
+  }
+
+  /// Forget every fault result. Used whenever the link drops or a new session
+  /// starts: an old list shown after a reconnect looks live and may not even
+  /// belong to the bike now plugged in.
+  void _clearFaultResults() {
+    _dtcCodes = [];
+    _dtcCodesReadAt = null;
+    _lastEngineRead = null;
+    _chassisDtcCodes = [];
+    _chassisScanOutcome = ChassisScanOutcome.idle;
+    _chassisRespondingModule = '';
+  }
+
+  /// Mark the adapter connected. The status line only says "Connected" once
+  /// the vehicle itself has answered; until then it says the bike is not
+  /// answering, which is the truth with the ignition off.
+  void _setConnected(String answeredMessage, String silentMessage) {
+    _connectedStatusMessage = answeredMessage;
+    _setStatus(ConnectionStatus.connected,
+        vehicleAnswered ? answeredMessage : silentMessage);
+  }
+
+  /// The vehicle gave a positive reply. Upgrades the status line the first
+  /// time it happens (e.g. the rider switched the ignition on after
+  /// connecting).
+  void _markVehicleAnswered() {
+    final s = _session;
+    if (s == null || s.vehicleAnswered) return;
+    s.vehicleAnswered = true;
+    if (_status == ConnectionStatus.connected &&
+        _connectedStatusMessage.isNotEmpty) {
+      _statusMessage = _connectedStatusMessage;
+    }
+    notifyListeners();
   }
 
   void _onBtRawChunk(String chunk) {
@@ -574,6 +664,9 @@ class ObdService extends ChangeNotifier {
     _stopPolling();
     _completeAllPending('DISCONNECTED');
     _data = VehicleData.empty();
+    _clearFaultResults();
+    _session = null;
+    recorder?.endSession(reason: 'link dropped');
     _setStatus(ConnectionStatus.disconnected, reason);
   }
 
@@ -632,7 +725,13 @@ class ObdService extends ChangeNotifier {
       // Init always starts from a clean gate — see _resetDiagnostics().
       _linkSynced = true;
       _adapterWedged = false;
-      await _send(ObdPids.reset, delay: const Duration(milliseconds: 300));
+      final banner =
+          await _send(ObdPids.reset, delay: const Duration(milliseconds: 300));
+      final identity = _adapterIdentityFrom(banner);
+      if (identity != null) {
+        _session?.adapterIdentity = identity;
+        recorder?.recordNote('adapter identity (ATZ): $identity');
+      }
       await Future.delayed(const Duration(milliseconds: 500));
 
       final echo = await _send(ObdPids.echoOff);
@@ -650,20 +749,63 @@ class ObdService extends ChangeNotifier {
       final st = await _send('ATST32');
       if (_isDeadResponse(st)) debugPrint('[ObdService] ATST32 unsupported');
 
+      // The adapter answering its set-up commands proves nothing about the
+      // bike. Only a positive reply to the supported-PIDs request (41 00)
+      // does, so that — not "init finished" — is what marks the vehicle as
+      // answering. A silent ECU (ignition off, wrong cable, a bike the adapter
+      // cannot talk to) leaves the session at vehicleAnswered == false, and no
+      // fault read can then pass for an all-clear.
       for (var attempt = 0; attempt < 2; attempt++) {
         final probe = await _send('0100');
-        if (!_isDeadResponse(probe) && !probe.toUpperCase().contains('SEARCHING')) break;
+        if (_isPositiveSupportedPidsReply(probe)) {
+          _markVehicleAnswered();
+          break;
+        }
         await Future.delayed(const Duration(milliseconds: 300));
       }
 
       final dpn = await _send('ATDPN');
-      debugPrint('[ObdService] protocol (ATDPN): "$dpn"');
-      debugPrint('[ObdService] init OK — live baseline ATH0/ATS0');
+      if (!_isDeadResponse(dpn)) {
+        _session?.protocol = ObdProtocol.fromAtdpn(dpn);
+        recorder?.recordNote('protocol (ATDPN): ${_session?.protocol}');
+      }
       return true;
     } catch (e) {
       debugPrint('[ObdService] Init sequence exception: $e');
       return false;
     }
+  }
+
+  /// The adapter's identity line from its `ATZ` banner (e.g. `ELM327 v1.5`),
+  /// or null when the reply carried none.
+  String? _adapterIdentityFrom(String banner) {
+    if (_isDeadResponse(banner)) return null;
+    for (final line in banner.split(RegExp(r'[\r\n]+'))) {
+      final t = line.trim();
+      if (t.isNotEmpty && t.toUpperCase() != 'OK' && t != 'ATZ') return t;
+    }
+    return null;
+  }
+
+  /// Is this a positive reply to `01 00` — the vehicle, not the adapter,
+  /// saying which PIDs it supports? Accepts headers on or off, spaces on or
+  /// off, and a leading `SEARCHING...` line.
+  bool _isPositiveSupportedPidsReply(String reply) {
+    final upper = reply.toUpperCase();
+    if (upper.contains('NO DATA') ||
+        upper.contains('UNABLE') ||
+        upper.contains('ERROR') ||
+        upper.contains('TIMEOUT') ||
+        upper.contains('DISCONNECTED')) {
+      return false;
+    }
+    for (final line in upper.split(RegExp(r'[\r\n]+'))) {
+      if (line.contains('SEARCHING')) continue;
+      final payload = _stripCanHeaderForLivePid(line.trim());
+      final compact = payload.replaceAll(RegExp(r'\s+'), '');
+      if (compact.startsWith('4100') && compact.length >= 12) return true;
+    }
+    return false;
   }
 
   /// Did this AT command take effect?
@@ -737,7 +879,8 @@ class ObdService extends ChangeNotifier {
       // Without this, _consecutiveTimeouts freezes and _pollLoop's
       // >= 6 check can never fire, leaving the UI stuck on "Connected".
       _consecutiveTimeouts++;
-      debugPrint('[ObdService] BLOCKED write "$cmd" — link not synced');
+      // The command itself is not printed: no adapter traffic in logs.
+      debugPrint('[ObdService] BLOCKED write — link not synced');
       return 'TIMEOUT';
     }
     if (delay != null) await Future.delayed(delay);
@@ -963,6 +1106,7 @@ class ObdService extends ChangeNotifier {
           if (_isUsableResponse(response)) {
             final value = ObdParser.parsePid(pid.command, _stripCanHeaderForLivePid(response));
             if (value != null) {
+              _markVehicleAnswered();
               _updateData(pid.command, value);
               _consecutiveParseFailures = 0;
               _recoveryAttempts = 0;
@@ -1126,10 +1270,39 @@ class ObdService extends ChangeNotifier {
   // ══════════════════════════════════════════════════════════════════════════
   // DTC READ / CLEAR
   // ══════════════════════════════════════════════════════════════════════════
+  /// Read engine fault codes and return the codes the engine computer
+  /// reported — empty unless it actually answered. Prefer [readEngineDtcs],
+  /// which says WHY a read produced no codes.
   Future<List<DtcCode>> readDtcs() async {
-    if (!isConnected) return [];
-    if (_dtcReadInFlight) return _dtcCodes;
-    _dtcReadInFlight = true;
+    final result = await readEngineDtcs();
+    return result is EngineAnswered ? result.codes : const <DtcCode>[];
+  }
+
+  Future<EngineDtcRead>? _engineReadInFlight;
+
+  /// One engine fault-code read (Mode 03), classified honestly.
+  ///
+  /// Returns [EngineAnswered] only for a positive `43` response — the one
+  /// case in which an empty list means "no stored faults". `NO DATA`,
+  /// timeouts, bare prompts, `UNABLE TO CONNECT`, bus errors and `?` are
+  /// [EngineNoAnswer]; `7F 03` is [EngineRefused]; a dead link is
+  /// [EngineLinkLost]; a K-line bus is [EngineKLineGated] while
+  /// [kKLineFaultReadingEnabled] is false.
+  ///
+  /// A failed read never touches [dtcCodes]: the last answered list stays,
+  /// with [dtcCodesReadAt], for the screen to show as an older result.
+  Future<EngineDtcRead> readEngineDtcs() {
+    if (!isConnected) {
+      return Future.value(EngineLinkLost(DateTime.now()));
+    }
+    final inFlight = _engineReadInFlight;
+    if (inFlight != null) return inFlight;
+    final future = _runEngineRead();
+    _engineReadInFlight = future;
+    return future.whenComplete(() => _engineReadInFlight = null);
+  }
+
+  Future<EngineDtcRead> _runEngineRead() async {
 
     _acquirePollLock();
     await _waitForLinkIdle();
@@ -1140,7 +1313,7 @@ class ObdService extends ChangeNotifier {
     try {
       if (!_linkSynced) {
         final recovered = await _recoverAdapter();
-        if (!recovered) return _dtcCodes;
+        if (!recovered) return _finishEngineRead(EngineLinkLost(DateTime.now()));
       }
 
       if (_cmdTimeout < _readDtcsMinTimeout) _cmdTimeout = _readDtcsMinTimeout;
@@ -1149,52 +1322,120 @@ class ObdService extends ChangeNotifier {
       final stResp = await _send('ATST7D');
       stWidened = !_isDeadResponse(stResp);
 
-      var response = await _send(ObdPids.readDtcs);
+      final response = await _send(ObdPids.readDtcs);
+      final linkFailed =
+          _classifyReply(response) == ObdReplyClass.linkFailure;
 
       if (response == 'TIMEOUT') {
+        // Unchanged: a timed-out read still resyncs the adapter. What changed
+        // is that it is now reported as no answer instead of returning the
+        // previous list as if it had just been read.
         await _recoverAdapter();
-        return _dtcCodes;
       }
 
-      if (!_isUsableDtcResponse(response)) return _dtcCodes;
+      final upperResponse = response.trim().toUpperCase();
+      if (linkFailed ||
+          upperResponse == 'DISCONNECTED' ||
+          upperResponse == 'ERROR') {
+        return _finishEngineRead(EngineLinkLost(DateTime.now()));
+      }
 
-      var parsed = ObdParser.parseDetailed(response);
+      // The protocol is only settled once a request has reached the bus, so
+      // ask again now if init could not tell.
+      final session = _session;
+      if (session != null && !session.protocol.isKnown && _linkSynced) {
+        final dpn = await _send('ATDPN');
+        if (!_isDeadResponse(dpn)) {
+          session.protocol = ObdProtocol.fromAtdpn(dpn);
+          recorder?.recordNote('protocol (ATDPN): ${session.protocol}');
+        }
+      }
 
-      if (parsed.countMismatch) {
+      // K-line gate. The reply is deliberately NOT parsed: the parser is
+      // confirmed to decode K-line replies into wrong codes. (The raw reply
+      // still reaches the tester-mode recorder, which is how real fixtures
+      // will be collected.)
+      if (!kKLineFaultReadingEnabled &&
+          session != null &&
+          session.protocol.isKLine) {
+        return _finishEngineRead(
+            EngineKLineGated(session.protocol, DateTime.now()));
+      }
+
+      var verdict = classifyEngineDtcReply(response, linkFailed: false);
+
+      if (verdict is ReplyPositive && verdict.parsed.countMismatch) {
         await Future.delayed(const Duration(milliseconds: 300));
         final retryResp = await _send(ObdPids.readDtcs);
-        if (retryResp != 'TIMEOUT' && _isUsableDtcResponse(retryResp)) {
-          final retry = ObdParser.parseDetailed(retryResp);
-          if (!retry.countMismatch || retry.allCodes.length > parsed.allCodes.length) {
-            parsed = retry;
-            response = retryResp;
+        final retryVerdict = classifyEngineDtcReply(retryResp,
+            linkFailed:
+                _classifyReply(retryResp) == ObdReplyClass.linkFailure);
+        if (retryVerdict is ReplyPositive) {
+          final retry = retryVerdict.parsed;
+          if (!retry.countMismatch ||
+              retry.allCodes.length > verdict.parsed.allCodes.length) {
+            verdict = retryVerdict;
           }
         }
       }
 
-      _dtcCodes = parsed.powertrainCodes.map((code) {
-        final info = _dtcInfo(code);
-        return DtcCode(
-          code: code,
-          description: info['desc']!,
-          possibleCause: info['cause']!,
-          severity: info['severity']!,
-          action: info['action']!,
-        );
-      }).toList();
-
-      notifyListeners();
-      return _dtcCodes;
+      final now = DateTime.now();
+      switch (verdict) {
+        case ReplyPositive(:final parsed):
+          _markVehicleAnswered();
+          // Every system the engine computer reports — P, C, B and U. Only P
+          // was kept before, so a network fault (U0100) set by the engine
+          // never reached the rider.
+          _dtcCodes = [for (final code in parsed.allCodes) _buildEngineDtc(code)];
+          _dtcCodesReadAt = now;
+          return _finishEngineRead(EngineAnswered(_dtcCodes, now));
+        case ReplyRefused(:final nrc):
+          // A refusal is still the vehicle speaking.
+          _markVehicleAnswered();
+          return _finishEngineRead(EngineRefused(nrc, now));
+        case ReplyNoAnswer(:final reason):
+          return _finishEngineRead(EngineNoAnswer(reason, now));
+        case ReplyLinkLost():
+          return _finishEngineRead(EngineLinkLost(now));
+      }
     } catch (e) {
-      debugPrint('[ObdService] readDtcs exception: $e');
-      return _dtcCodes;
+      debugPrint('[ObdService] engine read failed (${e.runtimeType})');
+      return _finishEngineRead(
+          EngineNoAnswer(EngineNoAnswerReason.adapterError, DateTime.now()));
     } finally {
       if (stWidened && _linkSynced) await _send('ATST32');
       if (headersOn) await _restoreLiveHeaders();
       _cmdTimeout = previousTimeout;
       _releasePollLock();
-      _dtcReadInFlight = false;
     }
+  }
+
+  EngineDtcRead _finishEngineRead(EngineDtcRead result) {
+    _lastEngineRead = result;
+    recorder?.recordNote('engine read: ${result.runtimeType}');
+    notifyListeners();
+    return result;
+  }
+
+  /// Build an engine [DtcCode]. The 31-entry `DtcDatabase` supplies text,
+  /// cause, severity and action for standard codes; a manufacturer-defined
+  /// code never takes text from it (see [isManufacturerDefined]).
+  DtcCode _buildEngineDtc(String code) {
+    final info = isManufacturerDefined(code)
+        ? const <String, String>{
+            'desc': '',
+            'cause': '',
+            'severity': 'unknown',
+            'action': '',
+          }
+        : _dtcInfo(code);
+    return DtcCode(
+      code: code,
+      description: info['desc']!,
+      possibleCause: info['cause']!,
+      severity: info['severity']!,
+      action: info['action']!,
+    );
   }
 
   /// Why the last [clearDtcs] call ended as it did. See [ClearDtcsOutcome].
@@ -2086,7 +2327,9 @@ class ObdService extends ChangeNotifier {
     _wifiBuffer.clear();
     _btBuffer.clear();
     _data = VehicleData.empty();
-    _dtcCodes = [];
+    _clearFaultResults();
+    _session = null;
+    recorder?.endSession(reason: 'disconnected');
     _resetDiagnostics();
     _setStatus(ConnectionStatus.disconnected, 'Disconnected');
   }

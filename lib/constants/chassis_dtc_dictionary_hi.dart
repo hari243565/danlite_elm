@@ -86,7 +86,7 @@ class ChassisDtcDictionaryHi {
       'C1024': ChassisDtcText(
         description: '(जेनेरिक) ABS व्हील स्पीड का अंतर बहुत अधिक',
         query: 'आगे/पीछे के WSS से सिग्नल की गुणवत्ता ठीक नहीं है',
-        remedy: 'फ्रंट टोनर व्हील / एयरगैप की जाँच करें',
+        remedy: 'अगला टोनर व्हील / एयरगैप की एकरूपता / WSS ब्रैकेट जाँचें',
       ),
       'C1031': ChassisDtcText(
         description: 'ABS व्हील स्पीड सर्किट खुला या शॉर्ट (पिछला)',
