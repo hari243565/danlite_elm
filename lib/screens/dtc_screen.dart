@@ -5,6 +5,12 @@ import 'package:provider/provider.dart';
 import '../constants/app_strings.dart';
 import '../constants/chassis_dtc_dictionary.dart';
 import '../constants/chassis_modules.dart';
+import '../knowledge/clear_record.dart';
+import '../knowledge/fault_resolver.dart';
+import '../knowledge/history_recorder.dart';
+import '../knowledge/kb_models.dart' show RiderAction;
+import '../knowledge/knowledge_service.dart';
+import '../knowledge/legacy_text.dart';
 import '../providers/settings_provider.dart';
 import '../providers/vehicle_provider.dart';
 import '../services/dtc_service.dart';
@@ -12,7 +18,26 @@ import '../services/fault_decoders.dart' show FailureType, UdsStatusByte;
 import '../services/obd_service.dart';
 import '../services/session_recorder.dart';
 import '../models/vehicle_data.dart';
+import '../widgets/resolved_fault_view.dart';
+import 'code_lookup_screen.dart';
 import 'honda_blink_reference_screen.dart';
+import 'scan_history_screen.dart';
+
+/// Resolve one card's code. With no knowledge service (older test harnesses,
+/// or before the app wires one) the resolver still runs, over the older
+/// tables only — exactly the text those screens showed before.
+ResolvedFault resolveForCard(BuildContext context, DtcCode code,
+    {required VehicleContext vehicle}) {
+  final lang = context.watch<SettingsProvider>().locale.languageCode;
+  final knowledge = Provider.of<KnowledgeService?>(context);
+  final record = code.record ?? FaultRecord.fromDtcCode(code, readAt: DateTime.now());
+  final domain = code.isChassis ? FaultDomain.abs : FaultDomain.engine;
+  if (knowledge != null) {
+    return knowledge.resolve(record, vehicle, lang, domain: domain);
+  }
+  return FaultResolver(index: KnowledgeIndex.empty, legacy: legacyEngineText)
+      .resolve(record, vehicle, lang, domain: domain);
+}
 
 // Unified Telemetry Design System Palette (matches home_screen._NC / realtime_screen._RC)
 class _RC {
@@ -141,6 +166,7 @@ class _DtcScreenState extends State<DtcScreen> {
   @override
   void dispose() {
     _loopTimer?.cancel();
+    _clearRecorder?.cancel();
     super.dispose();
   }
 
@@ -202,6 +228,9 @@ class _DtcScreenState extends State<DtcScreen> {
 
     setState(() => _clearing = true);
     final obd = context.read<ObdService>();
+    // Fault Phase 1B (B9), internal record only: the last answered read, if
+    // recent, as the pre-clear snapshot. Taken synchronously; sends nothing.
+    final preClear = PreClearSnapshot.capture(obd, DateTime.now());
     final ok = await obd.clearDtcs();
     if (ok) await obd.readDtcs(); // refresh — should come back empty
     if (!mounted) return;
@@ -212,6 +241,21 @@ class _DtcScreenState extends State<DtcScreen> {
     });
 
     final outcome = obd.lastClearOutcome;
+
+    // Fault Phase 1B (B9), internal record only. Scheduled for the frame
+    // AFTER the message below is shown: one silent stored-code re-read, saved
+    // to history as codes returned / cleared and verified / could not verify.
+    // Not awaited; it changes nothing on this screen. Registered before the
+    // message line so the record is kept even if that line throws.
+    final recorder = ClearCodesRecorder(
+      obd: obd,
+      knowledge: Provider.of<KnowledgeService?>(context, listen: false),
+      vehicle: activeVehicleSnapshot(_activeVehicle),
+    );
+    _clearRecorder = recorder;
+    WidgetsBinding.instance.addPostFrameCallback((_) =>
+        unawaited(recorder.verifyAndRecord(preClear, clearOutcome: outcome)));
+
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
       // One message reaches the rider, so there is one colour and one duration.
       backgroundColor: clearOutcomeColor(ok, outcome),
@@ -222,6 +266,12 @@ class _DtcScreenState extends State<DtcScreen> {
       ),
     ));
   }
+
+  /// The running B9 after-check, so leaving the screen can stop it.
+  ClearCodesRecorder? _clearRecorder;
+
+  void _openLookup() => Navigator.of(context).push(
+      MaterialPageRoute<void>(builder: (_) => const CodeLookupScreen()));
 
   /// What to tell the rider about a Clear Codes attempt.
   String _clearOutcomeMessage(
@@ -273,12 +323,30 @@ class _DtcScreenState extends State<DtcScreen> {
     }
   }
 
-  String _timeAgo(DateTime t) {
+  String _timeAgo(BuildContext context, DateTime t) {
     final diff = DateTime.now().difference(t);
-    if (diff.inSeconds < 5) return 'just now';
-    if (diff.inSeconds < 60) return '${diff.inSeconds}s ago';
-    return '${diff.inMinutes}m ago';
+    if (diff.inSeconds < 5) return context.tr('timeJustNow');
+    if (diff.inSeconds < 60) {
+      return context.trArgs('timeSecondsAgo', {'n': '${diff.inSeconds}'});
+    }
+    return context.trArgs('timeMinutesAgo', {'n': '${diff.inMinutes}'});
   }
+
+  /// Sort rank for a card: the rider action when the resolver knows one
+  /// (STOP first), else the older severity band.
+  int _cardRank(DtcCode c, ResolvedFault r) => switch (r.riderAction) {
+        RiderAction.stop => 0,
+        RiderAction.serviceSoon => 1,
+        RiderAction.monitor => 2,
+        RiderAction.info => 3,
+        null => _severityRank(c.severity),
+      };
+
+  /// Counted in the CRITICAL chip: STOP, or critical/high where no rider
+  /// action is known.
+  bool _isCritical(DtcCode c, ResolvedFault r) =>
+      r.riderAction == RiderAction.stop ||
+      (r.riderAction == null && (c.severity == 'critical' || c.severity == 'high'));
 
   /// "Read at 14:05:09" — the label every older, no-longer-current result
   /// carries instead of the LIVE SCAN stamp.
@@ -305,6 +373,17 @@ class _DtcScreenState extends State<DtcScreen> {
             style: const TextStyle(
                 color: _RC.textMain, fontWeight: FontWeight.w800)),
         actions: [
+          IconButton(
+            tooltip: context.tr('lookupTitle'),
+            onPressed: _openLookup,
+            icon: const Icon(Icons.manage_search_rounded, color: _RC.neonCyan),
+          ),
+          IconButton(
+            tooltip: context.tr('historyTitle'),
+            onPressed: () => Navigator.of(context).push(MaterialPageRoute<void>(
+                builder: (_) => const ScanHistoryScreen())),
+            icon: const Icon(Icons.history_rounded, color: _RC.neonCyan),
+          ),
           IconButton(
             tooltip: context.tr('freezeFrame'),
             onPressed: obd.isConnected ? _showFreezeFrame : null,
@@ -440,8 +519,8 @@ class _DtcScreenState extends State<DtcScreen> {
                   size: 48, color: _RC.textMuted),
             ),
             const SizedBox(height: 20),
-            const Text('ADAPTER NOT CONNECTED',
-                style: TextStyle(
+            Text(context.tr('dtcAdapterNotConnected'),
+                style: const TextStyle(
                     color: _RC.textMain,
                     fontWeight: FontWeight.w800,
                     fontSize: 14,
@@ -452,6 +531,18 @@ class _DtcScreenState extends State<DtcScreen> {
               child: Text(context.tr('connectToRead'),
                   textAlign: TextAlign.center,
                   style: const TextStyle(color: _RC.textMuted, fontSize: 13)),
+            ),
+            // Lookup needs no adapter: offer it right here.
+            const SizedBox(height: 18),
+            OutlinedButton.icon(
+              onPressed: _openLookup,
+              icon: const Icon(Icons.manage_search_rounded, size: 18),
+              label: Text(context.tr('lookupTitle'),
+                  style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 12.5)),
+              style: OutlinedButton.styleFrom(
+                foregroundColor: _RC.neonCyan,
+                side: BorderSide(color: _RC.neonCyan.withValues(alpha: 0.45)),
+              ),
             ),
           ],
         ),
@@ -464,8 +555,18 @@ class _DtcScreenState extends State<DtcScreen> {
     // Every card for the current answer: Mode 03 plus any pending- or
     // permanent-only code the extras found, each with its status.
     final shown = read is EngineAnswered ? _sanitize(obd.engineDisplayCodes) : codes;
+    // Rank and count by the rider action the resolver gives each card, so a
+    // STOP card is never counted "0 CRITICAL" because the older table did
+    // not know the code.
+    final vehicle =
+        activeVehicleSnapshot(context.watch<VehicleProvider>().active).context;
+    final resolved = {
+      for (final c in shown) c.code: resolveForCard(context, c, vehicle: vehicle),
+    };
+    shown.sort((a, b) => _cardRank(a, resolved[a.code]!)
+        .compareTo(_cardRank(b, resolved[b.code]!)));
     final criticalCount =
-        shown.where((c) => c.severity == 'critical' || c.severity == 'high').length;
+        shown.where((c) => _isCritical(c, resolved[c.code]!)).length;
 
     return Column(
       children: [
@@ -476,6 +577,7 @@ class _DtcScreenState extends State<DtcScreen> {
         // Clear Codes keys on the Mode 03 list, exactly as before.
         _buildActionBar(context, codes),
         if (obd.batteryVoltageLow) _batteryBanner(context, obd),
+        if (obd.batteryVoltageHigh) _batteryBanner(context, obd, high: true),
         Expanded(
           child: RefreshIndicator(
             color: _RC.neonCyan,
@@ -488,9 +590,9 @@ class _DtcScreenState extends State<DtcScreen> {
     );
   }
 
-  /// "Battery voltage is low (11.4 V)…" — shown above the results; it never
-  /// blocks a scan.
-  Widget _batteryBanner(BuildContext context, ObdService obd) {
+  /// "Battery voltage is low (11.4 V)…" — or, with [high], "…is high
+  /// (15.6 V)…" — shown above the results; it never blocks a scan.
+  Widget _batteryBanner(BuildContext context, ObdService obd, {bool high = false}) {
     final v = obd.latestVoltage?.volts;
     return Container(
       width: double.infinity,
@@ -508,7 +610,7 @@ class _DtcScreenState extends State<DtcScreen> {
           const SizedBox(width: 10),
           Expanded(
             child: Text(
-              context.trArgs('batteryLowBanner',
+              context.trArgs(high ? 'batteryHighBanner' : 'batteryLowBanner',
                   {'v': v == null ? '—' : v.toStringAsFixed(1)}),
               style: const TextStyle(
                   color: _RC.textMain, fontSize: 12.5, height: 1.45),
@@ -678,14 +780,14 @@ class _DtcScreenState extends State<DtcScreen> {
       child: Row(
         children: [
           _statChip(
-              label: 'CODES',
+              label: context.tr('dtcCodesChip'),
               value: current ? '${codes.length}' : '—',
               color: !current
                   ? _RC.textMuted
                   : (codes.isEmpty ? _RC.neonGreen : _RC.neonAmber)),
           const SizedBox(width: 10),
           _statChip(
-              label: 'CRITICAL',
+              label: context.tr('dtcCriticalChip'),
               value: current ? '$criticalCount' : '—',
               color: current && criticalCount > 0 ? _RC.neonRed : _RC.textMuted),
           // PID 01 01 says the engine computer has the warning lamp on. Shown
@@ -706,7 +808,7 @@ class _DtcScreenState extends State<DtcScreen> {
                 ),
                 const SizedBox(width: 6),
                 Text(
-                  'LIVE SCAN · ${_timeAgo(readAt)}',
+                  '${context.tr('dtcLiveScan')} · ${_timeAgo(context, readAt)}',
                   style: const TextStyle(
                       color: _RC.textMuted,
                       fontSize: 10,
@@ -830,7 +932,7 @@ class _DtcScreenState extends State<DtcScreen> {
                   size: 64, color: ready ? _RC.neonGreen : _RC.textMuted),
               const SizedBox(height: 16),
               Text(
-                ready ? context.tr('noFaultCodes') : 'Scanning for fault codes…',
+                ready ? context.tr('noFaultCodes') : context.tr('dtcScanningTitle'),
                 style: const TextStyle(
                     color: _RC.textMain, fontSize: 17, fontWeight: FontWeight.w800),
               ),
@@ -840,7 +942,7 @@ class _DtcScreenState extends State<DtcScreen> {
                 child: Text(
                   ready
                       ? context.tr('noFaultCodesDesc')
-                      : 'Live diagnostic scan in progress — codes will appear here automatically.',
+                      : context.tr('dtcScanningBody'),
                   textAlign: TextAlign.center,
                   style: const TextStyle(
                       color: _RC.textMuted, fontSize: 13, height: 1.5),
@@ -893,6 +995,7 @@ class _DtcScreenState extends State<DtcScreen> {
         _buildChassisSummaryBar(context, obd, codes),
         _buildChassisActionBar(context, scanning),
         if (obd.batteryVoltageLow) _batteryBanner(context, obd),
+        if (obd.batteryVoltageHigh) _batteryBanner(context, obd, high: true),
         Expanded(
           child: RefreshIndicator(
             color: _RC.neonCyan,
@@ -1166,7 +1269,7 @@ class _DtcScreenState extends State<DtcScreen> {
       child: Row(
         children: [
           _statChip(
-              label: 'CODES',
+              label: context.tr('dtcCodesChip'),
               value: '${codes.length}',
               color: codes.isEmpty ? _RC.neonGreen : _RC.neonRed),
           const SizedBox(width: 10),
@@ -1265,6 +1368,14 @@ class _DtcScreenState extends State<DtcScreen> {
                   '${context.tr('absAdapterTimingNormal')}'
               : context.tr('absNoModuleDesc');
         }
+        break;
+      case ChassisScanOutcome.moduleBusy:
+        // The module is there and alive; it never sent its codes. Never
+        // "no module", never "no faults".
+        icon = Icons.hourglass_top_rounded;
+        color = _RC.neonAmber;
+        title = context.tr('absModuleBusyTitle');
+        body = context.tr('absModuleBusyDesc');
         break;
       case ChassisScanOutcome.addressingUnsupported:
         icon = Icons.usb_off_rounded;
@@ -1396,6 +1507,39 @@ class _HazardCard extends StatelessWidget {
 
   bool get _mayBeFalse => lowVoltage && code.code.startsWith('U');
 
+  /// What the resolver says about this code for the active vehicle. Chassis
+  /// cards keep the platform their list was scanned under.
+  ResolvedFault _resolved(BuildContext context) {
+    final snap = activeVehicleSnapshot(context.watch<VehicleProvider>().active);
+    final v = snap.context;
+    final vehicle = code.isChassis
+        ? VehicleContext(
+            profileId: v.profileId,
+            make: v.make,
+            model: v.model,
+            manufacturerKey: v.manufacturerKey,
+            platformKey: platformKey)
+        : v;
+    return resolveForCard(context, code, vehicle: vehicle);
+  }
+
+  /// True while the knowledge store is still loading at app start: the card
+  /// says so instead of briefly showing a structure-only answer.
+  bool _knowledgeLoading(BuildContext context) =>
+      Provider.of<KnowledgeService?>(context)?.state == KnowledgeState.loading;
+
+  /// The store may still change this answer: anything from L4 down (generic,
+  /// older table, structure, raw) waits for it, so the rider never sees one
+  /// text flip to another a moment later. Manual-table answers do not wait.
+  bool _awaitingKnowledge(BuildContext context, ResolvedFault r) =>
+      _knowledgeLoading(context) &&
+      r.level.index >= ResolvedLevel.l4Generic.index;
+
+  /// Card colour: the rider action when the resolver knows one, else the
+  /// older severity band.
+  Color _cardColor(ResolvedFault r) =>
+      r.riderAction != null ? riderActionColor(r.riderAction!) : _severityColor;
+
   Color get _severityColor {
     switch (code.severity) {
       case 'critical':
@@ -1438,20 +1582,22 @@ class _HazardCard extends StatelessWidget {
   // Localized description via the DTC service: Hindi is served from the
   // ingested master dictionary; every other language falls back to the English
   // description already resolved by ObdService until it ships its own set.
-  String _localizedDescription(BuildContext context) {
-    final languageCode = context.watch<SettingsProvider>().locale.languageCode;
+  /// The card's main line, from the resolver (fault Phase 1B). Every wording
+  /// for "no meaning" is the one these cards already used.
+  String _localizedDescription(BuildContext context, ResolvedFault r) {
+    if (_awaitingKnowledge(context, r)) {
+      return context.tr('knowledgeLoading');
+    }
+    final title = r.title ?? '';
+    if (title.isNotEmpty) return title;
 
     // Chassis codes resolve through the manufacturer-keyed dictionary: the
-    // same C-code means different faults on different makes, so the generic
-    // description table must never be consulted for one.
+    // same C-code means different faults on different makes. Two different
+    // sentences for "nothing", because they are two different facts: "this
+    // make's codes are read but undecoded" says the value on screen is real
+    // and worth quoting to a dealer; "no manufacturer description available"
+    // applies when there is no table for this platform at all.
     if (code.isChassis) {
-      final entry = _chassisText(context);
-      if (entry != null && entry.description.isNotEmpty) return entry.description;
-      // Two different sentences, because they are two different facts. "This
-      // make's codes are read but undecoded" tells the rider the value on
-      // screen is real and worth quoting to a dealer; "no manufacturer
-      // description available" is the older, weaker statement that applies
-      // when there is no table for this platform at all.
       if (_platform?.showsRawUnverifiedCodes ?? false) {
         return context.tr('absRawUnverifiedDesc');
       }
@@ -1459,30 +1605,21 @@ class _HazardCard extends StatelessWidget {
     }
 
     // A manufacturer-defined code (P1xxx, U1xxx…) means whatever this bike's
-    // maker says it means. No generic table is consulted — not even the 436
-    // P1 entries the engine assets carry, several of them GM wording.
+    // maker says it means. The resolver never gives it a generic meaning.
     if (isManufacturerDefined(code.code)) {
       return context.tr('dtcManufacturerSpecific');
     }
-
-    final resolved = DtcLocalizations.description(
-      code.code,
-      languageCode,
-      englishFallback: code.description,
-    );
-    return resolved.isEmpty ? context.tr('dtcNoVerifiedDescription') : resolved;
+    if (r.level == ResolvedLevel.l6Raw) return context.tr('faultRawShowDealer');
+    return context.tr('dtcNoVerifiedDescription');
   }
 
   /// Subsystem label for an engine code shown by its structure (no verified
   /// description). Null when a description exists or the range has no
   /// grouping the app is confident of.
-  String? _structuralSubsystem(BuildContext context) {
-    if (code.isChassis || isManufacturerDefined(code.code)) return null;
-    final languageCode = context.watch<SettingsProvider>().locale.languageCode;
-    final resolved = DtcLocalizations.description(code.code, languageCode,
-        englishFallback: code.description);
-    if (resolved.isNotEmpty) return null;
-    final key = DtcLocalizations.subsystemKey(code.code);
+  String? _structuralSubsystem(BuildContext context, ResolvedFault r) {
+    if (code.isChassis || r.level != ResolvedLevel.l5Structure) return null;
+    if (_awaitingKnowledge(context, r)) return null;
+    final key = r.structure?.subsystemKey;
     return key == null ? null : context.tr(key);
   }
 
@@ -1557,7 +1694,16 @@ class _HazardCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = _severityColor;
+    final r = _resolved(context);
+    final color = _cardColor(r);
+    // The store's guidance replaces the older table's rows; the older rows
+    // (cause, action, severity note) stay exactly as they were for an answer
+    // that still comes from the older table.
+    final waiting = _awaitingKnowledge(context, r);
+    final storeGuidance = !waiting && r.provenance == Provenance.aiGuidance;
+    final legacyAnswer = !waiting &&
+        (r.provenance == Provenance.legacyTable ||
+            r.provenance == Provenance.legacyImported);
     return Container(
       margin: const EdgeInsets.only(bottom: 10),
       decoration: BoxDecoration(
@@ -1605,7 +1751,8 @@ class _HazardCard extends StatelessWidget {
                             ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                               duration: const Duration(milliseconds: 900),
                               backgroundColor: _RC.card,
-                              content: Text('${code.code} copied',
+                              content: Text(
+                                  context.trArgs('codeCopied', {'code': code.code}),
                                   style: const TextStyle(color: _RC.textMain)),
                             ));
                           },
@@ -1625,17 +1772,22 @@ class _HazardCard extends StatelessWidget {
                                 fontFamily: 'monospace',
                                 letterSpacing: 1)),
                         const SizedBox(width: 10),
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                          decoration: BoxDecoration(
-                              color: color.withValues(alpha: 0.14),
-                              borderRadius: BorderRadius.circular(6)),
-                          child: Text(_severityLabel(context),
-                              style: TextStyle(
-                                  color: color,
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.w700)),
-                        ),
+                        // Rider action (icon + word) when the resolver knows
+                        // one; the older severity label otherwise.
+                        if (r.riderAction != null)
+                          RiderActionChip(r.riderAction!)
+                        else
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                            decoration: BoxDecoration(
+                                color: color.withValues(alpha: 0.14),
+                                borderRadius: BorderRadius.circular(6)),
+                            child: Text(_severityLabel(context),
+                                style: TextStyle(
+                                    color: color,
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w700)),
+                          ),
                         // UDS status bit 3 clear: the module saw this fault but
                         // has not stored it as confirmed. Worth flagging rather
                         // than presenting it with the same weight as a stored
@@ -1691,7 +1843,7 @@ class _HazardCard extends StatelessWidget {
                       );
                     }),
                     const SizedBox(height: 6),
-                    Text(_localizedDescription(context),
+                    Text(_localizedDescription(context, r),
                         style: const TextStyle(
                             color: _RC.textMain,
                             fontSize: 14,
@@ -1739,19 +1891,19 @@ class _HazardCard extends StatelessWidget {
                     // Rows are only built when they have content.
                     if (!code.isChassis) ...[
                       Builder(builder: (context) {
-                        final subsystem = _structuralSubsystem(context);
+                        final subsystem = _structuralSubsystem(context, r);
                         return subsystem == null
                             ? const SizedBox.shrink()
                             : _detailRow(context.tr('dtcSubsystem'), subsystem,
                                 _RC.textMain);
                       }),
-                      if (code.possibleCause.isNotEmpty)
+                      if (legacyAnswer && code.possibleCause.isNotEmpty)
                         _detailRow(context.tr('possibleCause'),
                             code.possibleCause, _RC.textMuted),
-                      if (code.action.isNotEmpty)
+                      if (legacyAnswer && code.action.isNotEmpty)
                         _detailRow(context.tr('recommendedAction'), code.action,
                             _RC.neonCyan),
-                      if (code.severity != 'unknown') ...[
+                      if (legacyAnswer && code.severity != 'unknown') ...[
                         const SizedBox(height: 8),
                         Text(context.tr('dtcSeverityGuidance'),
                             style: const TextStyle(
@@ -1761,6 +1913,7 @@ class _HazardCard extends StatelessWidget {
                                 height: 1.4)),
                       ],
                     ],
+
 
                     // Chassis codes carry the manufacturer's own Component,
                     // Query and Remedy columns — genuinely actionable detail a
@@ -1816,6 +1969,14 @@ class _HazardCard extends StatelessWidget {
                         );
                       }),
                     ],
+                    // Fault Phase 1B: the knowledge store's guidance (likely
+                    // causes, what to do, can-ride line, conditions) for an
+                    // answer from the store, on any card; otherwise the
+                    // language note and the plain provenance line alone.
+                    if (storeGuidance)
+                      ResolvedGuidance(r)
+                    else if (!_awaitingKnowledge(context, r))
+                      ProvenanceLine(r),
                   ],
                 ),
               ),

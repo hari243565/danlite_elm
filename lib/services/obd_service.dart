@@ -16,9 +16,11 @@ import 'engine_report.dart';
 import 'fault_decoders.dart';
 import 'response_pending.dart';
 import 'session_recorder.dart';
+import 'stored_codes_check.dart';
 
 export 'engine_dtc_read.dart';
 export 'engine_report.dart';
+export 'stored_codes_check.dart';
 
 enum ConnectionType { wifi, bluetooth }
 
@@ -269,6 +271,11 @@ class ObdService extends ChangeNotifier {
 
   /// True when the latest voltage reading is LOW for the known engine state.
   bool get batteryVoltageLow => _engineReport?.lowVoltage ?? false;
+
+  /// True when the latest voltage reading is HIGH (above [kHighVoltage]).
+  /// Unknown voltage is never high.
+  bool get batteryVoltageHigh =>
+      _engineReport?.voltageLevel == VoltageLevel.high;
 
   /// When the last ABS/chassis scan finished.
   DateTime? _chassisReadAt;
@@ -2158,6 +2165,85 @@ class ObdService extends ChangeNotifier {
     }
   }
 
+  // ── Clear Codes: the silent after-check (fault Phase 1B, B9) ─────────────
+  /// One Mode 03 read, for the INTERNAL Clear Codes record only.
+  ///
+  /// Called after the existing Clear Codes flow has finished and its message
+  /// is on screen; [clearDtcs] itself is not touched. It changes nothing the
+  /// rider sees: no code list, no read result, no status line, no
+  /// notification. It waits for any engine read to hand the link back, then
+  /// holds the engine job slot (so Clear, the ABS scan and the next read wait
+  /// for it, as they do for the extras), and sends `03` once through the
+  /// Phase 1A pending helper, bounded by one attempt window. It stops early —
+  /// as "unknown" — when [isCancelled] says so, when another operation asks
+  /// for the link, or when the link drops.
+  Future<StoredCodesCheck> checkStoredCodesSilently(
+      {bool Function()? isCancelled}) async {
+    if (!isConnected) return StoredCodesUnknown('not connected', DateTime.now());
+    _acquirePollLock();
+    await _waitForLinkIdle();
+    if (_engineJob != null || _engineReadInFlight != null || _chassisScanInFlight) {
+      _releasePollLock();
+      return StoredCodesUnknown('link busy', DateTime.now());
+    }
+    final done = Completer<void>();
+    _engineJob = done.future;
+    final previousTimeout = _cmdTimeout;
+    var headersOn = false;
+    var stWidened = false;
+    bool stop() =>
+        (isCancelled?.call() ?? false) || _linkWaiters > 0 || !isConnected;
+    try {
+      if (!_linkSynced) return StoredCodesUnknown('link not synced', DateTime.now());
+      final session = _session;
+      if (!kKLineFaultReadingEnabled &&
+          session != null &&
+          session.protocol.isKLine) {
+        return StoredCodesUnknown('k-line not read', DateTime.now());
+      }
+      if (_cmdTimeout < _readDtcsMinTimeout) _cmdTimeout = _readDtcsMinTimeout;
+      headersOn = await _enableDtcHeaders();
+      stWidened = !_isDeadResponse(await _send('ATST7D'));
+      if (stop()) return StoredCodesUnknown('cancelled', DateTime.now());
+      final sent = await _sendWithPending(ObdPids.readDtcs,
+          policy: faultTiming.pendingPolicy(overall: faultTiming.pendingPerAttempt),
+          isCancelled: stop);
+      final now = DateTime.now();
+      if (sent is! PendingAnswered) {
+        return StoredCodesUnknown(stop() ? 'cancelled' : 'module busy', now);
+      }
+      final countMode = session?.protocol.family == ObdProtocolFamily.can
+          ? DtcCountByteMode.present
+          : DtcCountByteMode.auto;
+      final verdict = classifyEngineDtcReply(sent.reply,
+          linkFailed: _classifyReply(sent.reply) == ObdReplyClass.linkFailure,
+          countByteMode: countMode);
+      switch (verdict) {
+        case ReplyPositive(:final parsed):
+          return parsed.allCodes.isEmpty
+              ? StoredCodesEmpty(now)
+              : StoredCodesPresent(List<String>.unmodifiable(parsed.allCodes), now);
+        case ReplyRefused():
+          return StoredCodesUnknown('refused', now);
+        case ReplyNoAnswer():
+          return StoredCodesUnknown('no answer', now);
+        case ReplyLinkLost():
+          return StoredCodesUnknown('link lost', now);
+      }
+    } catch (e) {
+      debugPrint('[ObdService] silent stored-code check failed (${e.runtimeType})');
+      return StoredCodesUnknown('error', DateTime.now());
+    } finally {
+      _cmdTimeout = previousTimeout;
+      if (stWidened && _linkSynced) await _send('ATST32');
+      if (headersOn) await _restoreLiveHeaders();
+      _cmdTimeout = previousTimeout;
+      _releasePollLock();
+      if (identical(_engineJob, done.future)) _engineJob = null;
+      done.complete();
+    }
+  }
+
   // ══════════════════════════════════════════════════════════════════════════
   // CHASSIS / ABS MODULE SCAN
   // ══════════════════════════════════════════════════════════════════════════
@@ -2228,6 +2314,9 @@ class ObdService extends ChangeNotifier {
     var stWidened = false;
     var addressingChanged = false;
     var addressingAccepted = false;
+    // A module answered "busy" to the end on at least one request. Only the
+    // final outcome label uses it; the sweep itself is unchanged.
+    var moduleStayedBusy = false;
 
     _acquirePollLock();
     await _waitForLinkIdle();
@@ -2363,6 +2452,7 @@ class ObdService extends ChangeNotifier {
             // The module is there and alive, and never got to its answer.
             // Not a code list, not "clean", not an adapter-timing sample.
             consecutiveTimeouts = 0;
+            moduleStayedBusy = true;
             log.add('${target.label} · $request: module kept reporting busy '
                 '(response pending, ${sent.attempts} attempts) — no answer.');
             continue;
@@ -2497,9 +2587,13 @@ class ObdService extends ChangeNotifier {
         ));
 
         _chassisDtcCodes = <DtcCode>[];
-        _chassisScanOutcome = addressingAccepted
-            ? ChassisScanOutcome.noModuleResponse
-            : ChassisScanOutcome.addressingUnsupported;
+        // Busy outranks "no module": a module DID answer, and its silence
+        // about codes says nothing about whether it has any.
+        _chassisScanOutcome = moduleStayedBusy
+            ? ChassisScanOutcome.moduleBusy
+            : addressingAccepted
+                ? ChassisScanOutcome.noModuleResponse
+                : ChassisScanOutcome.addressingUnsupported;
       } else {
         _chassisDtcCodes = found;
         _chassisScanOutcome = found.isEmpty

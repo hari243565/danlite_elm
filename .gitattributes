@@ -1,0 +1,4 @@
+# Knowledge packs are hashed byte for byte (manifest content_sha256). Never let
+# git rewrite their line endings on checkout, or the bundled pack's hash breaks
+# on a Windows machine with core.autocrlf=true.
+assets/knowledge/** -text

@@ -274,6 +274,113 @@ class AppStrings {
       'recorderNothingToShare':
           'No recording yet. Connect to the adapter first.',
 
+      // ── Fault Phase 1B: resolved guidance, lookup, history, small fixes ──
+      // English and Hindi; other languages fall back to English, as above.
+      'riderActionStop': 'Stop',
+      'riderActionServiceSoon': 'Service soon',
+      'riderActionMonitor': 'Monitor',
+      'riderActionInfo': 'Info',
+      'canRideYes': 'Can be ridden to a workshop',
+      'canRideWithCare': 'Can be ridden to a workshop, with care',
+      'canRideNo': 'Do not ride. Have the bike taken to a workshop.',
+      'faultLikelyCauses': 'Likely causes',
+      'faultWhatToDo': 'What to do',
+      'faultForMechanic': 'For the mechanic',
+      'provenanceAi':
+          'Guidance written by Danlite with AI assistance, not manufacturer data',
+      'provenanceManual': 'From the manufacturer\'s service manual',
+      'provenanceManualNoMeaning':
+          'Listed in the manufacturer\'s service manual without a meaning',
+      'provenanceDealerReadout': 'From a dealer tool\'s reading of the Bosch '
+          'ABS module, not a service manual',
+      'provenanceLegacyTable': 'Older app text; its source is not recorded',
+      'provenanceLegacyImported':
+          'Older imported text, test builds only; its licence is not recorded',
+      'provenanceStructure': 'Structure only, no verified meaning',
+      'provenanceRaw': 'Raw code only, no meaning known',
+      'provenanceDraft': 'Draft: not yet independently reviewed.',
+      'faultShowingEnglish':
+          'Showing English: this text is not available in your language yet.',
+      'faultPartlyEnglish': 'Some of this text is shown in English.',
+      'faultRawShowDealer':
+          'No meaning is known for this code. Show it to your dealer or workshop.',
+      'appliesCylindersMin2':
+          'Applies only to bikes with two or more cylinders.',
+      'appliesLiquidCooled': 'Applies only to liquid-cooled bikes.',
+      'appliesRideByWire': 'Applies only to bikes with a ride-by-wire throttle.',
+      'appliesAbsFitted': 'Applies only to bikes fitted with ABS.',
+      'knowledgeLoading': 'Loading fault code guidance…',
+      'lookupTitle': 'Look up a code',
+      'lookupHint': 'P0120, U0100, 5043H, 4-3 or words',
+      'lookupIntro':
+          'Type a fault code or a few words. This works without the adapter.',
+      'lookupNoResults': 'Nothing found for "{q}". Check the code, or show it '
+          'to your dealer.',
+      'lookupCapped':
+          'Showing the first 50 results. Type more to narrow the search.',
+      'lookupForVehicle': 'For your vehicle: {v}',
+      'lookupGenericOnly': 'No vehicle identified: generic meanings only.',
+      'lookupOtherScope': 'This code is also listed for {scope}. That meaning '
+          'is not shown because your selected vehicle is not that model.',
+      'lookupScopeGeneric': 'Generic (all bikes)',
+      'lookupScopeBosch': 'Bosch ABS module',
+      'lookupNotReadNote': 'Looked up, not read from the bike.',
+      'historyTitle': 'Scan history',
+      'historyEmpty':
+          'No scans saved yet. Each engine and ABS read is saved here.',
+      'historyPrivacy': 'Saved only on this phone. Nothing is uploaded. '
+          'Vehicle ID numbers are never saved.',
+      'historyDeleteAll': 'Delete all history',
+      'historyDeleteConfirm':
+          'Delete every saved scan from this phone? This cannot be undone.',
+      'historyDelete': 'Delete',
+      'historyDeleted': 'History deleted',
+      'historyShare': 'Share as text',
+      'historyRepeat': 'Read {n} times, same result',
+      'historyNoCodes': 'No codes',
+      'historyCodeCount': '{n} code(s)',
+      'historyReach_answered': 'The bike answered',
+      'historyReach_no_answer': 'The bike did not answer',
+      'historyReach_module_busy': 'The module was busy',
+      'historyReach_refused': 'The bike refused the request',
+      'historyReach_link_lost': 'Connection lost',
+      'historyReach_kline_not_read': 'Older connection type, codes not read',
+      'historyReach_clean': 'ABS answered, no codes',
+      'historyReach_faults_found': 'ABS answered with codes',
+      'historyReach_no_module': 'No reply from the ABS module',
+      'historyReach_addressing_unsupported':
+          'The adapter could not address the ABS module',
+      'historyReach_link_unavailable': 'Not connected',
+      'historyVoltageLow': 'Battery voltage low',
+      'historyVoltageHigh': 'Battery voltage high',
+      'historyEngineRunning': 'Engine running',
+      'historyEngineOff': 'Engine off',
+      'historyShareHeader': 'Danlite scan history',
+      'historyShareFooter': 'Saved on the phone and shared by the rider. No '
+          'vehicle ID number is included.',
+      'absModuleBusyTitle': 'The ABS module is busy',
+      'absModuleBusyDesc': 'The ABS module is busy and did not send its fault '
+          'codes. This does not mean there are no faults. Try again in a '
+          'moment.',
+      'batteryHighBanner': 'Battery voltage is high ({v} V). A charging fault '
+          'can damage the battery and electronics. Have the charging system '
+          'checked soon.',
+      'dtcAdapterNotConnected': 'ADAPTER NOT CONNECTED',
+      'dtcScanningTitle': 'Scanning for fault codes…',
+      'dtcScanningBody': 'Live diagnostic scan in progress — codes will appear '
+          'here automatically.',
+      'dtcLiveScan': 'LIVE SCAN',
+      'dtcCodesChip': 'CODES',
+      'dtcCriticalChip': 'CRITICAL',
+      'timeJustNow': 'just now',
+      'timeSecondsAgo': '{n}s ago',
+      'timeMinutesAgo': '{n}m ago',
+      'codeCopied': '{code} copied',
+      'connectedViaBtSilent':
+          'Adapter connected via Bluetooth · bike not answering',
+      'connectedViaWifiSilent':
+          'Adapter connected via Wi-Fi · bike not answering',
+
       // ── Module selector (Engine / ABS) ──────────────────────────────────
       // Only 'en' and 'hi' ship these; AppStrings.get falls every other
       // language back to English, exactly as DTC descriptions already do.
@@ -1098,6 +1205,113 @@ class AppStrings {
       'recorderTurnedOff': 'सेशन रिकॉर्डर बंद किया गया',
       'recorderNothingToShare':
           'अभी कोई रिकॉर्डिंग नहीं है। पहले अडैप्टर से कनेक्ट करें।',
+
+      // ── Fault Phase 1B — technician register: workshop loanwords for
+      // parts, ABS and ECU in Latin script, native verbs for actions ──
+      'riderActionStop': 'रुकें',
+      'riderActionServiceSoon': 'जल्द सर्विस कराएँ',
+      'riderActionMonitor': 'नज़र रखें',
+      'riderActionInfo': 'जानकारी',
+      'canRideYes': 'वर्कशॉप तक चलाकर ले जा सकते हैं',
+      'canRideWithCare': 'सावधानी से वर्कशॉप तक चलाकर ले जा सकते हैं',
+      'canRideNo': 'बाइक न चलाएँ। बाइक को वर्कशॉप तक पहुँचवाएँ।',
+      'faultLikelyCauses': 'संभावित कारण',
+      'faultWhatToDo': 'क्या करें',
+      'faultForMechanic': 'मैकेनिक के लिए',
+      'provenanceAi':
+          'Danlite ने AI की मदद से लिखी जानकारी, निर्माता का डेटा नहीं',
+      'provenanceManual': 'निर्माता की सर्विस मैनुअल से',
+      'provenanceManualNoMeaning':
+          'निर्माता की सर्विस मैनुअल में यह कोड है, पर इसका मतलब नहीं दिया गया',
+      'provenanceDealerReadout':
+          'Bosch ABS मॉड्यूल की डीलर टूल रीडिंग से, सर्विस मैनुअल से नहीं',
+      'provenanceLegacyTable': 'ऐप का पुराना टेक्स्ट; इसका स्रोत दर्ज नहीं है',
+      'provenanceLegacyImported':
+          'पुराना आयात किया गया टेक्स्ट, सिर्फ़ टेस्ट बिल्ड में; इसका लाइसेंस दर्ज नहीं है',
+      'provenanceStructure': 'सिर्फ़ कोड का ढाँचा, सत्यापित मतलब नहीं',
+      'provenanceRaw': 'सिर्फ़ कच्चा कोड, कोई मतलब मालूम नहीं',
+      'provenanceDraft': 'ड्राफ़्ट: अभी किसी दूसरे व्यक्ति ने जाँचा नहीं है।',
+      'faultShowingEnglish':
+          'अंग्रेज़ी में दिखा रहे हैं: यह जानकारी अभी हिंदी में उपलब्ध नहीं है।',
+      'faultPartlyEnglish': 'इसका कुछ हिस्सा अंग्रेज़ी में दिखाया गया है।',
+      'faultRawShowDealer':
+          'इस कोड का मतलब मालूम नहीं है। इसे अपने डीलर या वर्कशॉप को दिखाएँ।',
+      'appliesCylindersMin2':
+          'यह सिर्फ़ दो या ज़्यादा सिलेंडर वाली बाइक पर लागू होता है।',
+      'appliesLiquidCooled': 'यह सिर्फ़ लिक्विड-कूल्ड बाइक पर लागू होता है।',
+      'appliesRideByWire':
+          'यह सिर्फ़ राइड-बाय-वायर थ्रॉटल वाली बाइक पर लागू होता है।',
+      'appliesAbsFitted': 'यह सिर्फ़ ABS वाली बाइक पर लागू होता है।',
+      'knowledgeLoading': 'फ़ॉल्ट कोड की जानकारी लोड हो रही है…',
+      'lookupTitle': 'कोड खोजें',
+      'lookupHint': 'P0120, U0100, 5043H, 4-3 या शब्द',
+      'lookupIntro':
+          'फ़ॉल्ट कोड या कुछ शब्द लिखें। यह एडेप्टर के बिना भी काम करता है।',
+      'lookupNoResults':
+          '"{q}" के लिए कुछ नहीं मिला। कोड जाँचें, या इसे अपने डीलर को दिखाएँ।',
+      'lookupCapped':
+          'पहले 50 नतीजे दिखाए गए हैं। खोज छोटी करने के लिए और लिखें।',
+      'lookupForVehicle': 'आपके वाहन के लिए: {v}',
+      'lookupGenericOnly': 'कोई वाहन पहचाना नहीं गया: सिर्फ़ सामान्य मतलब।',
+      'lookupOtherScope': 'यह कोड {scope} के लिए भी दर्ज है। वह मतलब नहीं '
+          'दिखाया गया, क्योंकि आपका चुना हुआ वाहन वह मॉडल नहीं है।',
+      'lookupScopeGeneric': 'सामान्य (सभी बाइक)',
+      'lookupScopeBosch': 'Bosch ABS मॉड्यूल',
+      'lookupNotReadNote': 'यह खोजा गया है, बाइक से पढ़ा नहीं गया।',
+      'historyTitle': 'स्कैन हिस्ट्री',
+      'historyEmpty':
+          'अभी कोई स्कैन सेव नहीं है। हर इंजन और ABS रीड यहाँ सेव होता है।',
+      'historyPrivacy': 'सिर्फ़ इसी फ़ोन पर सेव। कुछ भी अपलोड नहीं होता। वाहन '
+          'पहचान संख्या (VIN) कभी सेव नहीं होती।',
+      'historyDeleteAll': 'पूरी हिस्ट्री मिटाएँ',
+      'historyDeleteConfirm':
+          'इस फ़ोन से सारे सेव स्कैन मिटाएँ? यह वापस नहीं होगा।',
+      'historyDelete': 'मिटाएँ',
+      'historyDeleted': 'हिस्ट्री मिटा दी गई',
+      'historyShare': 'टेक्स्ट के रूप में शेयर करें',
+      'historyRepeat': '{n} बार पढ़ा, वही नतीजा',
+      'historyNoCodes': 'कोई कोड नहीं',
+      'historyCodeCount': '{n} कोड',
+      'historyReach_answered': 'बाइक ने जवाब दिया',
+      'historyReach_no_answer': 'बाइक ने जवाब नहीं दिया',
+      'historyReach_module_busy': 'मॉड्यूल व्यस्त था',
+      'historyReach_refused': 'बाइक ने अनुरोध मना कर दिया',
+      'historyReach_link_lost': 'कनेक्शन टूट गया',
+      'historyReach_kline_not_read': 'पुराना कनेक्शन प्रकार, कोड नहीं पढ़े गए',
+      'historyReach_clean': 'ABS ने जवाब दिया, कोई कोड नहीं',
+      'historyReach_faults_found': 'ABS ने कोड भेजे',
+      'historyReach_no_module': 'ABS मॉड्यूल से जवाब नहीं मिला',
+      'historyReach_addressing_unsupported':
+          'एडेप्टर ABS मॉड्यूल तक नहीं पहुँच पाया',
+      'historyReach_link_unavailable': 'कनेक्ट नहीं',
+      'historyVoltageLow': 'बैटरी वोल्टेज कम',
+      'historyVoltageHigh': 'बैटरी वोल्टेज अधिक',
+      'historyEngineRunning': 'इंजन चालू',
+      'historyEngineOff': 'इंजन बंद',
+      'historyShareHeader': 'Danlite स्कैन हिस्ट्री',
+      'historyShareFooter': 'फ़ोन पर सेव और राइडर द्वारा शेयर किया गया। इसमें '
+          'वाहन पहचान संख्या (VIN) नहीं है।',
+      'absModuleBusyTitle': 'ABS मॉड्यूल व्यस्त है',
+      'absModuleBusyDesc': 'ABS मॉड्यूल व्यस्त है और उसने अपने फ़ॉल्ट कोड नहीं '
+          'भेजे। इसका मतलब यह नहीं कि कोई खराबी नहीं है। थोड़ी देर बाद फिर से '
+          'कोशिश करें।',
+      'batteryHighBanner': 'बैटरी वोल्टेज अधिक है ({v} V)। चार्जिंग की खराबी से '
+          'बैटरी और इलेक्ट्रॉनिक्स खराब हो सकते हैं। चार्जिंग सिस्टम की जाँच जल्द '
+          'कराएँ।',
+      'dtcAdapterNotConnected': 'एडेप्टर कनेक्ट नहीं है',
+      'dtcScanningTitle': 'फ़ॉल्ट कोड स्कैन हो रहे हैं…',
+      'dtcScanningBody': 'लाइव स्कैन चल रहा है — कोड अपने-आप यहाँ दिखेंगे।',
+      'dtcLiveScan': 'लाइव स्कैन',
+      'dtcCodesChip': 'कोड',
+      'dtcCriticalChip': 'गंभीर',
+      'timeJustNow': 'अभी-अभी',
+      'timeSecondsAgo': '{n} सेकंड पहले',
+      'timeMinutesAgo': '{n} मिनट पहले',
+      'codeCopied': '{code} कॉपी हो गया',
+      'connectedViaBtSilent':
+          'एडेप्टर Bluetooth से कनेक्ट है · बाइक जवाब नहीं दे रही',
+      'connectedViaWifiSilent':
+          'एडेप्टर Wi-Fi से कनेक्ट है · बाइक जवाब नहीं दे रही',
 
       // ── मॉड्यूल चयन (इंजन / ABS) ────────────────────────────────────────
       'moduleEngine': 'इंजन',

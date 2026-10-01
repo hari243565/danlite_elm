@@ -26,6 +26,15 @@ class MainActivity : FlutterActivity() {
                     dir.mkdirs()
                     result.success(dir.absolutePath)
                 }
+                // Fault knowledge store + scan history database
+                // (lib/knowledge/knowledge_service.dart). Also in
+                // noBackupFilesDir: scan history must not leave the phone
+                // through Auto Backup.
+                "knowledgeDirectory" -> {
+                    val dir = File(noBackupFilesDir, "knowledge")
+                    dir.mkdirs()
+                    result.success(dir.absolutePath)
+                }
                 "shareText" -> {
                     val text = call.argument<String>("text") ?: ""
                     val subject = call.argument<String>("subject") ?: "Danlite"

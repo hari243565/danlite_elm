@@ -577,4 +577,9 @@ enum ChassisScanOutcome {
 
   /// Adapter not connected / link dropped mid-scan.
   linkUnavailable,
+
+  /// A module answered, but only ever with "response pending" (busy), and no
+  /// other address gave a usable answer. Not "no module", and never "clean":
+  /// the module is there and did not send its codes.
+  moduleBusy,
 }

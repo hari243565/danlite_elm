@@ -49,8 +49,10 @@ class _HomeScreenState extends State<HomeScreen> {
 
     Color statusColor = Colors.transparent;
     if (obd.status == ConnectionStatus.connected) {
-      statusColor =
-          obd.transport == ConnectionType.wifi ? _NC.stripWifi : _NC.stripBt;
+      // Adapter up, bike silent: amber, matching the words.
+      statusColor = !obd.vehicleAnswered
+          ? Colors.amber
+          : (obd.transport == ConnectionType.wifi ? _NC.stripWifi : _NC.stripBt);
     } else if (obd.status == ConnectionStatus.error ||
         obd.status == ConnectionStatus.connecting) {
       statusColor =
@@ -184,12 +186,21 @@ class _HomeScreenState extends State<HomeScreen> {
 // status/transport enums so the ribbon never surfaces the service layer's raw
 // English statusMessage. Dynamic detail (IP / device name) stays available on
 // the connection screen; the ribbon is a compact, translated status only.
+//
+// Connected but the bike has not answered (ignition off, silent ECU): say so,
+// as the fault screen does, instead of a bare "Connected".
+@visibleForTesting
+String ribbonStatusLabel(BuildContext context, ObdService obd) =>
+    _ribbonStatusLabel(context, obd);
+
 String _ribbonStatusLabel(BuildContext context, ObdService obd) {
   switch (obd.status) {
     case ConnectionStatus.connected:
-      return context.tr(obd.transport == ConnectionType.wifi
-          ? 'connectedViaWifi'
-          : 'connectedViaBt');
+      final wifi = obd.transport == ConnectionType.wifi;
+      if (!obd.vehicleAnswered) {
+        return context.tr(wifi ? 'connectedViaWifiSilent' : 'connectedViaBtSilent');
+      }
+      return context.tr(wifi ? 'connectedViaWifi' : 'connectedViaBt');
     case ConnectionStatus.connecting:
       return context.tr('connecting');
     case ConnectionStatus.scanning:
@@ -300,7 +311,9 @@ class _DrawerHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final connected = obd.isConnected;
+    // Green only when the bike itself has answered; an adapter alone is not a
+    // working connection to the bike.
+    final connected = obd.isConnected && obd.vehicleAnswered;
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 22, 20, 18),
       decoration: const BoxDecoration(
@@ -349,7 +362,11 @@ class _DrawerHeader extends StatelessWidget {
                 ),
                 const SizedBox(width: 6),
                 Text(
-                  obd.statusMessage,
+                  // Connected states in the rider's language (incl. "bike
+                  // not answering"); error states keep their detailed text.
+                  obd.isConnected
+                      ? _ribbonStatusLabel(context, obd)
+                      : obd.statusMessage,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                       color: connected ? _NC.green : _NC.textOff,

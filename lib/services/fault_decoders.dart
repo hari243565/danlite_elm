@@ -134,7 +134,8 @@ class FailureType {
     final hindi = languageCode == 'hi';
     if (entry == null) {
       return hindi
-          ? 'फ़ेल्योर टाइप ${hex(ftb)}, कोई विवरण नहीं'
+          // Same words as the ABS card's row label ('faultFailureType').
+          ? 'खराबी का प्रकार ${hex(ftb)}, कोई विवरण नहीं'
           : 'failure type ${hex(ftb)}, no description';
     }
     return hindi ? entry[1] : entry[0];

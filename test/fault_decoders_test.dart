@@ -152,8 +152,10 @@ void main() {
         expect(FailureType.isKnown(ftb), isFalse);
         expect(FailureType.describe(ftb, 'en'),
             'failure type 0x$hex, no description');
+        // Phase 1B (B10c): the Hindi wording now matches the ABS row label
+        // 'खराबी का प्रकार'. Same rule tested — never guessed, the byte shown.
         expect(FailureType.describe(ftb, 'hi'),
-            'फ़ेल्योर टाइप 0x$hex, कोई विवरण नहीं');
+            'खराबी का प्रकार 0x$hex, कोई विवरण नहीं');
       }
     });
 

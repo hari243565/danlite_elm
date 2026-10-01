@@ -14,6 +14,8 @@ import 'services/session_recorder.dart';
 import 'services/supabase_service.dart';
 import 'services/trip_logger.dart';
 import 'services/dtc_service.dart';
+import 'knowledge/history_recorder.dart';
+import 'knowledge/knowledge_service.dart';
 import 'app.dart';
 
 void main() {
@@ -91,6 +93,16 @@ void main() {
     final recorder = SessionRecorder();
     final obdService = ObdService(btService, recorder: recorder);
 
+    // Fault knowledge store + scan history (fault Phase 1B). Created here,
+    // STARTED after runApp (not awaited) so the first screen never waits on
+    // the bundled-pack import. The recorder saves every engine and ABS read.
+    final knowledge = KnowledgeService.forApp();
+    HistoryRecorder(
+      obd: obdService,
+      knowledge: knowledge,
+      vehicle: () => activeVehicleSnapshot(vehicles.active),
+    ).attach();
+
     // Backend auth (Phase 2). Both calls swallow their own failures: a missing
     // or unreachable Supabase config must never stop the diagnostics app from
     // starting, since nothing is gated behind a licence until Phase 8.
@@ -121,11 +133,13 @@ void main() {
             ChangeNotifierProvider<SessionRecorder>.value(value: recorder),
             ChangeNotifierProvider<AuthProvider>.value(value: auth),
             ChangeNotifierProvider<EntitlementProvider>.value(value: entitlement),
+            ChangeNotifierProvider<KnowledgeService?>.value(value: knowledge),
           ],
           child: const DanliteELMApp(),
         ),
       ),
     );
+    unawaited(knowledge.start());
   }, (Object error, StackTrace stack) {
     debugPrint('[FATAL-ZONE] $error');
     debugPrint('[FATAL-ZONE] $stack');

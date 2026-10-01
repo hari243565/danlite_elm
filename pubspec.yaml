@@ -64,6 +64,13 @@ dependencies:
   # native surface shrinks. Verified by a full `flutter build apk --release`.
   sentry_flutter: 9.27.0
 
+  # ── Fault knowledge store and scan history (fault Phase 1B) ────────────────
+  # Raw SQL, no code generation. Only SQL that Android 5's SQLite 3.8 knows is
+  # used (lib/knowledge/kb_schema.dart). Pure-Java Android plugin: no Kotlin or
+  # AGP floor; the debug APK was built with it before any code used it.
+  sqflite: ^2.4.4
+  path: ^1.9.1
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -77,6 +84,10 @@ dev_dependencies:
   # pubspec.lock). Dev-only: it is never bundled into the APK.
   image: 4.8.0
 
+  # Host-side SQLite for the knowledge-store tests only (flutter test runs on
+  # the desktop VM, where the Android plugin does not exist). Never bundled.
+  sqflite_common_ffi: ^2.4.3
+
 flutter:
   uses-material-design: true
   generate: true
@@ -85,6 +96,9 @@ flutter:
     - assets/images/
     - assets/icons/
     - assets/dtc_translations.json
+    # Bundled baseline knowledge pack (fault Phase 1B). Trusted because the
+    # signed APK carries it; see lib/knowledge/knowledge_service.dart.
+    - assets/knowledge/generic_en/
     # Supabase URL + anon key. Gitignored; see .env.example.
     - .env
 flutter_launcher_icons:
