@@ -1,0 +1,9 @@
+code,obdex_title,concern,confidence_of_concern
+P0139,"O2 Sensor Circuit High Voltage (Bank 1 Sensor 2)","Same wording as P0138; the standard meaning of P0139 is a slow response of this sensor",high
+P0626,"Generator Field/F Terminal Circuit Performance","Neighbouring codes P0625 (low) and P0626 (high) follow a low/high pattern in the standard list",medium
+P0686,"ECM/PCM Power Relay Control Circuit Open","P0685 already covers control circuit open; the standard pattern is P0686 control circuit low",medium
+P0687,"ECM/PCM Power Relay Sense Circuit Open","The standard pattern is P0687 control circuit high; this was judged WRONG in the quality-gate sample",medium
+P0688,"ECM/PCM Power Relay Sense Circuit High","Source gives P0688 and P0690 the same title; P0688 is normally sense circuit open",medium
+U0075,"Control Module Communication Bus ""B"" Performance","Source lists two entries for bus B (U0074 and U0075) and skips bus D; the standard pattern is bus A to F off",medium
+U0076,"Control Module Communication Bus ""C"" Off","Same bus-lettering inconsistency as U0075",medium
+U0077,"Vehicle Communication Bus B Off","Same bus-lettering inconsistency as U0075",medium

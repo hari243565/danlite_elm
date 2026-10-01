@@ -1,0 +1,61 @@
+code,title,components,causes,symptoms,reason
+C003C,QUESTIONABLE,OK,OK,QUESTIONABLE,"non-standard title; ESC/brake-assist boilerplate, MIL flag set"
+C003D,OK,OK,OK,QUESTIONABLE,single cause; ESC/transmission symptoms are car boilerplate
+C0042,OK,OK,OK,QUESTIONABLE,"ESC and brake-assist wording is car boilerplate, same four symptoms on every C-code"
+C0050,OK,OK,OK,QUESTIONABLE,same boilerplate symptoms
+C0052,OK,OK,OK,QUESTIONABLE,same boilerplate symptoms
+C0080,QUESTIONABLE,OK,OK,QUESTIONABLE,'front axle' has no meaning on a bike; boilerplate symptoms
+C0111,OK,OK,QUESTIONABLE,QUESTIONABLE,hydraulic block leak is a stretch; ABS lamp is not the usual symptom
+C0234,OK,OK,OK,QUESTIONABLE,same boilerplate symptoms
+P0054,OK,OK,OK,EMPTY,"heater resistance, causes thin but right"
+P0068,OK,QUESTIONABLE,OK,OK,"components list a MAF sensor, small bikes use speed-density"
+P0109,OK,OK,OK,EMPTY,no symptoms in source
+P0110,OK,OK,OK,EMPTY,no symptoms; combined MAF/IAT cause is car-only but minor
+P0114,OK,OK,OK,EMPTY,no symptoms; causes padded with near duplicates
+P0122,OK,OK,OK,OK,"limp mode wording fits ride-by-wire, softer on cable throttles"
+P013F,OK,OK,OK,QUESTIONABLE,downstream sensor: fuel use and rough idle symptoms are misleading
+P0197,OK,OK,OK,EMPTY,no symptoms in source
+P0217,OK,OK,OK,WRONG,cabin heater and long warm-up do not fit an overheating code
+P0219,OK,OK,OK,EMPTY,over-rev from missed downshift is right for a bike
+P0220,OK,QUESTIONABLE,OK,OK,'pedal' sensor wording; a bike has a twist grip
+P0231,OK,OK,OK,OK,
+P0262,OK,OK,OK,EMPTY,no symptoms in source
+P033F,QUESTIONABLE,OK,OK,EMPTY,title could not be confirmed against the standard
+P0340,OK,OK,OK,OK,
+P0341,OK,QUESTIONABLE,OK,OK,variable valve timing solenoid is rare on small bikes
+P0344,OK,OK,OK,OK,three causes say nearly the same thing (padding)
+P0410,OK,QUESTIONABLE,QUESTIONABLE,EMPTY,air pump and combi valve are car parts; bikes use a reed valve
+P0454,OK,OK,OK,QUESTIONABLE,fuel smell and loose-cap symptoms do not fit a sensor circuit fault
+P0457,OK,OK,OK,OK,
+P0460,OK,OK,OK,EMPTY,single cause
+P0497,OK,OK,OK,QUESTIONABLE,loose-cap warning does not fit low purge flow
+P0499,OK,OK,OK,QUESTIONABLE,fuel smell and loose-cap symptoms do not fit a circuit fault
+P0512,OK,OK,OK,EMPTY,no symptoms in source
+P0518,OK,OK,OK,OK,padded causes
+P0519,OK,OK,OK,OK,
+P0520,OK,OK,OK,EMPTY,"single cause, no symptoms"
+P0563,OK,OK,OK,EMPTY,no symptoms in source
+P0605,OK,OK,OK,OK,
+P060B,OK,OK,OK,OK,
+P0629,OK,OK,OK,OK,'ground open' is a stretch for a circuit-high code
+P0638,OK,OK,OK,OK,single cause
+P0652,OK,OK,OK,OK,
+P0687,WRONG,OK,QUESTIONABLE,OK,SAE P0687 is the relay control circuit HIGH; source says sense circuit open
+P0697,OK,OK,OK,OK,
+P0915,OK,QUESTIONABLE,QUESTIONABLE,WRONG,"automatic-transmission symptoms (slipping, harsh shifts) on a gear position input"
+P2100,OK,OK,OK,OK,
+P2118,OK,OK,OK,OK,
+P2119,OK,OK,OK,OK,
+P2127,OK,QUESTIONABLE,OK,OK,'pedal' sensor wording
+P2177,OK,QUESTIONABLE,OK,OK,MAF listed in components and causes
+P2181,OK,OK,OK,EMPTY,no symptoms in source
+P2195,OK,OK,OK,OK,
+P2271,OK,OK,OK,QUESTIONABLE,downstream sensor: fuel use and rough idle symptoms are misleading
+P2305,OK,OK,OK,EMPTY,no symptoms in source
+U0004,OK,OK,OK,OK,
+U0005,OK,OK,OK,OK,
+U0075,QUESTIONABLE,OK,OK,OK,title conflicts with U0073-U0077 pattern (two entries for bus B)
+U0115,OK,OK,QUESTIONABLE,OK,a second engine computer does not exist on a bike (code later dropped from selection)
+U0146,OK,OK,QUESTIONABLE,OK,central-electronics fuse is a car idea (thin entry)
+U0168,OK,OK,OK,QUESTIONABLE,generic bus symptoms; the real symptom (no start) is missing
+U0401,OK,OK,OK,OK,

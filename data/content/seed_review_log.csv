@@ -1,0 +1,20 @@
+code,problem,fix,status
+P0115,"Advice said idle high and fan runs all the time; the code is a generic circuit fault and the fan was not in the source",Rewrote to hard cold start / idle wrong / watch temperature gauge,fixed
+P0117,"Advice described the cold-reading symptoms (rich, smoke) but this code means the engine reads hot",Rewrote to hard cold start and stumble until warm,fixed
+P0118,"Advice named the cooling fan, which is not in the source entry",Reworded to 'cooling may not switch on when needed' and kept the overheating watch,fixed
+P0130,"Named the catalytic converter, not in the source entry",Reworded to 'emission system',fixed
+P0132,"Named the catalytic converter and 'near the exhaust'; neither is in the source entry",Reworded; hint now says chafing and heat damage,fixed
+P0172,"Named the catalyst, not in the source entry",Reworded to 'emissions parts' / 'emission system',fixed
+P0300,"'Stop if the lamp blinks' is not reliable on bikes; many do not blink the lamp for misfire",Added 'or the engine runs very rough',fixed
+P0301,"Same blinking-lamp wording",Same fix,fixed
+P0302,"Same blinking-lamp wording",Same fix,fixed
+P0351,"Named the catalytic converter, not in the source entry",Reworded to 'emission system',fixed
+P0352,"Same",Same fix,fixed
+P0563,"Overcharging advice names the battery; the source lists only alternator and regulator (battery appears only in the source description)",Kept (it is the safety point); validator warns; needs_mechanic_review true,accepted - owner to confirm
+P0600,"Advice named the cluster and hint named the battery; neither is in the source entry",Removed both,fixed
+P0850,"'May refuse to start in neutral or in gear' is vague and could confuse",Reworded to 'may not start, or neutral lamp may show the wrong state',fixed
+U0121,"Meaning said 'ECU or cluster'; cluster is not in the source entry",Reworded to 'Another control unit',fixed
+U0121,"'Normal braking should still work' is a braking claim that depends on the bike (combined braking systems differ)",Kept with hedge; needs_mechanic_review true,open - needs mechanic
+C0035,"'Left front' has no meaning on a bike (front and rear sensors only)",Title says 'listed as left front'; hint tells the technician to check the maker's table,open - needs maker table
+P0202,"On a single-cylinder bike this code should not appear",Kept; the app should only show it when the bike has two cylinders,open - app rule
+ALL,"All entries rely on structure-only mode; confidence is 'high' only where the generic code meaning is standard and bike-independent",Confidence set per entry,accepted
