@@ -52,8 +52,8 @@ R = [
     ("iat", "P0110", "P0114", 3), ("iat", "P0127", "P0127", 4),
     ("ambient_temp", "P0070", "P0074", 4),
     # engine / oil temperature, cooling fan, oil pressure
-    ("ect", "P0115", "P0119", 3), ("ect", "P0125", "P0126", 3),
-    ("ect", "P0128", "P0128", 3), ("ect", "P0217", "P0217", 3),
+    ("ect", "P0115", "P0119", 3), ("ect_warmup", "P0125", "P0126", 3),
+    ("ect_warmup", "P0128", "P0128", 3), ("ect", "P0217", "P0217", 3),
     ("overspeed", "P0219", "P0219", 4), ("cooling_fan", "P0480", "P0480", 3),
     ("cooling_fan", "P0483", "P0485", 4), ("cooling_fan", "P0691", "P0692", 3),
     ("cooling_system", "P2181", "P2181", 4),
@@ -72,7 +72,9 @@ R = [
     ("o2_sensor", "P2A00", "P2A01", 4),
     ("catalyst", "P0420", "P0421", 3),
     # injectors (cylinders 1 and 2), fuel pump, fuel level
-    ("injector", "P0200", "P0202", 3), ("injector", "P0261", "P0266", 3),
+    ("injector", "P0200", "P0202", 3), ("injector", "P0261", "P0262", 3),
+    ("injector_balance", "P0263", "P0263", 3), ("injector", "P0264", "P0265", 3),
+    ("injector_balance", "P0266", "P0266", 3),
     ("injector", "P2146", "P2148", 4),
     ("fuel_pump", "P0230", "P0233", 3), ("fuel_pump", "P0627", "P0629", 3),
     ("fuel_level", "P0460", "P0464", 4),
@@ -153,8 +155,8 @@ HONDA_FAMILIES = {"map_baro", "ect", "throttle", "iat", "injector"}
 # Order of reason tags inside a tier: more likely on a small bike first,
 # ride-by-wire and car-style chassis variants last.
 TAG_PRIORITY = [
-    "throttle", "map_baro", "iat", "ect", "oil_temp", "o2_sensor", "o2_heater", "fuel_trim",
-    "injector", "fuel_pump", "misfire", "crankshaft", "camshaft", "ignition_coil", "knock",
+    "throttle", "map_baro", "iat", "ect", "ect_warmup", "oil_temp", "o2_sensor", "o2_heater", "fuel_trim",
+    "injector", "injector_balance", "fuel_pump", "misfire", "crankshaft", "camshaft", "ignition_coil", "knock",
     "vehicle_speed", "neutral_gear", "idle", "system_voltage", "starter_relay",
     "ecu_power_relay", "sensor_reference_supply", "control_module", "immobiliser",
     "starter_immobiliser", "can_bus", "lost_comm_engine", "lost_comm_abs", "lost_comm_cluster",

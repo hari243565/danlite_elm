@@ -47,10 +47,10 @@ P0111,45,3,iat,no,yes,Intake Air Temperature Sensor Range/Performance,Intake Air
 P0114,46,3,iat,no,yes,Intake Air Temperature Sensor Intermittent,Intake Air Temperature Sensor Intermittent,obdex,yes
 P0116,47,3,ect,no,yes,Engine Coolant Temperature Sensor Range/Performance,Engine Coolant Temperature Sensor Range/Performance,obdex,yes
 P0119,48,3,ect,no,yes,Engine Coolant Temperature Sensor Circuit Intermittent,Engine Coolant Temperature Sensor Circuit Intermittent,obdex,yes
-P0125,49,3,ect,no,yes,Insufficient Coolant Temperature for Closed Loop Fuel Control,Insufficient Coolant Temperature for Closed Loop Fuel Control,obdex,yes
-P0126,50,3,ect,no,yes,Insufficient Coolant Temperature for Stable Operation,Insufficient Coolant Temperature for Stable Operation,obdex,yes
-P0128,51,3,ect,no,yes,Coolant Thermostat Below Regulating Temperature,Coolant Thermostat Below Regulating Temperature,obdex,yes
-P0217,52,3,ect,no,yes,Engine Coolant Over Temperature Condition,Engine Coolant Over Temperature Condition,obdex,yes
+P0217,49,3,ect,no,yes,Engine Coolant Over Temperature Condition,Engine Coolant Over Temperature Condition,obdex,yes
+P0125,50,3,ect_warmup,no,no,Insufficient Coolant Temperature for Closed Loop Fuel Control,Insufficient Coolant Temperature for Closed Loop Fuel Control,obdex,yes
+P0126,51,3,ect_warmup,no,no,Insufficient Coolant Temperature for Stable Operation,Insufficient Coolant Temperature for Stable Operation,obdex,yes
+P0128,52,3,ect_warmup,no,no,Coolant Thermostat Below Regulating Temperature,Coolant Thermostat Below Regulating Temperature,obdex,yes
 P0196,53,3,oil_temp,no,no,Engine Oil Temperature Sensor Range / Performance,Engine Oil Temperature Sensor Range / Performance,obdex,yes
 P0197,54,3,oil_temp,no,no,Engine Oil Temperature Sensor Low,Engine Oil Temperature Sensor Low,obdex,yes
 P0198,55,3,oil_temp,no,no,Engine Oil Temperature Sensor High,Engine Oil Temperature Sensor High,obdex,yes
@@ -66,10 +66,10 @@ P0170,64,3,fuel_trim,no,no,Fuel Trim Malfunction (Bank 1),Fuel Trim Malfunction 
 P0200,65,3,injector,no,yes,Injector Circuit/Open,Injector Circuit/Open,obdex,yes
 P0261,66,3,injector,no,yes,Cylinder 1 Injector Circuit Low,Cylinder 1 Injector Circuit Low,obdex,yes
 P0262,67,3,injector,no,yes,Cylinder 1 Injector Circuit High,Cylinder 1 Injector Circuit High,obdex,yes
-P0263,68,3,injector,no,yes,Cylinder 1 Contribution/Balance Fault,Cylinder 1 Contribution/Balance Fault,obdex,yes
-P0264,69,3,injector,no,yes,Cylinder 2 Injector Circuit Low,Cylinder 2 Injector Circuit Low,obdex,yes
-P0265,70,3,injector,no,yes,Cylinder 2 Injector Circuit High,Cylinder 2 Injector Circuit High,obdex,yes
-P0266,71,3,injector,no,yes,Cylinder 2 Contribution/Balance Fault,Cylinder 2 Contribution/Balance Fault,obdex,yes
+P0264,68,3,injector,no,yes,Cylinder 2 Injector Circuit Low,Cylinder 2 Injector Circuit Low,obdex,yes
+P0265,69,3,injector,no,yes,Cylinder 2 Injector Circuit High,Cylinder 2 Injector Circuit High,obdex,yes
+P0263,70,3,injector_balance,no,no,Cylinder 1 Contribution/Balance Fault,Cylinder 1 Contribution/Balance Fault,obdex,yes
+P0266,71,3,injector_balance,no,no,Cylinder 2 Contribution/Balance Fault,Cylinder 2 Contribution/Balance Fault,obdex,yes
 P0231,72,3,fuel_pump,no,no,Fuel Pump Secondary Circuit Low,Fuel Pump Secondary Circuit Low,obdex,yes
 P0232,73,3,fuel_pump,no,no,Fuel Pump Secondary Circuit High,Fuel Pump Secondary Circuit High,obdex,yes
 P0233,74,3,fuel_pump,no,no,Fuel Pump Secondary Circuit Intermittent,Fuel Pump Secondary Circuit Intermittent,obdex,yes

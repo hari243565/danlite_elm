@@ -64,7 +64,7 @@ DERIVED_KEYS = {"source", "licence", "repo_commit", "source_entry_sha256", "mode
 # ---- rubric mapping: reason tag (from relevance_ranking.csv) -> allowed levels
 S, SS, M, I = "STOP", "SERVICE_SOON", "MONITOR", "INFO"
 TAG_LEVELS = {
-    "injector": {S}, "ignition_coil": {S}, "fuel_pump": {S, SS}, "crankshaft": {S},
+    "injector": {S}, "injector_balance": {SS, S}, "ect_warmup": {M, SS}, "ignition_coil": {S}, "fuel_pump": {S, SS}, "crankshaft": {S},
     "cam_crank_sync": {S, SS}, "engine_speed_input": {S, SS}, "camshaft": {SS, S},
     "misfire": {SS, S}, "throttle": {SS, S}, "ride_by_wire": {SS, S},
     "twist_grip_sensor": {SS, S}, "idle": {SS}, "map_baro": {SS}, "iat": {M, SS},
@@ -167,7 +167,7 @@ R9_WORKSHOP = re.compile(r"short to ground|short to battery|open circuit|plausib
 R10_TITLE_BAD = re.compile(r"\(listed as|bank ?2\b", re.I)
 # duplicate titles that the standard really contains (none yet)
 TITLE_DUP_EXCEPTIONS = []  # list of frozensets of codes
-SECOND_CYL = re.compile(r"cylinder (#)?2\b|ignition coil [\"']?b\b", re.I)
+SECOND_CYL = re.compile(r"cylinder (#)?2\b|ignition coil [\"']?b\b|contribution/balance", re.I)
 
 # ---- parts named in an entry must appear in the source entry ---------------
 PARTS = [
@@ -296,7 +296,7 @@ def direction(std_title):
     if re.search(r"\b(too|over|under)\s+(low|high)\s*$", t, re.I):
         return None
     m = R6_LOWHIGH.search(t)
-    if not m or re.match(r"high speed can", t, re.I):
+    if not m:
         return None
     return m.group(1).upper()
 
@@ -632,7 +632,11 @@ def check_entry(r, ctx, err, warn):
                 err(c, "S", f"names '{m.group(0)}' which is not in the source title, components, causes or description")
     if df["mode"] == "structure-only" and not any(p in r["title_en"].lower() + r["meaning_en"].lower()
                                                   for p in PHRASES + ["circuit fault", "misfire", "too lean",
-                                                                      "too rich", "efficiency", "fault"]):
+                                                                      "too rich", "efficiency", "fault", "too low",
+                                                                      "too high", "slow response", "overheating",
+                                                                      "error", "unstable", "incorrect", "switched off too",
+                                                                      "weaker", "rough", "key", "lower than", "higher than",
+                                                                      "warming up", "stays below", "not programmed"]):
         warn(c, "S", "title/meaning uses none of the shared failure phrases; check it is a generic code")
 
 
