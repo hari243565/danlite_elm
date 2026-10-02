@@ -170,6 +170,38 @@ def main():
     ]
     for label, code, fn, rule in M2:
         results.append(expect(label, mutate(code, fn), rule))
+    # ---- 2c v5 mutation test: the groups G2 to G8 of 2026-10-02 (owner decisions after the review of V4)
+    print("== 2c. v5 mutation test: owner decisions G2 to G8")
+    IDLE_STACK = "If it stalls more than once or will not restart, do not keep riding; have it taken to a workshop."
+    OLD_BATTERY = ("If the battery is hot, swollen or smells of rotten eggs, or the lights are very bright or bulbs keep "
+                   "blowing, stop, switch off and do not ride on.")
+    M3 = [
+        ("G2 standard title back to the OBDex wording (P0351)", "P0351",
+         lambda r: r.update(standard_title_en='Ignition Coil "A" Primary/Secondary Circuit Malfunction (Cylinder 1)'), "S"),
+        ("G4 P2100 back to SERVICE_SOON", "P2100",
+         lambda r: r.update(rider_action_level="SERVICE_SOON", can_ride_to_workshop="with_care",
+                            rider_advice_en="The throttle may not follow the twist grip. Get it checked soon."), "R13"),
+        ("G4 P2111 loses the slow-down advice", "P2111",
+         lambda r: r.update(rider_advice_en="Pull over safely, switch off and do not keep riding; have the bike taken to a workshop."), "D"),
+        ("G5 idle entry with the stacked STALL sentence (P0506)", "P0506",
+         lambda r: r.update(rider_advice_en="If it stalls once at a stop, ride gently, avoid heavy traffic and have it checked soon. " + IDLE_STACK), "R21"),
+        ("G5 idle entry with the old first sentence (P0509)", "P0509",
+         lambda r: r.update(rider_advice_en="If it stalls at stops or will not hold idle, ride gently, avoid heavy traffic and have it checked soon. If it stalls more than once or will not restart, do not keep riding."), "R21"),
+        ("G6 cylinder 1 STOP entry loses the twin clause (P0201)", "P0201",
+         lambda r: r.update(rider_advice_en="The engine may misfire, lose power or stop. Pull over safely, switch off and do not keep riding; have the bike taken to a workshop."), "D"),
+        ("G7 the old 29-word battery sentence is no longer allowed (P0563)", "P0563",
+         lambda r: r.update(rider_advice_en=OLD_BATTERY + " Otherwise ride only a short way, in daylight, to a workshop."), "R22"),
+        ("G8 CAN entry without can_bus_fitted (U0001)", "U0001",
+         lambda r: r.update(applies_when=None), "R20"),
+        ("G8 idiom 'misbehave' (P0602)", "P0602",
+         lambda r: r.update(rider_action_basis="ECU may misbehave"), "R22"),
+        ("G8 idiom 'pulling the bus down' (U0004)", "U0004",
+         lambda r: r.update(likely_causes_en=["CAN plus wire short to ground", "A faulty unit pulling the bus down"]), "R22"),
+        ("G8 discouraged word 'sender' (P0460)", "P0460",
+         lambda r: r.update(likely_causes_en=["Failed fuel level sender", "Damaged wiring or loose connector"]), "R22"),
+    ]
+    for label, code, fn, rule in M3:
+        results.append(expect(label, mutate(code, fn), rule))
     # T1: a new entry (not written before Step T) whose title the two sources do not agree on
     t1 = copy.deepcopy(BY["P0420"])
     t1["code"], t1["content_id"] = "P0449", "generic:P0449:en"

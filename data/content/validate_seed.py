@@ -87,9 +87,10 @@ TAG_APPLIES = {"knock": "knock_sensor_fitted", "camshaft": "camshaft_sensor_fitt
                "clutch_switch": "clutch_switch_fitted", "ride_by_wire": "ride_by_wire",
                "twist_grip_sensor": "ride_by_wire", "wheel_speed": "abs_fitted", "abs_pump": "abs_fitted",
                "abs_module": "abs_fitted", "abs_relay": "abs_fitted", "abs_lamp": "abs_fitted",
-               "lost_comm_abs": "abs_fitted"}
+               "lost_comm_abs": "abs_fitted", "can_bus": "can_bus_fitted"}  # can_bus added in V5 (G8)
 CODE_APPLIES = {"P0510": "closed_throttle_switch_fitted", "P0220": "ride_by_wire", "P0221": "ride_by_wire",
-                "P0222": "ride_by_wire", "P0223": "ride_by_wire", "P0224": "ride_by_wire"}  # throttle sensor B = redundant track
+                "P0222": "ride_by_wire", "P0223": "ride_by_wire", "P0224": "ride_by_wire",
+                "U0140": "can_bus_fitted", "U0146": "can_bus_fitted"}  # throttle sensor B = redundant track
 GEAR_POSITION_CODES = {f"P09{n:02X}" for n in range(0x14, 0x1A)}  # P0914 to P0919
 DERIVED_KEYS = {"source", "licence", "repo_commit", "source_entry_sha256", "mode", "title_basis"}
 
@@ -141,7 +142,7 @@ PHRASES = ["short to ground", "short to battery supply", "open circuit", "voltag
            "voltage above threshold", "current below threshold", "current above threshold",
            "resistance above threshold", "signal out of range", "signal plausibility fault",
            "performance or incorrect operation", "stuck", "internal fault of the control unit",
-           "communication lost"]
+           "communication lost", "short circuit", "resistance out of range"]  # last two added in V5 (G8)
 VARIANTS = {
     r"shorted to (ground|earth)|short circuit to (ground|earth)|short to earth|shorted to earth": "short to ground",
     r"shorted to (battery|supply|power)|short to (power|supply|positive|battery(?! supply))|short circuit to (battery|supply)":
@@ -527,7 +528,8 @@ IDIOMS = re.compile(
     r"\breduce (the )?load\b|\bfair share\b|\brefus(e|es|ed|ing) to\b|\bkeeps? pulling\b|\brun(s)? hot\b|"
     r"\boff in one direction\b|\bwreck(s|ed)?\b|\bstumbles?\b|\bconks?\b|\bgoes? haywire\b|\bfire up\b|\bbogs?\b|"
     r"\brun(s|ning)? (rich|lean|richer|leaner)\b|\bkicks? in\b|\bfalls? back\b|\bcomes? and goes\b|\bgive up\b|"
-    r"\bpoint(s)? to\b|\bsit(s)? (too )?(high|low)\b|\bwrong way round\b|\bgets? worse\b", re.I)
+    r"\bpoint(s)? to\b|\bsit(s)? (too )?(high|low)\b|\bwrong way round\b|\bgets? worse\b|"
+    r"\bmisbehav(e|es|ed|ing)\b|\bfine-tun(e|es|ed|ing)\b|\bjumped\b|\bpulling the bus down\b|\brun(s)? on\b|\bsender\b", re.I)  # sender: not a glossary term, use sensor
 DISCOURAGED_WORDS = re.compile(r"\bmodules?\b|\bharness(es)?\b|\bloom\b", re.I)
 
 # ---- R20/R21/R22 helpers
@@ -766,6 +768,18 @@ for _c in ("P0201", "P0261", "P0262", "P0351", "P2300", "P2301", "P2302"):
     DECISIONS.setdefault(_c, []).append(
         ("G6 twin clause in the advice, level unchanged STOP",
          lambda r: TWIN_CLAUSE in r["rider_advice_en"] and r["rider_action_level"] == "STOP"))
+
+# G4 (V5): ride-by-wire levels and the P2111 slow-down advice
+for _c in ("P2100", "P2102", "P2103"):
+    DECISIONS.setdefault(_c, []).append(
+        ("G4 STOP (throttle motor fault can leave the throttle unresponsive) with review true",
+         lambda r: r["rider_action_level"] == "STOP" and r["needs_independent_review"] is True))
+DECISIONS.setdefault("P2101", []).append(
+    ("G4 stays SERVICE_SOON with_care", lambda r: r["rider_action_level"] == "SERVICE_SOON" and r["can_ride_to_workshop"] == "with_care"))
+DECISIONS.setdefault("P2111", []).append(
+    ("G4 slow-down advice for a stuck-open throttle",
+     lambda r: "Close the throttle, pull in the clutch, use both brakes to slow down, then stop safely and switch off."
+     in r["rider_advice_en"] and r["needs_independent_review"] is True))
 
 # P0507 (idle too high) carries its own first sentence (throttle not closing fully) instead of the G5 first sentence;
 # it still needs the second half of the pair, and the decision check in DECISIONS makes the throttle sentence mandatory.
@@ -1111,6 +1125,11 @@ def main():
         if only is None or r.get("code") in only:
             rows.append(r)
     errors, warns = check_all(rows, ctx)
+    held_path = os.path.join(HERE, "held_entries_v5.jsonl")  # G3: held-out codes must not be in the shipped seed
+    if os.path.exists(held_path) and os.path.abspath(seed) == os.path.join(HERE, "generic_en_seed.jsonl"):
+        held = {json.loads(x)["code"] for x in open(held_path, encoding="utf-8") if x.strip()}
+        errors += [f"{r['code']}: S: code is held out (held_entries_v5.jsonl) but is in the shipped seed"
+                   for r in rows if r.get("code") in held]
     errors = bad + errors
     print(f"{len(rows)} entries checked in {seed} against OBDex commit {ctx['commit']}")
     for w in warns:

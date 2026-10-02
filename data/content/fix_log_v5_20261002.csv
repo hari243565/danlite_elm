@@ -1,0 +1,129 @@
+code,check,action,reason
+C0035,1 meaning matches standard title and structure,APPLIED,entry held out of the shipped seed (G3) until the owner's assistant settles the chassis edition and the position rule; text left as it is
+C0035,12 chassis wheel-speed wording position-neutral,REJECTED,standard_title_en is locked to the source title by the validator; the entry is held out (G3) and a schema field 'not for riders' is a backlog item
+C0037,12 chassis wheel-speed wording position-neutral,APPLIED,entry held out of the shipped seed (G3) until the owner's assistant settles the chassis edition and the position rule; text left as it is
+C0038,12 chassis wheel-speed wording position-neutral,APPLIED,entry held out of the shipped seed (G3) until the owner's assistant settles the chassis edition and the position rule; text left as it is
+C003A,12 chassis wheel-speed wording position-neutral,APPLIED,entry held out of the shipped seed (G3) until the owner's assistant settles the chassis edition and the position rule; text left as it is
+C003B,12 chassis wheel-speed wording position-neutral,APPLIED,entry held out of the shipped seed (G3) until the owner's assistant settles the chassis edition and the position rule; text left as it is
+C003C,12 chassis wheel-speed wording position-neutral,APPLIED,entry held out of the shipped seed (G3) until the owner's assistant settles the chassis edition and the position rule; text left as it is
+C003D,12 chassis wheel-speed wording position-neutral,APPLIED,entry held out of the shipped seed (G3) until the owner's assistant settles the chassis edition and the position rule; text left as it is
+C003E,12 chassis wheel-speed wording position-neutral,APPLIED,entry held out of the shipped seed (G3) until the owner's assistant settles the chassis edition and the position rule; text left as it is
+C003F,1 meaning matches standard title and structure,APPLIED,unsupported 'most bikes do not measure' clause removed and plain wording used; entry also held out (G3)
+C003F,7 understandable to a rider,APPLIED,unsupported 'most bikes do not measure' clause removed and plain wording used; entry also held out (G3)
+P0054,6 shared failure wording and glossary used,APPLIED,'resistance out of range' added to the shared phrase list and used in the titles of P0053 and P0054
+P00D1,1 meaning matches standard title and structure,APPLIED,"meaning now says the heater does not warm the sensor as expected, as in the standard title"
+P0201,4 level correct under RUBRIC.md and stop_table,APPLIED,"twin clause added to the cylinder 1 text, level unchanged (G6); schema field action_level_twin put on the backlog"
+P0217,11 applies_when correct,REJECTED,"adding liquid_cooled would hide a STOP overheating code on air- and oil-cooled bikes, which can also overheat; the text is already conditional on a radiator"
+P0224,10 Hindi-translatability,APPLIED,"'work wrongly' wording; same fix for the other entries with 'misbehave' (P0124, P0600, P0601, P0607, P0634); idiom added to the validator"
+P0231,1 meaning matches standard title and structure,APPLIED,title and meaning say 'fuel pump circuit (secondary)' as in the standard title
+P0232,1 meaning matches standard title and structure,APPLIED,title and meaning say 'fuel pump circuit (secondary)' as in the standard title
+P0232,7 understandable to a rider,REJECTED,"'the battery may go flat' is not in the source and the owner has not agreed; no safety gain, so the sentence stays as it is"
+P0233,1 meaning matches standard title and structure,APPLIED,title and meaning say 'fuel pump circuit (secondary)' as in the standard title
+P0261,4 level correct under RUBRIC.md and stop_table,APPLIED,"twin clause added to the cylinder 1 text, level unchanged (G6); schema field action_level_twin put on the backlog"
+P0262,4 level correct under RUBRIC.md and stop_table,APPLIED,"twin clause added to the cylinder 1 text, level unchanged (G6); schema field action_level_twin put on the backlog"
+P0321,1 meaning matches standard title and structure,APPLIED,meaning says the signal does not match what the ECU expects; no 'in range' and no 'plausibility check'
+P0321,7 understandable to a rider,APPLIED,meaning says the signal does not match what the ECU expects; no 'in range' and no 'plausibility check'
+P0322,"2 causes plausible for a small bike, not car-only",APPLIED,'Failed pickup'
+P0328,1 meaning matches standard title and structure,APPLIED,verified public title stored in title_overrides.csv and in standard_title_en with title_basis override (G2)
+P033F,10 Hindi-translatability,APPLIED,'Worn or slipped timing chain (rare)'; 'jumped' added to the idiom list
+P0351,1 meaning matches standard title and structure,APPLIED,verified public title stored in title_overrides.csv and in standard_title_en with title_basis override (G2)
+P0351,4 level correct under RUBRIC.md and stop_table,APPLIED,"twin clause added to the cylinder 1 text, level unchanged (G6); schema field action_level_twin put on the backlog"
+P0352,1 meaning matches standard title and structure,APPLIED,verified public title stored in title_overrides.csv and in standard_title_en with title_basis override (G2)
+P0445,"2 causes plausible for a small bike, not car-only",APPLIED,'Shorted purge valve coil or wire'
+P0445,6 shared failure wording and glossary used,APPLIED,'short circuit' added to the shared phrase list in validate_seed.py
+P0448,11 applies_when correct,REJECTED,"needs new applies_when keys (evap_vent_valve_fitted, evap_pressure_sensor_fitted) that the schema does not have; put on the backlog"
+P0451,11 applies_when correct,REJECTED,"needs new applies_when keys (evap_vent_valve_fitted, evap_pressure_sensor_fitted) that the schema does not have; put on the backlog"
+P0454,11 applies_when correct,REJECTED,"needs new applies_when keys (evap_vent_valve_fitted, evap_pressure_sensor_fitted) that the schema does not have; put on the backlog"
+P0460,6 shared failure wording and glossary used,APPLIED,'sensor' instead of 'sender' (also P0464); 'sender' added to the validator list
+P0460,10 Hindi-translatability,APPLIED,'sensor' instead of 'sender' (also P0464); 'sender' added to the validator list
+P0483,7 understandable to a rider,APPLIED,"replaced by the sentence about a temperature warning, steam or hot coolant in all 11 entries; removed from P0117"
+P0485,7 understandable to a rider,APPLIED,"replaced by the sentence about a temperature warning, steam or hot coolant in all 11 entries; removed from P0117"
+P0506,"3 advice free of reversals, circular advice and danger",APPLIED,idle entries now use the owner's pair of sentences (G5); the reviewer's suggested wording was replaced by the owner's
+P0509,"3 advice free of reversals, circular advice and danger",APPLIED,idle entries now use the owner's pair of sentences (G5); the reviewer's suggested wording was replaced by the owner's
+P0520,"5 no part, number or hardware the source does not support",APPLIED,'the workshop's oil pressure test' in all five oil pressure entries (P0520 to P0524)
+P0521,"5 no part, number or hardware the source does not support",APPLIED,'the workshop's oil pressure test' in all five oil pressure entries (P0520 to P0524)
+P0524,"2 causes plausible for a small bike, not car-only",APPLIED,third hint added about the sensor and wiring after the oil level and pressure test; level stays STOP
+P0524,"5 no part, number or hardware the source does not support",APPLIED,'the workshop's oil pressure test' in all five oil pressure entries (P0520 to P0524)
+P0602,10 Hindi-translatability,APPLIED,"'work wrongly' wording; same fix for the other entries with 'misbehave' (P0124, P0600, P0601, P0607, P0634); idiom added to the validator"
+P0617,10 Hindi-translatability,APPLIED,'starter may keep turning after the engine starts'; 'run on' added to the idiom list
+P0625,"2 causes plausible for a small bike, not car-only",APPLIED,brushes cause removed (entry is held out under G3)
+P0625,11 applies_when correct,REJECTED,needs a new key (alternator_ecu_controlled) that the schema does not have; the six entries are held out (G3) until it exists
+P0626,11 applies_when correct,REJECTED,needs a new key (alternator_ecu_controlled) that the schema does not have; the six entries are held out (G3) until it exists
+P0633,"3 advice free of reversals, circular advice and danger",APPLIED,reason now 'avoid switching off unless unsafe' (P0512 and P0513 changed the same way)
+P0633,11 applies_when correct,REJECTED,needs a new key (immobiliser_fitted or neutral_switch_fitted) that the schema does not have; put on the backlog
+P0651,11 applies_when correct,REJECTED,"needs a new key for sensor supplies B and C that the schema does not have; confidence left as it is, no evidence to lower it"
+P0652,11 applies_when correct,REJECTED,"needs a new key for sensor supplies B and C that the schema does not have; confidence left as it is, no evidence to lower it"
+P0653,11 applies_when correct,REJECTED,"needs a new key for sensor supplies B and C that the schema does not have; confidence left as it is, no evidence to lower it"
+P068A,8 can_ride_to_workshop sensible and consistent,APPLIED,"reason now 'ride with care; go to a workshop soon', which fits with_care"
+P0697,11 applies_when correct,REJECTED,"needs a new key for sensor supplies B and C that the schema does not have; confidence left as it is, no evidence to lower it"
+P0698,11 applies_when correct,REJECTED,"needs a new key for sensor supplies B and C that the schema does not have; confidence left as it is, no evidence to lower it"
+P0699,11 applies_when correct,REJECTED,"needs a new key for sensor supplies B and C that the schema does not have; confidence left as it is, no evidence to lower it"
+P0852,11 applies_when correct,REJECTED,needs a new key (immobiliser_fitted or neutral_switch_fitted) that the schema does not have; put on the backlog
+P0917,1 meaning matches standard title and structure,APPLIED,gear position text reduced to 'the signal is unreliable' (starting effect dropped) in all six P0914 to P0919 entries; entries held out (G3)
+P0918,1 meaning matches standard title and structure,APPLIED,gear position text reduced to 'the signal is unreliable' (starting effect dropped) in all six P0914 to P0919 entries; entries held out (G3)
+P2097,"2 causes plausible for a small bike, not car-only",APPLIED,'Contaminated or aged downstream oxygen sensor'
+P2100,4 level correct under RUBRIC.md and stop_table,APPLIED,"now STOP and in stop_table.csv (G4, owner decision)"
+P2102,4 level correct under RUBRIC.md and stop_table,APPLIED,"now STOP and in stop_table.csv (G4, owner decision)"
+P2103,4 level correct under RUBRIC.md and stop_table,APPLIED,"now STOP and in stop_table.csv (G4, owner decision)"
+P2109,7 understandable to a rider,APPLIED,'the closed position of the throttle'
+P2111,"3 advice free of reversals, circular advice and danger",APPLIED,owner's slow-down advice added (G4); confidence set to medium because rule Q4 forbids high confidence on braking text
+P2118,1 meaning matches standard title and structure,APPLIED,'often from a binding throttle or a worn motor'
+P2122,"5 no part, number or hardware the source does not support",APPLIED,"'throttle (twist grip) position sensor D/E' in title, meaning, cause and hint; confidence was already low"
+P2123,"5 no part, number or hardware the source does not support",APPLIED,"'throttle (twist grip) position sensor D/E' in title, meaning, cause and hint; confidence was already low"
+P2127,"5 no part, number or hardware the source does not support",APPLIED,"'throttle (twist grip) position sensor D/E' in title, meaning, cause and hint; confidence was already low"
+P2128,"5 no part, number or hardware the source does not support",APPLIED,"'throttle (twist grip) position sensor D/E' in title, meaning, cause and hint; confidence was already low"
+P2138,"5 no part, number or hardware the source does not support",APPLIED,"'throttle (twist grip) position sensor D/E' in title, meaning, cause and hint; confidence was already low"
+P2148,"9 canonical sentences exact, each sentence 25 words or fewer",APPLIED,"BATTERY-HOT sentence added to the advice (it replaces the STALL sentence, as the advice may have only two sentences)"
+P2196,10 Hindi-translatability,APPLIED,'adjust' instead of 'fine-tune' (also P0130 and P2195); idiom added to the validator
+P2300,4 level correct under RUBRIC.md and stop_table,APPLIED,"twin clause added to the cylinder 1 text, level unchanged (G6); schema field action_level_twin put on the backlog"
+P2301,4 level correct under RUBRIC.md and stop_table,APPLIED,"twin clause added to the cylinder 1 text, level unchanged (G6); schema field action_level_twin put on the backlog"
+P2302,4 level correct under RUBRIC.md and stop_table,APPLIED,"twin clause added to the cylinder 1 text, level unchanged (G6); schema field action_level_twin put on the backlog"
+P2500,11 applies_when correct,REJECTED,needs a new key (alternator_ecu_controlled) that the schema does not have; the six entries are held out (G3) until it exists
+P2501,11 applies_when correct,REJECTED,needs a new key (alternator_ecu_controlled) that the schema does not have; the six entries are held out (G3) until it exists
+P2504,"9 canonical sentences exact, each sentence 25 words or fewer",APPLIED,battery sentence split into two sentences of 19 and 13 words (G7)
+P2A00,10 Hindi-translatability,APPLIED,'adjust' instead of 'fine-tune' (also P0130 and P2195); idiom added to the validator
+U0001,11 applies_when correct,APPLIED,applies_when {can_bus_fitted: true} added to all 17 CAN entries and rule R20 now requires it for the can_bus tag
+U0002,11 applies_when correct,APPLIED,applies_when {can_bus_fitted: true} added to all 17 CAN entries and rule R20 now requires it for the can_bus tag
+U0003,7 understandable to a rider,APPLIED,'CAN bus (the bike's data network)' at first use (sentence kept to 25 words or fewer)
+U0003,11 applies_when correct,APPLIED,applies_when {can_bus_fitted: true} added to all 17 CAN entries and rule R20 now requires it for the can_bus tag
+U0004,7 understandable to a rider,APPLIED,'CAN bus (the bike's data network)' at first use (sentence kept to 25 words or fewer)
+U0004,10 Hindi-translatability,APPLIED,'A faulty unit that disturbs the bus' in all eight entries that had the idiom; idiom added to the validator list
+U0004,11 applies_when correct,APPLIED,applies_when {can_bus_fitted: true} added to all 17 CAN entries and rule R20 now requires it for the can_bus tag
+U0005,7 understandable to a rider,APPLIED,'CAN bus (the bike's data network)' at first use (sentence kept to 25 words or fewer)
+U0005,11 applies_when correct,APPLIED,applies_when {can_bus_fitted: true} added to all 17 CAN entries and rule R20 now requires it for the can_bus tag
+U0006,7 understandable to a rider,APPLIED,'CAN bus (the bike's data network)' at first use (sentence kept to 25 words or fewer)
+U0006,11 applies_when correct,APPLIED,applies_when {can_bus_fitted: true} added to all 17 CAN entries and rule R20 now requires it for the can_bus tag
+U0007,7 understandable to a rider,APPLIED,'CAN bus (the bike's data network)' at first use (sentence kept to 25 words or fewer)
+U0007,10 Hindi-translatability,APPLIED,'A faulty unit that disturbs the bus' in all eight entries that had the idiom; idiom added to the validator list
+U0007,11 applies_when correct,APPLIED,applies_when {can_bus_fitted: true} added to all 17 CAN entries and rule R20 now requires it for the can_bus tag
+U0008,7 understandable to a rider,APPLIED,'CAN bus (the bike's data network)' at first use (sentence kept to 25 words or fewer)
+U0008,11 applies_when correct,APPLIED,applies_when {can_bus_fitted: true} added to all 17 CAN entries and rule R20 now requires it for the can_bus tag
+U0009,10 Hindi-translatability,APPLIED,'A faulty unit that disturbs the bus' in all eight entries that had the idiom; idiom added to the validator list
+U0009,11 applies_when correct,APPLIED,applies_when {can_bus_fitted: true} added to all 17 CAN entries and rule R20 now requires it for the can_bus tag
+U0010,11 applies_when correct,APPLIED,applies_when {can_bus_fitted: true} added to all 17 CAN entries and rule R20 now requires it for the can_bus tag
+U0073,7 understandable to a rider,APPLIED,'CAN bus (the bike's data network)' at first use (sentence kept to 25 words or fewer)
+U0073,10 Hindi-translatability,APPLIED,'A faulty unit that disturbs the bus' in all eight entries that had the idiom; idiom added to the validator list
+U0073,11 applies_when correct,APPLIED,applies_when {can_bus_fitted: true} added to all 17 CAN entries and rule R20 now requires it for the can_bus tag
+U0074,7 understandable to a rider,APPLIED,'CAN bus (the bike's data network)' at first use (sentence kept to 25 words or fewer)
+U0074,10 Hindi-translatability,APPLIED,'A faulty unit that disturbs the bus' in all eight entries that had the idiom; idiom added to the validator list
+U0074,11 applies_when correct,APPLIED,applies_when {can_bus_fitted: true} added to all 17 CAN entries and rule R20 now requires it for the can_bus tag
+U0075,6 shared failure wording and glossary used,APPLIED,titles read 'communication lost (bus off)' like U0073 and U0074
+U0075,10 Hindi-translatability,APPLIED,'A faulty unit that disturbs the bus' in all eight entries that had the idiom; idiom added to the validator list
+U0075,11 applies_when correct,APPLIED,applies_when {can_bus_fitted: true} added to all 17 CAN entries and rule R20 now requires it for the can_bus tag
+U0076,6 shared failure wording and glossary used,APPLIED,titles read 'communication lost (bus off)' like U0073 and U0074
+U0076,10 Hindi-translatability,APPLIED,'A faulty unit that disturbs the bus' in all eight entries that had the idiom; idiom added to the validator list
+U0076,11 applies_when correct,APPLIED,applies_when {can_bus_fitted: true} added to all 17 CAN entries and rule R20 now requires it for the can_bus tag
+U0077,6 shared failure wording and glossary used,APPLIED,titles read 'communication lost (bus off)' like U0073 and U0074
+U0077,10 Hindi-translatability,APPLIED,'A faulty unit that disturbs the bus' in all eight entries that had the idiom; idiom added to the validator list
+U0077,11 applies_when correct,APPLIED,applies_when {can_bus_fitted: true} added to all 17 CAN entries and rule R20 now requires it for the can_bus tag
+U0140,"2 causes plausible for a small bike, not car-only",REJECTED,needs a new key for a body control unit; confidence is already low and can_bus_fitted is now set
+U0140,11 applies_when correct,APPLIED,applies_when {can_bus_fitted: true} added to all 17 CAN entries and rule R20 now requires it for the can_bus tag
+U0146,11 applies_when correct,APPLIED,applies_when {can_bus_fitted: true} added to all 17 CAN entries and rule R20 now requires it for the can_bus tag
+U0167,11 applies_when correct,REJECTED,needs a new key (immobiliser_fitted or neutral_switch_fitted) that the schema does not have; put on the backlog
+P0117,"3 advice free of reversals, circular advice and danger [outside the seeded sample]",APPLIED,"replaced by the sentence about a temperature warning, steam or hot coolant in all 11 entries; removed from P0117"
+P0325,1 meaning matches standard title and structure [outside the seeded sample],APPLIED,verified public title stored in title_overrides.csv and in standard_title_en with title_basis override (G2)
+P0326,1 meaning matches standard title and structure [outside the seeded sample],REJECTED,"no verified title was given for P0326 (the two sources agree on it); the owner's G2 list names six codes, so it is unchanged"
+P0327,1 meaning matches standard title and structure [outside the seeded sample],APPLIED,verified public title stored in title_overrides.csv and in standard_title_en with title_basis override (G2)
+P0504,8 can_ride_to_workshop sensible and consistent [outside the seeded sample],APPLIED,reason now 'ride only if the brake light works; ride gently'
+P0505,1 meaning matches standard title and structure [outside the seeded sample],APPLIED,verified public title stored in title_overrides.csv and in standard_title_en with title_basis override (G2)
+P0522,4 level correct under RUBRIC.md and stop_table [outside the seeded sample],APPLIED,"needs_independent_review true and the advice now names noisy, hot or low oil as reasons to stop"

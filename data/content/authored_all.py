@@ -62,6 +62,8 @@ def apply_fixes_v5(entries, log):
         e = by[code]
         for k, v in fields.items():
             old = e.get(k)
+            if callable(v):  # a text transformation of the current value
+                v = v(old)
             if old != v:
                 log.append((code, group, k, old, v, why))
             e[k] = v
