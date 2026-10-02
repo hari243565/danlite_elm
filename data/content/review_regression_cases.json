@@ -1,5 +1,5 @@
 {
-  "source": "docs/content/REVIEW_REPORT_20261001.md section 4 on branch content/review-20261001 (independent review, 2026-10-01). Each case is the reviewer's defective field set; the test applies it on top of the current good entry for that code and requires the validator to reject it with the named rule. Extended 2026-10-02 (owner decision D1) with the 8 defective entries written by the batch 1 reviewer (REVIEW_REPORT_BATCH1_20261001.md section D; review_validator_defeat_20261001.py on branch content/review-batch1-20261001), which the validator of that date accepted with zero errors.",
+  "source": "docs/content/REVIEW_REPORT_20261001.md section 4 on branch content/review-20261001 (independent review, 2026-10-01). Each case is the reviewer's defective field set; the test applies it on top of the current good entry for that code and requires the validator to reject it with the named rule. Extended 2026-10-02 (owner decision D1) with the 8 defective entries written by the batch 1 reviewer (REVIEW_REPORT_BATCH1_20261001.md section D; review_validator_defeat_20261001.py on branch content/review-batch1-20261001), which the validator of that date accepted with zero errors. Extended 2026-10-02 (V5, owner decision G1) with the 8 defective entries of the independent review of V4 (REVIEW_REPORT_V4_20261002.md section D, review_attacks_v4_20261002.py on branch content/review-v4-20261002), which the V4 validator accepted with zero errors; rules Q1 to Q8 reject them.",
   "cases": [
     {
       "name": "Defect 1: wrong direction (P0123 carrying the P0122 meaning)",
@@ -125,6 +125,95 @@
       "fields": {
         "rider_advice_en": "Pull over safely, switch off and do not keep riding. If you must, you can still ride gently home at normal speed.",
         "can_ride_reason": "safe to ride home gently; workshop can wait"
+      }
+    },
+    {
+      "name": "V4 review attack A1: Always-true 'if' hides a near-certain stall and no-restart claim at SERVICE_SOON (R3 and R12 loophole)",
+      "code": "P0121",
+      "expect_rule": "Q1",
+      "fields": {
+        "rider_advice_en": "If you ride in traffic, the engine will stall and will not restart. If it stalls more than once or will not restart, do not keep riding; have it taken to a workshop."
+      }
+    },
+    {
+      "name": "V4 review attack A2: Fire risk written with words R16 does not know (seeping, vapour, hot engine) and no PETROL sentence",
+      "code": "P0301",
+      "expect_rule": "Q2",
+      "fields": {
+        "rider_action_basis": "fuel seeping onto the hot engine",
+        "rider_advice_en": "Fuel may be seeping from the injector onto the hot engine and vapour can collect under the seat. Ride gently and get it checked soon."
+      }
+    },
+    {
+      "name": "V4 review attack A3: Direction reversed on a 'Too Low' standard title (R6 and R14 skip 'too low' and 'too high' titles)",
+      "code": "P0524",
+      "expect_rule": "Q3",
+      "fields": {
+        "title_en": "Engine oil pressure too high",
+        "meaning_en": "The bike's computer (ECU) found that the engine oil pressure is above the safe limit, which can quickly damage the engine.",
+        "likely_causes_en": [
+          "Cold, thick engine oil",
+          "Blocked oil passage",
+          "Faulty oil pressure sensor"
+        ]
+      }
+    },
+    {
+      "name": "V4 review attack A4: Brake light switch code downgraded to MONITOR, reassuring, review false, confidence high",
+      "code": "P0504",
+      "expect_rule": "Q4",
+      "fields": {
+        "rider_action_level": "MONITOR",
+        "rider_action_basis": "minor brake light fault",
+        "rider_advice_en": "The brake light is a minor matter. The bike rides normally; get the switch checked at the next service.",
+        "can_ride_to_workshop": "yes",
+        "can_ride_reason": "brake light only; ride normally",
+        "confidence": "high",
+        "needs_independent_review": false
+      }
+    },
+    {
+      "name": "V4 review attack A5: STOP advice tells the rider to open the hot radiator cap (R17 checks technician hints only)",
+      "code": "P0217",
+      "expect_rule": "Q5",
+      "fields": {
+        "rider_advice_en": "Pull over safely, switch off and do not keep riding; have the bike taken to a workshop. Open the radiator cap at once to let the steam out and add cold water."
+      }
+    },
+    {
+      "name": "V4 review attack A6: Brake fluid loss implied by an ABS pump entry that stays SERVICE_SOON (nothing checks braking hydraulics)",
+      "code": "C0020",
+      "expect_rule": "Q6",
+      "fields": {
+        "likely_causes_en": [
+          "Low brake fluid or a leaking brake line",
+          "Pump motor seized after long inactivity",
+          "Corroded power supply connection"
+        ],
+        "technician_hints_en": [
+          "Check the brake fluid level and top it up if it is low",
+          "Check the ABS pump motor supply and ground connections"
+        ]
+      }
+    },
+    {
+      "name": "V4 review attack B1: Bonus: wheel position named in meaning and hint of a wheel speed entry (owner rule: position-neutral)",
+      "code": "C0037",
+      "expect_rule": "Q7",
+      "fields": {
+        "meaning_en": "The ABS control unit found a fault in the left front wheel speed sensor, so ABS is probably switched off.",
+        "technician_hints_en": [
+          "Replace the left front wheel speed sensor first",
+          "Check the sensor signal on the scan tool while the wheel turns"
+        ]
+      }
+    },
+    {
+      "name": "V4 review attack B2: Bonus: can_ride_reason contradicts the level and the entry's own warning (lean mixture overheats the engine)",
+      "code": "P2177",
+      "expect_rule": "Q8",
+      "fields": {
+        "can_ride_reason": "ride normally; long trips are fine"
       }
     }
   ]

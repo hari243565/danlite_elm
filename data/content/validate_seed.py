@@ -40,6 +40,7 @@ Added 2026-10-02 (independent review of batch 1, owner decisions D1 to D8):
   R20 applies_when keys are required for hardware that not every bike has (knock, camshaft, oil temperature ...)
   R21 canonical sentences (D3 idle, D4 STALL, PETROL, ABS, NETWORK) word for word where they apply, no variants
   R22 Hindi-readiness (D6): sentences at most 25 words, idiom blocklist, discouraged words
+  Q1 to Q8 (V5, from the independent review of V4): see check_q
   T1  title agreement (title_agreement.csv): a new entry needs AGREE; entries written before Step T only warn
 """
 import csv
@@ -500,6 +501,8 @@ NETWORK = ("Some electronic units on the bike cannot talk to each other, so warn
            "not work. If ABS is affected, your normal brakes still work, but ABS is off, so a wheel can lock in "
            "hard braking.")
 IDLE_FIRST = "If it stalls at stops or will not hold idle, ride gently, avoid heavy traffic and have it checked soon."
+IDLE_PAIR = ("If it stalls once at a stop, ride gently, avoid heavy traffic and have it checked soon. If it stalls "
+             "more than once or will not restart, do not keep riding.")
 BATTERY_HOT = "If the battery is hot or swollen, stop, switch off and do not ride on."
 TWO_CASE = ("If the engine runs normally, have it checked soon; if it stalls, loses power or will not start, "
             "do not keep riding.")
@@ -645,6 +648,106 @@ def check_v4(r, ctx, err, warn, tags, rk):
         m = DISCOURAGED_WORDS.search(r[f])
         if m:
             err(c, "R22", f"discouraged word '{m.group(0)}' in {f}; see GLOSSARY_EN.md")
+
+
+# ============================================================================
+# Q1 to Q8 (2026-10-02 independent review of V4, adopted by the owner in V5 group G1)
+# ============================================================================
+Q_TRIGGER = re.compile(r"stall|loses? power|power loss|will not (re)?start|does not (re)?start|runs? very rough|rough|hot|"
+                       r"swollen|keeps turning|hold idle|runs normally|battery|key|lamp stays on|smell|lock", re.I)
+Q_CERTAIN = re.compile(r"\bwill (stall|not (re)?start|stop|shut|die|fail|lose)\b|\bwill not restart\b", re.I)
+Q_FIRE = re.compile(r"(fuel|petrol|vapou?rs?)[^.;]{0,60}\b(seep\w*|ooze\w*|weep\w*|dribbl\w*|escap\w*|build\w* up|collect\w*|"
+                    r"ignit\w*|catch\w* fire|on fire|hot (engine|exhaust|part)s?)\b|"
+                    r"\b(seep\w*|ooze\w*|weep\w*|dribbl\w*|collect\w*)\b[^.;]{0,40}(fuel|petrol|vapou?r)", re.I)
+Q_BRAKE = re.compile(r"\bbrak(e|es|ing)\b", re.I)
+Q_UNSAFE = re.compile(r"\b(open|remove|take off|loosen|unscrew)\b[^.;]{0,30}\b(radiator|coolant|filler|fuel|oil|tank)?\s?cap\b|"
+                      r"\b(pour|splash|spray)\b[^.;]{0,20}\bwater\b|\bblow (out|into)\b|\btouch the (exhaust|engine|silencer)\b|"
+                      r"\bcheck the (fuel|petrol) (level )?with (a )?(match|lighter|flame)\b", re.I)
+Q_HYDRAULIC = re.compile(r"\bbrake (fluid|line|hose|pad|disc|disk|pipe)s?\b|\bhydraulic\b|\bmaster cylinder\b|\bcaliper\b|"
+                         r"\bair in the (brake|lines?)\b", re.I)
+Q_POSITION = re.compile(r"\b(left|right)\b|\b(left|right) (front|rear)\b|\bfront left\b|\bfront right\b", re.I)
+Q_PERMIT = re.compile(r"\b(ride normally|long trips (are|is) fine|no need to (slow|stop|worry)|ride as (usual|normal)|"
+                      r"carry on as normal|as far as you like)\b", re.I)
+
+
+def check_q(r, ctx, err, tags, rk):
+    c = r["code"]
+    lvl = r["rider_action_level"]
+    fields4 = ("meaning_en", "rider_action_basis", "rider_advice_en", "can_ride_reason")
+    # Q1: below STOP, the "if" before a stall or no-start claim must contain a real symptom
+    if lvl != "STOP":
+        canon = {STALL, TWO_CASE, IDLE_FIRST, BATTERY, BATTERY_HOT, STOP_TAIL, PETROL, ABS_SENT, IDLE_PAIR}
+        for f in fields4:
+            for sg in _sentences(r[f]):
+                if sg in canon:
+                    continue
+                for part in sg.split(";"):
+                    m = R12_CLAIM.search(part) or Q_CERTAIN.search(part)
+                    if not m:
+                        continue
+                    ifm = re.search(r"\bif\b(.*)$", part[:m.start()], re.I)
+                    if ifm and "," in ifm.group(1) and not Q_TRIGGER.search(ifm.group(1)):
+                        err(c, "Q1", f"the 'if' before '{m.group(0)}' names no real symptom in {f}: '{ifm.group(0).strip()}'")
+    # Q2: fuel or vapour that seeps, collects or reaches a hot part needs the PETROL sentence
+    for f in fields4:
+        m = Q_FIRE.search(r[f])
+        if m and PETROL not in r["rider_advice_en"]:
+            err(c, "Q2", f"fire-risk wording '{m.group(0)}' in {f} without the PETROL sentence")
+    # Q3: 'too low/too high/low/high' standard titles: title_en and meaning_en must not say the opposite
+    if rk:
+        std = re.sub(r"\(.*?\)", "", rk["title_standard"]).strip()
+        m = re.search(r"\b(too )?(low|high)\s*(input|voltage)?\s*$", std, re.I)
+        if m:
+            low = m.group(2).lower() == "low"
+            lowrx, highrx = r"\b(below|low|lower|too low)\b", r"\b(above|higher|high|too high)\b"
+            right, wrong = (lowrx, highrx) if low else (highrx, lowrx)
+            for f in ("title_en", "meaning_en"):
+                if re.search(wrong, r[f], re.I) and not re.search(right, r[f], re.I):
+                    err(c, "Q3", f"standard title says {'LOW' if low else 'HIGH'} but {f} says the opposite")
+    # Q4: braking text needs review true, no MONITOR, no high confidence
+    txt = " ".join([r["title_en"], r["meaning_en"], r["rider_advice_en"], r["rider_action_basis"], r["can_ride_reason"]])
+    if Q_BRAKE.search(txt) or "brake" in r["standard_title_en"].lower():
+        if r["needs_independent_review"] is not True:
+            err(c, "Q4", "braking text but needs_independent_review is not true")
+        if lvl not in ("SERVICE_SOON", "STOP"):
+            err(c, "Q4", f"braking text at level {lvl} (SERVICE_SOON or STOP only)")
+        if r["confidence"] == "high":
+            err(c, "Q4", "braking text with confidence high (no braking entry may be high until a mechanic has seen it)")
+    # Q5: opening a cap or pouring water only as 'do not open the cap while it is hot'
+    for f, t in [("rider_advice_en", r["rider_advice_en"]), ("can_ride_reason", r["can_ride_reason"])] + \
+            [("hint", h) for h in r["technician_hints_en"]]:
+        for sg in _sentences(t):
+            m = Q_UNSAFE.search(sg)
+            if m and not re.search(r"\b(do not|don't|never)\b[^.;]{0,15}$", sg[:m.start()] + " ", re.I) \
+                    and not re.search(r"\b(do not|don't)\s+(open|remove)", sg, re.I):
+                err(c, "Q5", f"unsafe instruction in {f}: '{m.group(0)}'")
+    # Q6: braking hydraulics are an error unless the source has the word
+    src = source_text(ctx["obdex"][c]) if c in ctx["obdex"] else ""
+    for f in ("title_en", "meaning_en", "rider_advice_en", "rider_action_basis", "can_ride_reason"):
+        m = Q_HYDRAULIC.search(r[f])
+        if m and m.group(0).lower() not in src:
+            err(c, "Q6", f"braking hydraulics '{m.group(0)}' in {f}, not in the source")
+    for x in list(r["likely_causes_en"]) + list(r["technician_hints_en"]):
+        m = Q_HYDRAULIC.search(x)
+        if m and m.group(0).lower() not in src:
+            err(c, "Q6", f"braking hydraulics '{m.group(0)}' in '{x[:40]}', not in the source")
+    # Q7: no left or right wheel in any text field of a wheel speed entry
+    if "wheel_speed" in tags or c[0] == "C":
+        for f in ("title_en", "meaning_en", "rider_advice_en", "can_ride_reason"):
+            m = Q_POSITION.search(r[f])
+            if m:
+                err(c, "Q7", f"wheel position '{m.group(0)}' in {f}")
+        for x in list(r["likely_causes_en"]) + list(r["technician_hints_en"]):
+            m = Q_POSITION.search(x)
+            if m:
+                err(c, "Q7", f"wheel position '{m.group(0)}' in '{x[:40]}'")
+    # Q8: a with_care entry may not permit normal or long riding
+    if lvl == "SERVICE_SOON" and r["can_ride_to_workshop"] == "with_care":
+        for f in ("can_ride_reason", "rider_advice_en"):
+            m = Q_PERMIT.search(r[f])
+            if m:
+                err(c, "Q8", f"with_care entry permits normal riding in {f}: '{m.group(0)}'")
+
 
 
 # P0507 (idle too high) carries its own first sentence (throttle not closing fully) instead of the D3 sentence;
@@ -896,6 +999,7 @@ def check_entry(r, ctx, err, warn):
         err(c, "R10", f"title contains '{m.group(0)}'")
     # ---- v4 rules R12 to R22 and T1
     check_v4(r, ctx, err, warn, tags, rk)
+    check_q(r, ctx, err, tags, rk)
     # ---- D decisions
     for name, fn in DECISIONS.get(c, []):
         try:
