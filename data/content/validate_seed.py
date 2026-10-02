@@ -506,6 +506,9 @@ IDLE_ONCE = "If it stalls once at a stop, ride gently, avoid heavy traffic and h
 IDLE_REPEAT = "If it stalls more than once or will not restart, do not keep riding."
 IDLE_PAIR = ("If it stalls once at a stop, ride gently, avoid heavy traffic and have it checked soon. If it stalls "
              "more than once or will not restart, do not keep riding.")
+BATTERY_1 = "If the battery is hot, swollen or smells of rotten eggs, stop, switch off and do not ride on."
+BATTERY_2 = "Do the same if the lights are very bright or bulbs keep blowing."
+BATTERY_SPLIT = BATTERY_1 + " " + BATTERY_2
 BATTERY_HOT = "If the battery is hot or swollen, stop, switch off and do not ride on."
 TWO_CASE = ("If the engine runs normally, have it checked soon; if it stalls, loses power or will not start, "
             "do not keep riding.")
@@ -642,7 +645,7 @@ def check_v4(r, ctx, err, warn, tags, rk):
     for f in ("meaning_en", "rider_advice_en"):
         for sg in _sentences(r[f]):
             n = len(sg.split())
-            if n > MAX_WORDS and sg != BATTERY:  # the owner's D1 BATTERY sentence (29 words) is fixed text
+            if n > MAX_WORDS:  # no exemption since V5 G7: every sentence is measured
                 err(c, "R22", f"sentence of {n} words in {f} (limit {MAX_WORDS}): '{sg[:50]}...'")
     for f in fields + ["title_en"]:
         m = IDIOMS.search(r[f].replace(TWIN_CLAUSE, ""))  # the owner's G6 clause says "running on one cylinder" on purpose
@@ -684,7 +687,7 @@ def check_q(r, ctx, err, tags, rk):
     fields4 = ("meaning_en", "rider_action_basis", "rider_advice_en", "can_ride_reason")
     # Q1: below STOP, the "if" before a stall or no-start claim must contain a real symptom
     if lvl != "STOP":
-        canon = {STALL, TWO_CASE, IDLE_ONCE, IDLE_REPEAT, BATTERY, BATTERY_HOT, STOP_TAIL, PETROL, ABS_SENT, IDLE_PAIR}
+        canon = {STALL, TWO_CASE, IDLE_ONCE, IDLE_REPEAT, BATTERY_1, BATTERY_2, BATTERY_HOT, STOP_TAIL, PETROL, ABS_SENT, IDLE_PAIR}
         for f in fields4:
             for sg in _sentences(r[f]):
                 if sg in canon:
@@ -868,7 +871,7 @@ def check_entry(r, ctx, err, warn):
     if len(ms) != 1 or not r["meaning_en"].strip().endswith("."):
         err(c, "S", "meaning_en must be exactly one sentence ending with a full stop")
     ads = SENT_END.split(r["rider_advice_en"].strip())
-    if len(ads) > 2:
+    if len(ads) > (3 if BATTERY_SPLIT in r["rider_advice_en"] else 2):  # the split battery pair + 'Otherwise ...' (G7)
         err(c, "S", "rider_advice_en must be 1 or 2 sentences")
     for s in ms + ads:
         if len(s.split()) > 32:

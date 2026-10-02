@@ -68,3 +68,12 @@ G6 = "G6"
 for _c in ("P0201", "P0261", "P0262", "P0351", "P2300", "P2301", "P2302"):
     fix(_c, G6, "G6 owner decision: twin wording clause for a cylinder 1 fault (levels unchanged)",
         advice="The engine may misfire, lose power or stop; " + TWIN_CLAUSE + ". " + STOP_TAIL)
+
+
+# ======================= G7: long sentences ================================================================
+# The 29-word BATTERY sentence is split into two sentences of 25 words or fewer; the validator measures every
+# sentence and no longer exempts it. The NETWORK sentence was already two sentences (20 and 21 words): unchanged.
+G7 = "G7"
+for _c in ("P0563", "P2504"):
+    fix(_c, G7, "G7 owner decision: split the 29-word BATTERY sentence (19 and 13 words)",
+        advice=BATTERY_SPLIT + " Otherwise ride only a short way, in daylight, to a workshop.")

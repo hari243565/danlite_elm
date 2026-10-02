@@ -21,6 +21,9 @@ IDLE_REPEAT = "If it stalls more than once or will not restart, do not keep ridi
 IDLE_PAIR = IDLE_ONCE + " " + IDLE_REPEAT
 BATTERY = ("If the battery is hot, swollen or smells of rotten eggs, or the lights are very bright or bulbs keep "
            "blowing, stop, switch off and do not ride on.")
+BATTERY_1 = "If the battery is hot, swollen or smells of rotten eggs, stop, switch off and do not ride on."  # V5 G7
+BATTERY_2 = "Do the same if the lights are very bright or bulbs keep blowing."  # V5 G7
+BATTERY_SPLIT = BATTERY_1 + " " + BATTERY_2
 BATTERY_HOT = "If the battery is hot or swollen, stop, switch off and do not ride on."
 TWO_CASE = ("If the engine runs normally, have it checked soon; if it stalls, loses power or will not start, "
             "do not keep riding.")
