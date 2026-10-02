@@ -5,13 +5,13 @@ P0195,3,1,oil_temp,yes,no,Engine Oil Temperature Sensor Malfunction,Engine Oil T
 P0130,4,1,o2_sensor,yes,no,"O2 Sensor Circuit Malfunction (Bank 1, Sensor 1)","O2 Sensor Circuit Malfunction (Bank 1, Sensor 1)",obdex,yes,AGREE
 P0135,5,1,o2_heater,yes,no,"O2 Sensor Heater Circuit Malfunction (Bank 1, Sensor 1)","O2 Sensor Heater Circuit Malfunction (Bank 1, Sensor 1)",obdex,yes,AGREE
 P0201,6,1,injector,yes,yes,Injector Circuit Malfunction — Cylinder 1,Injector Circuit Malfunction — Cylinder 1,obdex,yes,AGREE
-P0351,7,1,ignition_coil,yes,no,"Ignition Coil ""A"" Primary/Secondary Circuit Malfunction (Cylinder 1)","Ignition Coil ""A"" Primary/Secondary Circuit Malfunction (Cylinder 1)",obdex,yes,DISAGREE
+P0351,7,1,ignition_coil,yes,no,"Ignition Coil ""A"" Primary/Secondary Circuit Malfunction (Cylinder 1)",Ignition Coil A Primary/Secondary Circuit Malfunction,override,yes,DISAGREE
 P0230,8,1,fuel_pump,yes,no,Fuel Pump Primary Circuit Malfunction,Fuel Pump Primary Circuit Malfunction,obdex,yes,AGREE
 P0335,9,1,crankshaft,yes,no,"Crankshaft Position Sensor ""A"" Circuit Malfunction","Crankshaft Position Sensor ""A"" Circuit Malfunction",obdex,yes,AGREE
 P0110,10,2,iat,no,yes,Intake Air Temperature Sensor Circuit Malfunction,Intake Air Temperature Sensor Circuit Malfunction,obdex,yes,AGREE
 P0115,11,2,ect,no,yes,Engine Coolant Temperature Sensor Circuit Malfunction,Engine Coolant Temperature Sensor Circuit Malfunction,obdex,yes,AGREE
 P0202,12,2,injector,no,yes,Injector Circuit Malfunction — Cylinder 2,Injector Circuit Malfunction — Cylinder 2,obdex,yes,AGREE
-P0352,13,2,ignition_coil,no,no,"Ignition Coil ""B"" Primary/Secondary Circuit Malfunction (Cylinder 2)","Ignition Coil ""B"" Primary/Secondary Circuit Malfunction (Cylinder 2)",obdex,yes,DISAGREE
+P0352,13,2,ignition_coil,no,no,"Ignition Coil ""B"" Primary/Secondary Circuit Malfunction (Cylinder 2)",Ignition Coil B Primary/Secondary Circuit Malfunction,override,yes,DISAGREE
 P0300,14,2,misfire,no,no,Random/Multiple Cylinder Misfire Detected,Random/Multiple Cylinder Misfire Detected,obdex,yes,AGREE
 P0301,15,2,misfire,no,no,Cylinder 1 Misfire Detected,Cylinder 1 Misfire Detected,obdex,yes,AGREE
 P0302,16,2,misfire,no,no,Cylinder 2 Misfire Detected,Cylinder 2 Misfire Detected,obdex,yes,AGREE
@@ -34,7 +34,7 @@ P0563,32,2,system_voltage,no,no,System Voltage High,System Voltage High,obdex,ye
 P0850,33,2,neutral_gear,no,no,Park/Neutral Switch Input Circuit,Park/Neutral Switch Input Circuit,obdex,yes,AGREE
 P0600,34,2,control_module,no,no,Serial Communication Link,Serial Communication Link,obdex,yes,AGREE
 P0340,35,2,camshaft,no,no,"Camshaft Position Sensor ""A"" Circuit (Bank 1 or Single Sensor)","Camshaft Position Sensor ""A"" Circuit (Bank 1 or Single Sensor)",obdex,yes,AGREE
-P0505,36,2,idle,no,no,Idle Air Control System Malfunction,Idle Air Control System Malfunction,obdex,yes,DISAGREE
+P0505,36,2,idle,no,no,Idle Air Control System Malfunction,Idle Control System Malfunction,override,yes,DISAGREE
 U0100,37,2,lost_comm_engine,no,no,"Lost Communication with ECM/PCM ""A""","Lost Communication with ECM/PCM ""A""",obdex,yes,AGREE
 U0121,38,2,lost_comm_abs,no,no,Lost Communication with ABS Control Module,Lost Communication with ABS Control Module,obdex,yes,AGREE
 U0155,39,2,lost_comm_cluster,no,no,Lost Communication with Instrument Panel Cluster,Lost Communication with Instrument Panel Cluster,obdex,yes,AGREE
@@ -86,10 +86,10 @@ P0343,84,3,camshaft,no,no,"Camshaft Position Sensor ""A"" Circuit High Input (Ba
 P0344,85,3,camshaft,no,no,Camshaft Position Sensor A Circuit Intermittent (Bank 1 or Single Sensor),Camshaft Position Sensor A Circuit Intermittent (Bank 1 or Single Sensor),obdex,yes,AGREE
 P0350,86,3,ignition_coil,no,no,Ignition Coil Primary/Secondary Circuit/Open,Ignition Coil Primary/Secondary Circuit/Open,obdex,yes,AGREE
 P0324,87,3,knock,no,no,Knock/Combustion Vibration Control System Error,Knock/Combustion Vibration Control System Error,obdex,yes,AGREE
-P0325,88,3,knock,no,no,Knock Sensor 1 Circuit Malfunction (Bank 1),Knock Sensor 1 Circuit Malfunction (Bank 1),obdex,yes,DISAGREE
+P0325,88,3,knock,no,no,Knock Sensor 1 Circuit Malfunction (Bank 1),Knock Sensor 1 Circuit Malfunction (Bank 1 or Single Sensor),override,yes,DISAGREE
 P0326,89,3,knock,no,no,Knock/Combustion Vibration Sensor A Circuit Range/Performance,Knock/Combustion Vibration Sensor A Circuit Range/Performance,obdex,yes,AGREE
-P0327,90,3,knock,no,no,Knock Sensor 1 Circuit Low Input (Bank 1),Knock Sensor 1 Circuit Low Input (Bank 1),obdex,yes,DISAGREE
-P0328,91,3,knock,no,no,Knock Sensor 1 Circuit High Input (Bank 1),Knock Sensor 1 Circuit High Input (Bank 1),obdex,yes,DISAGREE
+P0327,90,3,knock,no,no,Knock Sensor 1 Circuit Low Input (Bank 1),Knock Sensor 1 Circuit Low Input (Bank 1 or Single Sensor),override,yes,DISAGREE
+P0328,91,3,knock,no,no,Knock Sensor 1 Circuit High Input (Bank 1),Knock Sensor 1 Circuit High Input (Bank 1 or Single Sensor),override,yes,DISAGREE
 P0329,92,3,knock,no,no,Knock/Combustion Vibration Sensor A Circuit Intermittent,Knock/Combustion Vibration Sensor A Circuit Intermittent,obdex,yes,AGREE
 P0501,93,3,vehicle_speed,no,no,"Vehicle Speed Sensor ""A"" Range/Performance","Vehicle Speed Sensor ""A"" Range/Performance",obdex,yes,AGREE
 P0502,94,3,vehicle_speed,no,no,Vehicle Speed Sensor A Circuit Low,Vehicle Speed Sensor A Circuit Low,obdex,yes,AGREE

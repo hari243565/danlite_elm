@@ -1,5 +1,11 @@
 code,obdex_title,title_in_force,problem,action
+P0351,"Ignition Coil ""A"" Primary/Secondary Circuit Malfunction (Cylinder 1)",Ignition Coil A Primary/Secondary Circuit Malfunction,OBDex title wrong (owner-supplied check),override applied
+P0352,"Ignition Coil ""B"" Primary/Secondary Circuit Malfunction (Cylinder 2)",Ignition Coil B Primary/Secondary Circuit Malfunction,OBDex title wrong (owner-supplied check),override applied
+P0505,Idle Air Control System Malfunction,Idle Control System Malfunction,OBDex title wrong (owner-supplied check),override applied
 P0134,O2 Sensor Circuit No Activity / Slow Response (Bank 1 Sensor 1),O2 Sensor Circuit No Activity / Slow Response (Bank 1 Sensor 1),Title mixes 'No Activity' with 'Slow Response'; P0133 is already slow response and the standard meaning of P0134 is no activity detected. Check before writing.,do not write
+P0325,Knock Sensor 1 Circuit Malfunction (Bank 1),Knock Sensor 1 Circuit Malfunction (Bank 1 or Single Sensor),OBDex title wrong (owner-supplied check),override applied
+P0327,Knock Sensor 1 Circuit Low Input (Bank 1),Knock Sensor 1 Circuit Low Input (Bank 1 or Single Sensor),OBDex title wrong (owner-supplied check),override applied
+P0328,Knock Sensor 1 Circuit High Input (Bank 1),Knock Sensor 1 Circuit High Input (Bank 1 or Single Sensor),OBDex title wrong (owner-supplied check),override applied
 P0686,ECM/PCM Power Relay Control Circuit Open,ECM/PCM Power Relay Control Circuit Low,OBDex title wrong (owner-supplied check),override applied
 P0687,ECM/PCM Power Relay Sense Circuit Open,ECM/PCM Power Relay Control Circuit High,OBDex title wrong (owner-supplied check),override applied
 P0688,ECM/PCM Power Relay Sense Circuit High,ECM/PCM Power Relay Sense Circuit/Open,OBDex title wrong (owner-supplied check),override applied
