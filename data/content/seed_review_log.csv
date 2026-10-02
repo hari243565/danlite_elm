@@ -30,3 +30,10 @@ P0170,(outside sample) Title 'Fuel trim fault' is workshop language,Title is now
 P0263,(outside sample) Title 'Cylinder 1 is weaker than the others' says weaker; the source says the cylinder contributes less or more than the average,Title is now 'Cylinder 1 is out of balance with the others'; same for P0266,fixed
 U0001,(outside sample) CAN entries said 'other units may stop working' without any hint that safety systems can be affected,"Advice now says 'Meters, lamps or safety systems may stop working; ride carefully' (U0001 to U0008); ABS is not named because the source entries for U0002 to U0008 do not mention it",fixed
 P0687,(outside sample) P0687 and P068B advice mentioned a flat battery; the source does not list the battery for these codes,Reworded to 'The ECU may stay powered after the ignition is off',fixed
+P0524,Advice said the engine can be damaged 'within minutes'; the source only says 'rapidly destroy' (an unsupported time claim),Changed to 'quickly',fixed
+P0918,Two near-identical causes ('Damaged wiring or loose connector' and 'Loose or corroded connector'),Second cause now says wiring that breaks contact at times,fixed
+P2226,'in the hills' is informal; the source is about altitude compensation,'at high altitude' in P2226 and P2227,fixed
+P2148,Source names an overcharging alternator as a cause but nothing in the entry warned about a hot or swollen battery,can_ride_reason now says stop if the battery gets hot or swollen,fixed
+P2177,'off idle' is workshop jargon and hard to translate,'above idle' in the title and meaning of P2177 and P2178,fixed
+P0127,"Cause 'Sensor close to a hot part' is general knowledge, not in the source (the source lists only a car intercooler)","kept: hedged generic cause, no part named; needs the independent review",accepted
+P0914,Gear position codes come from automatic-transmission control units (TCM) in the source; on a manual bike the effect on starting is a guess,confidence low and needs_independent_review true for all six (P0914 to P0919); advice only says 'may be affected',accepted

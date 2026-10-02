@@ -87,7 +87,8 @@ TAG_APPLIES = {"knock": "knock_sensor_fitted", "camshaft": "camshaft_sensor_fitt
                "twist_grip_sensor": "ride_by_wire", "wheel_speed": "abs_fitted", "abs_pump": "abs_fitted",
                "abs_module": "abs_fitted", "abs_relay": "abs_fitted", "abs_lamp": "abs_fitted",
                "lost_comm_abs": "abs_fitted"}
-CODE_APPLIES = {"P0510": "closed_throttle_switch_fitted"}
+CODE_APPLIES = {"P0510": "closed_throttle_switch_fitted", "P0220": "ride_by_wire", "P0221": "ride_by_wire",
+                "P0222": "ride_by_wire", "P0223": "ride_by_wire", "P0224": "ride_by_wire"}  # throttle sensor B = redundant track
 GEAR_POSITION_CODES = {f"P09{n:02X}" for n in range(0x14, 0x1A)}  # P0914 to P0919
 DERIVED_KEYS = {"source", "licence", "repo_commit", "source_entry_sha256", "mode", "title_basis"}
 
@@ -503,7 +504,7 @@ STOP_TAIL = "Pull over safely, switch off and do not keep riding; have the bike 
 STALL_FAMILY = re.compile(r"\bstalls?\b[^.]*\bdo not keep riding\b", re.I)
 STALL_TAGS = {"throttle", "map_baro", "camshaft", "idle", "sensor_reference_supply", "ride_by_wire", "twist_grip_sensor"}
 NETWORK_TAGS = {"can_bus"}
-NETWORK_CODES = {"U0146"}
+NETWORK_CODES = {"U0146", "U0140"}
 IDLE_TAGS = {"idle"}
 
 # ---- R22 Hindi-readiness
@@ -612,8 +613,8 @@ def check_v4(r, ctx, err, warn, tags, rk):
     for sg in _sentences(advice):
         if STALL_FAMILY.search(sg) and STALL not in sg and TWO_CASE not in sg:
             err(c, "R21", f"stall advice is not the canonical STALL sentence: '{sg}'")
-    if tagset & STALL_TAGS and STALL not in advice:
-        err(c, "R21", "entry needs the canonical STALL sentence (D4) in rider_advice_en")
+    if tagset & STALL_TAGS and lvl != "STOP" and STALL not in advice and TWO_CASE not in advice:
+        err(c, "R21", "entry needs the canonical STALL (or TWO-CASE) sentence (D4) in rider_advice_en")
     if tagset & IDLE_TAGS and c not in IDLE_FIRST_EXEMPT and IDLE_FIRST not in advice:
         err(c, "R21", "idle entries need the D3 sentence: " + IDLE_FIRST)
     if (tagset & NETWORK_TAGS or c in NETWORK_CODES) and NETWORK not in advice:
@@ -924,7 +925,9 @@ def check_entry(r, ctx, err, warn):
                                                                       "too high", "slow response", "overheating",
                                                                       "error", "unstable", "incorrect", "switched off too",
                                                                       "weaker", "rough", "key", "lower than", "higher than",
-                                                                      "warming up", "stays below", "not programmed"]):
+                                                                      "warming up", "stays below", "not programmed", "short", "leak", "break", "open", "shorted",
+                                                                      "not working", "correlation", "does not match", "not match", "touching",
+                                                                      "too slow", "stopped", "delay", "slow", "resistance", "limited", "forced", "reacts", "outside"]):
         warn(c, "S", "title/meaning uses none of the shared failure phrases; check it is a generic code")
 
 
