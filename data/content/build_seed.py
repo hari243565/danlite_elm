@@ -102,6 +102,22 @@ def main(argv):
             "updated_at": date,
         })
     new.sort(key=lambda r: rank[r["code"]])
+    if not append and os.path.exists(out):
+        # rebuild: an entry that did not change keeps its old updated_at
+        old = {}
+        for line in open(out, encoding="utf-8"):
+            if line.strip():
+                o = json.loads(line)
+                old[o["code"]] = o
+        for r in new:
+            o = old.get(r["code"])
+            if o is not None:
+                a = dict(o)
+                b = dict(r)
+                a.pop("updated_at", None)
+                b.pop("updated_at", None)
+                if a == b:
+                    r["updated_at"] = o["updated_at"]
     rows = existing + new
     with open(out, "w", encoding="utf-8") as fh:
         for r in rows:

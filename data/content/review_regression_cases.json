@@ -1,5 +1,5 @@
 {
-  "source": "docs/content/REVIEW_REPORT_20261001.md section 4 on branch content/review-20261001 (independent review, 2026-10-01). Each case is the reviewer's defective field set; the test applies it on top of the current good entry for that code and requires the validator to reject it with the named rule.",
+  "source": "docs/content/REVIEW_REPORT_20261001.md section 4 on branch content/review-20261001 (independent review, 2026-10-01). Each case is the reviewer's defective field set; the test applies it on top of the current good entry for that code and requires the validator to reject it with the named rule. Extended 2026-10-02 (owner decision D1) with the 8 defective entries written by the batch 1 reviewer (REVIEW_REPORT_BATCH1_20261001.md section D; review_validator_defeat_20261001.py on branch content/review-batch1-20261001), which the validator of that date accepted with zero errors.",
   "cases": [
     {
       "name": "Defect 1: wrong direction (P0123 carrying the P0122 meaning)",
@@ -8,7 +8,10 @@
       "fields": {
         "title_en": "Throttle position sensor A: voltage below threshold",
         "meaning_en": "The throttle position sensor signal is lower than the bike's computer (ECU) expects, often from a short to ground.",
-        "likely_causes_en": ["Signal wire short to ground", "Faulty throttle position sensor"]
+        "likely_causes_en": [
+          "Signal wire short to ground",
+          "Faulty throttle position sensor"
+        ]
       }
     },
     {
@@ -26,7 +29,11 @@
       "code": "P0172",
       "expect_rule": "R7",
       "fields": {
-        "likely_causes_en": ["Stuck-open EGR valve", "Leaking or stuck-open fuel injector", "Blocked air filter"]
+        "likely_causes_en": [
+          "Stuck-open EGR valve",
+          "Leaking or stuck-open fuel injector",
+          "Blocked air filter"
+        ]
       }
     },
     {
@@ -37,6 +44,87 @@
         "rider_action_level": "SERVICE_SOON",
         "rider_action_basis": "engine may stall or not start",
         "rider_advice_en": "The engine may cut out or refuse to start while riding. Get it checked soon."
+      }
+    },
+    {
+      "name": "Batch1 defect D1: 'shuts off ... will not restart' at SERVICE_SOON (P0130)",
+      "code": "P0130",
+      "expect_rule": "R12",
+      "fields": {
+        "rider_action_basis": "engine shuts off at speed",
+        "rider_advice_en": "The engine will shut off suddenly at speed and will not restart. Get it checked soon.",
+        "can_ride_reason": "engine shuts off without warning; keep riding to the workshop"
+      }
+    },
+    {
+      "name": "Batch1 defect D2: fuel pump control circuit open set to SERVICE_SOON with the TWO-CASE sentence (P0627)",
+      "code": "P0627",
+      "expect_rule": "R13",
+      "fields": {
+        "rider_action_level": "SERVICE_SOON",
+        "rider_action_basis": "pump may not run",
+        "rider_advice_en": "The engine may be hard to start. If the engine runs normally, have it checked soon; if it stalls or will not start, do not keep riding.",
+        "can_ride_to_workshop": "with_care",
+        "can_ride_reason": "ride only if the engine runs normally",
+        "needs_independent_review": true
+      }
+    },
+    {
+      "name": "Batch1 defect D3: direction reversed in advice and reason, temperature HIGH voltage (P0118)",
+      "code": "P0118",
+      "expect_rule": "R14",
+      "fields": {
+        "rider_action_basis": "cooling may switch on too often",
+        "rider_advice_en": "The engine looks hotter than it is, so cooling may switch on more often than needed. There is no risk of overheating; get it checked at the next service.",
+        "can_ride_reason": "cooling runs too often only; safe in traffic and heat"
+      }
+    },
+    {
+      "name": "Batch1 defect D4: ABS sentence followed by a reassuring sentence (U0121)",
+      "code": "U0121",
+      "expect_rule": "R15",
+      "fields": {
+        "rider_advice_en": "Your normal brakes still work, but ABS is off, so a wheel can lock in hard braking. There is no need to ride differently in the rain.",
+        "can_ride_reason": "brakes work, ABS off; fine in the rain and at full speed"
+      }
+    },
+    {
+      "name": "Batch1 defect D5: fuel leak and fire risk without the word smell, 'keep riding' (P0172)",
+      "code": "P0172",
+      "expect_rule": "R16",
+      "fields": {
+        "rider_action_basis": "fuel may leak onto the hot engine",
+        "rider_advice_en": "Fuel may be leaking onto the hot engine and fumes can build up. Wipe it off and keep riding; get it checked soon.",
+        "can_ride_reason": "fuel may drip onto the engine; usually rideable"
+      }
+    },
+    {
+      "name": "Batch1 defect D6: unsafe technician hints (bypass, jumper wire, battery lead off while running) (P0850)",
+      "code": "P0850",
+      "expect_rule": "R17",
+      "fields": {
+        "technician_hints_en": [
+          "Bypass the neutral switch with a jumper wire to see whether the bike starts",
+          "Check the switch connector for oil, water and corrosion",
+          "Take a battery lead off while the engine is running to see if the fault clears"
+        ]
+      }
+    },
+    {
+      "name": "Batch1 bonus B7: 'if you like' used as a loophole (P0109)",
+      "code": "P0109",
+      "expect_rule": "R12",
+      "fields": {
+        "rider_advice_en": "Ride on if you like, because the engine will stall without warning in traffic. Get it checked when convenient."
+      }
+    },
+    {
+      "name": "Batch1 bonus B8: STOP entry that permits riding on (P0335)",
+      "code": "P0335",
+      "expect_rule": "R18",
+      "fields": {
+        "rider_advice_en": "Pull over safely, switch off and do not keep riding. If you must, you can still ride gently home at normal speed.",
+        "can_ride_reason": "safe to ride home gently; workshop can wait"
       }
     }
   ]

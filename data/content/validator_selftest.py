@@ -1,12 +1,14 @@
 #!/usr/bin/env python3
 """Self-tests for validate_seed.py. Run: python3 validator_selftest.py
 
-Four parts, all must pass:
+Five parts, all must pass (part 2b added 2026-10-02 for the rules R12 to R22 and T1):
   0. baseline: every unmodified entry in generic_en_seed.jsonl validates cleanly
   1. regression: the reviewer's defective entries (review_regression_cases.json)
      are rejected for the right rule. These are permanent.
   2. mutation test: 10 good entries, each broken in a different way a reviewer
      found; the validator must reject all ten with the expected rule.
+  2b. v4 mutation test: one good entry per new rule (R12 to R22, T1), each broken the way the batch 1
+     reviewer or the owner decisions D1 to D8 describe; the validator must reject each with the named rule
   3. rule coverage and legacy cases: every rule R1 to R11 and the owner
      decisions D1 to D6 are exercised at least once.
 
@@ -93,6 +95,78 @@ def main():
     assert len(M) == 10
     for label, code, fn, rule in M:
         results.append(expect(label, mutate(code, fn), rule))
+
+    # ---- 2b v4 mutation test
+    print("== 2b. v4 mutation test: the rules added on 2026-10-02")
+    STALL_ = "If it stalls more than once or will not restart, do not keep riding; have it taken to a workshop."
+    M2 = [
+        ("R12 'may shut off' at SERVICE_SOON (P0130)", "P0130",
+         lambda r: r.update(rider_advice_en="The engine may shut off at speed. Get it checked soon."), "R12"),
+        ("R12 'will not restart' in the ride reason, unconditional (P0633)", "P0633",
+         lambda r: r.update(can_ride_reason="go to a workshop; it will not restart"), "R12"),
+        ("R13 STOP not in the table (P0120)", "P0120",
+         lambda r: r.update(rider_action_level="STOP", can_ride_to_workshop="no",
+                            rider_advice_en="The engine may stop. Pull over safely, switch off and do not keep riding; "
+                                            "have the bike taken to a workshop."), "R13"),
+        ("R13 table code below STOP (P0335)", "P0335",
+         lambda r: r.update(rider_action_level="SERVICE_SOON", can_ride_to_workshop="with_care",
+                            rider_advice_en="The engine may stop or not start. Get it checked soon."), "R13"),
+        ("R14 'looks colder' on a LOW voltage engine temperature code (P0117)", "P0117",
+         lambda r: r.update(rider_action_basis="the engine looks colder than it is"), "R14"),
+        ("R15 ABS second sentence off the closed list (C0035)", "C0035",
+         lambda r: r.update(rider_advice_en="Your normal brakes still work, but ABS is off, so a wheel can lock in "
+                                            "hard braking. Ride as usual."), "R15"),
+        ("R16 fuel leak without the PETROL sentence (P0301)", "P0301",
+         lambda r: r.update(rider_action_basis="fuel may leak from the injector"), "R16"),
+        ("R17 jumper wire in a technician hint (P0105)", "P0105",
+         lambda r: r.update(technician_hints_en=["Use a jumper wire to feed the sensor directly"]), "R17"),
+        ("R18 STOP reason permits riding (P0201)", "P0201",
+         lambda r: r.update(can_ride_reason="you can still ride gently to the workshop"), "R18"),
+        ("R19 engine-control code with mil false (P0120)", "P0120",
+         lambda r: r["flags"].update(mil=False), "R19"),
+        ("R20 knock code without applies_when (P0324)", "P0324",
+         lambda r: r.update(applies_when=None), "R20"),
+        ("R20 oil temperature code without applies_when (P0195)", "P0195",
+         lambda r: r.update(applies_when=None), "R20"),
+        ("R21 camshaft stall variant instead of STALL (P0340)", "P0340",
+         lambda r: r.update(rider_advice_en="The engine may run rough. If it stalls or will not restart, do not keep "
+                                            "riding and have it taken to a workshop."), "R21"),
+        ("R21 idle entry without the D3 sentence (P0505)", "P0505",
+         lambda r: r.update(rider_advice_en="Idle may be uneven. " + STALL_), "R21"),
+        ("R21 CAN entry with the old advice (U0001)", "U0001",
+         lambda r: r.update(rider_advice_en="Meters, lamps or safety systems may stop working; ride carefully."), "R21"),
+        ("R21 bus fault with review false (U0003)", "U0003",
+         lambda r: r.update(needs_independent_review=False), "R21"),
+        ("R21 ABS entry without the canonical ABS sentence (U0121)", "U0121",
+         lambda r: r.update(rider_advice_en="Your brakes work, but ABS is off, so a wheel can lock. Ride gently, "
+                                            "brake early and get it checked soon."), "R21"),
+        ("R22 sentence of more than 25 words (P0300)", "P0300",
+         lambda r: r.update(meaning_en="The bike's computer (ECU) detected misfires on more than one cylinder or at "
+                                       "random times, so combustion is incomplete and the engine may run rough and lose "
+                                       "power."), "R22"),
+        ("R22 idiom 'cut out' (P0233)", "P0233",
+         lambda r: r.update(rider_action_basis="engine may cut out"), "R22"),
+        ("R22 idiom 'refuse to start' (P0337)", "P0337",
+         lambda r: r.update(rider_advice_en="The engine may refuse to start. Pull over safely, switch off and do not "
+                                            "keep riding; have the bike taken to a workshop."), "R22"),
+        ("R22 discouraged word 'module' (U0155)", "U0155",
+         lambda r: r.update(meaning_en="The bike's computer (ECU) stopped receiving messages from the cluster module."),
+         "R22"),
+        ("D2 P0232 back to STOP", "P0232",
+         lambda r: r.update(rider_action_level="STOP", can_ride_to_workshop="no"), "R13"),
+        ("D2 P0604 loses the TWO-CASE advice", "P0604",
+         lambda r: r.update(rider_advice_en="The engine may stall. Get it checked soon."), "D"),
+        ("D5 P068B loses the battery statement", "P068B",
+         lambda r: r.update(rider_advice_en="Have it checked soon; it may behave oddly."), "D"),
+        ("D7 P0512 unconditional no-restart reason", "P0512",
+         lambda r: r.update(can_ride_reason="go to a workshop; it may not restart"), "R12"),
+    ]
+    for label, code, fn, rule in M2:
+        results.append(expect(label, mutate(code, fn), rule))
+    # T1: a new entry (not written before Step T) whose title the two sources do not agree on
+    t1 = copy.deepcopy(BY["P0420"])
+    t1["code"], t1["content_id"] = "P0449", "generic:P0449:en"
+    results.append(expect("T1 new entry for a code whose title is DISAGREE (P0449)", t1, "T1"))
 
     # ---- 3 rule coverage, owner decisions and legacy cases
     print("== 3. rule coverage, owner decisions D1 to D6 and legacy cases")

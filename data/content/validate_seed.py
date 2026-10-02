@@ -27,7 +27,20 @@ Rules (rule id in messages):
   R9  plain words first in the meaning
   R10 title rules (no "(listed as", no bank 2, no duplicate titles)
   R11 schema v2 fields (can_ride_to_workshop, applies_when, review, verification)
-  D   owner decisions D1 to D6 for named codes
+  D   owner decisions D1 to D8 for named codes
+Added 2026-10-02 (independent review of batch 1, owner decisions D1 to D8):
+  R12 no unconditional stop / shut-off / no-start claim below STOP ("if" must come first, not "if you like")
+  R13 locked STOP table (stop_table.csv), two-way: a STOP not in the table is an error and so is a table code below STOP
+  R14 direction words (hotter/colder) agree with the standard title in EVERY rider field
+  R15 ABS and wheel-speed entries: no reassurance anywhere, second sentence from a closed list
+  R16 fuel leak, drip or fumes needs the PETROL sentence and never "keep riding" or "wipe"
+  R17 unsafe technician hints (bypass, jumper wire, battery lead off while running ...)
+  R18 STOP text must not permit riding
+  R19 a powertrain code with an engine-control tag has mil true
+  R20 applies_when keys are required for hardware that not every bike has (knock, camshaft, oil temperature ...)
+  R21 canonical sentences (D3 idle, D4 STALL, PETROL, ABS, NETWORK) word for word where they apply, no variants
+  R22 Hindi-readiness (D6): sentences at most 25 words, idiom blocklist, discouraged words
+  T1  title agreement (title_agreement.csv): a new entry needs AGREE; entries written before Step T only warn
 """
 import csv
 import glob
@@ -57,14 +70,32 @@ MODES = {"adapted", "structure-only"}
 VERIFICATION = {"structure-only": "ai_authored_from_standard_title", "adapted": "ai_authored_adapted"}
 CODE_RE = re.compile(r"^[PBCU][0-3][0-9A-F]{3}$")
 RIDE = {"yes", "with_care", "no"}
-APPLIES_KEYS = {"cylinders_min": lambda v: v == 2, "liquid_cooled": lambda v: v is True,
-                "ride_by_wire": lambda v: v is True, "abs_fitted": lambda v: v is True}
+_TRUE = lambda v: v is True  # noqa: E731
+APPLIES_KEYS = {"cylinders_min": lambda v: v == 2, "liquid_cooled": _TRUE, "ride_by_wire": _TRUE,
+                "abs_fitted": _TRUE, "knock_sensor_fitted": _TRUE, "camshaft_sensor_fitted": _TRUE,
+                "oil_temp_sensor_fitted": _TRUE, "closed_throttle_switch_fitted": _TRUE, "evap_fitted": _TRUE,
+                "secondary_air_fitted": _TRUE, "cooling_fan_fitted": _TRUE, "oil_pressure_sensor_fitted": _TRUE,
+                "ambient_temp_sensor_fitted": _TRUE, "fuel_level_sensor_fitted": _TRUE,
+                "gear_position_sensor_fitted": _TRUE, "clutch_switch_fitted": _TRUE,
+                "downstream_o2_sensor_fitted": _TRUE, "can_bus_fitted": _TRUE}
+# R20: reason tag (or code) -> applies_when key that must be present
+TAG_APPLIES = {"knock": "knock_sensor_fitted", "camshaft": "camshaft_sensor_fitted",
+               "oil_temp": "oil_temp_sensor_fitted", "evap": "evap_fitted", "secondary_air": "secondary_air_fitted",
+               "cooling_fan": "cooling_fan_fitted", "oil_pressure": "oil_pressure_sensor_fitted",
+               "ambient_temp": "ambient_temp_sensor_fitted", "fuel_level": "fuel_level_sensor_fitted",
+               "clutch_switch": "clutch_switch_fitted", "ride_by_wire": "ride_by_wire",
+               "twist_grip_sensor": "ride_by_wire", "wheel_speed": "abs_fitted", "abs_pump": "abs_fitted",
+               "abs_module": "abs_fitted", "abs_relay": "abs_fitted", "abs_lamp": "abs_fitted",
+               "lost_comm_abs": "abs_fitted"}
+CODE_APPLIES = {"P0510": "closed_throttle_switch_fitted"}
+GEAR_POSITION_CODES = {f"P09{n:02X}" for n in range(0x14, 0x1A)}  # P0914 to P0919
 DERIVED_KEYS = {"source", "licence", "repo_commit", "source_entry_sha256", "mode", "title_basis"}
 
 # ---- rubric mapping: reason tag (from relevance_ranking.csv) -> allowed levels
 S, SS, M, I = "STOP", "SERVICE_SOON", "MONITOR", "INFO"
 TAG_LEVELS = {
-    "injector": {S}, "injector_balance": {SS, S}, "ect_warmup": {M, SS}, "ignition_coil": {S}, "fuel_pump": {S, SS}, "crankshaft": {S},
+    # injector and ignition_coil: R13 (stop_table.csv) decides which codes are STOP; cylinder 2 codes are SERVICE_SOON (D2)
+    "injector": {S, SS}, "injector_balance": {SS, S}, "ect_warmup": {M, SS}, "ignition_coil": {S, SS}, "fuel_pump": {S, SS}, "crankshaft": {S},
     "cam_crank_sync": {S, SS}, "engine_speed_input": {S, SS}, "camshaft": {SS, S},
     "misfire": {SS, S}, "throttle": {SS, S}, "ride_by_wire": {SS, S},
     "twist_grip_sensor": {SS, S}, "idle": {SS}, "map_baro": {SS}, "iat": {M, SS},
@@ -261,6 +292,18 @@ def source_text(e):
     return " ".join(parts).lower().replace("_", " ")
 
 
+def _load_lines(name):
+    path = os.path.join(HERE, name)
+    return set(open(path, encoding="utf-8").read().split()) if os.path.exists(path) else set()
+
+
+def _load_verdicts():
+    path = os.path.join(HERE, "title_agreement.csv")
+    if not os.path.exists(path):
+        return {}
+    return {r["code"]: r["verdict"] for r in csv.DictReader(open(path, encoding="utf-8"))}
+
+
 def build_context(obdex, ranking):
     rk = {r["code"]: r for r in csv.DictReader(open(ranking, encoding="utf-8"))}
     return {
@@ -270,6 +313,10 @@ def build_context(obdex, ranking):
         "tags": {c: r["reason_tags"].split(";") for c, r in rk.items()},
         "overrides": {r["code"]: r for r in csv.DictReader(
             open(os.path.join(HERE, "title_overrides.csv"), encoding="utf-8"))},
+        "stop_table": {r["code"]: r for r in csv.DictReader(
+            open(os.path.join(HERE, "stop_table.csv"), encoding="utf-8"))},
+        "title_verdict": _load_verdicts(),
+        "grandfathered": _load_lines("entries_before_step_t.txt"),
     }
 
 
@@ -351,6 +398,46 @@ DECISIONS = {
     "U0077": [("plain single-bus entry, low confidence", lambda r: r["confidence"] == "low"),
               ("no car body networks", lambda r: not has({"x": all_text(r)}, "x", r"\bbody\b|comfort|door|window|seat"))],
 }
+# ---- owner decisions D2 to D8 (2026-10-02), kept as permanent checks
+for _c in ("P0604", "P0605", "P0606"):
+    DECISIONS.setdefault(_c, []).extend([
+        ("D2 SERVICE_SOON with_care (the source says the ECU keeps running)",
+         lambda r: r["rider_action_level"] == "SERVICE_SOON" and r["can_ride_to_workshop"] == "with_care"),
+        ("D2 TWO-CASE advice", lambda r: TWO_CASE in r["rider_advice_en"]),
+        ("D2 needs_independent_review", lambda r: r["needs_independent_review"] is True)])
+for _c in ("P0202", "P0264", "P0265", "P0352"):
+    DECISIONS.setdefault(_c, []).extend([
+        ("D2 SERVICE_SOON with_care (cylinder 2 only; the engine keeps running)",
+         lambda r: r["rider_action_level"] == "SERVICE_SOON" and r["can_ride_to_workshop"] == "with_care"),
+        ("D2 stop trigger for very rough running or heavy power loss",
+         lambda r: has(r, "rider_advice_en", r"stop if it runs very rough or loses power badly")),
+        ("D2 applies_when cylinders_min 2", lambda r: (r["applies_when"] or {}).get("cylinders_min") == 2)])
+DECISIONS.setdefault("P0232", []).extend([
+    ("D2 SERVICE_SOON with_care (the source says the pump stays powered)",
+     lambda r: r["rider_action_level"] == "SERVICE_SOON" and r["can_ride_to_workshop"] == "with_care"),
+    ("D2 reason in rider_action_basis (pump stays powered)", lambda r: has(r, "rider_action_basis", r"stay powered")),
+    ("D2 no open circuit claim", lambda r: not has({"x": all_text(r)}, "x", r"open circuit")),
+    ("D2 confidence low and review true", lambda r: r["confidence"] == "low" and r["needs_independent_review"] is True)])
+for _c in ("P0336", "P0629", "P0685", "P0686"):
+    DECISIONS.setdefault(_c, []).append(
+        ("D2 stays STOP with needs_independent_review true",
+         lambda r: r["rider_action_level"] == "STOP" and r["needs_independent_review"] is True))
+for _c in ("P0506", "P0510", "P0519"):
+    DECISIONS.setdefault(_c, []).append(
+        ("D3 no self-contradicting sentence",
+         lambda r: not has(r, "rider_advice_en", r"avoid traffic and do not keep riding")))
+DECISIONS.setdefault("P0507", []).append(
+    ("review: throttle-not-closing stop sentence",
+     lambda r: has(r, "rider_advice_en", r"if the throttle does not snap fully shut when you let go, do not ride")))
+DECISIONS.setdefault("P068B", []).append(
+    ("D5 battery-drain statement restored", lambda r: has(r, "rider_advice_en", r"battery may go flat")))
+for _c in ("P0633", "P0512", "P0513"):
+    DECISIONS.setdefault(_c, []).append(
+        ("D7 no-start claim is conditional", lambda r: has(r, "can_ride_reason", r"^if it starts")))
+for _c in ("U0001", "U0002", "U0003", "U0004", "U0005", "U0006", "U0007", "U0008"):
+    DECISIONS.setdefault(_c, []).append(
+        ("D4 NETWORK sentence and review true",
+         lambda r: NETWORK in r["rider_advice_en"] and r["needs_independent_review"] is True))
 # plain stall warning must be present on the three throttle sensor entries (review fix)
 for _c in ("P0120", "P0122", "P0123"):
     DECISIONS.setdefault(_c, []).append(
@@ -360,6 +447,204 @@ for _c in ("P0115", "P0117", "P0118"):
     DECISIONS.setdefault(_c, []).append(
         ("no gauge", lambda r: not has({"x": all_text(r)}, "x", r"gauge")))
 
+
+
+# ============================================================================
+# v4 rules (2026-10-02): reviewer's R12 to R19, plus R20 to R22 and T1
+# ============================================================================
+R12_CLAIM = re.compile(
+    r"\b(shuts?|shut(ting)?) (off|down)\b|\bstops? (running|suddenly|dead)\b|\bconks? out\b|"
+    r"\bgoes? (dead|off)\b|\bloses? (all|total) power\b|\b(will not|won't|may not|might not|can ?not|cannot|"
+    r"does not|doesn't|fails? to) (re)?start\b|\b(will not|won't|may not|cannot|can't) (turn over|crank)\b|"
+    r"\bdies?\b|\bdying\b|\bseiz(es|e|ing)\b|\b(stall(s|ed|ing)?|cuts? out|cutting out)\b", re.I)
+R12_IF_BEFORE = re.compile(r"\bif\b(?! you (like|wish|want|prefer|must))[^;.]{0,60}$", re.I)
+R14_WRONG = {
+    "LOW": re.compile(r"(looks?|reads?|thinks?|seems?|believes?|shows?)[^.;]{0,40}\b(colder|cooler|cold)\b", re.I),
+    "HIGH": re.compile(r"(looks?|reads?|thinks?|seems?|believes?|shows?)[^.;]{0,40}\b(hotter|warmer|hot)\b", re.I),
+}
+R15_REASSURE = re.compile(r"\bno need\b|\bnot a problem\b|\bnothing to worry\b|\bsafe to\b|\bnormal speed\b|"
+                          r"\bno risk\b|\bfine in the (rain|wet)\b|\bride (as usual|normally)\b|\bnot (a )?(danger|risk)\b|"
+                          r"\bno (danger|hazard)\b|\bwithout (any )?(worry|concern)\b|\bnormal (riding|braking)\b", re.I)
+R15_ALLOWED_SECOND = {
+    "ride gently, brake early and get it checked soon.",
+    "ride gently, brake early, avoid wet roads and get it checked soon.",
+}
+R16_FUEL = re.compile(r"(fuel|petrol|gasoline)[^.;]{0,40}\b(leak\w*|drip\w*|spill\w*|wet|fumes?|flood\w*|puddle|"
+                      r"soak\w*)\b|\b(leak\w*|drip\w*|spill\w*|fumes?|flood\w*)\b[^.;]{0,40}(fuel|petrol|gasoline)", re.I)
+R16_KEEP = re.compile(r"\b(keep riding|carry on|ride on|wipe|ignore|no need to stop|continue riding)\b", re.I)
+R17_UNSAFE_HINT = re.compile(
+    r"\bbypass\w*\b|\bjumper\b|\bjump(er)?(ing)? (the )?(relay|switch|wire)|short(ing)? (the )?(terminals?|pins?)|"
+    r"disconnect(ing)? the battery (while|with) the engine (is )?running|battery (lead|cable)s? off while|"
+    r"(open|remove) the (radiator|coolant|fuel) cap (while|when) (it is |the engine is )?(hot|running)|"
+    r"spark[- ](test|check)\w* (near|over|beside) (the )?(fuel|tank|injector)|run(ning)? the engine (dry|without oil)",
+    re.I)
+R18_PERMIT = re.compile(r"\byou can (still )?ride\b|\bride (on|home)\b|\bsafe to ride\b|\bride gently\b|\bshort ride\b|"
+                        r"\bif you must\b|\bkeep riding to\b|\bto the workshop at\b|\bnormal speed\b|\bfine to ride\b", re.I)
+R19_FLAGS_FLOOR = {"injector", "ignition_coil", "crankshaft", "fuel_pump", "misfire", "throttle", "map_baro", "ect",
+                   "o2_sensor", "o2_heater", "fuel_trim", "camshaft", "knock", "idle", "system_voltage",
+                   "control_module", "ecu_power_relay", "sensor_reference_supply", "catalyst", "cam_crank_sync",
+                   "starter_relay"}
+
+# ---- canonical sentences (D3, D4). One form, word for word, everywhere it applies.
+STALL = "If it stalls more than once or will not restart, do not keep riding; have it taken to a workshop."
+BATTERY = ("If the battery is hot, swollen or smells of rotten eggs, or the lights are very bright or bulbs keep "
+           "blowing, stop, switch off and do not ride on.")
+PETROL = "If you smell petrol strongly near the engine or tank, or see fuel dripping, stop and do not ride."
+ABS_SENT = "Your normal brakes still work, but ABS is off, so a wheel can lock in hard braking."
+NETWORK = ("Some electronic units on the bike cannot talk to each other, so warning lights or safety features may "
+           "not work. If ABS is affected, your normal brakes still work, but ABS is off, so a wheel can lock in "
+           "hard braking.")
+IDLE_FIRST = "If it stalls at stops or will not hold idle, ride gently, avoid heavy traffic and have it checked soon."
+BATTERY_HOT = "If the battery is hot or swollen, stop, switch off and do not ride on."
+TWO_CASE = ("If the engine runs normally, have it checked soon; if it stalls, loses power or will not start, "
+            "do not keep riding.")
+STOP_TAIL = "Pull over safely, switch off and do not keep riding; have the bike taken to a workshop."
+# a sentence that talks about stalling and "do not keep riding" must be one of the canonical forms
+STALL_FAMILY = re.compile(r"\bstalls?\b[^.]*\bdo not keep riding\b", re.I)
+STALL_TAGS = {"throttle", "map_baro", "camshaft", "idle", "sensor_reference_supply", "ride_by_wire", "twist_grip_sensor"}
+NETWORK_TAGS = {"can_bus"}
+NETWORK_CODES = {"U0146"}
+IDLE_TAGS = {"idle"}
+
+# ---- R22 Hindi-readiness
+MAX_WORDS = 25
+IDIOMS = re.compile(
+    r"\bcut(s|ting)? out\b|\bdrops? out\b|\bjumps? about\b|\bjumps?\b|\bhunt(s|ing)?\b|\brun(s|ning)? on one cylinder\b|"
+    r"\breduce (the )?load\b|\bfair share\b|\brefus(e|es|ed|ing) to\b|\bkeeps? pulling\b|\brun(s)? hot\b|"
+    r"\boff in one direction\b|\bwreck(s|ed)?\b|\bstumbles?\b|\bconks?\b|\bgoes? haywire\b|\bfire up\b|\bbogs?\b|"
+    r"\brun(s|ning)? (rich|lean|richer|leaner)\b|\bkicks? in\b|\bfalls? back\b|\bcomes? and goes\b|\bgive up\b|"
+    r"\bpoint(s)? to\b|\bsit(s)? (too )?(high|low)\b|\bwrong way round\b|\bgets? worse\b", re.I)
+DISCOURAGED_WORDS = re.compile(r"\bmodules?\b|\bharness(es)?\b|\bloom\b", re.I)
+
+# ---- R20/R21/R22 helpers
+def _sentences(text):
+    return [x.strip() for x in SENT_END.split(text.strip()) if x.strip()]
+
+
+def check_v4(r, ctx, err, warn, tags, rk):
+    c = r["code"]
+    lvl = r["rider_action_level"]
+    tagset = set(tags)
+    fields = ["meaning_en", "rider_action_basis", "rider_advice_en", "can_ride_reason"]
+    # ---- T1 title agreement
+    verdict = ctx.get("title_verdict", {}).get(c)
+    if ctx.get("title_verdict"):
+        if verdict != "AGREE":
+            if c in ctx.get("grandfathered", set()):
+                warn(c, "T1", f"title not agreed by two sources ({verdict}); entry written before Step T, "
+                              f"kept until the owner's assistant has checked the title")
+            else:
+                err(c, "T1", f"title not agreed by two sources ({verdict}); a new entry must not be written")
+    # ---- R12 no unconditional claim below STOP ("if" must come first)
+    if lvl in ("SERVICE_SOON", "MONITOR", "INFO"):
+        for f in fields:
+            for sg in _sentences(r[f]):
+                for part in sg.split(";"):
+                    m = R12_CLAIM.search(part)
+                    if m and not R12_IF_BEFORE.search(part[:m.start()]):
+                        err(c, "R12", f"{lvl} entry makes an unconditional claim '{m.group(0)}' in {f}")
+    # ---- R13 locked STOP table
+    st = ctx.get("stop_table", {})
+    if lvl == "STOP" and c not in st:
+        err(c, "R13", "STOP level is not in the owner's STOP table (stop_table.csv)")
+    if lvl != "STOP" and c in st:
+        err(c, "R13", "code is in the owner's STOP table (stop_table.csv) but the level is below STOP")
+    # ---- R14 direction words in every rider field
+    if rk is not None and tagset & R6_TEMP_TAGS:
+        d = direction(rk["title_standard"])
+        if d:
+            for f in fields:
+                m = R14_WRONG[d].search(r[f])
+                if m:
+                    err(c, "R14", f"{d} temperature code but {f} says '{m.group(0)}' (wrong direction)")
+    # ---- R15 ABS: no reassurance, second sentence from a closed list
+    if tagset & ABS_TAGS or c[0] == "C":
+        for f in ("rider_advice_en", "rider_action_basis", "can_ride_reason", "meaning_en"):
+            m = R15_REASSURE.search(r[f])
+            if m:
+                err(c, "R15", f"ABS entry reassures the rider in {f}: '{m.group(0)}'")
+        ss = _sentences(r["rider_advice_en"])
+        if len(ss) == 2 and ss[1].lower() not in R15_ALLOWED_SECOND:
+            err(c, "R15", f"ABS second sentence is not on the approved list: '{ss[1]}'")
+    # ---- R16 fuel leak and fumes
+    for f in fields:
+        m = R16_FUEL.search(r[f])
+        if m and PETROL not in r["rider_advice_en"]:
+            err(c, "R16", f"fuel leak or fumes in {f} ('{m.group(0)}') without the PETROL stop sentence")
+        if m and R16_KEEP.search(r[f]):
+            err(c, "R16", f"fuel leak in {f} with a keep-riding instruction ('{R16_KEEP.search(r[f]).group(0)}')")
+    # ---- R17 unsafe technician hints; rider text may only say bypass as 'do not bypass'
+    for h in r["technician_hints_en"]:
+        m = R17_UNSAFE_HINT.search(h)
+        if m:
+            err(c, "R17", f"unsafe technician hint: '{m.group(0)}'")
+    for f in ("rider_advice_en", "can_ride_reason"):
+        for sg in _sentences(r[f]):
+            if re.search(r"\bbypass", sg, re.I) and not re.search(r"\b(do not|don't|never) (try to )?bypass", sg, re.I):
+                err(c, "R17", f"rider text mentions bypass without 'do not bypass': '{sg}'")
+    # ---- R18 STOP text must not permit riding
+    if lvl == "STOP":
+        for f in ("rider_advice_en", "can_ride_reason", "rider_action_basis"):
+            m = R18_PERMIT.search(r[f])
+            if m:
+                err(c, "R18", f"STOP entry permits riding in {f}: '{m.group(0)}'")
+        if not any("pull over" in x.lower() and "do not keep riding" in x.lower()
+                   for x in _sentences(r["rider_advice_en"])):
+            err(c, "R18", "STOP advice lacks one sentence with 'pull over' and 'do not keep riding'")
+    # ---- R19 flags
+    if tagset & R19_FLAGS_FLOOR and c[0] == "P" and not r["flags"]["mil"]:
+        err(c, "R19", "powertrain code with an engine-control tag has mil false")
+    # ---- R20 applies_when for hardware that not every bike has
+    need = {TAG_APPLIES[t] for t in tagset if t in TAG_APPLIES}
+    if c in CODE_APPLIES:
+        need.add(CODE_APPLIES[c])
+    if c in GEAR_POSITION_CODES:
+        need.add("gear_position_sensor_fitted")
+    std = (rk["title_standard"] if rk else "").lower()
+    if re.search(r"sensor 2\b|sensor2\b", std) and tagset & {"o2_sensor", "o2_heater"}:
+        need.add("downstream_o2_sensor_fitted")
+    aw = r["applies_when"] or {}
+    for k in sorted(need):
+        if aw.get(k) is not True:
+            err(c, "R20", f"applies_when must include {{'{k}': true}} (hardware that not every bike has)")
+    # ---- R21 canonical sentences
+    advice = r["rider_advice_en"]
+    for sg in _sentences(advice):
+        if STALL_FAMILY.search(sg) and STALL not in sg and TWO_CASE not in sg:
+            err(c, "R21", f"stall advice is not the canonical STALL sentence: '{sg}'")
+    if tagset & STALL_TAGS and STALL not in advice:
+        err(c, "R21", "entry needs the canonical STALL sentence (D4) in rider_advice_en")
+    if tagset & IDLE_TAGS and c not in IDLE_FIRST_EXEMPT and IDLE_FIRST not in advice:
+        err(c, "R21", "idle entries need the D3 sentence: " + IDLE_FIRST)
+    if (tagset & NETWORK_TAGS or c in NETWORK_CODES) and NETWORK not in advice:
+        err(c, "R21", "bus fault entries need the canonical NETWORK sentence (D4) word for word")
+    if (tagset & NETWORK_TAGS or c in NETWORK_CODES) and r["needs_independent_review"] is not True:
+        err(c, "R21", "bus fault entries need needs_independent_review true (D4)")
+    if (tagset & ABS_TAGS or c[0] == "C") and ABS_SENT not in advice and NETWORK not in advice:
+        err(c, "R21", "ABS entries need the canonical ABS sentence (D4) word for word")
+    # ---- R22 Hindi-readiness (D6)
+    for f in ("meaning_en", "rider_advice_en"):
+        for sg in _sentences(r[f]):
+            n = len(sg.split())
+            if n > MAX_WORDS and sg != BATTERY:  # the owner's D1 BATTERY sentence (29 words) is fixed text
+                err(c, "R22", f"sentence of {n} words in {f} (limit {MAX_WORDS}): '{sg[:50]}...'")
+    for f in fields + ["title_en"]:
+        m = IDIOMS.search(r[f])
+        if m:
+            err(c, "R22", f"idiom or phrasal verb '{m.group(0)}' in {f}; use a plain glossary word")
+    for x in list(r["likely_causes_en"]) + list(r["technician_hints_en"]):
+        m = IDIOMS.search(x)
+        if m:
+            err(c, "R22", f"idiom or phrasal verb '{m.group(0)}' in '{x}'")
+    for f in fields + ["title_en"]:
+        m = DISCOURAGED_WORDS.search(r[f])
+        if m:
+            err(c, "R22", f"discouraged word '{m.group(0)}' in {f}; see GLOSSARY_EN.md")
+
+
+# P0507 (idle too high) carries its own first sentence (throttle not closing fully) instead of the D3 sentence;
+# it still needs STALL, and the decision check in DECISIONS makes the throttle sentence mandatory.
+IDLE_FIRST_EXEMPT = {"P0507"}
 
 # ============================================================================
 # per-entry checks
@@ -604,6 +889,8 @@ def check_entry(r, ctx, err, warn):
     m = R10_TITLE_BAD.search(r["title_en"])
     if m:
         err(c, "R10", f"title contains '{m.group(0)}'")
+    # ---- v4 rules R12 to R22 and T1
+    check_v4(r, ctx, err, warn, tags, rk)
     # ---- D decisions
     for name, fn in DECISIONS.get(c, []):
         try:
@@ -623,9 +910,10 @@ def check_entry(r, ctx, err, warn):
         err(c, "S", "source_entry_sha256 does not match the OBDex entry")
     stext = source_text(src)
     sdesc = source_description(src)
+    t_parts = t.replace(NETWORK, "").replace(PETROL, "")  # fixed owner sentences name ABS and fuel on purpose
     for rx, toks in PARTS:
-        if toks and re.search(rx, t, re.I) and not any(tok in stext for tok in toks):
-            m = re.search(rx, t, re.I)
+        if toks and re.search(rx, t_parts, re.I) and not any(tok in stext for tok in toks):
+            m = re.search(rx, t_parts, re.I)
             if any(tok in sdesc for tok in toks):
                 warn(c, "S", f"names '{m.group(0)}' found only in the source description, not in title/components/causes")
             else:
