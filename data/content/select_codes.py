@@ -4,6 +4,13 @@ Indian fuel-injected motorcycles and scooters.
 
 Usage: python3 select_codes.py /path/to/obdex data/content/relevance_ranking.csv
 
+Version 4 (2026-10-02): Step T. If title_agreement.csv exists (written by
+title_agreement.py, which compares the OBDex title with the Wal33D title), a
+code is writable only when the two sources AGREE. Codes that already had an
+entry before Step T (entries_before_step_t.txt) stay writable but are marked in
+the title_agreement column. Run order: select_codes.py, title_agreement.py,
+select_codes.py again (the rank order never depends on the agreement).
+
 Version 3 (2026-10-01): extends ecu_power_relay to P0690, applies
 title_overrides.csv, orders tier 3 by how likely a small bike is to raise the
 code (ride-by-wire last), runs a duplicate-title scan and writes
@@ -277,25 +284,50 @@ def main(obdex_dir, out_csv):
         elif c in dup:
             suspects.append((c, d[c]["title"]["en"], titles[c], dup[c][0] + ": " + dup[c][1], "do not write"))
     blocked = {s[0] for s in suspects if s[4] == "do not write"}
+    verdict = {}
+    ag_path = os.path.join(HERE, "title_agreement.csv")
+    if os.path.exists(ag_path):
+        verdict = {r["code"]: r["verdict"] for r in csv.DictReader(open(ag_path, encoding="utf-8"))}
+    grand_path = os.path.join(HERE, "entries_before_step_t.txt")
+    grand = set(open(grand_path).read().split()) if os.path.exists(grand_path) else set()
+    released, newly_blocked = set(), set()
+    if verdict:
+        for c in order:
+            v = verdict.get(c, "MISSING")
+            if v == "AGREE":
+                if c in blocked:
+                    blocked.discard(c)
+                    released.add(c)
+            elif c not in grand and c not in blocked:
+                blocked.add(c)
+                newly_blocked.add(c)
     anchors = set(ANCHORS)
     with open(out_csv, "w", newline="", encoding="utf-8") as fh:
         w = csv.writer(fh)
         w.writerow(["code", "rank", "tier", "reason_tags", "anchor", "honda_family", "title_obdex",
-                    "title_standard", "title_status", "write_ok"])
+                    "title_standard", "title_status", "write_ok", "title_agreement"])
         for i, c in enumerate(order, 1):
             t = 1 if c in anchors else (2 if c in TIER2 else tier[c])
             status = "override" if c in ov else ("suspect" if c in blocked else
-                                                 ("confirmed" if c in CONFIRMED else "obdex"))
+                                                 ("two-source" if c in released else
+                                                  ("confirmed" if c in CONFIRMED else "obdex")))
             w.writerow([c, i, t, ";".join(tags[c]), "yes" if c in anchors else "no",
                         "yes" if HONDA_FAMILIES & set(tags[c]) else "no",
-                        d[c]["title"]["en"], titles[c], status, "no" if c in blocked else "yes"])
+                        d[c]["title"]["en"], titles[c], status, "no" if c in blocked else "yes",
+                        verdict.get(c, "")])
+    for c in sorted(newly_blocked):
+        suspects.append((c, d[c]["title"]["en"], titles[c], "Step T: the Wal33D title does not agree "
+                         f"({verdict[c]}), see title_agreement.csv", "do not write"))
+    for c in sorted(released):
+        suspects.append((c, d[c]["title"]["en"], titles[c], "released by Step T: both sources agree",
+                         "write allowed"))
     with open(os.path.join(os.path.dirname(os.path.abspath(out_csv)), "title_suspects.csv"), "w",
               newline="", encoding="utf-8") as fh:
         w = csv.writer(fh)
         w.writerow(["code", "obdex_title", "title_in_force", "problem", "action"])
         w.writerows(suspects)
     print(f"selected {len(order)} codes of {len(d)}; {len(blocked)} not writable (suspect title); "
-          f"{len(ov)} overrides applied")
+          f"{len(ov)} overrides applied; step T released {len(released)}, newly blocked {len(newly_blocked)}")
 
 
 if __name__ == "__main__":

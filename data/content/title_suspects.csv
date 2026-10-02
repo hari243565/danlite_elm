@@ -29,3 +29,63 @@ C003C,Rear Tone Wheel,Rear Tone Wheel,See C0037.,do not write
 C003D,Rear Wheel Speed Sensor,Rear Wheel Speed Sensor,See C0037.,do not write
 C003E,Rear Wheel Speed Sensor Supply,Rear Wheel Speed Sensor Supply,See C0037.,do not write
 C003F,Wheel Speed Sensors Rotation Direction Correlation,Wheel Speed Sensors Rotation Direction Correlation,See C0037.,do not write
+C0021,ABS Pump Motor Circuit Range/Performance,ABS Pump Motor Circuit Range/Performance,"Step T: the Wal33D title does not agree (DISAGREE), see title_agreement.csv",do not write
+C0022,ABS Pump Motor Circuit Low,ABS Pump Motor Circuit Low,"Step T: the Wal33D title does not agree (DISAGREE), see title_agreement.csv",do not write
+C0023,ABS Pump Motor Circuit High,ABS Pump Motor Circuit High,"Step T: the Wal33D title does not agree (DISAGREE), see title_agreement.csv",do not write
+C0025,ABS Pump Motor Stalled,ABS Pump Motor Stalled,"Step T: the Wal33D title does not agree (DISAGREE), see title_agreement.csv",do not write
+C0040,Right Front Wheel Speed Sensor Circuit Malfunction,Right Front Wheel Speed Sensor Circuit Malfunction,"Step T: the Wal33D title does not agree (DISAGREE), see title_agreement.csv",do not write
+C0041,Right Front Wheel Speed Sensor Circuit Range/Performance,Right Front Wheel Speed Sensor Circuit Range/Performance,"Step T: the Wal33D title does not agree (DISAGREE), see title_agreement.csv",do not write
+C0042,Right Front Wheel Speed Sensor Circuit Low,Right Front Wheel Speed Sensor Circuit Low,"Step T: the Wal33D title does not agree (DISAGREE), see title_agreement.csv",do not write
+C0043,Right Front Wheel Speed Sensor Circuit High,Right Front Wheel Speed Sensor Circuit High,"Step T: the Wal33D title does not agree (DISAGREE), see title_agreement.csv",do not write
+C0044,Right Front Wheel Speed Sensor Signal Erratic,Right Front Wheel Speed Sensor Signal Erratic,"Step T: the Wal33D title does not agree (DISAGREE), see title_agreement.csv",do not write
+C0045,Left Rear Wheel Speed Sensor Circuit Malfunction,Left Rear Wheel Speed Sensor Circuit Malfunction,"Step T: the Wal33D title does not agree (DISAGREE), see title_agreement.csv",do not write
+C0046,Right Front Wheel Speed Sensor Circuit Intermittent,Right Front Wheel Speed Sensor Circuit Intermittent,"Step T: the Wal33D title does not agree (DISAGREE), see title_agreement.csv",do not write
+C0050,Right Rear Wheel Speed Sensor Circuit Malfunction,Right Rear Wheel Speed Sensor Circuit Malfunction,"Step T: the Wal33D title does not agree (MISSING), see title_agreement.csv",do not write
+C0052,Left Rear Wheel Speed Sensor Circuit Low,Left Rear Wheel Speed Sensor Circuit Low,"Step T: the Wal33D title does not agree (DISAGREE), see title_agreement.csv",do not write
+C0053,Left Rear Wheel Speed Sensor Circuit High,Left Rear Wheel Speed Sensor Circuit High,"Step T: the Wal33D title does not agree (DISAGREE), see title_agreement.csv",do not write
+C0054,Left Rear Wheel Speed Sensor Signal Erratic,Left Rear Wheel Speed Sensor Signal Erratic,"Step T: the Wal33D title does not agree (DISAGREE), see title_agreement.csv",do not write
+C0055,Left Rear Wheel Speed Sensor No Signal,Left Rear Wheel Speed Sensor No Signal,"Step T: the Wal33D title does not agree (DISAGREE), see title_agreement.csv",do not write
+C0056,Left Rear Wheel Speed Sensor Circuit Intermittent,Left Rear Wheel Speed Sensor Circuit Intermittent,"Step T: the Wal33D title does not agree (MISSING), see title_agreement.csv",do not write
+C0060,Right Rear Wheel Speed Sensor Circuit,Right Rear Wheel Speed Sensor Circuit,"Step T: the Wal33D title does not agree (MISSING), see title_agreement.csv",do not write
+C0061,Right Rear Wheel Speed Sensor Circuit Range/Performance,Right Rear Wheel Speed Sensor Circuit Range/Performance,"Step T: the Wal33D title does not agree (DISAGREE), see title_agreement.csv",do not write
+C0062,Right Rear Wheel Speed Sensor Circuit Low,Right Rear Wheel Speed Sensor Circuit Low,"Step T: the Wal33D title does not agree (DISAGREE), see title_agreement.csv",do not write
+C0063,Right Rear Wheel Speed Sensor Circuit High,Right Rear Wheel Speed Sensor Circuit High,"Step T: the Wal33D title does not agree (DISAGREE), see title_agreement.csv",do not write
+C0064,Right Rear Wheel Speed Sensor Signal Erratic,Right Rear Wheel Speed Sensor Signal Erratic,"Step T: the Wal33D title does not agree (DISAGREE), see title_agreement.csv",do not write
+C0065,Right Rear Wheel Speed Sensor No Signal,Right Rear Wheel Speed Sensor No Signal,"Step T: the Wal33D title does not agree (DISAGREE), see title_agreement.csv",do not write
+C0066,Right Rear Wheel Speed Sensor Circuit Intermittent,Right Rear Wheel Speed Sensor Circuit Intermittent,"Step T: the Wal33D title does not agree (MISSING), see title_agreement.csv",do not write
+C0080,Wheel Speed Mismatch (Front Axle),Wheel Speed Mismatch (Front Axle),"Step T: the Wal33D title does not agree (MISSING), see title_agreement.csv",do not write
+C0081,Wheel Speed Mismatch (Rear Axle),Wheel Speed Mismatch (Rear Axle),"Step T: the Wal33D title does not agree (DISAGREE), see title_agreement.csv",do not write
+C0099,ABS Control Module Internal Fault,ABS Control Module Internal Fault,"Step T: the Wal33D title does not agree (DISAGREE), see title_agreement.csv",do not write
+C0110,ABS Pump Motor Circuit Malfunction,ABS Pump Motor Circuit Malfunction,"Step T: the Wal33D title does not agree (MISSING), see title_agreement.csv",do not write
+C0111,ABS Activation Excessively Long,ABS Activation Excessively Long,"Step T: the Wal33D title does not agree (MISSING), see title_agreement.csv",do not write
+C0112,ABS Activation Frequency Too High,ABS Activation Frequency Too High,"Step T: the Wal33D title does not agree (MISSING), see title_agreement.csv",do not write
+C0121,Valve Relay Circuit Malfunction,Valve Relay Circuit Malfunction,"Step T: the Wal33D title does not agree (MISSING), see title_agreement.csv",do not write
+C0220,ABS Valve Block Supply Voltage,ABS Valve Block Supply Voltage,"Step T: the Wal33D title does not agree (MISSING), see title_agreement.csv",do not write
+C0225,ABS Valve Relay Circuit,ABS Valve Relay Circuit,"Step T: the Wal33D title does not agree (MISSING), see title_agreement.csv",do not write
+C0234,Wheel Speed Sensor Frequency Error,Wheel Speed Sensor Frequency Error,"Step T: the Wal33D title does not agree (MISSING), see title_agreement.csv",do not write
+C0235,Wheel Speed Sensor Signal Erratic,Wheel Speed Sensor Signal Erratic,"Step T: the Wal33D title does not agree (MISSING), see title_agreement.csv",do not write
+C0238,Speed Wheel-to-Wheel Mismatch,Speed Wheel-to-Wheel Mismatch,"Step T: the Wal33D title does not agree (MISSING), see title_agreement.csv",do not write
+C0241,ABS Warning Lamp Control Circuit,ABS Warning Lamp Control Circuit,"Step T: the Wal33D title does not agree (MISSING), see title_agreement.csv",do not write
+C0242,PCM Indicated ABS Malfunction,PCM Indicated ABS Malfunction,"Step T: the Wal33D title does not agree (MISSING), see title_agreement.csv",do not write
+C0245,Wheel Speed Sensor Frequency Mismatch,Wheel Speed Sensor Frequency Mismatch,"Step T: the Wal33D title does not agree (MISSING), see title_agreement.csv",do not write
+C0246,ABS/TCS Control Module Internal Performance,ABS/TCS Control Module Internal Performance,"Step T: the Wal33D title does not agree (MISSING), see title_agreement.csv",do not write
+P0418,"Secondary Air Injection System Relay ""A"" Circuit Malfunction","Secondary Air Injection System Relay ""A"" Circuit Malfunction","Step T: the Wal33D title does not agree (DISAGREE), see title_agreement.csv",do not write
+P0421,Warm Up Catalyst Efficiency Below Threshold (Bank 1),Warm Up Catalyst Efficiency Below Threshold (Bank 1),"Step T: the Wal33D title does not agree (DISAGREE), see title_agreement.csv",do not write
+P0446,Evaporative Emission Vent Control Circuit Malfunction,Evaporative Emission Vent Control Circuit Malfunction,"Step T: the Wal33D title does not agree (DISAGREE), see title_agreement.csv",do not write
+P0449,Evaporative Emission System Vent Valve/Solenoid Circuit Malfunction,Evaporative Emission System Vent Valve/Solenoid Circuit Malfunction,"Step T: the Wal33D title does not agree (DISAGREE), see title_agreement.csv",do not write
+P2119,Throttle Closed Position Performance,Throttle Closed Position Performance,"Step T: the Wal33D title does not agree (DISAGREE), see title_agreement.csv",do not write
+U0327,Software Incompatibility with Powertrain Control Module,Software Incompatibility with Powertrain Control Module,"Step T: the Wal33D title does not agree (DISAGREE), see title_agreement.csv",do not write
+U0408,Invalid Data Received from Vehicle Immobilizer Control Module,Invalid Data Received from Vehicle Immobilizer Control Module,"Step T: the Wal33D title does not agree (DISAGREE), see title_agreement.csv",do not write
+U0421,Invalid Data Received from Throttle/Pedal Position Sensor,Invalid Data Received from Throttle/Pedal Position Sensor,"Step T: the Wal33D title does not agree (DISAGREE), see title_agreement.csv",do not write
+C0037,Left Rear Wheel Speed Sensor,Left Rear Wheel Speed Sensor,released by Step T: both sources agree,write allowed
+C0038,Left Rear Wheel Speed Sensor Supply,Left Rear Wheel Speed Sensor Supply,released by Step T: both sources agree,write allowed
+C003A,Right Rear Wheel Speed Sensor,Right Rear Wheel Speed Sensor,released by Step T: both sources agree,write allowed
+C003B,Right Rear Wheel Speed Sensor Supply,Right Rear Wheel Speed Sensor Supply,released by Step T: both sources agree,write allowed
+C003C,Rear Tone Wheel,Rear Tone Wheel,released by Step T: both sources agree,write allowed
+C003D,Rear Wheel Speed Sensor,Rear Wheel Speed Sensor,released by Step T: both sources agree,write allowed
+C003E,Rear Wheel Speed Sensor Supply,Rear Wheel Speed Sensor Supply,released by Step T: both sources agree,write allowed
+C003F,Wheel Speed Sensors Rotation Direction Correlation,Wheel Speed Sensors Rotation Direction Correlation,released by Step T: both sources agree,write allowed
+P0141,"O2 Sensor Heater Circuit Malfunction (Bank 1, Sensor 2)","O2 Sensor Heater Circuit Malfunction (Bank 1, Sensor 2)",released by Step T: both sources agree,write allowed
+P033F,Crankshaft/Camshaft Loss Of Synchronization,Crankshaft/Camshaft Loss Of Synchronization,released by Step T: both sources agree,write allowed
+P2110,Throttle Actuator Control System — Forced Limited RPM,Throttle Actuator Control System — Forced Limited RPM,released by Step T: both sources agree,write allowed
+U0167,Lost Communication with Vehicle Immobiliser Control Module,Lost Communication with Vehicle Immobiliser Control Module,released by Step T: both sources agree,write allowed

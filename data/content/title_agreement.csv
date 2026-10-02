@@ -1,0 +1,388 @@
+code,obdex_title,wal33d_title,similarity,verdict,note,title_in_force,title_status,previously_held_back,entry_written
+P0120,Throttle Position Sensor / Switch A Circuit Malfunction,Throttle/Pedal Position Sensor/Switch A Circuit,1.00,AGREE,,Throttle Position Sensor / Switch A Circuit Malfunction,obdex,no,yes
+P0105,Manifold Absolute Pressure / Barometric Pressure Circuit Malfunction,Manifold Absolute Pressure/Barometric Pressure Sensor Circuit,1.00,AGREE,,Manifold Absolute Pressure / Barometric Pressure Circuit Malfunction,obdex,no,yes
+P0195,Engine Oil Temperature Sensor Malfunction,Engine Oil Temperature Sensor A Circuit,1.00,AGREE,,Engine Oil Temperature Sensor Malfunction,obdex,no,yes
+P0130,"O2 Sensor Circuit Malfunction (Bank 1, Sensor 1)",O2 Sensor Circuit Bank 1 Sensor 1,1.00,AGREE,,"O2 Sensor Circuit Malfunction (Bank 1, Sensor 1)",obdex,no,yes
+P0135,"O2 Sensor Heater Circuit Malfunction (Bank 1, Sensor 1)",O2 Sensor Heater Circuit Bank 1 Sensor 1,1.00,AGREE,,"O2 Sensor Heater Circuit Malfunction (Bank 1, Sensor 1)",obdex,no,yes
+P0201,Injector Circuit Malfunction — Cylinder 1,Cylinder 1 Injector A Circuit,1.00,AGREE,,Injector Circuit Malfunction — Cylinder 1,obdex,no,yes
+P0351,"Ignition Coil ""A"" Primary/Secondary Circuit Malfunction (Cylinder 1)",Ignition Coil A Primary Control Circuit/Open,0.59,DISAGREE,MEANING: key words differ: OBDex only ['cyl1']; Wal33D only ['open'],"Ignition Coil ""A"" Primary/Secondary Circuit Malfunction (Cylinder 1)",obdex,no,yes
+P0230,Fuel Pump Primary Circuit Malfunction,Fuel Pump Primary Circuit,1.00,AGREE,,Fuel Pump Primary Circuit Malfunction,obdex,no,yes
+P0335,"Crankshaft Position Sensor ""A"" Circuit Malfunction",Crankshaft Position Sensor A Circuit,1.00,AGREE,,"Crankshaft Position Sensor ""A"" Circuit Malfunction",obdex,no,yes
+P0110,Intake Air Temperature Sensor Circuit Malfunction,Intake Air Temperature Sensor 1 Circuit Bank 1,1.00,AGREE,,Intake Air Temperature Sensor Circuit Malfunction,obdex,no,yes
+P0115,Engine Coolant Temperature Sensor Circuit Malfunction,Engine Coolant Temperature Sensor 1 Circuit,1.00,AGREE,,Engine Coolant Temperature Sensor Circuit Malfunction,obdex,no,yes
+P0202,Injector Circuit Malfunction — Cylinder 2,Cylinder 2 Injector A Circuit,1.00,AGREE,,Injector Circuit Malfunction — Cylinder 2,obdex,no,yes
+P0352,"Ignition Coil ""B"" Primary/Secondary Circuit Malfunction (Cylinder 2)",Ignition Coil B Primary Control Circuit/Open,0.63,DISAGREE,MEANING: key words differ: OBDex only ['cyl2']; Wal33D only ['open'],"Ignition Coil ""B"" Primary/Secondary Circuit Malfunction (Cylinder 2)",obdex,no,yes
+P0300,Random/Multiple Cylinder Misfire Detected,Random/Multiple Cylinder Misfire Detected,1.00,AGREE,,Random/Multiple Cylinder Misfire Detected,obdex,no,yes
+P0301,Cylinder 1 Misfire Detected,Cylinder 1 Misfire Detected,1.00,AGREE,,Cylinder 1 Misfire Detected,obdex,no,yes
+P0302,Cylinder 2 Misfire Detected,Cylinder 2 Misfire Detected,1.00,AGREE,,Cylinder 2 Misfire Detected,obdex,no,yes
+P0171,System Too Lean (Bank 1),System Too Lean Bank 1,1.00,AGREE,,System Too Lean (Bank 1),obdex,no,yes
+P0172,System Too Rich (Bank 1),System Too Rich Bank 1,1.00,AGREE,,System Too Rich (Bank 1),obdex,no,yes
+P0420,Catalyst System Efficiency Below Threshold (Bank 1),Catalyst System Efficiency Below Threshold Bank 1,1.00,AGREE,,Catalyst System Efficiency Below Threshold (Bank 1),obdex,no,yes
+P0122,"Throttle/Pedal Position Sensor ""A"" Low Input",Throttle/Pedal Position Sensor/Switch A Circuit Low,1.00,AGREE,,"Throttle/Pedal Position Sensor ""A"" Low Input",obdex,no,yes
+P0123,"Throttle/Pedal Position Sensor ""A"" High Input",Throttle/Pedal Position Sensor/Switch A Circuit High,1.00,AGREE,,"Throttle/Pedal Position Sensor ""A"" High Input",obdex,no,yes
+P0107,Manifold Absolute Pressure Sensor Low Input,Manifold Absolute Pressure/Barometric Pressure Sensor Circuit Low,0.93,AGREE,,Manifold Absolute Pressure Sensor Low Input,obdex,no,yes
+P0108,Manifold Absolute Pressure Sensor High Input,Manifold Absolute Pressure/Barometric Pressure Sensor Circuit High,0.94,AGREE,,Manifold Absolute Pressure Sensor High Input,obdex,no,yes
+P0112,Intake Air Temperature Sensor Low Input,Intake Air Temperature Sensor 1 Circuit Low Bank 1,1.00,AGREE,,Intake Air Temperature Sensor Low Input,obdex,no,yes
+P0113,Intake Air Temperature Sensor High Input,Intake Air Temperature Sensor 1 Circuit High Bank 1,1.00,AGREE,,Intake Air Temperature Sensor High Input,obdex,no,yes
+P0117,Engine Coolant Temperature Sensor Low Input,Engine Coolant Temperature Sensor 1 Circuit Low,1.00,AGREE,,Engine Coolant Temperature Sensor Low Input,obdex,no,yes
+P0118,Engine Coolant Temperature Sensor High Input,Engine Coolant Temperature Sensor 1 Circuit High,1.00,AGREE,,Engine Coolant Temperature Sensor High Input,obdex,no,yes
+P0131,"O2 Sensor Circuit Low Voltage (Bank 1, Sensor 1)",O2 Sensor Circuit Low Voltage Bank 1 Sensor 1,1.00,AGREE,,"O2 Sensor Circuit Low Voltage (Bank 1, Sensor 1)",obdex,no,yes
+P0132,"O2 Sensor Circuit High Voltage (Bank 1, Sensor 1)",O2 Sensor Circuit High Voltage Bank 1 Sensor 1,1.00,AGREE,,"O2 Sensor Circuit High Voltage (Bank 1, Sensor 1)",obdex,no,yes
+P0500,"Vehicle Speed Sensor ""A"" Malfunction",Vehicle Speed Sensor A Circuit,1.00,AGREE,,"Vehicle Speed Sensor ""A"" Malfunction",obdex,no,yes
+P0562,System Voltage Low,System Voltage Low,1.00,AGREE,,System Voltage Low,obdex,no,yes
+P0563,System Voltage High,System Voltage High,1.00,AGREE,,System Voltage High,obdex,no,yes
+P0850,Park/Neutral Switch Input Circuit,Park/Neutral Switch Input Circuit,1.00,AGREE,,Park/Neutral Switch Input Circuit,obdex,no,yes
+P0600,Serial Communication Link,Serial Communication Link,1.00,AGREE,,Serial Communication Link,obdex,no,yes
+P0340,"Camshaft Position Sensor ""A"" Circuit (Bank 1 or Single Sensor)",Camshaft Position Sensor A Circuit Bank 1 or Single Sensor,1.00,AGREE,,"Camshaft Position Sensor ""A"" Circuit (Bank 1 or Single Sensor)",obdex,no,yes
+P0505,Idle Air Control System Malfunction,Idle Control System,0.76,DISAGREE,WORDING: same key words but similarity 0.76 is below 0.8,Idle Air Control System Malfunction,obdex,no,yes
+U0100,"Lost Communication with ECM/PCM ""A""",Lost Communication With ECM/PCM A,1.00,AGREE,,"Lost Communication with ECM/PCM ""A""",obdex,no,yes
+U0121,Lost Communication with ABS Control Module,Lost Communication With Anti-Lock Brake System (ABS) Control Module A,1.00,AGREE,,Lost Communication with ABS Control Module,obdex,no,yes
+U0155,Lost Communication with Instrument Panel Cluster,Lost Communication With Instrument Panel Cluster (IPC) Control Module,0.89,AGREE,,Lost Communication with Instrument Panel Cluster,obdex,no,yes
+C0035,Left Front Wheel Speed Sensor Circuit Malfunction,Right Front Wheel Speed Sensor Supply,0.62,DISAGREE,"MEANING: key words differ: OBDex only ['left']; Wal33D only ['right', 'supply']",Left Front Wheel Speed Sensor Circuit Malfunction,obdex,no,yes
+P0121,"Throttle/Pedal Position Sensor ""A"" Range/Performance",Throttle/Pedal Position Sensor/Switch A Circuit Range/Performance,1.00,AGREE,,"Throttle/Pedal Position Sensor ""A"" Range/Performance",obdex,no,yes
+P0124,"Throttle/Pedal Position Sensor ""A"" Circuit Intermittent",Throttle/Pedal Position Sensor/Switch A Circuit Intermittent,1.00,AGREE,,"Throttle/Pedal Position Sensor ""A"" Circuit Intermittent",obdex,no,yes
+P0106,Manifold Absolute Pressure Sensor Range/Performance,Manifold Absolute Pressure/Barometric Pressure Sensor Circuit Range/Performance,0.95,AGREE,,Manifold Absolute Pressure Sensor Range/Performance,obdex,no,yes
+P0109,Manifold Absolute Pressure / Barometric Pressure Circuit Intermittent,Manifold Absolute Pressure/Barometric Pressure Sensor Circuit Intermittent,1.00,AGREE,,Manifold Absolute Pressure / Barometric Pressure Circuit Intermittent,obdex,no,yes
+P0111,Intake Air Temperature Sensor Range/Performance,Intake Air Temperature Sensor 1 Circuit Range/Performance Bank 1,1.00,AGREE,,Intake Air Temperature Sensor Range/Performance,obdex,no,yes
+P0114,Intake Air Temperature Sensor Intermittent,Intake Air Temperature Sensor 1 Circuit Intermittent Bank 1,1.00,AGREE,,Intake Air Temperature Sensor Intermittent,obdex,no,yes
+P0116,Engine Coolant Temperature Sensor Range/Performance,Engine Coolant Temperature Sensor 1 Circuit Range/Performance,1.00,AGREE,,Engine Coolant Temperature Sensor Range/Performance,obdex,no,yes
+P0119,Engine Coolant Temperature Sensor Circuit Intermittent,Engine Coolant Temperature Sensor 1 Circuit Intermittent/Erratic,1.00,AGREE,,Engine Coolant Temperature Sensor Circuit Intermittent,obdex,no,yes
+P0217,Engine Coolant Over Temperature Condition,Engine Coolant Over Temperature Condition,1.00,AGREE,,Engine Coolant Over Temperature Condition,obdex,no,yes
+P0125,Insufficient Coolant Temperature for Closed Loop Fuel Control,Insufficient Coolant Temperature for Closed Loop Fuel Control,1.00,AGREE,,Insufficient Coolant Temperature for Closed Loop Fuel Control,obdex,no,yes
+P0126,Insufficient Coolant Temperature for Stable Operation,Insufficient Coolant Temperature for Stable Operation,1.00,AGREE,,Insufficient Coolant Temperature for Stable Operation,obdex,no,yes
+P0128,Coolant Thermostat Below Regulating Temperature,Coolant Thermostat (Coolant Temperature Below Thermostat Regulating Temperature),0.88,AGREE,,Coolant Thermostat Below Regulating Temperature,obdex,no,yes
+P0196,Engine Oil Temperature Sensor Range / Performance,Engine Oil Temperature Sensor A Range/Performance,1.00,AGREE,,Engine Oil Temperature Sensor Range / Performance,obdex,no,yes
+P0197,Engine Oil Temperature Sensor Low,Engine Oil Temperature Sensor A Circuit Low,1.00,AGREE,,Engine Oil Temperature Sensor Low,obdex,no,yes
+P0198,Engine Oil Temperature Sensor High,Engine Oil Temperature Sensor A Circuit High,1.00,AGREE,,Engine Oil Temperature Sensor High,obdex,no,yes
+P0199,Engine Oil Temperature Sensor Intermittent,Engine Oil Temperature Sensor A Circuit Intermittent/Erratic,1.00,AGREE,,Engine Oil Temperature Sensor Intermittent,obdex,no,yes
+P0133,"O2 Sensor Slow Response (Bank 1, Sensor 1)",O2 Sensor Circuit Slow Response Bank 1 Sensor 1,1.00,AGREE,,"O2 Sensor Slow Response (Bank 1, Sensor 1)",obdex,no,yes
+P0134,O2 Sensor Circuit No Activity / Slow Response (Bank 1 Sensor 1),O2 Sensor Circuit No Activity Detected Bank 1 Sensor 1,0.67,DISAGREE,"MEANING: key words differ: OBDex only ['response', 'slow']; Wal33D only []",O2 Sensor Circuit No Activity / Slow Response (Bank 1 Sensor 1),suspect,yes,no
+P2195,"O2 Sensor Signal Stuck Lean (Bank 1, Sensor 1)",O2 Sensor Signal Biased/Stuck Lean Bank 1 Sensor 1,0.84,AGREE,,"O2 Sensor Signal Stuck Lean (Bank 1, Sensor 1)",obdex,no,yes
+P2196,"O2 Sensor Signal Stuck Rich (Bank 1, Sensor 1)",O2 Sensor Signal Biased/Stuck Rich Bank 1 Sensor 1,0.84,AGREE,,"O2 Sensor Signal Stuck Rich (Bank 1, Sensor 1)",obdex,no,yes
+P0030,HO2S Heater Control Circuit (Bank 1 Sensor 1),HO2S Heater Control Circuit Bank 1 Sensor 1,1.00,AGREE,,HO2S Heater Control Circuit (Bank 1 Sensor 1),obdex,no,yes
+P0031,HO2S Heater Control Circuit Low (Bank 1 Sensor 1),HO2S Heater Control Circuit Low Bank 1 Sensor 1,1.00,AGREE,,HO2S Heater Control Circuit Low (Bank 1 Sensor 1),obdex,no,yes
+P0032,HO2S Heater Control Circuit High (Bank 1 Sensor 1),HO2S Heater Control Circuit High Bank 1 Sensor 1,1.00,AGREE,,HO2S Heater Control Circuit High (Bank 1 Sensor 1),obdex,no,yes
+P0170,Fuel Trim Malfunction (Bank 1),Fuel Trim Bank 1,1.00,AGREE,,Fuel Trim Malfunction (Bank 1),obdex,no,yes
+P0200,Injector Circuit/Open,Injector Circuit/Open,1.00,AGREE,,Injector Circuit/Open,obdex,no,yes
+P0261,Cylinder 1 Injector Circuit Low,Cylinder 1 Injector A Circuit Low,1.00,AGREE,,Cylinder 1 Injector Circuit Low,obdex,no,yes
+P0262,Cylinder 1 Injector Circuit High,Cylinder 1 Injector A Circuit High,1.00,AGREE,,Cylinder 1 Injector Circuit High,obdex,no,yes
+P0264,Cylinder 2 Injector Circuit Low,Cylinder 2 Injector A Circuit Low,1.00,AGREE,,Cylinder 2 Injector Circuit Low,obdex,no,yes
+P0265,Cylinder 2 Injector Circuit High,Cylinder 2 Injector A Circuit High,1.00,AGREE,,Cylinder 2 Injector Circuit High,obdex,no,yes
+P0263,Cylinder 1 Contribution/Balance Fault,Cylinder 1 Contribution/Balance,1.00,AGREE,,Cylinder 1 Contribution/Balance Fault,obdex,no,yes
+P0266,Cylinder 2 Contribution/Balance Fault,Cylinder 2 Contribution/Balance,1.00,AGREE,,Cylinder 2 Contribution/Balance Fault,obdex,no,yes
+P0231,Fuel Pump Secondary Circuit Low,Fuel Pump Secondary Circuit Low,1.00,AGREE,,Fuel Pump Secondary Circuit Low,obdex,no,yes
+P0232,Fuel Pump Secondary Circuit High,Fuel Pump Secondary Circuit High,1.00,AGREE,,Fuel Pump Secondary Circuit High,obdex,no,yes
+P0233,Fuel Pump Secondary Circuit Intermittent,Fuel Pump Secondary Circuit Intermittent,1.00,AGREE,,Fuel Pump Secondary Circuit Intermittent,obdex,no,yes
+P0627,"Fuel Pump ""A"" Control Circuit Open",Fuel Pump A Control Circuit/Open,1.00,AGREE,,"Fuel Pump ""A"" Control Circuit Open",obdex,no,yes
+P0628,Fuel Pump A Control Circuit Low,Fuel Pump A Control Circuit Low,1.00,AGREE,,Fuel Pump A Control Circuit Low,obdex,no,yes
+P0629,Fuel Pump A Control Circuit High,Fuel Pump A Control Circuit High,1.00,AGREE,,Fuel Pump A Control Circuit High,obdex,no,yes
+P0336,"Crankshaft Position Sensor ""A"" Circuit Range/Performance",Crankshaft Position Sensor A Circuit Range/Performance,1.00,AGREE,,"Crankshaft Position Sensor ""A"" Circuit Range/Performance",obdex,no,yes
+P0337,"Crankshaft Position Sensor ""A"" Circuit Low Input",Crankshaft Position Sensor A Circuit Low,1.00,AGREE,,"Crankshaft Position Sensor ""A"" Circuit Low Input",obdex,no,yes
+P0338,"Crankshaft Position Sensor ""A"" Circuit High Input",Crankshaft Position Sensor A Circuit High,1.00,AGREE,,"Crankshaft Position Sensor ""A"" Circuit High Input",obdex,no,yes
+P0339,Crankshaft Position Sensor A Circuit Intermittent,Crankshaft Position Sensor A Circuit Intermittent,1.00,AGREE,,Crankshaft Position Sensor A Circuit Intermittent,obdex,no,yes
+P0341,"Camshaft Position Sensor ""A"" Circuit Range/Performance (Bank 1)",Camshaft Position Sensor A Circuit Range/Performance Bank 1 or Single Sensor,0.85,AGREE,,"Camshaft Position Sensor ""A"" Circuit Range/Performance (Bank 1)",obdex,no,yes
+P0342,"Camshaft Position Sensor ""A"" Circuit Low Input (Bank 1)",Camshaft Position Sensor A Circuit Low Bank 1 or Single Sensor,0.80,AGREE,,"Camshaft Position Sensor ""A"" Circuit Low Input (Bank 1)",obdex,no,yes
+P0343,"Camshaft Position Sensor ""A"" Circuit High Input (Bank 1)",Camshaft Position Sensor A Circuit High Bank 1 or Single Sensor,0.81,AGREE,,"Camshaft Position Sensor ""A"" Circuit High Input (Bank 1)",obdex,no,yes
+P0344,Camshaft Position Sensor A Circuit Intermittent (Bank 1 or Single Sensor),Camshaft Position Sensor A Circuit Intermittent Bank 1 or Single Sensor,1.00,AGREE,,Camshaft Position Sensor A Circuit Intermittent (Bank 1 or Single Sensor),obdex,no,yes
+P0350,Ignition Coil Primary/Secondary Circuit/Open,Ignition Coil Primary/Secondary Circuit/Open,1.00,AGREE,,Ignition Coil Primary/Secondary Circuit/Open,obdex,no,yes
+P0324,Knock/Combustion Vibration Control System Error,Knock/Combustion Vibration Control System Error,1.00,AGREE,,Knock/Combustion Vibration Control System Error,obdex,no,yes
+P0325,Knock Sensor 1 Circuit Malfunction (Bank 1),Knock/Combustion Vibration Sensor A Circuit,0.33,DISAGREE,WORDING: same key words but similarity 0.33 is below 0.8,Knock Sensor 1 Circuit Malfunction (Bank 1),obdex,no,yes
+P0326,Knock/Combustion Vibration Sensor A Circuit Range/Performance,Knock/Combustion Vibration Sensor A Circuit Range/Performance,1.00,AGREE,,Knock/Combustion Vibration Sensor A Circuit Range/Performance,obdex,no,yes
+P0327,Knock Sensor 1 Circuit Low Input (Bank 1),Knock/Combustion Vibration Sensor A Circuit Low,0.48,DISAGREE,WORDING: same key words but similarity 0.48 is below 0.8,Knock Sensor 1 Circuit Low Input (Bank 1),obdex,no,yes
+P0328,Knock Sensor 1 Circuit High Input (Bank 1),Knock/Combustion Vibration Sensor A Circuit High,0.49,DISAGREE,WORDING: same key words but similarity 0.49 is below 0.8,Knock Sensor 1 Circuit High Input (Bank 1),obdex,no,yes
+P0329,Knock/Combustion Vibration Sensor A Circuit Intermittent,Knock/Combustion Vibration Sensor A Circuit Intermittent,1.00,AGREE,,Knock/Combustion Vibration Sensor A Circuit Intermittent,obdex,no,yes
+P0501,"Vehicle Speed Sensor ""A"" Range/Performance",Vehicle Speed Sensor A Circuit Range/Performance,1.00,AGREE,,"Vehicle Speed Sensor ""A"" Range/Performance",obdex,no,yes
+P0502,Vehicle Speed Sensor A Circuit Low,Vehicle Speed Sensor A Circuit Low,1.00,AGREE,,Vehicle Speed Sensor A Circuit Low,obdex,no,yes
+P0503,Vehicle Speed Sensor A Circuit Intermittent Erratic or High,Vehicle Speed Sensor A Circuit Intermittent/Erratic/High,1.00,AGREE,,Vehicle Speed Sensor A Circuit Intermittent Erratic or High,obdex,no,yes
+P0851,Park/Neutral Switch Input Circuit Low,Park/Neutral Switch Input Circuit Low,1.00,AGREE,,Park/Neutral Switch Input Circuit Low,obdex,no,yes
+P0852,Park/Neutral Switch Input Circuit High,Park/Neutral Switch Input Circuit High,1.00,AGREE,,Park/Neutral Switch Input Circuit High,obdex,no,yes
+P0506,Idle Air Control System RPM Lower Than Expected,Idle Control System RPM - Lower Than Expected,0.90,AGREE,,Idle Air Control System RPM Lower Than Expected,obdex,no,yes
+P0507,Idle Air Control System RPM Higher Than Expected,Idle Control System RPM - Higher Than Expected,0.90,AGREE,,Idle Air Control System RPM Higher Than Expected,obdex,no,yes
+P0508,Idle Air Control System Circuit Low,Idle Air Control System Circuit Low,1.00,AGREE,,Idle Air Control System Circuit Low,obdex,no,yes
+P0509,Idle Air Control System Circuit High,Idle Air Control System Circuit High,1.00,AGREE,,Idle Air Control System Circuit High,obdex,no,yes
+P050A,Cold Start Idle Control System Performance,Cold Start Idle Control System Performance,1.00,AGREE,,Cold Start Idle Control System Performance,obdex,no,yes
+P050D,Cold Start Rough Idle,Cold Start Rough Idle,1.00,AGREE,,Cold Start Rough Idle,obdex,no,yes
+P0510,Closed Throttle Position Switch,Closed Throttle Position Switch,1.00,AGREE,,Closed Throttle Position Switch,obdex,no,yes
+P0511,Idle Air Control Circuit,Idle Air Control Circuit,1.00,AGREE,,Idle Air Control Circuit,obdex,no,yes
+P0518,Idle Air Control Circuit Intermittent,Idle Air Control Circuit Intermittent,1.00,AGREE,,Idle Air Control Circuit Intermittent,obdex,no,yes
+P0519,Idle Air Control System Performance,Idle Air Control System Performance,1.00,AGREE,,Idle Air Control System Performance,obdex,no,yes
+P0560,System Voltage Malfunction,System Voltage,1.00,AGREE,,System Voltage Malfunction,obdex,no,yes
+P0561,System Voltage Unstable,System Voltage Unstable,1.00,AGREE,,System Voltage Unstable,obdex,no,yes
+P0615,Starter Relay Circuit,Starter Relay A Circuit,1.00,AGREE,,Starter Relay Circuit,obdex,no,yes
+P0616,Starter Relay A Circuit Low,Starter Relay A Circuit Low,1.00,AGREE,,Starter Relay A Circuit Low,obdex,no,yes
+P0617,Starter Relay Circuit High,Starter Relay A Circuit High,1.00,AGREE,,Starter Relay Circuit High,obdex,no,yes
+P0685,ECM or PCM Power Relay Control Circuit Open,ECM/PCM Power Relay Control Circuit/Open,1.00,AGREE,,ECM or PCM Power Relay Control Circuit Open,confirmed,no,yes
+P0686,ECM/PCM Power Relay Control Circuit Open,ECM/PCM Power Relay Control Circuit Low,1.00,AGREE,owner-checked override applied.,ECM/PCM Power Relay Control Circuit Low,override,no,yes
+P0687,ECM/PCM Power Relay Sense Circuit Open,ECM/PCM Power Relay Control Circuit High,1.00,AGREE,owner-checked override applied.,ECM/PCM Power Relay Control Circuit High,override,no,yes
+P0688,ECM/PCM Power Relay Sense Circuit High,ECM/PCM Power Relay Sense Circuit/Open,1.00,AGREE,owner-checked override applied.,ECM/PCM Power Relay Sense Circuit/Open,override,no,yes
+P0689,ECM or PCM Power Relay Sense Circuit Low,ECM/PCM Power Relay Sense Circuit Low,1.00,AGREE,,ECM or PCM Power Relay Sense Circuit Low,obdex,no,yes
+P068A,ECM or PCM Power Relay De-Energized Performance Too Early,ECM/PCM Power Relay De-Energized Performance - Too Early,1.00,AGREE,,ECM or PCM Power Relay De-Energized Performance Too Early,obdex,no,yes
+P068B,ECM or PCM Power Relay De-Energized Performance Too Late,ECM/PCM Power Relay De-Energized Performance - Too Late,1.00,AGREE,,ECM or PCM Power Relay De-Energized Performance Too Late,obdex,no,yes
+P0690,ECM or PCM Power Relay Sense Circuit High,ECM/PCM Power Relay Sense Circuit High,1.00,AGREE,,ECM or PCM Power Relay Sense Circuit High,obdex,no,yes
+P0641,"Sensor Reference Voltage ""A"" Circuit Open",Sensor Reference Voltage A Circuit/Open,1.00,AGREE,,"Sensor Reference Voltage ""A"" Circuit Open",obdex,no,yes
+P0642,"Sensor Reference Voltage ""A"" Circuit Low",Sensor Reference Voltage A Circuit Low,1.00,AGREE,,"Sensor Reference Voltage ""A"" Circuit Low",obdex,no,yes
+P0643,"Sensor Reference Voltage ""A"" Circuit High",Sensor Reference Voltage A Circuit High,1.00,AGREE,,"Sensor Reference Voltage ""A"" Circuit High",obdex,no,yes
+P0601,Internal Control Module Memory Check Sum Error,Internal Control Module Memory Checksum Error,1.00,AGREE,,Internal Control Module Memory Check Sum Error,obdex,no,yes
+P0602,Control Module Programming Error,Control Module Programming Error,1.00,AGREE,,Control Module Programming Error,obdex,no,yes
+P0603,Internal Control Module Keep Alive Memory (KAM) Error,Internal Control Module Keep Alive Memory (KAM) Error,1.00,AGREE,,Internal Control Module Keep Alive Memory (KAM) Error,obdex,no,yes
+P0604,Internal Control Module Random Access Memory (RAM) Error,Internal Control Module Random Access Memory (RAM) Error,1.00,AGREE,,Internal Control Module Random Access Memory (RAM) Error,obdex,no,yes
+P0605,Internal Control Module Read Only Memory (ROM) Error,Internal Control Module Read Only Memory (ROM) Error,1.00,AGREE,,Internal Control Module Read Only Memory (ROM) Error,obdex,no,yes
+P0606,ECM/PCM Processor Fault,Control Module Processor,1.00,AGREE,,ECM/PCM Processor Fault,obdex,no,yes
+P0607,Control Module Performance,Control Module Performance,1.00,AGREE,,Control Module Performance,obdex,no,yes
+P0633,Immobiliser Key Not Programmed,Immobilizer Key Not Programmed - ECM/PCM,0.87,AGREE,,Immobiliser Key Not Programmed,obdex,no,yes
+P0512,Starter Request Circuit,Starter Request Circuit,1.00,AGREE,,Starter Request Circuit,obdex,no,yes
+P0513,Incorrect Immobilizer Key,Incorrect Immobilizer Key,1.00,AGREE,,Incorrect Immobilizer Key,obdex,no,yes
+U0001,High Speed CAN Communication Bus,High Speed CAN Communication Bus,1.00,AGREE,,High Speed CAN Communication Bus,obdex,no,yes
+U0002,High Speed CAN Communication Bus Performance,High Speed CAN Communication Bus Performance,1.00,AGREE,,High Speed CAN Communication Bus Performance,obdex,no,yes
+U0003,High Speed CAN Communication Bus (+) Open,High Speed CAN Communication Bus (+) Open,1.00,AGREE,,High Speed CAN Communication Bus (+) Open,obdex,no,yes
+U0004,High Speed CAN Communication Bus (+) Low,High Speed CAN Communication Bus (+) Low,1.00,AGREE,,High Speed CAN Communication Bus (+) Low,obdex,no,yes
+U0005,High Speed CAN Communication Bus (+) High,High Speed CAN Communication Bus (+) High,1.00,AGREE,,High Speed CAN Communication Bus (+) High,obdex,no,yes
+U0006,High Speed CAN Communication Bus (-) Open,High Speed CAN Communication Bus (-) Open,1.00,AGREE,,High Speed CAN Communication Bus (-) Open,obdex,no,yes
+U0007,High Speed CAN Communication Bus (-) Low,High Speed CAN Communication Bus (-) Low,1.00,AGREE,,High Speed CAN Communication Bus (-) Low,obdex,no,yes
+U0008,High Speed CAN Communication Bus (-) High,High Speed CAN Communication Bus (-) High,1.00,AGREE,,High Speed CAN Communication Bus (-) High,obdex,no,yes
+U0009,High Speed CAN Communication Bus (-) Shorted to Bus (+),High Speed CAN Communication Bus (-) shorted to Bus (+),1.00,AGREE,,High Speed CAN Communication Bus (-) Shorted to Bus (+),obdex,no,no
+U0010,Medium Speed CAN Communication Bus,Medium Speed CAN Communication Bus,1.00,AGREE,,Medium Speed CAN Communication Bus,obdex,no,no
+P0480,Cooling Fan 1 Control Circuit,Fan 1 Control Circuit,1.00,AGREE,,Cooling Fan 1 Control Circuit,obdex,no,no
+P0691,Cooling Fan 1 Control Circuit Low,Fan 1 Control Circuit Low,1.00,AGREE,,Cooling Fan 1 Control Circuit Low,obdex,no,no
+P0692,Cooling Fan 1 Control Circuit High,Fan 1 Control Circuit High,1.00,AGREE,,Cooling Fan 1 Control Circuit High,obdex,no,no
+P0520,Engine Oil Pressure Sensor or Switch A Circuit,Engine Oil Pressure Sensor/Switch A Circuit,1.00,AGREE,,Engine Oil Pressure Sensor or Switch A Circuit,obdex,no,no
+P0521,Engine Oil Pressure Sensor/Switch Range/Performance,Engine Oil Pressure Sensor/Switch A Range/Performance,1.00,AGREE,,Engine Oil Pressure Sensor/Switch Range/Performance,obdex,no,no
+P0522,Engine Oil Pressure Sensor/Switch Low Voltage,Engine Oil Pressure Sensor/Switch A Low,1.00,AGREE,,Engine Oil Pressure Sensor/Switch Low Voltage,obdex,no,no
+P0523,Engine Oil Pressure Sensor or Switch A High,Engine Oil Pressure Sensor/Switch A High,1.00,AGREE,,Engine Oil Pressure Sensor or Switch A High,obdex,no,no
+P0524,Engine Oil Pressure Too Low,Engine Oil Pressure Too Low,1.00,AGREE,,Engine Oil Pressure Too Low,obdex,no,no
+P0440,Evaporative Emission Control System Malfunction,EVAP System,1.00,AGREE,,Evaporative Emission Control System Malfunction,obdex,no,no
+P0441,Evaporative Emission System Incorrect Purge Flow,EVAP System Incorrect Purge Flow,1.00,AGREE,,Evaporative Emission System Incorrect Purge Flow,obdex,no,no
+P0442,Evaporative Emission System Leak Detected (Small Leak),EVAP System Leak Detected (small leak),1.00,AGREE,,Evaporative Emission System Leak Detected (Small Leak),obdex,no,no
+P0443,Evaporative Emission System Purge Control Valve Circuit,EVAP System Purge Control Valve A Circuit,1.00,AGREE,,Evaporative Emission System Purge Control Valve Circuit,obdex,no,no
+P0444,Evaporative Emission Purge Control Valve Circuit Open,EVAP System Purge Control Valve A Circuit Open,0.83,AGREE,,Evaporative Emission Purge Control Valve Circuit Open,obdex,no,no
+P0445,Evaporative Emission System Purge Control Valve Circuit Shorted,EVAP System Purge Control Valve A Circuit Shorted,1.00,AGREE,,Evaporative Emission System Purge Control Valve Circuit Shorted,obdex,no,no
+P0446,Evaporative Emission Vent Control Circuit Malfunction,EVAP System Vent Control Circuit,0.69,DISAGREE,WORDING: same key words but similarity 0.69 is below 0.8,Evaporative Emission Vent Control Circuit Malfunction,suspect,no,no
+P0447,Evaporative Emission System Vent Control Circuit Open,EVAP System Vent Control Circuit Open,1.00,AGREE,,Evaporative Emission System Vent Control Circuit Open,obdex,no,no
+P0448,EVAP System Vent Control Circuit Shorted,EVAP System Vent Control Circuit Shorted,1.00,AGREE,,EVAP System Vent Control Circuit Shorted,obdex,no,no
+P0449,Evaporative Emission System Vent Valve/Solenoid Circuit Malfunction,EVAP System Vent Valve Control Circuit/Open,0.78,DISAGREE,MEANING: key words differ: OBDex only []; Wal33D only ['open'],Evaporative Emission System Vent Valve/Solenoid Circuit Malfunction,suspect,no,no
+P0410,Secondary Air Injection System Malfunction,AIR System A,1.00,AGREE,,Secondary Air Injection System Malfunction,obdex,no,no
+P0411,Secondary Air Injection System Incorrect Flow,AIR System A Incorrect Flow Detected,1.00,AGREE,,Secondary Air Injection System Incorrect Flow,obdex,no,no
+P0412,Secondary Air Injection System Switching Valve A Circuit,AIR System Switching Valve A Circuit,1.00,AGREE,,Secondary Air Injection System Switching Valve A Circuit,obdex,no,no
+P0413,Secondary Air Injection System Switching Valve A Circuit Open,AIR System Switching Valve A Circuit Open,1.00,AGREE,,Secondary Air Injection System Switching Valve A Circuit Open,obdex,no,no
+P0414,"Secondary Air Injection System Switching Valve ""A"" Circuit Shorted",AIR System Switching Valve A Circuit Shorted,1.00,AGREE,,"Secondary Air Injection System Switching Valve ""A"" Circuit Shorted",obdex,no,no
+P0421,Warm Up Catalyst Efficiency Below Threshold (Bank 1),Catalyst 1 Efficiency Below Threshold Bank 1,0.78,DISAGREE,"MEANING: key words differ: OBDex only ['up', 'warm']; Wal33D only []",Warm Up Catalyst Efficiency Below Threshold (Bank 1),suspect,no,no
+P0638,Throttle Actuator Control Range or Performance Bank 1,Throttle Actuator Control Range/Performance Bank 1,1.00,AGREE,,Throttle Actuator Control Range or Performance Bank 1,obdex,no,no
+P2100,Throttle Actuator Control Motor Circuit Open,Throttle Actuator A Control Motor Circuit/Open,1.00,AGREE,,Throttle Actuator Control Motor Circuit Open,obdex,no,no
+P2101,Throttle Actuator Control Motor Circuit Range/Performance,Throttle Actuator A Control Motor Circuit Range/Performance,1.00,AGREE,,Throttle Actuator Control Motor Circuit Range/Performance,obdex,no,no
+P2102,Throttle Actuator Control Motor Circuit Low,Throttle Actuator A Control Motor Circuit Low,1.00,AGREE,,Throttle Actuator Control Motor Circuit Low,obdex,no,no
+P2103,Throttle Actuator Control Motor Circuit High,Throttle Actuator A Control Motor Circuit High,1.00,AGREE,,Throttle Actuator Control Motor Circuit High,obdex,no,no
+P2104,Throttle Actuator Control System — Forced Idle,Throttle Actuator Control System - Forced Idle,1.00,AGREE,,Throttle Actuator Control System — Forced Idle,obdex,no,no
+P2105,Throttle Actuator Control System — Forced Engine Shutdown,Throttle Actuator Control System - Forced Engine Shutdown,1.00,AGREE,,Throttle Actuator Control System — Forced Engine Shutdown,obdex,no,no
+P2106,Throttle Actuator Control System — Forced Limited Power,Throttle Actuator Control System - Forced Limited Power,1.00,AGREE,,Throttle Actuator Control System — Forced Limited Power,obdex,no,no
+P2107,Throttle Actuator Control Module Internal Processor,Throttle Actuator A Control Module Processor,1.00,AGREE,,Throttle Actuator Control Module Internal Processor,obdex,no,no
+P2108,Throttle Actuator Control Module Performance,Throttle Actuator A Control Module Performance,1.00,AGREE,,Throttle Actuator Control Module Performance,obdex,no,no
+P2109,Throttle/Pedal Position Sensor A Minimum Stop Performance,Throttle/Pedal Position Sensor A Minimum Stop Performance,1.00,AGREE,,Throttle/Pedal Position Sensor A Minimum Stop Performance,obdex,no,no
+P2110,Throttle Actuator Control System — Forced Limited RPM,Throttle Actuator A Control System - Forced Limited RPM,1.00,AGREE,,Throttle Actuator Control System — Forced Limited RPM,two-source,yes,no
+P2111,Throttle Actuator Control System — Stuck Open,Throttle Actuator A Control System - Stuck Open,1.00,AGREE,,Throttle Actuator Control System — Stuck Open,obdex,no,no
+P2112,Throttle Actuator Control System — Stuck Closed,Throttle Actuator A Control System - Stuck Closed,1.00,AGREE,,Throttle Actuator Control System — Stuck Closed,obdex,no,no
+P2118,Throttle Actuator Control Motor Current Range/Performance,Throttle Actuator A Control Motor Current Range/Performance,1.00,AGREE,,Throttle Actuator Control Motor Current Range/Performance,obdex,no,no
+P2119,Throttle Closed Position Performance,Throttle Actuator A Control Throttle Body Range/Performance,0.45,DISAGREE,"MEANING: key words differ: OBDex only ['closed']; Wal33D only ['body', 'range']",Throttle Closed Position Performance,suspect,no,no
+P2135,"Throttle/Pedal Position Sensor ""A""/""B"" Voltage Correlation",Throttle/Pedal Position Sensor/Switch A/B Voltage Correlation,1.00,AGREE,,"Throttle/Pedal Position Sensor ""A""/""B"" Voltage Correlation",obdex,no,no
+C0040,Right Front Wheel Speed Sensor Circuit Malfunction,Brake Pedal Switch A,0.18,DISAGREE,"MEANING: key words differ: OBDex only ['front', 'right', 'speed', 'wheel']; Wal33D only ['brake', 'pedal']",Right Front Wheel Speed Sensor Circuit Malfunction,suspect,no,no
+C0045,Left Rear Wheel Speed Sensor Circuit Malfunction,Brake Pressure Sensor B,0.16,DISAGREE,"MEANING: key words differ: OBDex only ['left', 'rear', 'speed', 'wheel']; Wal33D only ['b', 'brake']",Left Rear Wheel Speed Sensor Circuit Malfunction,suspect,no,no
+C0050,Right Rear Wheel Speed Sensor Circuit Malfunction,,0.00,MISSING,no GENERIC row for this code in the Wal33D database,Right Rear Wheel Speed Sensor Circuit Malfunction,suspect,no,no
+C0099,ABS Control Module Internal Fault,4WD/AWD Rear Differential Unit Actuator A Position Sensor A,0.09,DISAGREE,MEANING: key words differ: OBDex only ['abs']; Wal33D only ['rear'],ABS Control Module Internal Fault,suspect,no,no
+P0220,"Throttle/Pedal Position Sensor/Switch ""B"" Circuit",Throttle/Pedal Position Sensor/Switch B Circuit,1.00,AGREE,,"Throttle/Pedal Position Sensor/Switch ""B"" Circuit",obdex,no,no
+P0221,"Throttle/Pedal Position Sensor/Switch ""B"" Range/Performance",Throttle/Pedal Position Sensor/Switch B Circuit Range/Performance,1.00,AGREE,,"Throttle/Pedal Position Sensor/Switch ""B"" Range/Performance",obdex,no,no
+P0222,"Throttle/Pedal Position Sensor/Switch ""B"" Circuit Low Input",Throttle/Pedal Position Sensor/Switch B Circuit Low,1.00,AGREE,,"Throttle/Pedal Position Sensor/Switch ""B"" Circuit Low Input",obdex,no,no
+P0223,"Throttle/Pedal Position Sensor/Switch ""B"" Circuit High Input",Throttle/Pedal Position Sensor/Switch B Circuit High,1.00,AGREE,,"Throttle/Pedal Position Sensor/Switch ""B"" Circuit High Input",obdex,no,no
+P0224,Throttle/Pedal Position Sensor/Switch B Circuit Intermittent,Throttle/Pedal Position Sensor/Switch B Circuit Intermittent,1.00,AGREE,,Throttle/Pedal Position Sensor/Switch B Circuit Intermittent,obdex,no,no
+P0068,MAP/MAF - Throttle Position Correlation,MAP/MAF - Throttle Position Correlation,1.00,AGREE,,MAP/MAF - Throttle Position Correlation,obdex,no,no
+P0069,Manifold Absolute Pressure - Barometric Pressure Correlation,Manifold Absolute Pressure - Barometric Pressure Correlation,1.00,AGREE,,Manifold Absolute Pressure - Barometric Pressure Correlation,obdex,no,no
+P2226,Barometric Pressure Circuit,Barometric Pressure Sensor A Circuit,1.00,AGREE,,Barometric Pressure Circuit,obdex,no,no
+P2227,Barometric Pressure Circuit Range/Performance,Barometric Pressure Sensor A Circuit Range/Performance,1.00,AGREE,,Barometric Pressure Circuit Range/Performance,obdex,no,no
+P2228,Barometric Pressure Sensor Circuit Low,Barometric Pressure Sensor A Circuit Low,1.00,AGREE,,Barometric Pressure Sensor Circuit Low,obdex,no,no
+P2229,Barometric Pressure Sensor Circuit High,Barometric Pressure Sensor A Circuit High,1.00,AGREE,,Barometric Pressure Sensor Circuit High,obdex,no,no
+P2230,Barometric Pressure Circuit Low,Barometric Pressure Sensor A Circuit Intermittent/Erratic,0.61,DISAGREE,MEANING: key words differ: OBDex only ['low']; Wal33D only ['intermittent'],Barometric Pressure Circuit Low,suspect,yes,no
+P0127,Intake Air Temperature Too High,Intake Air Temperature Too High,1.00,AGREE,,Intake Air Temperature Too High,obdex,no,no
+P00D5,HO2S Sensor Correlation Bank 1 Sensor 1/Bank 1 Sensor 2,HO2S Sensor Correlation Bank 1 Sensor 1/Bank 1 Sensor 2,1.00,AGREE,,HO2S Sensor Correlation Bank 1 Sensor 1/Bank 1 Sensor 2,obdex,no,no
+P0136,"O2 Sensor Circuit Malfunction (Bank 1, Sensor 2)",O2 Sensor Circuit Bank 1 Sensor 2,1.00,AGREE,,"O2 Sensor Circuit Malfunction (Bank 1, Sensor 2)",obdex,no,no
+P0137,"O2 Sensor Circuit Low Voltage (Bank 1, Sensor 2)",O2 Sensor Circuit Low Voltage Bank 1 Sensor 2,1.00,AGREE,,"O2 Sensor Circuit Low Voltage (Bank 1, Sensor 2)",obdex,no,no
+P0138,"O2 Sensor Circuit High Voltage (Bank 1, Sensor 2)",O2 Sensor Circuit High Voltage Bank 1 Sensor 2,1.00,AGREE,,"O2 Sensor Circuit High Voltage (Bank 1, Sensor 2)",obdex,no,no
+P0139,O2 Sensor Circuit High Voltage (Bank 1 Sensor 2),O2 Sensor Circuit Slow Response Bank 1 Sensor 2,1.00,AGREE,owner-checked override applied.,"O2 Sensor Circuit Slow Response (Bank 1, Sensor 2)",override,no,no
+P013A,O2 Sensor Slow Response - Rich to Lean Bank 1 Sensor 2,O2 Sensor Slow Response - Rich to Lean Bank 1 Sensor 2,1.00,AGREE,,O2 Sensor Slow Response - Rich to Lean Bank 1 Sensor 2,obdex,no,no
+P013B,O2 Sensor Slow Response - Lean to Rich Bank 1 Sensor 2,O2 Sensor Slow Response - Lean to Rich Bank 1 Sensor 2,1.00,AGREE,,O2 Sensor Slow Response - Lean to Rich Bank 1 Sensor 2,obdex,no,no
+P013E,O2 Sensor Delayed Response - Rich to Lean Bank 1 Sensor 2,O2 Sensor Delayed Response - Rich to Lean Bank 1 Sensor 2,1.00,AGREE,,O2 Sensor Delayed Response - Rich to Lean Bank 1 Sensor 2,obdex,no,no
+P013F,O2 Sensor Delayed Response - Lean to Rich Bank 1 Sensor 2,O2 Sensor Delayed Response - Lean to Rich Bank 1 Sensor 2,1.00,AGREE,,O2 Sensor Delayed Response - Lean to Rich Bank 1 Sensor 2,obdex,no,no
+P0140,O2 Sensor Circuit No Activity / Slow Response (Bank 1 Sensor 2),O2 Sensor Circuit No Activity Detected Bank 1 Sensor 2,0.72,DISAGREE,"MEANING: key words differ: OBDex only ['response', 'slow']; Wal33D only []",O2 Sensor Circuit No Activity / Slow Response (Bank 1 Sensor 2),suspect,yes,no
+P014C,O2 Sensor Slow Response - Rich to Lean Bank 1 Sensor 1,O2 Sensor Slow Response - Rich to Lean Bank 1 Sensor 1,1.00,AGREE,,O2 Sensor Slow Response - Rich to Lean Bank 1 Sensor 1,obdex,no,no
+P014D,O2 Sensor Slow Response - Lean to Rich Bank 1 Sensor 1,O2 Sensor Slow Response - Lean to Rich Bank 1 Sensor 1,1.00,AGREE,,O2 Sensor Slow Response - Lean to Rich Bank 1 Sensor 1,obdex,no,no
+P015A,O2 Sensor Delayed Response - Rich to Lean Bank 1 Sensor 1,O2 Sensor Delayed Response - Rich to Lean Bank 1 Sensor 1,1.00,AGREE,,O2 Sensor Delayed Response - Rich to Lean Bank 1 Sensor 1,obdex,no,no
+P015B,O2 Sensor Delayed Response - Lean to Rich Bank 1 Sensor 1,O2 Sensor Delayed Response - Lean to Rich Bank 1 Sensor 1,1.00,AGREE,,O2 Sensor Delayed Response - Lean to Rich Bank 1 Sensor 1,obdex,no,no
+P2270,"O2 Sensor Signal Stuck Lean (Bank 1, Sensor 2)",O2 Sensor Signal Biased/Stuck Lean Bank 1 Sensor 2,0.86,AGREE,,"O2 Sensor Signal Stuck Lean (Bank 1, Sensor 2)",obdex,no,no
+P2271,"O2 Sensor Signal Stuck Rich (Bank 1, Sensor 2)",O2 Sensor Signal Biased/Stuck Rich Bank 1 Sensor 2,0.86,AGREE,,"O2 Sensor Signal Stuck Rich (Bank 1, Sensor 2)",obdex,no,no
+P2A00,O2 Sensor Circuit Range/Performance Bank 1 Sensor 1,O2 Sensor Circuit Range/Performance Bank 1 Sensor 1,1.00,AGREE,,O2 Sensor Circuit Range/Performance Bank 1 Sensor 1,obdex,no,no
+P2A01,O2 Sensor Circuit Range/Performance Bank 1 Sensor 2,O2 Sensor Circuit Range/Performance Bank 1 Sensor 2,1.00,AGREE,,O2 Sensor Circuit Range/Performance Bank 1 Sensor 2,obdex,no,no
+P0036,HO2S Heater Control Circuit (Bank 1 Sensor 2),HO2S Heater Control Circuit Bank 1 Sensor 2,1.00,AGREE,,HO2S Heater Control Circuit (Bank 1 Sensor 2),obdex,no,no
+P0037,HO2S Heater Control Circuit Low (Bank 1 Sensor 2),HO2S Heater Control Circuit Low Bank 1 Sensor 2,1.00,AGREE,,HO2S Heater Control Circuit Low (Bank 1 Sensor 2),obdex,no,no
+P0038,HO2S Heater Control Circuit High (Bank 1 Sensor 2),HO2S Heater Control Circuit High Bank 1 Sensor 2,1.00,AGREE,,HO2S Heater Control Circuit High (Bank 1 Sensor 2),obdex,no,no
+P0053,HO2S Heater Resistance Bank 1 Sensor 1,HO2S Heater Resistance Bank 1 Sensor 1,1.00,AGREE,,HO2S Heater Resistance Bank 1 Sensor 1,obdex,no,no
+P0054,HO2S Heater Resistance Bank 1 Sensor 2,HO2S Heater Resistance Bank 1 Sensor 2,1.00,AGREE,,HO2S Heater Resistance Bank 1 Sensor 2,obdex,no,no
+P00D1,HO2S Heater Control Circuit Range/Performance Bank 1 Sensor 1,HO2S Heater Control Circuit Range/Performance Bank 1 Sensor 1,1.00,AGREE,,HO2S Heater Control Circuit Range/Performance Bank 1 Sensor 1,obdex,no,no
+P00D2,HO2S Heater Control Circuit Range/Performance Bank 1 Sensor 2,HO2S Heater Control Circuit Range/Performance Bank 1 Sensor 2,1.00,AGREE,,HO2S Heater Control Circuit Range/Performance Bank 1 Sensor 2,obdex,no,no
+P0141,"O2 Sensor Heater Circuit Malfunction (Bank 1, Sensor 2)",O2 Sensor Heater Circuit Bank 1 Sensor 2,1.00,AGREE,,"O2 Sensor Heater Circuit Malfunction (Bank 1, Sensor 2)",two-source,yes,no
+P2096,Post Catalyst Fuel Trim System Too Lean (Bank 1),Post Catalyst Fuel Trim System Too Lean Bank 1,1.00,AGREE,,Post Catalyst Fuel Trim System Too Lean (Bank 1),obdex,no,no
+P2097,Post Catalyst Fuel Trim System Too Rich (Bank 1),Post Catalyst Fuel Trim System Too Rich Bank 1,1.00,AGREE,,Post Catalyst Fuel Trim System Too Rich (Bank 1),obdex,no,no
+P2177,System Too Lean Off Idle Bank 1,System Too Lean Off Idle Bank 1,1.00,AGREE,,System Too Lean Off Idle Bank 1,obdex,no,no
+P2178,System Too Rich Off Idle Bank 1,System Too Rich Off Idle Bank 1,1.00,AGREE,,System Too Rich Off Idle Bank 1,obdex,no,no
+P2187,System Too Lean at Idle (Bank 1),System Too Lean at Idle Bank 1,1.00,AGREE,,System Too Lean at Idle (Bank 1),obdex,no,no
+P2188,System Too Rich at Idle (Bank 1),System Too Rich at Idle Bank 1,1.00,AGREE,,System Too Rich at Idle (Bank 1),obdex,no,no
+P2146,Fuel Injector Group A Supply Voltage Circuit/Open,Fuel Injector Group A Supply Voltage Circuit/Open,1.00,AGREE,,Fuel Injector Group A Supply Voltage Circuit/Open,obdex,no,no
+P2147,Fuel Injector Group A Supply Voltage Circuit Low,Fuel Injector Group A Supply Voltage Circuit Low,1.00,AGREE,,Fuel Injector Group A Supply Voltage Circuit Low,obdex,no,no
+P2148,Fuel Injector Group A Supply Voltage Circuit High,Fuel Injector Group A Supply Voltage Circuit High,1.00,AGREE,,Fuel Injector Group A Supply Voltage Circuit High,obdex,no,no
+P0316,Engine Misfire Detected on Startup (First 1000 Revolutions),Engine Misfire Detected on Startup (First 1000 Revolutions),1.00,AGREE,,Engine Misfire Detected on Startup (First 1000 Revolutions),obdex,no,no
+P2300,Ignition Coil A Primary Control Circuit Low,Ignition Coil A Primary Control Circuit Low,1.00,AGREE,,Ignition Coil A Primary Control Circuit Low,obdex,no,no
+P2301,Ignition Coil A Primary Control Circuit High,Ignition Coil A Primary Control Circuit High,1.00,AGREE,,Ignition Coil A Primary Control Circuit High,obdex,no,no
+P2302,Ignition Coil A Secondary Circuit,Ignition Coil A Secondary Circuit,1.00,AGREE,,Ignition Coil A Secondary Circuit,obdex,no,no
+P2303,Ignition Coil B Primary Control Circuit Low,Ignition Coil B Primary Control Circuit Low,1.00,AGREE,,Ignition Coil B Primary Control Circuit Low,obdex,no,no
+P2304,Ignition Coil B Primary Control Circuit High,Ignition Coil B Primary Control Circuit High,1.00,AGREE,,Ignition Coil B Primary Control Circuit High,obdex,no,no
+P2305,Ignition Coil B Secondary Circuit,Ignition Coil B Secondary Circuit,1.00,AGREE,,Ignition Coil B Secondary Circuit,obdex,no,no
+P0914,Gear Shift Position Circuit A,Gear Shift Position Circuit A,1.00,AGREE,,Gear Shift Position Circuit A,obdex,no,no
+P0915,Gear Shift Position Circuit Range/Performance,Gear Shift Position Circuit A Range/Performance,1.00,AGREE,,Gear Shift Position Circuit Range/Performance,obdex,no,no
+P0916,Gear Shift Position Circuit Low A,Gear Shift Position Circuit A Low,1.00,AGREE,,Gear Shift Position Circuit Low A,obdex,no,no
+P0917,Gear Shift Position Circuit High A,Gear Shift Position Circuit A High,1.00,AGREE,,Gear Shift Position Circuit High A,obdex,no,no
+P0918,Gear Shift Position Circuit Intermittent A,Gear Shift Position Circuit A Intermittent,1.00,AGREE,,Gear Shift Position Circuit Intermittent A,obdex,no,no
+P0919,Gear Shift Position Control Error,Gear Shift Position Control Error,1.00,AGREE,,Gear Shift Position Control Error,obdex,no,no
+P0651,Sensor Reference Voltage B Circuit Open,Sensor Reference Voltage B Circuit/Open,1.00,AGREE,,Sensor Reference Voltage B Circuit Open,obdex,no,no
+P0652,Sensor Reference Voltage B Circuit Low,Sensor Reference Voltage B Circuit Low,1.00,AGREE,,Sensor Reference Voltage B Circuit Low,obdex,no,no
+P0653,Sensor Reference Voltage B Circuit High,Sensor Reference Voltage B Circuit High,1.00,AGREE,,Sensor Reference Voltage B Circuit High,obdex,no,no
+P0697,Sensor Reference Voltage C Circuit Open,Sensor Reference Voltage C Circuit/Open,1.00,AGREE,,Sensor Reference Voltage C Circuit Open,obdex,no,no
+P0698,Sensor Reference Voltage C Circuit Low,Sensor Reference Voltage C Circuit Low,1.00,AGREE,,Sensor Reference Voltage C Circuit Low,obdex,no,no
+P0699,Sensor Reference Voltage C Circuit High,Sensor Reference Voltage C Circuit High,1.00,AGREE,,Sensor Reference Voltage C Circuit High,obdex,no,no
+P0608,Control Module VSS Output A,Control Module VSS Output A,1.00,AGREE,,Control Module VSS Output A,obdex,no,no
+P0609,Control Module VSS Output B,Control Module VSS Output B,1.00,AGREE,,Control Module VSS Output B,obdex,no,no
+P060A,Internal Control Module Monitoring Processor Performance,Internal Control Module Monitoring Processor Performance,1.00,AGREE,,Internal Control Module Monitoring Processor Performance,obdex,no,no
+P060B,Internal Control Module A and D Processing Performance,Internal Control Module A/D Processing Performance,1.00,AGREE,,Internal Control Module A and D Processing Performance,obdex,no,no
+P060C,Internal Control Module Main Processor Performance,Internal Control Module Main Processor Performance,1.00,AGREE,,Internal Control Module Main Processor Performance,obdex,no,no
+P060D,Internal Control Module Accelerator Pedal Position Performance,Internal Control Module Accelerator Pedal Position Performance,1.00,AGREE,,Internal Control Module Accelerator Pedal Position Performance,obdex,no,no
+P060E,Internal Control Module Throttle Position Performance,Internal Control Module Throttle Position Performance,1.00,AGREE,,Internal Control Module Throttle Position Performance,obdex,no,no
+P060F,Internal Control Module Coolant Temperature Performance,Internal Control Module Coolant Temperature Performance,1.00,AGREE,,Internal Control Module Coolant Temperature Performance,obdex,no,no
+P0610,Control Module Vehicle Options Error,Control Module Vehicle Options Error,1.00,AGREE,,Control Module Vehicle Options Error,obdex,no,no
+P062F,Internal Control Module EEPROM Error,Internal Control Module EEPROM Error,1.00,AGREE,,Internal Control Module EEPROM Error,obdex,no,no
+P0630,VIN Not Programmed or Incompatible ECM or PCM,VIN Not Programmed or Incompatible - ECM/PCM,1.00,AGREE,,VIN Not Programmed or Incompatible ECM or PCM,obdex,no,no
+P0634,Control Module Internal Temperature A Too High,Control Module Internal Temperature A Too High,1.00,AGREE,,Control Module Internal Temperature A Too High,obdex,no,no
+P2610,ECM/PCM Internal Engine Off Timer Performance,ECM/PCM Engine Off Timer Performance,1.00,AGREE,,ECM/PCM Internal Engine Off Timer Performance,obdex,no,no
+U0073,"Control Module Communication Bus ""A"" Off",Control Module Communication Bus A Off,1.00,AGREE,,"Control Module Communication Bus ""A"" Off",confirmed,no,no
+U0074,"Control Module Communication Bus ""B"" Off",Control Module Communication Bus B Off,1.00,AGREE,,"Control Module Communication Bus ""B"" Off",confirmed,no,no
+U0075,"Control Module Communication Bus ""B"" Performance",Control Module Communication Bus C Off,1.00,AGREE,owner-checked override applied.,Control Module Communication Bus C Off,override,no,no
+U0076,"Control Module Communication Bus ""C"" Off",Control Module Communication Bus D Off,1.00,AGREE,owner-checked override applied.,Control Module Communication Bus D Off,override,no,no
+U0077,Vehicle Communication Bus B Off,Control Module Communication Bus E Off,1.00,AGREE,owner-checked override applied.,Control Module Communication Bus E Off,override,no,no
+U0140,Lost Communication with Body Control Module,Lost Communication With Body Control Module,1.00,AGREE,,Lost Communication with Body Control Module,obdex,no,no
+U0146,"Lost Communication with Gateway ""A""",Lost Communication With Serial Data Gateway Module A,1.00,AGREE,,"Lost Communication with Gateway ""A""",obdex,no,no
+U0167,Lost Communication with Vehicle Immobiliser Control Module,Lost Communication With Vehicle Immobilizer Control Module,1.00,AGREE,,Lost Communication with Vehicle Immobiliser Control Module,two-source,yes,no
+U0168,Lost Communication with Vehicle Immobilizer Control Module,Lost Communication With Vehicle Security Control Module,0.70,DISAGREE,MEANING: key words differ: OBDex only ['immobiliser']; Wal33D only ['security'],Lost Communication with Vehicle Immobilizer Control Module,suspect,yes,no
+P0483,Cooling Fan Rationality Check,Fan Rationality Check,1.00,AGREE,,Cooling Fan Rationality Check,obdex,no,no
+P0484,Cooling Fan Current Too High,Fan Circuit Current High,1.00,AGREE,,Cooling Fan Current Too High,obdex,no,no
+P0485,Cooling Fan Power/Ground Circuit,Fan Power/Ground Circuit,1.00,AGREE,,Cooling Fan Power/Ground Circuit,obdex,no,no
+P2181,Cooling System Performance,Cooling System Performance,1.00,AGREE,,Cooling System Performance,obdex,no,no
+P0450,EVAP System Pressure Sensor/Switch A Circuit,EVAP System Pressure Sensor/Switch A Circuit,1.00,AGREE,,EVAP System Pressure Sensor/Switch A Circuit,obdex,no,no
+P0451,Evaporative Emission System Pressure Sensor Range/Performance,EVAP System Pressure Sensor/Switch A Circuit Range/Performance,1.00,AGREE,,Evaporative Emission System Pressure Sensor Range/Performance,obdex,no,no
+P0452,Evaporative Emission System Pressure Sensor Low Input,EVAP System Pressure Sensor/Switch A Circuit Low,1.00,AGREE,,Evaporative Emission System Pressure Sensor Low Input,obdex,no,no
+P0453,Evaporative Emission System Pressure Sensor High Input,EVAP System Pressure Sensor/Switch A Circuit High,1.00,AGREE,,Evaporative Emission System Pressure Sensor High Input,obdex,no,no
+P0454,EVAP System Pressure Sensor/Switch A Circuit Intermittent,EVAP System Pressure Sensor/Switch A Circuit Intermittent,1.00,AGREE,,EVAP System Pressure Sensor/Switch A Circuit Intermittent,obdex,no,no
+P0455,Evaporative Emission System Leak Detected (Large Leak),EVAP System Leak Detected - Large Leak,1.00,AGREE,,Evaporative Emission System Leak Detected (Large Leak),obdex,no,no
+P0456,Evaporative Emission System Leak Detected (Very Small Leak),EVAP System Leak Detected (very small leak),1.00,AGREE,,Evaporative Emission System Leak Detected (Very Small Leak),obdex,no,no
+P0457,Evaporative Emission System Leak Detected (Fuel Cap Loose/Off),EVAP System Leak Detected (fuel cap loose/off),1.00,AGREE,,Evaporative Emission System Leak Detected (Fuel Cap Loose/Off),obdex,no,no
+P0496,Evaporative Emission System High Purge Flow,EVAP System High Purge Flow,1.00,AGREE,,Evaporative Emission System High Purge Flow,obdex,no,no
+P0497,EVAP System Low Purge Flow,EVAP System Low Purge Flow,1.00,AGREE,,EVAP System Low Purge Flow,obdex,no,no
+P0498,EVAP System Vent Valve Control Circuit Low,EVAP System Vent Valve Control Circuit Low,1.00,AGREE,,EVAP System Vent Valve Control Circuit Low,obdex,no,no
+P0499,EVAP System Vent Valve Control Circuit High,EVAP System Vent Valve Control Circuit High,1.00,AGREE,,EVAP System Vent Valve Control Circuit High,obdex,no,no
+P0418,"Secondary Air Injection System Relay ""A"" Circuit Malfunction",AIR System Control A Circuit,0.72,DISAGREE,MEANING: key words differ: OBDex only ['relay']; Wal33D only [],"Secondary Air Injection System Relay ""A"" Circuit Malfunction",suspect,no,no
+P0491,Secondary Air Injection System Insufficient Flow (Bank 1),AIR System Insufficient Flow Bank 1,1.00,AGREE,,Secondary Air Injection System Insufficient Flow (Bank 1),obdex,no,no
+U0300,Internal Control Module Software Incompatibility,Internal Control Module Software Incompatibility,1.00,AGREE,,Internal Control Module Software Incompatibility,obdex,no,no
+U0301,Software Incompatibility with ECM/PCM,Software Incompatibility With ECM/PCM,1.00,AGREE,,Software Incompatibility with ECM/PCM,obdex,no,no
+U0327,Software Incompatibility with Powertrain Control Module,Software Incompatibility With Vehicle Security Control Module,0.63,DISAGREE,MEANING: key words differ: OBDex only ['powertrain']; Wal33D only ['security'],Software Incompatibility with Powertrain Control Module,suspect,no,no
+U0401,Invalid Data Received from ECM/PCM,Invalid Data Received From ECM/PCM A,1.00,AGREE,,Invalid Data Received from ECM/PCM,obdex,no,no
+U0408,Invalid Data Received from Vehicle Immobilizer Control Module,Invalid Data Received From Throttle Actuator A Control Module,0.42,DISAGREE,MEANING: key words differ: OBDex only ['immobiliser']; Wal33D only ['throttle'],Invalid Data Received from Vehicle Immobilizer Control Module,suspect,no,no
+U0415,Invalid Data Received from ABS Control Module,Invalid Data Received From Anti-Lock Brake System (ABS) Control Module,1.00,AGREE,,Invalid Data Received from ABS Control Module,obdex,no,no
+U0421,Invalid Data Received from Throttle/Pedal Position Sensor,Invalid Data Received From Suspension Control Module A,0.38,DISAGREE,MEANING: key words differ: OBDex only ['throttle']; Wal33D only ['suspension'],Invalid Data Received from Throttle/Pedal Position Sensor,suspect,no,no
+P0620,Generator Control Circuit,Generator Control Circuit,1.00,AGREE,,Generator Control Circuit,obdex,no,no
+P0621,Generator Lamp L Control Circuit,Generator Lamp/L Terminal Circuit,1.00,AGREE,,Generator Lamp L Control Circuit,obdex,no,no
+P0625,Generator Field Terminal Circuit Low,Generator Field/F Terminal Circuit Low,1.00,AGREE,,Generator Field Terminal Circuit Low,obdex,no,no
+P0626,Generator Field/F Terminal Circuit Performance,Generator Field/F Terminal Circuit High,1.00,AGREE,owner-checked override applied.,Generator Field/F Terminal Circuit High,override,no,no
+P2500,Generator Lamp/L-Terminal Circuit Low,Generator Lamp/L-Terminal Circuit Low,1.00,AGREE,,Generator Lamp/L-Terminal Circuit Low,obdex,no,no
+P2501,Generator Lamp/L-Terminal Circuit High,Generator Lamp/L-Terminal Circuit High,1.00,AGREE,,Generator Lamp/L-Terminal Circuit High,obdex,no,no
+P2502,Charging System Voltage,Charging System Voltage,1.00,AGREE,,Charging System Voltage,obdex,no,no
+P2503,Charging System Voltage Low,Charging System Voltage Low,1.00,AGREE,,Charging System Voltage Low,obdex,no,no
+P2504,Charging System Voltage High,Charging System Voltage High,1.00,AGREE,,Charging System Voltage High,obdex,no,no
+P0016,Crankshaft Position - Camshaft Position Correlation (Bank 1 Sensor A),Crankshaft Position - Camshaft Position Correlation Bank 1 Sensor A,1.00,AGREE,,Crankshaft Position - Camshaft Position Correlation (Bank 1 Sensor A),obdex,no,no
+P033F,Crankshaft/Camshaft Loss Of Synchronization,Crankshaft/Camshaft Loss Of Synchronization,1.00,AGREE,,Crankshaft/Camshaft Loss Of Synchronization,two-source,yes,no
+P0320,Ignition/Distributor Engine Speed Input Circuit,Ignition/Distributor Engine Speed Input Circuit,1.00,AGREE,,Ignition/Distributor Engine Speed Input Circuit,obdex,no,no
+P0321,Ignition/Distributor Engine Speed Input Circuit Range/Performance,Ignition/Distributor Engine Speed Input Circuit Range/Performance,1.00,AGREE,,Ignition/Distributor Engine Speed Input Circuit Range/Performance,obdex,no,no
+P0322,Ignition/Distributor Engine Speed Input Circuit No Signal,Ignition/Distributor Engine Speed Input Circuit No Signal,1.00,AGREE,,Ignition/Distributor Engine Speed Input Circuit No Signal,obdex,no,no
+P0323,Ignition/Distributor Engine Speed Input Circuit Intermittent,Ignition/Distributor Engine Speed Input Circuit Intermittent,1.00,AGREE,,Ignition/Distributor Engine Speed Input Circuit Intermittent,obdex,no,no
+P0219,Engine Overspeed Condition,Engine Overspeed Condition,1.00,AGREE,,Engine Overspeed Condition,obdex,no,no
+P0460,Fuel Level Sensor A Circuit,Fuel Level Sensor A Circuit,1.00,AGREE,,Fuel Level Sensor A Circuit,obdex,no,no
+P0461,Fuel Level Sensor A Circuit Range/Performance,Fuel Level Sensor A Circuit Range/Performance,1.00,AGREE,,Fuel Level Sensor A Circuit Range/Performance,obdex,no,no
+P0462,Fuel Level Sensor A Circuit Low,Fuel Level Sensor A Circuit Low,1.00,AGREE,,Fuel Level Sensor A Circuit Low,obdex,no,no
+P0463,Fuel Level Sensor A Circuit High,Fuel Level Sensor A Circuit High,1.00,AGREE,,Fuel Level Sensor A Circuit High,obdex,no,no
+P0464,Fuel Level Sensor A Circuit Intermittent,Fuel Level Sensor A Circuit Intermittent,1.00,AGREE,,Fuel Level Sensor A Circuit Intermittent,obdex,no,no
+P0070,Ambient Air Temperature Sensor Circuit A,Ambient Air Temperature Sensor Circuit A,1.00,AGREE,,Ambient Air Temperature Sensor Circuit A,obdex,no,no
+P0071,Ambient Air Temperature Sensor Circuit A Range/Performance,Ambient Air Temperature Sensor Circuit A Range/Performance,1.00,AGREE,,Ambient Air Temperature Sensor Circuit A Range/Performance,obdex,no,no
+P0072,Ambient Air Temperature Sensor Circuit A Low,Ambient Air Temperature Sensor Circuit A Low,1.00,AGREE,,Ambient Air Temperature Sensor Circuit A Low,obdex,no,no
+P0073,Ambient Air Temperature Sensor Circuit A High,Ambient Air Temperature Sensor Circuit A High,1.00,AGREE,,Ambient Air Temperature Sensor Circuit A High,obdex,no,no
+P0074,Ambient Air Temperature Sensor Circuit A Intermittent/Erratic,Ambient Air Temperature Sensor Circuit A Intermittent/Erratic,1.00,AGREE,,Ambient Air Temperature Sensor Circuit A Intermittent/Erratic,obdex,no,no
+P0504,"Brake Switch ""A""/""B"" Correlation",Brake Switch A/B Correlation,1.00,AGREE,,"Brake Switch ""A""/""B"" Correlation",obdex,no,no
+P0704,Clutch Switch Input Circuit,Clutch Switch Input Circuit,1.00,AGREE,,Clutch Switch Input Circuit,obdex,no,no
+P2122,"Throttle/Pedal Position Sensor ""D"" Circuit Low",Throttle/Pedal Position Sensor/Switch D Circuit Low,1.00,AGREE,,"Throttle/Pedal Position Sensor ""D"" Circuit Low",obdex,no,no
+P2123,"Throttle/Pedal Position Sensor ""D"" Circuit High",Throttle/Pedal Position Sensor/Switch D Circuit High,1.00,AGREE,,"Throttle/Pedal Position Sensor ""D"" Circuit High",obdex,no,no
+P2127,"Throttle/Pedal Position Sensor ""E"" Circuit Low",Throttle/Pedal Position Sensor/Switch E Circuit Low,1.00,AGREE,,"Throttle/Pedal Position Sensor ""E"" Circuit Low",obdex,no,no
+P2128,"Throttle/Pedal Position Sensor ""E"" Circuit High",Throttle/Pedal Position Sensor/Switch E Circuit High,1.00,AGREE,,"Throttle/Pedal Position Sensor ""E"" Circuit High",obdex,no,no
+P2138,"Throttle/Pedal Position Sensor ""D""/""E"" Voltage Correlation",Throttle/Pedal Position Sensor/Switch D/E Voltage Correlation,1.00,AGREE,,"Throttle/Pedal Position Sensor ""D""/""E"" Voltage Correlation",obdex,no,no
+C0020,ABS Pump Motor Circuit,ABS Pump Motor Control,1.00,AGREE,,ABS Pump Motor Circuit,obdex,no,no
+C0021,ABS Pump Motor Circuit Range/Performance,Brake Booster Performance,0.30,DISAGREE,"MEANING: key words differ: OBDex only ['abs', 'motor', 'pump', 'range']; Wal33D only ['brake']",ABS Pump Motor Circuit Range/Performance,suspect,no,no
+C0022,ABS Pump Motor Circuit Low,Brake Booster Solenoid,0.12,DISAGREE,"MEANING: key words differ: OBDex only ['abs', 'low', 'motor', 'pump']; Wal33D only ['brake']",ABS Pump Motor Circuit Low,suspect,no,no
+C0023,ABS Pump Motor Circuit High,Stop Lamp Control,0.18,DISAGREE,"MEANING: key words differ: OBDex only ['abs', 'high', 'motor', 'pump']; Wal33D only ['lamp']",ABS Pump Motor Circuit High,suspect,no,no
+C0025,ABS Pump Motor Stalled,Brake Pedal Feedback Pressure Sensor Circuit,0.14,DISAGREE,"MEANING: key words differ: OBDex only ['abs', 'motor', 'pump', 'stalled']; Wal33D only ['brake', 'pedal']",ABS Pump Motor Stalled,suspect,no,no
+C0110,ABS Pump Motor Circuit Malfunction,,0.00,MISSING,no GENERIC row for this code in the Wal33D database,ABS Pump Motor Circuit Malfunction,suspect,no,no
+C0111,ABS Activation Excessively Long,,0.00,MISSING,no GENERIC row for this code in the Wal33D database,ABS Activation Excessively Long,suspect,no,no
+C0112,ABS Activation Frequency Too High,,0.00,MISSING,no GENERIC row for this code in the Wal33D database,ABS Activation Frequency Too High,suspect,no,no
+C0030,Left Front Wheel Speed Sensor Circuit Range/Performance,Left Front Tone Wheel,0.51,DISAGREE,"MEANING: key words differ: OBDex only ['performance', 'range', 'speed']; Wal33D only ['tone']",Left Front Wheel Speed Sensor Circuit Range/Performance,suspect,yes,no
+C0031,Left Front Wheel Speed Sensor Circuit Low,Left Front Wheel Speed Sensor,0.86,DISAGREE,MEANING: key words differ: OBDex only ['low']; Wal33D only [],Left Front Wheel Speed Sensor Circuit Low,suspect,yes,no
+C0032,Left Front Wheel Speed Sensor Circuit High,Left Front Wheel Speed Sensor Supply,0.73,DISAGREE,MEANING: key words differ: OBDex only ['high']; Wal33D only ['supply'],Left Front Wheel Speed Sensor Circuit High,suspect,yes,no
+C0033,Left Front Wheel Speed Sensor Signal Erratic,Right Front Tone Wheel,0.40,DISAGREE,"MEANING: key words differ: OBDex only ['erratic', 'left', 'signal', 'speed']; Wal33D only ['right', 'tone']",Left Front Wheel Speed Sensor Signal Erratic,suspect,yes,no
+C0034,Left Front Wheel Speed Sensor No Signal,Right Front Wheel Speed Sensor,0.58,DISAGREE,"MEANING: key words differ: OBDex only ['left', 'no', 'signal']; Wal33D only ['right']",Left Front Wheel Speed Sensor No Signal,suspect,yes,no
+C0036,Left Front Wheel Speed Sensor Circuit Intermittent,Left Rear Tone Wheel,0.38,DISAGREE,"MEANING: key words differ: OBDex only ['front', 'intermittent', 'speed']; Wal33D only ['rear', 'tone']",Left Front Wheel Speed Sensor Circuit Intermittent,suspect,yes,no
+C0037,Left Rear Wheel Speed Sensor,Left Rear Wheel Speed Sensor,1.00,AGREE,,Left Rear Wheel Speed Sensor,two-source,yes,no
+C0038,Left Rear Wheel Speed Sensor Supply,Left Rear Wheel Speed Sensor Supply,1.00,AGREE,,Left Rear Wheel Speed Sensor Supply,two-source,yes,no
+C003A,Right Rear Wheel Speed Sensor,Right Rear Wheel Speed Sensor,1.00,AGREE,,Right Rear Wheel Speed Sensor,two-source,yes,no
+C003B,Right Rear Wheel Speed Sensor Supply,Right Rear Wheel Speed Sensor Supply,1.00,AGREE,,Right Rear Wheel Speed Sensor Supply,two-source,yes,no
+C003C,Rear Tone Wheel,Rear Tone Wheel,1.00,AGREE,,Rear Tone Wheel,two-source,yes,no
+C003D,Rear Wheel Speed Sensor,Rear Wheel Speed Sensor,1.00,AGREE,,Rear Wheel Speed Sensor,two-source,yes,no
+C003E,Rear Wheel Speed Sensor Supply,Rear Wheel Speed Sensor Supply,1.00,AGREE,,Rear Wheel Speed Sensor Supply,two-source,yes,no
+C003F,Wheel Speed Sensors Rotation Direction Correlation,Wheel Speed Sensors Rotation Direction Correlation,1.00,AGREE,,Wheel Speed Sensors Rotation Direction Correlation,two-source,yes,no
+C0041,Right Front Wheel Speed Sensor Circuit Range/Performance,Brake Pedal Switch B,0.11,DISAGREE,"MEANING: key words differ: OBDex only ['front', 'performance', 'range', 'right', 'speed', 'wheel']; Wal33D only ['b', 'brake', 'pedal']",Right Front Wheel Speed Sensor Circuit Range/Performance,suspect,no,no
+C0042,Right Front Wheel Speed Sensor Circuit Low,Brake Pedal Position Sensor Circuit A,0.06,DISAGREE,"MEANING: key words differ: OBDex only ['front', 'low', 'right', 'speed', 'wheel']; Wal33D only ['brake', 'pedal']",Right Front Wheel Speed Sensor Circuit Low,suspect,no,no
+C0043,Right Front Wheel Speed Sensor Circuit High,Brake Pedal Position Sensor Circuit B,0.06,DISAGREE,"MEANING: key words differ: OBDex only ['front', 'high', 'right', 'speed', 'wheel']; Wal33D only ['b', 'brake', 'pedal']",Right Front Wheel Speed Sensor Circuit High,suspect,no,no
+C0044,Right Front Wheel Speed Sensor Signal Erratic,Brake Pressure Sensor A,0.12,DISAGREE,"MEANING: key words differ: OBDex only ['erratic', 'front', 'right', 'signal', 'speed', 'wheel']; Wal33D only ['brake']",Right Front Wheel Speed Sensor Signal Erratic,suspect,no,no
+C0046,Right Front Wheel Speed Sensor Circuit Intermittent,Brake Pressure Sensor A/B,0.10,DISAGREE,"MEANING: key words differ: OBDex only ['front', 'intermittent', 'right', 'speed', 'wheel']; Wal33D only ['b', 'brake']",Right Front Wheel Speed Sensor Circuit Intermittent,suspect,no,no
+C0052,Left Rear Wheel Speed Sensor Circuit Low,Steering Wheel Position Sensor Signal A,0.28,DISAGREE,"MEANING: key words differ: OBDex only ['left', 'low', 'rear', 'speed']; Wal33D only ['signal', 'steering']",Left Rear Wheel Speed Sensor Circuit Low,suspect,no,no
+C0053,Left Rear Wheel Speed Sensor Circuit High,Steering Wheel Position Sensor Signal B,0.28,DISAGREE,"MEANING: key words differ: OBDex only ['high', 'left', 'rear', 'speed']; Wal33D only ['b', 'signal', 'steering']",Left Rear Wheel Speed Sensor Circuit High,suspect,no,no
+C0054,Left Rear Wheel Speed Sensor Signal Erratic,Steering Wheel Position Sensor Signal C,0.39,DISAGREE,"MEANING: key words differ: OBDex only ['erratic', 'left', 'rear', 'speed']; Wal33D only ['c', 'steering']",Left Rear Wheel Speed Sensor Signal Erratic,suspect,no,no
+C0055,Left Rear Wheel Speed Sensor No Signal,Steering Wheel Position Sensor Signal D,0.41,DISAGREE,"MEANING: key words differ: OBDex only ['left', 'no', 'rear', 'speed']; Wal33D only ['d', 'steering']",Left Rear Wheel Speed Sensor No Signal,suspect,no,no
+C0056,Left Rear Wheel Speed Sensor Circuit Intermittent,,0.00,MISSING,no GENERIC row for this code in the Wal33D database,Left Rear Wheel Speed Sensor Circuit Intermittent,suspect,no,no
+C0060,Right Rear Wheel Speed Sensor Circuit,,0.00,MISSING,no GENERIC row for this code in the Wal33D database,Right Rear Wheel Speed Sensor Circuit,suspect,no,no
+C0061,Right Rear Wheel Speed Sensor Circuit Range/Performance,Lateral Acceleration Sensor,0.13,DISAGREE,"MEANING: key words differ: OBDex only ['performance', 'range', 'rear', 'right', 'speed', 'wheel']; Wal33D only ['acceleration']",Right Rear Wheel Speed Sensor Circuit Range/Performance,suspect,no,no
+C0062,Right Rear Wheel Speed Sensor Circuit Low,Longitudinal Acceleration Sensor,0.08,DISAGREE,"MEANING: key words differ: OBDex only ['low', 'rear', 'right', 'speed', 'wheel']; Wal33D only ['acceleration']",Right Rear Wheel Speed Sensor Circuit Low,suspect,no,no
+C0063,Right Rear Wheel Speed Sensor Circuit High,Yaw Rate Sensor,0.09,DISAGREE,"MEANING: key words differ: OBDex only ['high', 'rear', 'right', 'speed', 'wheel']; Wal33D only ['yaw']",Right Rear Wheel Speed Sensor Circuit High,suspect,no,no
+C0064,Right Rear Wheel Speed Sensor Signal Erratic,Roll Rate Sensor,0.15,DISAGREE,"MEANING: key words differ: OBDex only ['erratic', 'rear', 'right', 'signal', 'speed', 'wheel']; Wal33D only []",Right Rear Wheel Speed Sensor Signal Erratic,suspect,no,no
+C0065,Right Rear Wheel Speed Sensor No Signal,Vertical Acceleration Sensor,0.11,DISAGREE,"MEANING: key words differ: OBDex only ['no', 'rear', 'right', 'signal', 'speed', 'wheel']; Wal33D only ['acceleration']",Right Rear Wheel Speed Sensor No Signal,suspect,no,no
+C0066,Right Rear Wheel Speed Sensor Circuit Intermittent,,0.00,MISSING,no GENERIC row for this code in the Wal33D database,Right Rear Wheel Speed Sensor Circuit Intermittent,suspect,no,no
+C0080,Wheel Speed Mismatch (Front Axle),,0.00,MISSING,no GENERIC row for this code in the Wal33D database,Wheel Speed Mismatch (Front Axle),suspect,no,no
+C0081,Wheel Speed Mismatch (Rear Axle),ABS Malfunction Indicator,0.14,DISAGREE,"MEANING: key words differ: OBDex only ['mismatch', 'rear', 'speed', 'wheel']; Wal33D only ['abs']",Wheel Speed Mismatch (Rear Axle),suspect,no,no
+C0234,Wheel Speed Sensor Frequency Error,,0.00,MISSING,no GENERIC row for this code in the Wal33D database,Wheel Speed Sensor Frequency Error,suspect,no,no
+C0235,Wheel Speed Sensor Signal Erratic,,0.00,MISSING,no GENERIC row for this code in the Wal33D database,Wheel Speed Sensor Signal Erratic,suspect,no,no
+C0238,Speed Wheel-to-Wheel Mismatch,,0.00,MISSING,no GENERIC row for this code in the Wal33D database,Speed Wheel-to-Wheel Mismatch,suspect,no,no
+C0245,Wheel Speed Sensor Frequency Mismatch,,0.00,MISSING,no GENERIC row for this code in the Wal33D database,Wheel Speed Sensor Frequency Mismatch,suspect,no,no
+C004F,ABS Control Module Over Temperature,ABS Control Module Over Temperature,1.00,AGREE,,ABS Control Module Over Temperature,obdex,no,no
+C0220,ABS Valve Block Supply Voltage,,0.00,MISSING,no GENERIC row for this code in the Wal33D database,ABS Valve Block Supply Voltage,suspect,no,no
+C0246,ABS/TCS Control Module Internal Performance,,0.00,MISSING,no GENERIC row for this code in the Wal33D database,ABS/TCS Control Module Internal Performance,suspect,no,no
+C0121,Valve Relay Circuit Malfunction,,0.00,MISSING,no GENERIC row for this code in the Wal33D database,Valve Relay Circuit Malfunction,suspect,no,no
+C0225,ABS Valve Relay Circuit,,0.00,MISSING,no GENERIC row for this code in the Wal33D database,ABS Valve Relay Circuit,suspect,no,no
+C0241,ABS Warning Lamp Control Circuit,,0.00,MISSING,no GENERIC row for this code in the Wal33D database,ABS Warning Lamp Control Circuit,suspect,no,no
+C0242,PCM Indicated ABS Malfunction,,0.00,MISSING,no GENERIC row for this code in the Wal33D database,PCM Indicated ABS Malfunction,suspect,no,no
