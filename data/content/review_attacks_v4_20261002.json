@@ -1,0 +1,451 @@
+{
+ "attacks": [
+  {
+   "id": "A1",
+   "code": "P0121",
+   "label": "Always-true 'if' hides a near-certain stall and no-restart claim at SERVICE_SOON (R3 and R12 loophole)",
+   "validator_errors": [],
+   "accepted_by_validator": true,
+   "proposed_rule": "Q1",
+   "proposed_rule_catches": true,
+   "proposed_messages": [
+    "Q1 the 'if' before 'stall' names no real symptom in rider_advice_en: 'If you ride in traffic, the engine will'"
+   ],
+   "entry": {
+    "schema_version": 2,
+    "content_id": "generic:P0121:en",
+    "code": "P0121",
+    "system": "powertrain",
+    "title_en": "Throttle position sensor A: performance or incorrect operation",
+    "standard_title_en": "Throttle/Pedal Position Sensor \"A\" Range/Performance",
+    "meaning_en": "The throttle position reading does not match what the bike's computer (ECU) expects, so the throttle opening may be misread.",
+    "likely_causes_en": [
+     "Worn or faulty throttle position sensor",
+     "Sensor loose or out of position on the throttle body",
+     "Damaged wiring or loose connector"
+    ],
+    "rider_action_level": "SERVICE_SOON",
+    "rider_action_basis": "throttle reading wrong",
+    "rider_advice_en": "If you ride in traffic, the engine will stall and will not restart. If it stalls more than once or will not restart, do not keep riding; have it taken to a workshop.",
+    "can_ride_to_workshop": "with_care",
+    "can_ride_reason": "idle may be uneven; avoid traffic and long trips",
+    "technician_hints_en": [
+     "Compare the throttle reading with the real throttle position, closed to fully open",
+     "Check the sensor mounting and the connector for water and corrosion"
+    ],
+    "flags": {
+     "mil": true,
+     "emissions_relevant": true,
+     "limp_possible": true
+    },
+    "applies_when": null,
+    "confidence": "high",
+    "derived_from": {
+     "source": "OBDex",
+     "licence": "CC0-1.0",
+     "repo_commit": "bc58b0eb7273226a1aabae98e956b70b8362bda1",
+     "source_entry_sha256": "36dbb03f0d962dc1d4c71b5bb1259be8f2a42cca3c19a370a6159e2b7c6acfb0",
+     "mode": "structure-only",
+     "title_basis": "obdex"
+    },
+    "verification": "ai_authored_from_standard_title",
+    "needs_independent_review": false,
+    "updated_at": "2026-10-01"
+   }
+  },
+  {
+   "id": "A2",
+   "code": "P0301",
+   "label": "Fire risk written with words R16 does not know (seeping, vapour, hot engine) and no PETROL sentence",
+   "validator_errors": [],
+   "accepted_by_validator": true,
+   "proposed_rule": "Q2",
+   "proposed_rule_catches": true,
+   "proposed_messages": [
+    "Q2 fire-risk wording 'fuel seeping onto the hot engine' in rider_action_basis without the PETROL sentence",
+    "Q2 fire-risk wording 'Fuel may be seeping from the injector onto the hot engine' in rider_advice_en without the PETROL sentence"
+   ],
+   "entry": {
+    "schema_version": 2,
+    "content_id": "generic:P0301:en",
+    "code": "P0301",
+    "system": "powertrain",
+    "title_en": "Cylinder 1 misfire detected",
+    "standard_title_en": "Cylinder 1 Misfire Detected",
+    "meaning_en": "The bike's computer (ECU) detected misfires on cylinder 1, so that cylinder is not burning its fuel properly.",
+    "likely_causes_en": [
+     "Faulty ignition coil on cylinder 1",
+     "Worn or fouled spark plug on cylinder 1",
+     "Blocked or leaking injector on cylinder 1",
+     "Low compression on cylinder 1"
+    ],
+    "rider_action_level": "SERVICE_SOON",
+    "rider_action_basis": "fuel seeping onto the hot engine",
+    "rider_advice_en": "Fuel may be seeping from the injector onto the hot engine and vapour can collect under the seat. Ride gently and get it checked soon.",
+    "can_ride_to_workshop": "with_care",
+    "can_ride_reason": "ride gently, avoid hard acceleration; keep the trip short",
+    "technician_hints_en": [
+     "Read the freeze-frame data to see when the misfire happens",
+     "Check the spark plug and ignition coil on this cylinder first",
+     "Check the injector and compression if spark is good"
+    ],
+    "flags": {
+     "mil": true,
+     "emissions_relevant": true,
+     "limp_possible": false
+    },
+    "applies_when": null,
+    "confidence": "high",
+    "derived_from": {
+     "source": "OBDex",
+     "licence": "CC0-1.0",
+     "repo_commit": "bc58b0eb7273226a1aabae98e956b70b8362bda1",
+     "source_entry_sha256": "fdf7e9b0e85e1ff448bca1a9e2b9d9032a1a606f5e5a465f7a47cef7e8d3b1df",
+     "mode": "structure-only",
+     "title_basis": "obdex"
+    },
+    "verification": "ai_authored_from_standard_title",
+    "needs_independent_review": false,
+    "updated_at": "2026-10-02"
+   }
+  },
+  {
+   "id": "A3",
+   "code": "P0524",
+   "label": "Direction reversed on a 'Too Low' standard title (R6 and R14 skip 'too low' and 'too high' titles)",
+   "validator_errors": [],
+   "accepted_by_validator": true,
+   "proposed_rule": "Q3",
+   "proposed_rule_catches": true,
+   "proposed_messages": [
+    "Q3 standard title says LOW but title_en says the opposite",
+    "Q3 standard title says LOW but meaning_en says the opposite"
+   ],
+   "entry": {
+    "schema_version": 2,
+    "content_id": "generic:P0524:en",
+    "code": "P0524",
+    "system": "powertrain",
+    "title_en": "Engine oil pressure too high",
+    "standard_title_en": "Engine Oil Pressure Too Low",
+    "meaning_en": "The bike's computer (ECU) found that the engine oil pressure is above the safe limit, which can quickly damage the engine.",
+    "likely_causes_en": [
+     "Cold, thick engine oil",
+     "Blocked oil passage",
+     "Faulty oil pressure sensor"
+    ],
+    "rider_action_level": "STOP",
+    "rider_action_basis": "low oil pressure can destroy the engine",
+    "rider_advice_en": "Riding with low oil pressure can damage the engine quickly. Pull over safely, switch off and do not keep riding; have the bike taken to a workshop.",
+    "can_ride_to_workshop": "no",
+    "can_ride_reason": "low oil pressure can destroy the engine; arrange transport",
+    "technician_hints_en": [
+     "Check the oil level and condition first, with the bike upright and the engine cool",
+     "Measure the oil pressure with a mechanical oil pressure tester"
+    ],
+    "flags": {
+     "mil": true,
+     "emissions_relevant": false,
+     "limp_possible": true
+    },
+    "applies_when": {
+     "oil_pressure_sensor_fitted": true
+    },
+    "confidence": "high",
+    "derived_from": {
+     "source": "OBDex",
+     "licence": "CC0-1.0",
+     "repo_commit": "bc58b0eb7273226a1aabae98e956b70b8362bda1",
+     "source_entry_sha256": "e934516af98182e65afbd4f2b783e9860b9551fdd64dbac9773ad7545db0675d",
+     "mode": "structure-only",
+     "title_basis": "obdex"
+    },
+    "verification": "ai_authored_from_standard_title",
+    "needs_independent_review": true,
+    "updated_at": "2026-10-02"
+   }
+  },
+  {
+   "id": "A4",
+   "code": "P0504",
+   "label": "Brake light switch code downgraded to MONITOR, reassuring, review false, confidence high",
+   "validator_errors": [],
+   "accepted_by_validator": true,
+   "proposed_rule": "Q4",
+   "proposed_rule_catches": true,
+   "proposed_messages": [
+    "Q4 braking text but needs_independent_review is not true",
+    "Q4 braking text at level MONITOR (SERVICE_SOON or STOP only)",
+    "Q4 braking text with confidence high (no braking entry may be high until a mechanic has seen it)"
+   ],
+   "entry": {
+    "schema_version": 2,
+    "content_id": "generic:P0504:en",
+    "code": "P0504",
+    "system": "powertrain",
+    "title_en": "Brake switch A and B: signal plausibility fault",
+    "standard_title_en": "Brake Switch \"A\"/\"B\" Correlation",
+    "meaning_en": "The two brake switch signals do not agree, so the bike's computer (ECU) may misjudge when the brake is pressed.",
+    "likely_causes_en": [
+     "Brake switch out of adjustment",
+     "Faulty brake switch"
+    ],
+    "rider_action_level": "MONITOR",
+    "rider_action_basis": "minor brake light fault",
+    "rider_advice_en": "The brake light is a minor matter. The bike rides normally; get the switch checked at the next service.",
+    "can_ride_to_workshop": "yes",
+    "can_ride_reason": "brake light only; ride normally",
+    "technician_hints_en": [
+     "Check both brake switches for adjustment and the brake light operation",
+     "Check the brake switch wiring and connectors"
+    ],
+    "flags": {
+     "mil": true,
+     "emissions_relevant": false,
+     "limp_possible": false
+    },
+    "applies_when": null,
+    "confidence": "high",
+    "derived_from": {
+     "source": "OBDex",
+     "licence": "CC0-1.0",
+     "repo_commit": "bc58b0eb7273226a1aabae98e956b70b8362bda1",
+     "source_entry_sha256": "dc559b9404e7bfb2ee2f30e9cc264232236d67369e591b2256dc8c8bafa47200",
+     "mode": "structure-only",
+     "title_basis": "obdex"
+    },
+    "verification": "ai_authored_from_standard_title",
+    "needs_independent_review": false,
+    "updated_at": "2026-10-02"
+   }
+  },
+  {
+   "id": "A5",
+   "code": "P0217",
+   "label": "STOP advice tells the rider to open the hot radiator cap (R17 checks technician hints only)",
+   "validator_errors": [],
+   "accepted_by_validator": true,
+   "proposed_rule": "Q5",
+   "proposed_rule_catches": true,
+   "proposed_messages": [
+    "Q5 unsafe instruction in rider_advice_en: 'Open the radiator cap'"
+   ],
+   "entry": {
+    "schema_version": 2,
+    "content_id": "generic:P0217:en",
+    "code": "P0217",
+    "system": "powertrain",
+    "title_en": "Engine overheating detected",
+    "standard_title_en": "Engine Coolant Over Temperature Condition",
+    "meaning_en": "The engine temperature went above the limit that the bike's computer (ECU) allows.",
+    "likely_causes_en": [
+     "Low coolant level or coolant leak (liquid-cooled bikes)",
+     "Faulty thermostat or water pump (liquid-cooled bikes)",
+     "Faulty engine temperature sensor"
+    ],
+    "rider_action_level": "STOP",
+    "rider_action_basis": "overheating can destroy the engine",
+    "rider_advice_en": "Pull over safely, switch off and do not keep riding; have the bike taken to a workshop. Open the radiator cap at once to let the steam out and add cold water.",
+    "can_ride_to_workshop": "no",
+    "can_ride_reason": "overheating can destroy the engine; arrange transport",
+    "technician_hints_en": [
+     "Check the engine oil level and the coolant level (liquid-cooled bikes)",
+     "Look for a lean mixture and for blocked airflow around the engine"
+    ],
+    "flags": {
+     "mil": true,
+     "emissions_relevant": false,
+     "limp_possible": true
+    },
+    "applies_when": null,
+    "confidence": "medium",
+    "derived_from": {
+     "source": "OBDex",
+     "licence": "CC0-1.0",
+     "repo_commit": "bc58b0eb7273226a1aabae98e956b70b8362bda1",
+     "source_entry_sha256": "b85663e4f9410473124f081c5b0f94706f16fbe259981370cd752de78d3265f7",
+     "mode": "structure-only",
+     "title_basis": "obdex"
+    },
+    "verification": "ai_authored_from_standard_title",
+    "needs_independent_review": true,
+    "updated_at": "2026-10-02"
+   }
+  },
+  {
+   "id": "A6",
+   "code": "C0020",
+   "label": "Brake fluid loss implied by an ABS pump entry that stays SERVICE_SOON (nothing checks braking hydraulics)",
+   "validator_errors": [],
+   "accepted_by_validator": true,
+   "proposed_rule": "Q6",
+   "proposed_rule_catches": true,
+   "proposed_messages": [
+    "Q6 braking hydraulics 'brake fluid' in 'Low brake fluid or a leaking brake line', not in the source",
+    "Q6 braking hydraulics 'brake fluid' in 'Check the brake fluid level and top it u', not in the source"
+   ],
+   "entry": {
+    "schema_version": 2,
+    "content_id": "generic:C0020:en",
+    "code": "C0020",
+    "system": "chassis",
+    "title_en": "ABS pump motor: circuit fault",
+    "standard_title_en": "ABS Pump Motor Circuit",
+    "meaning_en": "The ABS control unit found an electrical fault in the ABS pump motor circuit, so ABS is probably switched off.",
+    "likely_causes_en": [
+     "Low brake fluid or a leaking brake line",
+     "Pump motor seized after long inactivity",
+     "Corroded power supply connection"
+    ],
+    "rider_action_level": "SERVICE_SOON",
+    "rider_action_basis": "ABS is off",
+    "rider_advice_en": "Your normal brakes still work, but ABS is off, so a wheel can lock in hard braking. Ride gently, brake early, avoid wet roads and get it checked soon.",
+    "can_ride_to_workshop": "with_care",
+    "can_ride_reason": "brakes work but no ABS; ride gently, brake early, avoid wet roads",
+    "technician_hints_en": [
+     "Check the brake fluid level and top it up if it is low",
+     "Check the ABS pump motor supply and ground connections"
+    ],
+    "flags": {
+     "mil": false,
+     "emissions_relevant": false,
+     "limp_possible": false
+    },
+    "applies_when": {
+     "abs_fitted": true
+    },
+    "confidence": "low",
+    "derived_from": {
+     "source": "OBDex",
+     "licence": "CC0-1.0",
+     "repo_commit": "bc58b0eb7273226a1aabae98e956b70b8362bda1",
+     "source_entry_sha256": "ab459b72ae459bd2ba25f175db893465bac2f18e03c7a700f2773bb52bf28985",
+     "mode": "structure-only",
+     "title_basis": "obdex"
+    },
+    "verification": "ai_authored_from_standard_title",
+    "needs_independent_review": true,
+    "updated_at": "2026-10-02"
+   }
+  },
+  {
+   "id": "B1",
+   "code": "C0037",
+   "label": "Bonus: wheel position named in meaning and hint of a wheel speed entry (owner rule: position-neutral)",
+   "validator_errors": [],
+   "accepted_by_validator": true,
+   "proposed_rule": "Q7",
+   "proposed_rule_catches": true,
+   "proposed_messages": [
+    "Q7 wheel position 'left' in meaning_en",
+    "Q7 wheel position 'left' in 'Replace the left front wheel speed senso'"
+   ],
+   "entry": {
+    "schema_version": 2,
+    "content_id": "generic:C0037:en",
+    "code": "C0037",
+    "system": "chassis",
+    "title_en": "Rear wheel speed sensor: fault",
+    "standard_title_en": "Left Rear Wheel Speed Sensor",
+    "meaning_en": "The ABS control unit found a fault in the left front wheel speed sensor, so ABS is probably switched off.",
+    "likely_causes_en": [
+     "Failed wheel speed sensor",
+     "Damaged wiring or loose connector"
+    ],
+    "rider_action_level": "SERVICE_SOON",
+    "rider_action_basis": "ABS is off",
+    "rider_advice_en": "Your normal brakes still work, but ABS is off, so a wheel can lock in hard braking. Ride gently, brake early, avoid wet roads and get it checked soon.",
+    "can_ride_to_workshop": "with_care",
+    "can_ride_reason": "brakes work but no ABS; ride gently, brake early, avoid wet roads",
+    "technician_hints_en": [
+     "Replace the left front wheel speed sensor first",
+     "Check the sensor signal on the scan tool while the wheel turns"
+    ],
+    "flags": {
+     "mil": false,
+     "emissions_relevant": false,
+     "limp_possible": false
+    },
+    "applies_when": {
+     "abs_fitted": true
+    },
+    "confidence": "low",
+    "derived_from": {
+     "source": "OBDex",
+     "licence": "CC0-1.0",
+     "repo_commit": "bc58b0eb7273226a1aabae98e956b70b8362bda1",
+     "source_entry_sha256": "40f9cce99629c74476388084e74e1d2c6b1d60c833c1483dee27a8217d1e6e24",
+     "mode": "structure-only",
+     "title_basis": "obdex"
+    },
+    "verification": "ai_authored_from_standard_title",
+    "needs_independent_review": true,
+    "updated_at": "2026-10-02"
+   }
+  },
+  {
+   "id": "B2",
+   "code": "P2177",
+   "label": "Bonus: can_ride_reason contradicts the level and the entry's own warning (lean mixture overheats the engine)",
+   "validator_errors": [],
+   "accepted_by_validator": true,
+   "proposed_rule": "Q8",
+   "proposed_rule_catches": true,
+   "proposed_messages": [
+    "Q8 with_care entry permits normal riding in can_ride_reason: 'ride normally'"
+   ],
+   "entry": {
+    "schema_version": 2,
+    "content_id": "generic:P2177:en",
+    "code": "P2177",
+    "system": "powertrain",
+    "title_en": "Fuel mixture too lean (above idle)",
+    "standard_title_en": "System Too Lean Off Idle Bank 1",
+    "meaning_en": "The bike's computer (ECU) has to add a lot of fuel above idle, so the engine is getting too much air or too little fuel.",
+    "likely_causes_en": [
+     "Intake air leak (vacuum leak)",
+     "Weak fuel pump or low fuel pressure",
+     "Partly blocked fuel injector"
+    ],
+    "rider_action_level": "SERVICE_SOON",
+    "rider_action_basis": "lean running can overheat engine",
+    "rider_advice_en": "The engine may hesitate, run rough or lose power, and a lean mixture can overheat the engine. Get it checked soon and avoid hard or long rides until it is fixed.",
+    "can_ride_to_workshop": "with_care",
+    "can_ride_reason": "ride normally; long trips are fine",
+    "technician_hints_en": [
+     "Look for cracked intake boots and loose clamps",
+     "Check fuel supply and injector condition",
+     "Compare the fuel trim values at idle and at steady cruise"
+    ],
+    "flags": {
+     "mil": true,
+     "emissions_relevant": true,
+     "limp_possible": false
+    },
+    "applies_when": null,
+    "confidence": "medium",
+    "derived_from": {
+     "source": "OBDex",
+     "licence": "CC0-1.0",
+     "repo_commit": "bc58b0eb7273226a1aabae98e956b70b8362bda1",
+     "source_entry_sha256": "3a63eb15c8c13c308128836ccf6fa12f268c9a98d82fbdc614dbedacb79a1e15",
+     "mode": "structure-only",
+     "title_basis": "obdex"
+    },
+    "verification": "ai_authored_from_standard_title",
+    "needs_independent_review": false,
+    "updated_at": "2026-10-02"
+   }
+  }
+ ],
+ "false_positives": {
+  "Q1": {},
+  "Q2": {},
+  "Q3": {},
+  "Q4": {},
+  "Q5": {},
+  "Q6": {},
+  "Q7": {},
+  "Q8": {}
+ }
+}
