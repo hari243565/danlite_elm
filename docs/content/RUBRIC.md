@@ -1,8 +1,8 @@
-# Rider action rubric (Step 2), revised 2026-10-01 (schema version 2)
+# Rider action rubric (Step 2), revised 2026-10-02 (schema version 2; owner decisions D1 to D8 of the batch 2 to 4 run are at the end)
 
 | Level | Use when | Rider advice must |
 |---|---|---|
-| STOP | Typically causes stalling, no start, sudden power loss, fuel leakage or fire risk, or loss of the ability to brake or steer normally | tell the rider to pull over safely, switch off and not keep riding (rule R3) |
+| STOP | Typically causes stalling, no start, sudden power loss, fuel leakage or fire risk, or loss of the ability to brake or steer normally; also an active condition that can destroy the engine within minutes (overheating, no oil pressure; rubric gap found by the batch 1 reviewer) | tell the rider to pull over safely, switch off and not keep riding (rules R3, R18) |
 | SERVICE_SOON | Can damage the engine or catalyst if ignored, or hurts drivability (misfire, O2 sensor, throttle, fuel trim) | say to get it checked soon and how to ride meanwhile; any stall or no-start wording must be conditional ("if ...") |
 | MONITOR | Minor, emissions-only or likely to clear | say it can wait for the next service; no stall or no-start claim |
 | INFO | Reserved, test not completed, purely diagnostic | not use "pull over" |
@@ -24,7 +24,8 @@ The tags come from `relevance_ranking.csv`. A code with several tags may use any
 
 | Tag | Allowed |
 |---|---|
-| injector, ignition_coil, crankshaft | STOP |
+| crankshaft | STOP |
+| injector, ignition_coil | STOP or SERVICE_SOON (the STOP table, rule R13, decides; changed 2026-10-02) |
 | fuel_pump, cam_crank_sync, engine_speed_input, oil_pressure, ecu_power_relay | STOP, SERVICE_SOON |
 | camshaft, misfire, injector_balance, throttle, ride_by_wire, twist_grip_sensor, ect, cooling_fan, cooling_system, system_voltage, starter_relay, charging, sensor_reference_supply, control_module, immobiliser, starter_immobiliser, can_bus, lost_comm_engine | SERVICE_SOON, STOP |
 | lost_comm_abs, wheel_speed, abs_pump, abs_module, abs_relay, abs_lamp | SERVICE_SOON (D3) |
@@ -73,3 +74,40 @@ Judgement calls inside the mapping (for the reviewer to challenge):
 ## Wording rules
 
 No absolute words (always, never, guaranteed, definitely, certainly, absolutely). No part numbers, pin numbers, voltages, resistances or cost figures. No brand names. Parts named in an entry must appear in the source entry's title, components or causes (a part found only in the source description gives a validator warning). In structure-only mode this is the check that stops the author inventing parts: 24 of the 100 batch 1 first drafts failed it and were rewritten.
+
+
+## Owner decisions of the batch 2 to 4 run (final, 2026-10-02)
+
+- **D1** The reviewer's validator rules R12 to R19 are adopted (see below) and the reviewer's 8 defective entries are in `review_regression_cases.json` for good.
+- **D2** Downgraded from STOP to SERVICE_SOON with `can_ride_to_workshop` with_care: P0604, P0605, P0606 (the source says the ECU keeps running in reduced power mode) and the cylinder 2 faults P0202, P0264, P0265, P0352. P0232 is downgraded too, because its OBDex description says the pump stays powered when it should be off (reason in `rider_action_basis`). P0336, P0629, P0685 and P0686 stay at STOP with `needs_independent_review` true.
+- **D3** Idle faults carry the advice "If it stalls at stops or will not hold idle, ride gently, avoid heavy traffic and have it checked soon." followed by the STALL sentence. P0507 (idle too high) carries its own first sentence about a throttle that does not snap shut. The self-contradicting "avoid traffic and do not keep riding" is gone everywhere (P0506, P0510, P0519 and ten more).
+- **D4** One canonical form for each standard sentence: STALL, PETROL, ABS and NETWORK (see GLOSSARY_EN.md, "Fixed sentences"). Bus faults (U0001 to U0010, U0073 to U0077, U0140, U0146) carry NETWORK and `needs_independent_review` true.
+- **D5** P068B says the battery may go flat if the ECU stays powered after switch-off (the source description supports it).
+- **D6** Hindi-readiness: sentences of at most 25 words, no idioms, glossary terms only (rule R22). One fixed sentence is longer than that on purpose: the owner's D1 BATTERY sentence for P0563 and P2504 (29 words); the validator exempts exactly that sentence.
+- **D7** P0633, P0512 and P0513 no longer claim "may not restart" at SERVICE_SOON; the reason now starts with "if it starts, ...".
+- **D8** Entries keep schema version 2, the AI-authored labels, and never say "verified".
+
+## STOP table (`data/content/stop_table.csv`, rule R13)
+
+The table is the owner's list of STOP codes. A STOP entry that is not in the table is an error and so is a table code below STOP, so a STOP changes only by an edit of this file. `status` is `owner_confirmed` for the 20 codes of the first 140 entries and `proposed_batch2` or `proposed_batch3` for the 13 added in this run (P0524 oil pressure too low; P2104, P2105, P2111, P2112 ride-by-wire throttle; P2146 injector supply open; P2300 to P2302 ignition coil A; P0320 to P0323 engine speed signal). Their reasons are in the file; the owner confirms or removes each one. After this run STOP is 33 of 329 entries (10 percent).
+
+## Validator rules added on 2026-10-02
+
+| Rule | What it checks |
+|---|---|
+| R12 | Below STOP: no unconditional "shuts off", "stops running", "will not start", "dies" claim; the "if" must come before the claim and not be "if you like". |
+| R13 | The locked STOP table, both ways. |
+| R14 | Temperature direction words (hotter, colder) agree with the standard title in every rider field. |
+| R15 | ABS and wheel speed entries: no reassurance wording, and the second advice sentence comes from a closed list. |
+| R16 | A fuel leak, drip or fumes in rider text needs the PETROL sentence and never "keep riding" or "wipe". |
+| R17 | Technician hints may not contain unsafe procedures (bypass, jumper wire, battery lead off while running ...). Rider text may only say "do not bypass". |
+| R18 | STOP text must not permit riding and must say "pull over" and "do not keep riding" in one sentence. |
+| R19 | A powertrain code with an engine-control tag has `mil` true. |
+| R20 | `applies_when` must name the hardware that not every bike has (new keys below). |
+| R21 | The canonical sentences (STALL, PETROL, ABS, NETWORK, the idle sentence) word for word where they apply; no variants; bus faults need review true. |
+| R22 | Hindi-readiness: sentences of at most 25 words, an idiom blocklist (cut out, drops out, hunt, reduce load, run rich ...), discouraged words (module, harness, loom). |
+| T1 | Title agreement (`title_agreement.csv`): a new entry needs AGREE; an entry written before Step T only warns. |
+
+New `applies_when` keys (all `true`): `knock_sensor_fitted`, `camshaft_sensor_fitted`, `oil_temp_sensor_fitted`, `closed_throttle_switch_fitted`, `evap_fitted`, `secondary_air_fitted`, `cooling_fan_fitted`, `oil_pressure_sensor_fitted`, `ambient_temp_sensor_fitted`, `fuel_level_sensor_fitted`, `gear_position_sensor_fitted`, `clutch_switch_fitted`, `downstream_o2_sensor_fitted`, `can_bus_fitted`, besides the existing `cylinders_min`, `liquid_cooled`, `ride_by_wire` and `abs_fitted`. The app has to know which of these a bike family has; otherwise it would show codes the bike cannot raise.
+
+Level mapping change: `injector` and `ignition_coil` now allow STOP and SERVICE_SOON in the tag table, because the STOP table (R13) decides which of them is STOP.

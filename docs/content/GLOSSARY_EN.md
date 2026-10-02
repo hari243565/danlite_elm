@@ -123,3 +123,41 @@ Generic "circuit malfunction" codes do not say how the circuit failed. Use **cir
 | ECU | write "bike's computer (ECU)" the first time in an entry, then "ECU" | ECM, PCM, engine control module |
 
 Rider-facing text never says "scan tool", "gauge", "tachometer" or a blinking lamp unless it is written "if your bike ..." (rules R1 to R3 in RUBRIC.md). Technician hints may say "scan tool".
+
+
+## Added 2026-10-02 (batch 2 to 4 run)
+
+### Fixed sentences (translate once and reuse word for word; the validator checks them)
+
+| Id | English | Used in |
+|---|---|---|
+| STALL | If it stalls more than once or will not restart, do not keep riding; have it taken to a workshop. | the only form of this advice, everywhere: throttle, MAP, camshaft, idle, sensor supply, ride-by-wire, twist grip sensor, system voltage and other entries (owner decision D4) |
+| PETROL | If you smell petrol strongly near the engine or tank, or see fuel dripping, stop and do not ride. | any entry that mentions a petrol smell, a fuel leak or a vapour leak |
+| ABS | Your normal brakes still work, but ABS is off, so a wheel can lock in hard braking. | every ABS and wheel speed entry |
+| NETWORK | Some electronic units on the bike cannot talk to each other, so warning lights or safety features may not work. If ABS is affected, your normal brakes still work, but ABS is off, so a wheel can lock in hard braking. | CAN bus and similar bus faults (U0001 to U0010, U0073 to U0077, U0140, U0146, U0300) |
+| IDLE | If it stalls at stops or will not hold idle, ride gently, avoid heavy traffic and have it checked soon. | first sentence of every idle entry, followed by STALL (owner decision D3) |
+| BATTERY-HOT | If the battery is hot or swollen, stop, switch off and do not ride on. | P0561, P2502 (the longer BATTERY sentence stays for P0563 and P2504) |
+| OVERHEAT | Pull over safely, switch off and let the engine cool; do not keep riding. | P0217 |
+| TWO-CASE | If the engine runs normally, have it checked soon; if it stalls, loses power or will not start, do not keep riding. | ECU internal faults, sensor supply and other entries where the ECU or its link may be at fault |
+| STOP-TAIL | Pull over safely, switch off and do not keep riding; have the bike taken to a workshop. | every STOP entry |
+
+### New terms
+
+| Preferred form | Meaning for the translator | Do not use |
+|---|---|---|
+| downstream oxygen sensor | the exhaust sensor after the emission system (sensor 2); "upstream" is the one before it | post-cat sensor, rear sensor |
+| delayed response | an oxygen sensor that reacts only after a wait; "slow response" reacts but too slowly | lag |
+| twist grip | the throttle handle; "twist grip sensor" is the sensor on a ride-by-wire bike | pedal, accelerator |
+| pickup | the simple engine speed sensor of some ignition systems | distributor pickup |
+| tone ring (toothed ring) | the toothed ring a wheel speed sensor reads (the glossary entry above stays) | tone wheel |
+| vapour system, purge valve, vent valve | the evaporative emission system that catches fuel vapour from the tank and feeds it to the engine | EVAP (alone), canister purge |
+| sensor supply A, B, C | the shared supplies the ECU gives its sensors (A, B and C are separate supplies) | reference voltage, 5 V rail |
+| bus off | a control unit has stopped using a data bus because it is not working | bus shut down |
+| ECU power relay (if fitted) | as before | main relay |
+| alternator, generator | the charging source; write "alternator (generator)" once | dynamo |
+| above idle, at idle | engine speed above idle, or at idle (fuel mixture codes) | off idle |
+| learned settings | as before | adaptations |
+
+### Retired words (the validator rejects them; they were hard to translate)
+
+cut out, drops out, jumps (about), hunt, reduce load, run on one cylinder, fair share, refuse to start, keeps pulling, run hot, run rich or lean, points to, off in one direction, wreck, stumbles, module, harness (in rider text), loom. Use: "stop suddenly", "is lost or changes suddenly at times", "go up and down", "ride gently and avoid hard acceleration", "may not start", "overheat", "use too much fuel".

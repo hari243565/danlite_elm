@@ -16,6 +16,18 @@ Reproduce with `python3 data/content/select_codes.py /tmp/obdex data/content/rel
 | U0 network | 29 | CAN bus, ECU, ABS, cluster, immobiliser, software, invalid data |
 | P3, U3, B0 | 0 | P3 is mixed hybrid/other; U3 is hybrid/fuel cell; B0 is airbag and car comfort |
 
+## Update 2026-10-02 (version 4): Step T, two-source title agreement
+
+The selection (387 codes, same ranks) did not change. What changed is which codes may be written.
+
+- `data/content/title_agreement.py` compares the title in force (OBDex, with the 8 owner-checked overrides applied) with the generic title in the Wal33D database (`github.com/Wal33D/dtc-database`, MIT, commit `04c43d72e7db7197658b6f72fe582c5076d9eee8`, table `dtc_definitions`, `manufacturer = 'GENERIC'`). The verdict rule is fixed in the script header: AGREE needs identical meaning words (wheel position, sensor letter and number, cylinder, failure type, unit name) and a similarity of at least 0.80; a default marker such as "sensor A" or "sensor 1" that only one source writes is ignored.
+- A code is writable only when the verdict is AGREE. The 140 entries that existed before Step T stay (listed in `entries_before_step_t.txt`) and give a validator warning if their verdict is not AGREE.
+- `select_codes.py` now reads `title_agreement.csv` (run order: select_codes.py, title_agreement.py, select_codes.py) and writes the verdict in a new column `title_agreement`; `title_status` is `two-source` for a code that was held back and is now released.
+- Result: **322 AGREE, 47 DISAGREE, 18 MISSING** (all 18 MISSING are chassis codes the Wal33D database does not have). Of the 22 codes held back before: **12 released** (P0141, P2110, P033F, U0167, C0037, C0038, C003A to C003F) and 10 stay held (P0134, P0140, P2230, U0168, C0030 to C0034, C0036). 48 codes that were not suspect before now fail the gate (30 DISAGREE, 18 MISSING; 40 of them chassis, 5 powertrain, 3 network). `data/content/held_back_titles_v2.csv` lists all 65 non-AGREE codes (58 not written, 7 written before Step T) with both titles and the neighbouring codes, for the owner's assistant to check on the public web.
+- Writable codes after the gate: **329** (the 140 existing + 189 new). Written in this run: batch 2 (100) and batch 3 (89); there is no batch 4 because no writable code is left.
+
+The version 3 text below is kept as history. Where it says "22 held back" or "365 can be written", the numbers above replace it.
+
 ## What changed on 2026-10-01 (version 3)
 
 1. **Selection bug fixed.** The ECU power relay range stopped at P0688 and missed P0689 and P0690. It now runs P0685 to P0690, which also pulls in P068A and P068B (relay switched off too early or too late). Total 383 to 387.
