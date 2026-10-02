@@ -54,6 +54,42 @@ void main() {
     expect(AppStrings.get('faultCodes', 'en'), 'Fault Codes');
   });
 
+  // The old word for "fault code" ("दोष कोड"), spelled with escapes. Where it is
+  // still used it is listed here on purpose: KNOWN AND DEFERRED to a later
+  // wording pass, because those strings belong to the Clear Codes dialog (or to
+  // the generated l10n file), whose wording this phase must not change.
+  const oldFaultCode = 'दोष कोड';
+  const deferredAppStrings = <String>{'clearAllQ'};
+  const deferredGenerated = <String>{'faultCodes', 'noFaultCodes', 'clearAllCodesQ'};
+
+  test('"फ़ॉल्ट कोड" is the accepted form in the DTC title and the empty state', () {
+    expect(hi['faultCodesDtc'], '$_fault कोड (DTC)');
+    expect(hi['noFaultCodes'], 'कोई $_fault कोड नहीं मिला');
+    for (final k in ['faultCodesDtc', 'noFaultCodes']) {
+      expect(hi[k]!.contains(oldFaultCode), isFalse, reason: k);
+    }
+  });
+
+  test('the remaining old "दोष कोड" strings are exactly the known, deferred ones', () {
+    final found = <String>{
+      for (final e in hi.entries)
+        if (e.value.contains(oldFaultCode)) e.key,
+    };
+    expect(found, deferredAppStrings,
+        reason: 'a new "दोष कोड" must use "फ़ॉल्ट कोड"; a deferred one must be listed here');
+    // The Clear Codes dialog is untouched.
+    expect(hi['clearAllQ'], 'सभी दोष कोड साफ करें?');
+  });
+
+  test('the generated Hindi l10n file keeps its old wording (deferred, not changed)', () {
+    final src = File('lib/generated/app_localizations_hi.dart').readAsStringSync();
+    final found = <String>{
+      for (final m in RegExp(r"String get (\w+) => '[^']*" + oldFaultCode).allMatches(src))
+        m[1]!,
+    };
+    expect(found, deferredGenerated);
+  });
+
   test('service manual is masculine in the two provenance lines', () {
     expect(
         AppStrings.get('provenanceManual', 'hi'),
