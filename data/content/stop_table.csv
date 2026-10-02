@@ -28,3 +28,7 @@ P2146,STOP,proposed_batch2,"injector supply open: the injector may get no power,
 P2300,STOP,proposed_batch2,"ignition coil A primary low: no spark can stop a single-cylinder bike, as P0351"
 P2301,STOP,proposed_batch2,"ignition coil A primary high: no spark can stop a single-cylinder bike, as P0351"
 P2302,STOP,proposed_batch2,"ignition coil A secondary circuit: no spark can stop a single-cylinder bike, as P0351"
+P0320,STOP,proposed_batch3,"engine speed signal circuit (ignition input): like the crankshaft codes the engine may stop or not start; low confidence, distributor-style source"
+P0321,STOP,proposed_batch3,"engine speed signal performance: as P0336 (borderline STOP kept by D2)"
+P0322,STOP,proposed_batch3,"engine speed signal lost: the engine may not run"
+P0323,STOP,proposed_batch3,"engine speed signal intermittent: sudden stop, as P0339"

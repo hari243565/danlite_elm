@@ -198,7 +198,11 @@ R9_WORKSHOP = re.compile(r"short to ground|short to battery|open circuit|plausib
                          r"current below|current above|performance or incorrect|communication lost", re.I)
 R10_TITLE_BAD = re.compile(r"\(listed as|bank ?2\b", re.I)
 # duplicate titles that the standard really contains (none yet)
-TITLE_DUP_EXCEPTIONS = []  # list of frozensets of codes
+# A bike has one rear wheel speed sensor, so the standard car-style left, right and shared rear codes get the same
+# rider title; their standard titles stay in standard_title_en (batch 3, 2026-10-02).
+TITLE_DUP_EXCEPTIONS = [frozenset(p) for p in (
+    ("C0037", "C003A"), ("C0037", "C003D"), ("C003A", "C003D"),
+    ("C0038", "C003B"), ("C0038", "C003E"), ("C003B", "C003E"))]
 SECOND_CYL = re.compile(r"cylinder (#)?2\b|ignition coil [\"']?b\b|contribution/balance", re.I)
 
 # ---- parts named in an entry must appear in the source entry ---------------
@@ -912,7 +916,10 @@ def check_entry(r, ctx, err, warn):
     stext = source_text(src)
     sdesc = source_description(src)
     t_parts = t.replace(NETWORK, "").replace(PETROL, "")  # fixed owner sentences name ABS and fuel on purpose
+    abs_entry = bool(set(tags) & ABS_TAGS) or c[0] == "C"  # ABS and wheel speed are the subject of these codes
     for rx, toks in PARTS:
+        if abs_entry and toks and toks[0] in ("abs", "wheel speed"):
+            continue
         if toks and re.search(rx, t_parts, re.I) and not any(tok in stext for tok in toks):
             m = re.search(rx, t_parts, re.I)
             if any(tok in sdesc for tok in toks):
