@@ -51,6 +51,11 @@ class AppStrings {
     return map[key] ?? _all['en']![key] ?? key;
   }
 
+  /// One language's whole table, for tests that scan every string.
+  @visibleForTesting
+  static Map<String, String> languageTable(String langCode) =>
+      _all[langCode] ?? const <String, String>{};
+
   static const Map<String, Map<String, String>> _all = {
     // ══════════════════════════════════════════════════════════════════════════
     // ENGLISH — Complete
@@ -358,6 +363,63 @@ class AppStrings {
       'historyShareHeader': 'Danlite scan history',
       'historyShareFooter': 'Saved on the phone and shared by the rider. No '
           'vehicle ID number is included.',
+      // Phase A-4 (S2): the internal Clear Codes record, History detail only.
+      'historyClearAttempt': 'Clear attempted at {time}.',
+      'historyClearAfterCodes':
+          'After clearing: {n} code(s) were still reported.',
+      'historyClearAfterNone': 'After clearing: no codes were reported.',
+      'historyClearAfterUnknown': 'After clearing: could not check.',
+      // Phase A-4 (C1-C3): freeze frame, lamp and clear counters, emission
+      // self-checks. English + Hindi only; other languages show English.
+      'showDetails': 'Show details',
+      'hideDetails': 'Hide details',
+      'snapshotTitle': 'Snapshot when the fault was recorded',
+      'snapshotNone': 'There is no snapshot saved for this fault.',
+      'snapshotUnsupported': 'This bike does not provide snapshot data.',
+      'snapshotNoAnswer': 'The bike did not answer. This does not mean there is '
+          'no snapshot. Try again.',
+      'snapshotRefused': 'The bike\'s computer would not send the snapshot.',
+      'snapshotOtherFault':
+          'This snapshot belongs to {code}, not to this fault.',
+      'ctxPartial': 'Some details could not be read. Try again.',
+      'snapFuelSystem': 'Fuel system status',
+      'snapShortTrim': 'Short-term fuel trim',
+      'snapLongTrim': 'Long-term fuel trim',
+      'snapIntakePressure': 'Intake pressure',
+      'snapIntakeAirTemp': 'Intake air temperature',
+      'snapModuleVoltage': 'ECU voltage',
+      'fuelStatusOpenCold': 'Open loop (engine cold)',
+      'fuelStatusClosed': 'Closed loop',
+      'fuelStatusOpenLoad': 'Open loop (load or fuel cut)',
+      'fuelStatusOpenFault': 'Open loop (system fault)',
+      'fuelStatusClosedFault': 'Closed loop (sensor fault)',
+      'fuelStatusUnknown': 'Unknown status',
+      'ctxLampKm': 'Warning lamp has been on for {n} km',
+      'ctxLampMin': 'Warning lamp has been on for {n} min',
+      'ctxClearedKm': 'Codes were cleared {n} km ago',
+      'ctxClearedMin': 'Codes were cleared {n} min ago',
+      'ctxWarmUps': 'Engine warmed up {n} times since clearing',
+      'ctxAtLeast': 'at least {n}',
+      'readinessTitle': 'Emission self-checks',
+      'readinessComplete': 'Complete',
+      'readinessNotComplete': 'Not complete yet',
+      'readinessNotSupported': 'Not supported by this bike',
+      'readinessNotApplicable': 'Not applicable to this engine type',
+      'readinessUnavailable':
+          'This bike does not provide self-check information.',
+      'readinessHint': 'These checks reset after codes are cleared and finish '
+          'after some riding.',
+      'monMisfire': 'Misfire',
+      'monFuelSystem': 'Fuel system',
+      'monComponents': 'Components',
+      'monCatalyst': 'Catalyst',
+      'monHeatedCatalyst': 'Heated catalyst',
+      'monEvaporative': 'Evaporative system',
+      'monSecondaryAir': 'Secondary air',
+      'monAcRefrigerant': 'A/C refrigerant',
+      'monOxygenSensor': 'Oxygen sensor',
+      'monOxygenSensorHeater': 'Oxygen sensor heater',
+      'monEgr': 'EGR / VVT',
       'absModuleBusyTitle': 'The ABS module is busy',
       'absModuleBusyDesc': 'The ABS module is busy and did not send its fault '
           'codes. This does not mean there are no faults. Try again in a '
@@ -539,7 +601,6 @@ class AppStrings {
           'Captures sensor snapshot when fault was set. Read fault codes first.',
       'readFreezeFrame': 'Read Freeze Frame',
       'snapshotData': 'Snapshot Data',
-      'noFreezeData': 'No Freeze Data Available',
       'triggerCode': 'Trigger Code',
       'complete': 'Complete',
       'notRun': 'Not Run',
@@ -928,7 +989,7 @@ class AppStrings {
       'appName': 'OBD Danlite',
       'dashboard': 'डैशबोर्ड',
       'liveData': 'लाइव डेटा',
-      'faultCodes': 'दोष कोड',
+      'faultCodes': 'फ़ॉल्ट कोड',
       'performance': 'प्रदर्शन',
       'settings': 'सेटिंग्स',
       'dashboardTab': 'डैशबोर्ड',
@@ -1019,7 +1080,6 @@ class AppStrings {
       'freezeFrame': 'फ्रीज फ्रेम',
       'freezeFrameTitle': 'फ्रीज फ्रेम डेटा',
       'snapshotData': 'स्नैपशॉट डेटा',
-      'noFreezeData': 'कोई फ्रीज फ्रेम डेटा उपलब्ध नहीं',
       'triggerCode': 'ट्रिगर कोड',
       'readiness': 'तत्परता',
       'readCodes': 'कोड पढ़ें',
@@ -1140,17 +1200,17 @@ class AppStrings {
       // ── Fault-code safety release (Phase 0) — PROPOSED, needs review by a
       // Hindi speaker before release ───────────────────────────────────────
       'dtcNoAnswerTitle': 'बाइक से जवाब नहीं मिला',
-      'dtcNoAnswerBody': 'अडैप्टर जुड़ा है, लेकिन बाइक के कंप्यूटर ने जवाब नहीं '
+      'dtcNoAnswerBody': 'एडेप्टर जुड़ा है, लेकिन बाइक के कंप्यूटर ने जवाब नहीं '
           'दिया। इसका मतलब यह नहीं कि कोई खराबी नहीं है।',
-      'dtcNoAnswerChecklist': 'इग्निशन चालू (ON) करें। अडैप्टर को बाइक के सॉकेट '
+      'dtcNoAnswerChecklist': 'इग्निशन चालू (ON) करें। एडेप्टर को बाइक के सॉकेट '
           'में पूरा लगाएँ और अपनी बाइक के कनेक्टर के हिसाब से सही केबल इस्तेमाल '
           'करें। बैटरी ठीक है या नहीं देखें। कुछ पुरानी बाइकें ऐसे कनेक्शन का उपयोग '
           'करती हैं जिसे ऐप अभी नहीं पढ़ सकता। फिर दोबारा कोशिश करें।',
       'dtcRefusedTitle': 'बाइक ने अनुरोध अस्वीकार किया',
       'dtcRefusedBody': 'बाइक के कंप्यूटर ने जवाब दिया, लेकिन अपने फ़ॉल्ट कोड नहीं '
           'बताए। इसका मतलब यह नहीं कि कोई खराबी नहीं है। फिर से कोशिश करें।',
-      'dtcLinkLostTitle': 'अडैप्टर से संपर्क टूट गया',
-      'dtcLinkLostBody': 'कोई फ़ॉल्ट कोड नहीं पढ़ा जा सका। देखें कि अडैप्टर अभी भी '
+      'dtcLinkLostTitle': 'एडेप्टर से संपर्क टूट गया',
+      'dtcLinkLostBody': 'कोई फ़ॉल्ट कोड नहीं पढ़ा जा सका। देखें कि एडेप्टर अभी भी '
           'लगा और जुड़ा है, फिर दोबारा कोशिश करें।',
       'dtcKLineGated': 'यह बाइक पुराने प्रकार के कनेक्शन का उपयोग करती दिखती है। '
           'इसके फ़ॉल्ट कोड पढ़ना अभी चालू नहीं है, इसलिए ऐप ऐसे कोड नहीं दिखाएगा जो '
@@ -1195,7 +1255,7 @@ class AppStrings {
           'कोड आ सकते हैं। बैटरी चार्ज करें या बदलें, फिर दोबारा स्कैन करें।',
       'mayBeFalseLowVoltage': 'कम बैटरी वोल्टेज के कारण यह कोड गलत हो सकता है',
       'recorderOnTitle': 'सेशन रिकॉर्डर चालू है',
-      'recorderOnBody': 'Danlite इस कनेक्शन के अडैप्टर संदेशों को इसी फ़ोन पर एक '
+      'recorderOnBody': 'Danlite इस कनेक्शन के एडेप्टर संदेशों को इसी फ़ोन पर एक '
           'फ़ाइल में सहेज रहा है, ताकि और बाइकों को सपोर्ट किया जा सके। कुछ भी अपलोड '
           'नहीं होता। वाहन पहचान संख्या (VIN) छिपा दी जाती है। फ़ाइल फ़ोन से तभी '
           'बाहर जाती है जब आप शेयर दबाते हैं।',
@@ -1204,7 +1264,7 @@ class AppStrings {
       'recorderTurnedOn': 'सेशन रिकॉर्डर चालू किया गया',
       'recorderTurnedOff': 'सेशन रिकॉर्डर बंद किया गया',
       'recorderNothingToShare':
-          'अभी कोई रिकॉर्डिंग नहीं है। पहले अडैप्टर से कनेक्ट करें।',
+          'अभी कोई रिकॉर्डिंग नहीं है। पहले एडेप्टर से कनेक्ट करें।',
 
       // ── Fault Phase 1B — technician register: workshop loanwords for
       // parts, ABS and ECU in Latin script, native verbs for actions ──
@@ -1220,9 +1280,9 @@ class AppStrings {
       'faultForMechanic': 'मैकेनिक के लिए',
       'provenanceAi':
           'Danlite ने AI की मदद से लिखी जानकारी, निर्माता का डेटा नहीं',
-      'provenanceManual': 'निर्माता की सर्विस मैनुअल से',
+      'provenanceManual': 'निर्माता के सर्विस मैनुअल से',
       'provenanceManualNoMeaning':
-          'निर्माता की सर्विस मैनुअल में यह कोड है, पर इसका मतलब नहीं दिया गया',
+          'निर्माता के सर्विस मैनुअल में यह कोड है, पर इसका मतलब नहीं दिया गया',
       'provenanceDealerReadout':
           'Bosch ABS मॉड्यूल की डीलर टूल रीडिंग से, सर्विस मैनुअल से नहीं',
       'provenanceLegacyTable': 'ऐप का पुराना टेक्स्ट; इसका स्रोत दर्ज नहीं है',
@@ -1291,6 +1351,64 @@ class AppStrings {
       'historyShareHeader': 'Danlite स्कैन हिस्ट्री',
       'historyShareFooter': 'फ़ोन पर सेव और राइडर द्वारा शेयर किया गया। इसमें '
           'वाहन पहचान संख्या (VIN) नहीं है।',
+      // Phase A-4 (S2): the internal Clear Codes record, History detail only.
+      'historyClearAttempt': 'कोड साफ़ करने की कोशिश: {time}।',
+      'historyClearAfterCodes': 'उसके बाद {n} कोड अब भी दिखे।',
+      'historyClearAfterNone': 'उसके बाद कोई कोड नहीं दिखा।',
+      'historyClearAfterUnknown': 'उसके बाद जाँच नहीं हो सकी।',
+      // Phase A-4 (C1-C3). The first block is the owner's wording (S4); the
+      // keys marked "proposed" are written in the same style sheet and wait
+      // for the owner's record.
+      'showDetails': 'विवरण दिखाएँ',
+      'hideDetails': 'विवरण छिपाएँ', // proposed
+      'snapshotTitle': 'फ़ॉल्ट दर्ज होने के समय का स्नैपशॉट',
+      'snapshotNone': 'इस फ़ॉल्ट के लिए कोई स्नैपशॉट सेव नहीं है।',
+      'snapshotUnsupported': 'यह बाइक स्नैपशॉट डेटा नहीं देती।',
+      'snapshotNoAnswer': 'बाइक ने जवाब नहीं दिया। इसका मतलब यह नहीं कि '
+          'स्नैपशॉट नहीं है। फिर से कोशिश करें।',
+      'snapshotRefused':
+          'बाइक के कंप्यूटर ने स्नैपशॉट भेजने से मना कर दिया।', // proposed
+      'snapshotOtherFault':
+          'यह स्नैपशॉट {code} का है, इस फ़ॉल्ट का नहीं।', // proposed
+      'ctxPartial': 'कुछ विवरण पढ़े नहीं जा सके। फिर से कोशिश करें।', // proposed
+      'snapFuelSystem': 'ईंधन सिस्टम स्थिति', // proposed
+      'snapShortTrim': 'शॉर्ट-टर्म फ्यूल ट्रिम', // proposed
+      'snapLongTrim': 'लॉन्ग-टर्म फ्यूल ट्रिम', // proposed
+      'snapIntakePressure': 'इनटेक प्रेशर', // proposed
+      'snapIntakeAirTemp': 'इनटेक एयर तापमान', // proposed
+      'snapModuleVoltage': 'ECU वोल्टेज', // proposed
+      'fuelStatusOpenCold': 'ओपन लूप (इंजन ठंडा)', // proposed
+      'fuelStatusClosed': 'क्लोज़्ड लूप', // proposed
+      'fuelStatusOpenLoad': 'ओपन लूप (लोड या फ्यूल कट)', // proposed
+      'fuelStatusOpenFault': 'ओपन लूप (सिस्टम खराबी)', // proposed
+      'fuelStatusClosedFault': 'क्लोज़्ड लूप (सेंसर खराबी)', // proposed
+      'fuelStatusUnknown': 'अज्ञात स्थिति', // proposed
+      'ctxLampKm': 'चेतावनी लैंप {n} km से चालू है',
+      'ctxLampMin': 'चेतावनी लैंप {n} मिनट से चालू है',
+      'ctxClearedKm': 'कोड {n} km पहले साफ़ किए गए थे',
+      'ctxClearedMin': 'कोड {n} मिनट पहले साफ़ किए गए थे',
+      'ctxWarmUps': 'कोड साफ़ होने के बाद इंजन {n} बार गर्म हुआ',
+      'ctxAtLeast': 'कम से कम {n}',
+      'readinessTitle': 'उत्सर्जन सेल्फ-चेक',
+      'readinessComplete': 'पूरा',
+      'readinessNotComplete': 'अभी पूरा नहीं',
+      'readinessNotSupported': 'इस बाइक में नहीं है',
+      'readinessNotApplicable': 'इस इंजन टाइप पर लागू नहीं', // proposed
+      'readinessUnavailable':
+          'यह बाइक सेल्फ-चेक की जानकारी नहीं देती।', // proposed
+      'readinessHint': 'कोड साफ़ करने के बाद ये चेक रीसेट हो जाते हैं और कुछ '
+          'राइड के बाद पूरे होते हैं।',
+      'monMisfire': 'मिसफ़ायर',
+      'monFuelSystem': 'ईंधन सिस्टम',
+      'monComponents': 'कंपोनेंट',
+      'monCatalyst': 'कैटेलिस्ट',
+      'monHeatedCatalyst': 'हीटेड कैटेलिस्ट',
+      'monEvaporative': 'इवैपोरेटिव सिस्टम',
+      'monSecondaryAir': 'सेकेंडरी एयर',
+      'monAcRefrigerant': 'A/C रेफ्रिजरेंट',
+      'monOxygenSensor': 'ऑक्सीजन सेंसर',
+      'monOxygenSensorHeater': 'ऑक्सीजन सेंसर हीटर',
+      'monEgr': 'EGR / VVT',
       'absModuleBusyTitle': 'ABS मॉड्यूल व्यस्त है',
       'absModuleBusyDesc': 'ABS मॉड्यूल व्यस्त है और उसने अपने फ़ॉल्ट कोड नहीं '
           'भेजे। इसका मतलब यह नहीं कि कोई खराबी नहीं है। थोड़ी देर बाद फिर से '
@@ -1328,39 +1446,39 @@ class AppStrings {
       'absNotScannedDesc':
           'ब्रेकिंग मॉड्यूल से कोड पढ़ने के लिए "ABS स्कैन करें" दबाएँ। यह इंजन ECU से '
           'अलग मॉड्यूल है, इसलिए इसे लगातार नहीं, माँगने पर स्कैन किया जाता है।',
-      'absNoFaults': 'कोई ABS फॉल्ट कोड नहीं',
+      'absNoFaults': 'कोई ABS फ़ॉल्ट कोड नहीं',
       'absNoFaultsDesc':
-          'ABS मॉड्यूल ने उत्तर दिया और कोई संग्रहित फॉल्ट नहीं बताया।',
+          'ABS मॉड्यूल ने उत्तर दिया और कोई संग्रहित फ़ॉल्ट नहीं बताया।',
       'absNoModule': 'ABS मॉड्यूल से कोई उत्तर नहीं',
       'absNoModuleDesc':
           'सभी संभावित ABS पतों पर प्रयास किया गया, किसी ने उत्तर नहीं दिया। इसका अर्थ '
-          'यह हो सकता है कि इस वाहन में मॉड्यूल का पता अलग है, या यह ELM327 एडाप्टर '
-          'इंजन के अलावा किसी मॉड्यूल तक पहुँच ही नहीं सकता — कई एडाप्टर इंजन कोड ठीक '
+          'यह हो सकता है कि इस वाहन में मॉड्यूल का पता अलग है, या यह ELM327 एडेप्टर '
+          'इंजन के अलावा किसी मॉड्यूल तक पहुँच ही नहीं सकता — कई एडेप्टर इंजन कोड ठीक '
           'पढ़ते हैं फिर भी ABS नहीं पढ़ पाते। इससे यह सिद्ध नहीं होता कि ABS सिस्टम खराब है।',
-      'absAdapterMayBeLimited': 'यह एडाप्टर शायद ABS मॉड्यूल तक नहीं पहुँच पा रहा',
+      'absAdapterMayBeLimited': 'यह एडेप्टर शायद ABS मॉड्यूल तक नहीं पहुँच पा रहा',
       'absAdapterMayBeLimitedDesc':
           'किसी भी पते ने उत्तर नहीं दिया, और उत्तरों का समय ऐसा था जो यह नहीं दर्शाता कि '
-          'एडाप्टर वास्तव में बस का इंतज़ार कर रहा था — वे या तो असली राउंड ट्रिप के लिए '
+          'एडेप्टर वास्तव में बस का इंतज़ार कर रहा था — वे या तो असली राउंड ट्रिप के लिए '
           'बहुत तेज़ थे, या बिल्कुल लौटे ही नहीं। इससे संकेत मिलता है कि समस्या मोटरसाइकिल '
-          'की नहीं, एडाप्टर की हो सकती है, हालाँकि केवल समय से यह सिद्ध नहीं होता। कई सस्ते '
-          'ELM327 एडाप्टर इंजन कोड ठीक पढ़ते हैं फिर भी इंजन के अलावा किसी मॉड्यूल तक नहीं '
+          'की नहीं, एडेप्टर की हो सकती है, हालाँकि केवल समय से यह सिद्ध नहीं होता। कई सस्ते '
+          'ELM327 एडेप्टर इंजन कोड ठीक पढ़ते हैं फिर भी इंजन के अलावा किसी मॉड्यूल तक नहीं '
           'पहुँच पाते; यह हार्डवेयर की सीमा है जिसे कोई ऐप दूर नहीं कर सकता। यदि ABS स्कैन '
-          'आपके लिए ज़रूरी है, तो STN11xx चिप वाला एडाप्टर (जैसे OBDLink) इंजन के अलावा '
+          'आपके लिए ज़रूरी है, तो STN11xx चिप वाला एडेप्टर (जैसे OBDLink) इंजन के अलावा '
           'मॉड्यूल तक पहुँचने का दस्तावेज़ी समर्थन देता है। इंजन कोड दोनों ही स्थितियों में '
           'प्रभावित नहीं होते।',
       'absAdapterTimingNormal':
-          'इस स्कैन में एडाप्टर के उत्तरों का समय सामान्य लगा।',
+          'इस स्कैन में एडेप्टर के उत्तरों का समय सामान्य लगा।',
       'absLearnedAddress': 'याद रखा गया पता',
-      'absAddressingUnsupported': 'एडाप्टर ABS मॉड्यूल को संबोधित नहीं कर सकता',
+      'absAddressingUnsupported': 'एडेप्टर ABS मॉड्यूल को संबोधित नहीं कर सकता',
       'absAddressingUnsupportedDesc':
-          'इस एडाप्टर ने किसी विशिष्ट मॉड्यूल से बात करने वाले कमांड (ATSH / ATCRA) '
+          'इस एडेप्टर ने किसी विशिष्ट मॉड्यूल से बात करने वाले कमांड (ATSH / ATCRA) '
           'अस्वीकार कर दिए। ABS कोड पढ़ने के लिए मॉड्यूल एड्रेसिंग सपोर्ट करने वाला '
           'ELM327 चाहिए। इंजन कोड इससे प्रभावित नहीं होते।',
       'absNoDictionary':
           'इस कोड के लिए निर्माता का विवरण उपलब्ध नहीं है।',
       'absSetMake': 'अपने वाहन का मेक दर्ज करें',
       'absSetMakeDesc':
-          'चेसिस कोड निर्माता-विशिष्ट होते हैं — एक ही कोड अलग-अलग मेक पर अलग फॉल्ट '
+          'चेसिस कोड निर्माता-विशिष्ट होते हैं — एक ही कोड अलग-अलग मेक पर अलग फ़ॉल्ट '
           'दर्शाता है। सही विवरण दिखाने के लिए वाहन प्रोफ़ाइल में मेक जोड़ें।',
       'absMakeUnsupported': 'इस मेक के लिए अभी ABS डिक्शनरी नहीं है',
       'absMakeUnsupportedDesc':
@@ -1368,7 +1486,7 @@ class AppStrings {
       'absSetModel': 'अपने वाहन का मॉडल दर्ज करें',
       'absSetModelDesc':
           'इस मेक में एक से अधिक ABS प्लेटफ़ॉर्म हैं, और एक ही कोड नंबर हर प्लेटफ़ॉर्म पर '
-          'अलग फॉल्ट दर्शाता है — इसलिए कोड का विवरण दिखाने से पहले मॉडल जानना ज़रूरी है। '
+          'अलग फ़ॉल्ट दर्शाता है — इसलिए कोड का विवरण दिखाने से पहले मॉडल जानना ज़रूरी है। '
           'मॉडल के बिना भी कोड पढ़े और दिखाए जाएँगे। पहचाने जाने वाले मॉडल:',
       'absSetModelAnyModelDesc':
           'वाहन प्रोफ़ाइल में अपना मॉडल जोड़ें। इस मेक में कोड हर मॉडल पर एक ही तरीक़े से '
@@ -1380,9 +1498,9 @@ class AppStrings {
       'absCbsDesc':
           'Danlite के रिकॉर्ड में यह मॉडल ABS के बजाय CBS (Combi-Brake System) के साथ '
           'दर्ज है। CBS पूरी तरह मैकेनिकल लिंक्ड ब्रेक है: इसमें न ABS कंट्रोल यूनिट होती '
-          'है, न व्हील स्पीड सेंसर, और न कोई फॉल्ट मेमोरी — इसलिए इस वाहन में पढ़ने के '
-          'लिए कोई चेसिस फॉल्ट कोड होता ही नहीं। यह इस मॉडल के लिए सामान्य है, कोई '
-          'खराबी नहीं।\n\nइंजन के फॉल्ट कोड इससे प्रभावित नहीं होते — इंजन कैटेगरी '
+          'है, न व्हील स्पीड सेंसर, और न कोई फ़ॉल्ट मेमोरी — इसलिए इस वाहन में पढ़ने के '
+          'लिए कोई चेसिस फ़ॉल्ट कोड होता ही नहीं। यह इस मॉडल के लिए सामान्य है, कोई '
+          'खराबी नहीं।\n\nइंजन के फ़ॉल्ट कोड इससे प्रभावित नहीं होते — इंजन कैटेगरी '
           'इस्तेमाल करें।',
       'absCbsProvenance':
           'यह वर्गीकरण मॉडल के इंजन साइज़ और भारत के ब्रेकिंग नियम से निकला है, आपकी '
@@ -1394,9 +1512,9 @@ class AppStrings {
       'absBlinkOnlyTitle': 'इस Honda का ABS ब्लिंक कोड से पढ़ा जाता है, '
           'ब्लूटूथ से नहीं',
       'absBlinkOnlyDesc':
-          'ज़्यादातर Honda ABS मोटरसाइकिलों में ABS फॉल्ट कोड DLC कनेक्टर को जोड़कर और '
+          'ज़्यादातर Honda ABS मोटरसाइकिलों में ABS फ़ॉल्ट कोड DLC कनेक्टर को जोड़कर और '
           'ABS वार्निंग लैंप की चमक गिनकर निकाला जाता है। यह कोड वाहन के CAN बस पर जाता '
-          'ही नहीं, इसलिए कोई भी ब्लूटूथ एडाप्टर या ऐप — यह ऐप भी — उसे नहीं पढ़ सकता। '
+          'ही नहीं, इसलिए कोई भी ब्लूटूथ एडेप्टर या ऐप — यह ऐप भी — उसे नहीं पढ़ सकता। '
           'यह मोटरसाइकिल पर की जाने वाली एक भौतिक, आँखों से देखी जाने वाली प्रक्रिया '
           'है।\n\nDanlite इतना कर सकता है कि गिनने के बाद उस पैटर्न का मतलब बता दे। '
           'Honda की प्रकाशित ABS कोड तालिका ऐप में मौजूद है।',
@@ -1414,11 +1532,11 @@ class AppStrings {
       'absRawUnverifiedNote':
           'यह आपके ABS मॉड्यूल से पढ़ा गया असली मान है, ठीक वैसा ही दिखाया गया जैसा '
           'मॉड्यूल ने बताया। इस मेक पर इसका क्या मतलब है, इसका सत्यापित विवरण Danlite '
-          'के पास नहीं है, और ब्रेकिंग फॉल्ट के बारे में अंदाज़ा नहीं लगाया जाएगा। ऊपर '
+          'के पास नहीं है, और ब्रेकिंग फ़ॉल्ट के बारे में अंदाज़ा नहीं लगाया जाएगा। ऊपर '
           'दिया मॉड्यूल कोड अपने सर्विस सेंटर को बताएँ।',
       'absRawBanner': 'इस मेक के लिए सीमित डेटा',
       'absRawBannerDesc':
-          'इस मेक में Bosch का ABS मॉड्यूल लगता है। Danlite मॉड्यूल में दर्ज फॉल्ट मान '
+          'इस मेक में Bosch का ABS मॉड्यूल लगता है। Danlite मॉड्यूल में दर्ज फ़ॉल्ट मान '
           'पढ़ सकता है, पर इनमें से ज़्यादातर का इस मेक पर क्या मतलब है, यह किसी '
           'सार्वजनिक स्रोत में दर्ज नहीं है — इसलिए वे विवरण के बजाय कच्चे मॉड्यूल कोड '
           'के रूप में दिखाए जाते हैं। यह Royal Enfield और Honda की तालिकाओं जितना '
@@ -1452,7 +1570,7 @@ class AppStrings {
 
       'emissionReadiness': 'उत्सर्जन तत्परता',
       'freezeFrameDesc':
-          'फॉल्ट सेट होने पर सेंसर स्नैपशॉट कैप्चर करता है। पहले फॉल्ट कोड पढ़ें।',
+          'फ़ॉल्ट सेट होने पर सेंसर स्नैपशॉट कैप्चर करता है। पहले फ़ॉल्ट कोड पढ़ें।',
       'readFreezeFrame': 'फ्रीज़ फ्रेम पढ़ें',
       'complete': 'पूर्ण',
       'notRun': 'नहीं चला',
@@ -1755,7 +1873,6 @@ class AppStrings {
       'freezeFrame': 'ফ্রিজ ফ্রেম',
       'freezeFrameTitle': 'ফ্রিজ ফ্রেম ডেটা',
       'snapshotData': 'স্ন্যাপশট ডেটা',
-      'noFreezeData': 'কোনো ফ্রিজ ফ্রেম ডেটা উপলব্ধ নেই',
       'triggerCode': 'ট্রিগার কোড',
       'readiness': 'প্রস্তুতি',
       'readCodes': 'কোড পড়ুন',
@@ -1949,7 +2066,6 @@ class AppStrings {
       'freezeFrame': 'ఫ్రీజ్ ఫ్రేమ్',
       'freezeFrameTitle': 'ఫ్రీజ్ ఫ్రేమ్ డేటా',
       'snapshotData': 'స్నాప్‌షాట్ డేటా',
-      'noFreezeData': 'ఫ్రీజ్ ఫ్రేమ్ డేటా అందుబాటులో లేదు',
       'triggerCode': 'ట్రిగ్గర్ కోడ్',
       'readiness': 'సంసిద్ధత',
       'startTest': 'పరీక్ష ప్రారంభించండి',
@@ -2204,7 +2320,6 @@ class AppStrings {
       'freezeFrame': 'फ्रीज फ्रेम',
       'freezeFrameTitle': 'फ्रीज फ्रेम डेटा',
       'snapshotData': 'स्नॅपशॉट डेटा',
-      'noFreezeData': 'फ्रीज फ्रेम डेटा उपलब्ध नाही',
       'triggerCode': 'ट्रिगर कोड',
       'readiness': 'तयारी',
       'startTest': 'चाचणी सुरू करा',
@@ -2459,7 +2574,6 @@ class AppStrings {
       'freezeFrame': 'ஃப்ரீஸ் ஃப்ரேம்',
       'freezeFrameTitle': 'ஃப்ரீஸ் ஃப்ரேம் தரவு',
       'snapshotData': 'ஸ்னாப்ஷாட் தரவு',
-      'noFreezeData': 'ஃப்ரீஸ் ஃப்ரேம் தரவு இல்லை',
       'triggerCode': 'தூண்டல் குறியீடு',
       'readiness': 'தயார்நிலை',
       'startTest': 'சோதனை தொடங்கு',
@@ -2711,7 +2825,6 @@ class AppStrings {
       'freezeFrame': 'ફ્રીઝ ફ્રેમ',
       'freezeFrameTitle': 'ફ્રીઝ ફ્રેમ ડેટા',
       'snapshotData': 'સ્નેપશોટ ડેટા',
-      'noFreezeData': 'ફ્રીઝ ફ્રેમ ડેટા ઉપલબ્ધ નથી',
       'triggerCode': 'ટ્રિગર કોડ',
       'readiness': 'તૈયારી',
       'startTest': 'પ્રારંભ કરો',
@@ -2966,7 +3079,6 @@ class AppStrings {
       'freezeFrame': 'ಫ್ರೀಜ್ ಫ್ರೇಮ್',
       'freezeFrameTitle': 'ಫ್ರೀಜ್ ಫ್ರೇಮ್ ಡೇಟಾ',
       'snapshotData': 'ಸ್ನ್ಯಾಪ್‌ಶಾಟ್ ಡೇಟಾ',
-      'noFreezeData': 'ಫ್ರೀಜ್ ಫ್ರೇಮ್ ಡೇಟಾ ಲಭ್ಯವಿಲ್ಲ',
       'triggerCode': 'ಟ್ರಿಗ್ಗರ್ ಕೋಡ್',
       'readiness': 'ಸಿದ್ಧತೆ',
       'startTest': 'ಪರೀಕ್ಷೆ ಪ್ರಾರಂಭಿಸಿ',
@@ -3221,7 +3333,6 @@ class AppStrings {
       'freezeFrame': 'ഫ്രീസ് ഫ്രേം',
       'freezeFrameTitle': 'ഫ്രീസ് ഫ്രെയിം ഡാറ്റ',
       'snapshotData': 'സ്നാപ്പ്ഷോട്ട് ഡാറ്റ',
-      'noFreezeData': 'ഫ്രീസ് ഫ്രെയിം ഡാറ്റ ലഭ്യമല്ല',
       'triggerCode': 'ട്രിഗർ കോഡ്',
       'readiness': 'തയ്യാർ',
       'startTest': 'പരീക്ഷ ആരംഭിക്കുക',
@@ -3501,7 +3612,6 @@ class AppStrings {
       'freezeFrame': 'ਫ੍ਰੀਜ਼ ਫ੍ਰੇਮ',
       'freezeFrameTitle': 'ਫ੍ਰੀਜ਼ ਫ੍ਰੇਮ ਡੇਟਾ',
       'snapshotData': 'ਸਨੈਪਸ਼ਾਟ ਡੇਟਾ',
-      'noFreezeData': 'ਕੋਈ ਫ੍ਰੀਜ਼ ਫ੍ਰੇਮ ਡੇਟਾ ਉਪਲਬਧ ਨਹੀਂ',
       'triggerCode': 'ਟ੍ਰਿਗਰ ਕੋਡ',
       'readiness': 'ਤਿਆਰੀ',
       'startTest': 'ਟੈਸਟ ਸ਼ੁਰੂ ਕਰੋ',
@@ -3999,7 +4109,6 @@ class AppStrings {
       'freezeFrame': 'फ्रिज फ्रेम',
       'freezeFrameTitle': 'फ्रिज फ्रेम डाटा',
       'snapshotData': 'स्न्यापसट डाटा',
-      'noFreezeData': 'फ्रिज फ्रेम डाटा उपलब्ध छैन',
       'triggerCode': 'ट्रिगर कोड',
       'readiness': 'तयारी',
       'startTest': 'परीक्षण सुरू गर्नुहोस्',

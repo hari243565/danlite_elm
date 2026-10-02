@@ -10,6 +10,7 @@
 # expect lamp: on
 # expect pending: unsupported
 # expect permanent: unsupported
+# expect contextWire: none
 09:30:00.000 TX>ATZ
 09:30:00.300 RX<\r\rELM327 v1.5\r\r
 # 09:30:00.300 adapter identity (ATZ): ELM327 v1.5

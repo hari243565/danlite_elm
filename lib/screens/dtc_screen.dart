@@ -18,6 +18,7 @@ import '../services/fault_decoders.dart' show FailureType, UdsStatusByte;
 import '../services/obd_service.dart';
 import '../services/session_recorder.dart';
 import '../models/vehicle_data.dart';
+import '../widgets/engine_context_view.dart';
 import '../widgets/resolved_fault_view.dart';
 import 'code_lookup_screen.dart';
 import 'honda_blink_reference_screen.dart';
@@ -163,10 +164,21 @@ class _DtcScreenState extends State<DtcScreen> {
     setState(() => _lastReadAt = DateTime.now());
   }
 
+  ObdService? _obdForDispose;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _obdForDispose = context.read<ObdService>();
+  }
+
   @override
   void dispose() {
     _loopTimer?.cancel();
     _clearRecorder?.cancel();
+    // A context read the rider started here is bounded, but it holds the link:
+    // leaving the screen lets it go.
+    _obdForDispose?.cancelContextRead();
     super.dispose();
   }
 
@@ -276,7 +288,7 @@ class _DtcScreenState extends State<DtcScreen> {
   /// What to tell the rider about a Clear Codes attempt.
   String _clearOutcomeMessage(
           BuildContext context, bool ok, ClearDtcsOutcome outcome) =>
-      context.tr(clearOutcomeMessageKey(ok, outcome));
+      AppStrings.get(clearOutcomeMessageKey(ok, outcome), context.read<SettingsProvider>().locale.languageCode);
 
   Future<void> _showFreezeFrame() async {
     final obd = context.read<ObdService>();
@@ -289,7 +301,7 @@ class _DtcScreenState extends State<DtcScreen> {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
-      builder: (_) => _FreezeFrameSheet(future: obd.fetchFreezeFrame()),
+      builder: (_) => const _FreezeFrameSheet(),
     );
   }
 
@@ -649,7 +661,12 @@ class _DtcScreenState extends State<DtcScreen> {
             ),
             const SizedBox(height: 10),
           ],
-          for (final c in codes) _HazardCard(code: c, lowVoltage: lowVoltage),
+          for (final c in codes)
+            _HazardCard(
+                key: ValueKey('card-${c.code}'),
+                code: c,
+                lowVoltage: lowVoltage,
+                showContext: true),
         ],
       );
     }
@@ -1473,8 +1490,17 @@ class _HazardCard extends StatelessWidget {
   /// marked as possibly false.
   final bool lowVoltage;
 
+  /// Engine cards of the CURRENT answered read only: a "Show details" button
+  /// that reads the snapshot and counters on demand. Never on the greyed
+  /// earlier list or an ABS card.
+  final bool showContext;
+
   const _HazardCard(
-      {required this.code, this.platformKey, this.lowVoltage = false});
+      {super.key,
+      required this.code,
+      this.platformKey,
+      this.lowVoltage = false,
+      this.showContext = false});
 
   /// Small status labels, only for what is KNOWN to be true — an unknown
   /// flag shows nothing, never "No".
@@ -1977,6 +2003,9 @@ class _HazardCard extends StatelessWidget {
                       ResolvedGuidance(r)
                     else if (!_awaitingKnowledge(context, r))
                       ProvenanceLine(r),
+                    // Phase A-4: the snapshot and counters, on demand.
+                    if (showContext && !code.isChassis)
+                      _CardDetails(code: code.code),
                   ],
                 ),
               ),
@@ -2014,142 +2043,213 @@ class _StatusLabel extends StatelessWidget {
       );
 }
 
-// ── Freeze Frame Bottom Sheet ────────────────────────────────────────────────
-// Shows the static Mode 02 sensor snapshot captured by the ECU at the moment
-// a DTC was set, fetched via ObdService.fetchFreezeFrame().
-class _FreezeFrameSheet extends StatelessWidget {
-  final Future<FreezeFrameData?> future;
-  const _FreezeFrameSheet({required this.future});
+// ── "Show details" on a fault card (fault Phase A-4) ─────────────────────────
+// Collapsed by default: nothing is read until the rider taps it. The read is
+// the service's one bounded, cancelable context read; the card only shows what
+// it established, and only while that is current (this connection, after the
+// last Clear Codes, recent).
+class _CardDetails extends StatefulWidget {
+  const _CardDetails({required this.code});
+  final String code;
+
+  @override
+  State<_CardDetails> createState() => _CardDetailsState();
+}
+
+class _CardDetailsState extends State<_CardDetails> {
+  bool _open = false;
+
+  void _toggle() {
+    setState(() => _open = !_open);
+    if (_open) unawaited(context.read<ObdService>().readEngineContext());
+  }
+
+  void _retry() =>
+      unawaited(context.read<ObdService>().readEngineContext(force: true));
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      top: false,
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(20, 18, 20, 20),
-        child: FutureBuilder<FreezeFrameData?>(
-          future: future,
-          builder: (context, snapshot) {
-            final loading = snapshot.connectionState != ConnectionState.done;
-            final data = snapshot.data;
-
-            return Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    const Icon(Icons.ac_unit_rounded, color: _RC.neonCyan, size: 22),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(context.tr('freezeFrameTitle'),
-                              style: const TextStyle(
-                                  color: _RC.textMain,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w800)),
-                          Text(context.tr('snapshotData'),
-                              style: const TextStyle(
-                                  color: _RC.textMuted,
-                                  fontSize: 11.5,
-                                  fontWeight: FontWeight.w600)),
-                        ],
-                      ),
-                    ),
-                    GestureDetector(
-                      onTap: () => Navigator.of(context).pop(),
-                      child: const Icon(Icons.close_rounded,
-                          color: _RC.textMuted, size: 20),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 18),
-                if (loading)
-                  const Padding(
-                    padding: EdgeInsets.symmetric(vertical: 30),
-                    child: Center(
-                      child: CircularProgressIndicator(
-                          strokeWidth: 2, color: _RC.neonCyan),
-                    ),
-                  )
-                else if (data == null || !data.hasData)
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 24),
-                    child: Center(
-                      child: Column(
-                        children: [
-                          const Icon(Icons.search_off_rounded,
-                              size: 40, color: _RC.textMuted),
-                          const SizedBox(height: 10),
-                          Text(context.tr('noFreezeData'),
-                              textAlign: TextAlign.center,
-                              style: const TextStyle(
-                                  color: _RC.textMuted,
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w600)),
-                        ],
-                      ),
-                    ),
-                  )
-                else ...[
-                  if (data.dtcCode != null)
-                    _snapshotRow(context, Icons.report_gmailerrorred_rounded,
-                        context.tr('triggerCode'), data.dtcCode!, _RC.neonRed),
-                  if (data.rpm != null)
-                    _snapshotRow(context, Icons.speed_rounded, context.tr('rpm'),
-                        '${data.rpm!.toStringAsFixed(0)} RPM', _RC.neonAmber),
-                  if (data.speed != null)
-                    _snapshotRow(context, Icons.directions_car_filled_rounded,
-                        context.tr('speed'), '${data.speed!.toStringAsFixed(0)} km/h',
-                        _RC.neonCyan),
-                  if (data.coolantTemp != null)
-                    _snapshotRow(
-                        context,
-                        Icons.thermostat_rounded,
-                        context.tr('coolantTemp'),
-                        '${data.coolantTemp!.toStringAsFixed(0)} °C',
-                        _RC.neonYellow),
-                  if (data.engineLoad != null)
-                    _snapshotRow(context, Icons.bar_chart_rounded,
-                        context.tr('engineLoad'), '${data.engineLoad!.toStringAsFixed(0)} %',
-                        _RC.neonGreen),
-                ],
-              ],
-            );
-          },
-        ),
+    final obd = context.watch<ObdService>();
+    final snapshot = obd.freezeFrameResult;
+    final counters = obd.contextCounters;
+    final inFlight = obd.contextReadInFlight;
+    return Padding(
+      padding: const EdgeInsets.only(top: 6),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          TextButton.icon(
+            key: const ValueKey('contextToggle'),
+            onPressed: _toggle,
+            style: TextButton.styleFrom(
+                padding: EdgeInsets.zero,
+                minimumSize: const Size(0, 32),
+                alignment: Alignment.centerLeft,
+                foregroundColor: _RC.neonCyan),
+            icon: Icon(_open ? Icons.expand_less_rounded : Icons.expand_more_rounded,
+                size: 18),
+            label: Text(context.tr(_open ? 'hideDetails' : 'showDetails'),
+                style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.w800)),
+          ),
+          if (_open) ...[
+            const SizedBox(height: 6),
+            if (inFlight)
+              const Padding(
+                padding: EdgeInsets.symmetric(vertical: 8),
+                child: SizedBox(
+                    width: 18,
+                    height: 18,
+                    child: CircularProgressIndicator(
+                        strokeWidth: 2, color: _RC.neonCyan)),
+              ),
+            if (snapshot != null)
+              ContextSnapshotView(result: snapshot, cardCode: widget.code),
+            if (counters != null) ...[
+              const SizedBox(height: 10),
+              ContextCountersView(counters: counters, lampOn: obd.contextLampOn),
+            ],
+            if (!inFlight &&
+                (snapshot == null ||
+                    contextNeedsRetry(
+                        snapshot: snapshot,
+                        counters: counters,
+                        readiness: obd.readinessRead)))
+              TextButton(
+                key: const ValueKey('contextRetry'),
+                onPressed: _retry,
+                child: Text(context.tr('retry'),
+                    style: const TextStyle(
+                        color: _RC.neonCyan, fontWeight: FontWeight.w800)),
+              ),
+          ],
+        ],
       ),
     );
   }
+}
 
-  Widget _snapshotRow(
-      BuildContext context, IconData icon, String label, String value, Color color) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 8),
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-      decoration: BoxDecoration(
-        color: _RC.surface,
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: _RC.border),
-      ),
-      child: Row(
-        children: [
-          Icon(icon, size: 16, color: color),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Text(label,
-                style: const TextStyle(
-                    color: _RC.textMuted, fontSize: 12.5, fontWeight: FontWeight.w700)),
+// ── Freeze Frame Bottom Sheet ────────────────────────────────────────────────
+// The snapshot recorded when the last fault was set, the lamp and clear-codes
+// counters, and the emission self-checks. One bounded, cancelable read that
+// starts when the sheet opens (the rider asked for it) and stops when it is
+// closed. Nothing here ever shows a silence as "no data".
+class _FreezeFrameSheet extends StatefulWidget {
+  const _FreezeFrameSheet();
+
+  @override
+  State<_FreezeFrameSheet> createState() => _FreezeFrameSheetState();
+}
+
+class _FreezeFrameSheetState extends State<_FreezeFrameSheet> {
+  ObdService? _obd;
+  bool _closed = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _obd = context.read<ObdService>();
+    // After the first frame: the read tells its listeners at once, which is
+    // not allowed while the sheet is still being built.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted || _closed) return;
+      unawaited(_obd!.readEngineContext(isCancelled: () => _closed));
+    });
+  }
+
+  @override
+  void dispose() {
+    _closed = true;
+    _obd?.cancelContextRead();
+    super.dispose();
+  }
+
+  void _retry() => unawaited(
+      _obd!.readEngineContext(force: true, isCancelled: () => _closed));
+
+  @override
+  Widget build(BuildContext context) {
+    final obd = context.watch<ObdService>();
+    final snapshot = obd.freezeFrameResult;
+    final counters = obd.contextCounters;
+    final readiness = obd.readinessRead;
+    final inFlight = obd.contextReadInFlight;
+    final nothingYet = snapshot == null && counters == null && readiness == null;
+
+    return SafeArea(
+      top: false,
+      child: ConstrainedBox(
+        constraints: BoxConstraints(
+            maxHeight: MediaQuery.of(context).size.height * 0.88),
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.fromLTRB(20, 18, 20, 20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  const Icon(Icons.ac_unit_rounded, color: _RC.neonCyan, size: 22),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(context.tr('freezeFrameTitle'),
+                            style: const TextStyle(
+                                color: _RC.textMain,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w800)),
+                        Text(context.tr('snapshotData'),
+                            style: const TextStyle(
+                                color: _RC.textMuted,
+                                fontSize: 11.5,
+                                fontWeight: FontWeight.w600)),
+                      ],
+                    ),
+                  ),
+                  GestureDetector(
+                    onTap: () => Navigator.of(context).pop(),
+                    child: const Icon(Icons.close_rounded,
+                        color: _RC.textMuted, size: 20),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 18),
+              if (inFlight)
+                Padding(
+                  padding: EdgeInsets.symmetric(vertical: nothingYet ? 30 : 8),
+                  child: const Center(
+                    child: CircularProgressIndicator(
+                        strokeWidth: 2, color: _RC.neonCyan),
+                  ),
+                ),
+              if (snapshot != null) ContextSnapshotView(result: snapshot),
+              if (counters != null) ...[
+                const SizedBox(height: 12),
+                ContextCountersView(counters: counters, lampOn: obd.contextLampOn),
+              ],
+              if (readiness != null) ...[
+                const SizedBox(height: 14),
+                ReadinessView(read: readiness),
+              ],
+              if (!inFlight &&
+                  (nothingYet ||
+                      contextNeedsRetry(
+                          snapshot: snapshot,
+                          counters: counters,
+                          readiness: readiness)))
+                Center(
+                  child: TextButton(
+                    key: const ValueKey('contextRetry'),
+                    onPressed: _retry,
+                    child: Text(context.tr('retry'),
+                        style: const TextStyle(
+                            color: _RC.neonCyan, fontWeight: FontWeight.w800)),
+                  ),
+                ),
+            ],
           ),
-          Text(value,
-              style: TextStyle(
-                  color: color,
-                  fontSize: 14,
-                  fontWeight: FontWeight.w800,
-                  fontFamily: 'monospace')),
-        ],
+        ),
       ),
     );
   }

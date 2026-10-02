@@ -749,6 +749,14 @@ Decoded<List<List<int>>> _decodeServicePid(String? raw,
   }
 }
 
+/// The data bytes after `<service+40> <pid>` from every module that answered —
+/// the shared helper above, public for the context decoders in
+/// `engine_context.dart` (Mode 02 passes `service: 2`; its data starts with
+/// the frame-number byte).
+Decoded<List<List<int>>> decodePidData(String? raw,
+        {required int service, required int pid, required int minBytes}) =>
+    _decodeServicePid(raw, service: service, pid: pid, minBytes: minBytes);
+
 Decoded<R> _map<R>(Decoded<List<List<int>>> d, R Function(List<List<int>>) f) {
   switch (d) {
     case DecodedValue(:final value):

@@ -1,0 +1,38 @@
+# Danlite ELM session recording
+# started: 2026-10-02T09:30:00.000
+# transport: bluetooth
+# format: <time> TX> command | RX< reply (\r = carriage return); # lines are notes
+# FIXTURE: hand-written from documented ELM327 / SAE J1979 behaviour.
+# NOT recorded from a real bike.
+# The bike answers Mode 03 but Mode 02 draws NO DATA; most counters are also
+# not implemented. "Not offered" is not "no snapshot" and not an error: the
+# unsupported items are simply not drawn.
+# timing: 0.2
+# expect engine: answered P0301
+# expect snapshot: unsupported
+# expect counters: lampKm=unsupported clearedKm=unsupported lampMin=unsupported clearedMin=unsupported warmUps=7
+# expect readiness: misfire=complete fuelSystem=complete components=complete catalyst=complete heatedCatalyst=notSupported evaporative=notComplete secondaryAir=notSupported acRefrigerant=notSupported oxygenSensor=complete oxygenSensorHeater=complete egr=complete
+09:30:00.000 TX>ATZ
+09:30:00.100 RX<\r\rELM327 v1.5\r\r
+09:30:00.200 TX>ATE0
+09:30:00.300 RX<ATE0\rOK\r\r
+09:30:00.400 TX>0100
+09:30:00.500 RX<\r41 00 BE 3E B8 11\r\r
+09:30:00.600 TX>ATDPN
+09:30:00.700 RX<\rA6\r\r
+09:30:00.800 TX>03
+09:30:00.900 RX<\r7E8 04 43 01 03 01\r\r
+09:30:01.000 TX>0101
+09:30:01.100 RX<\r7E8 06 41 01 83 07 E5 04\r\r
+09:30:01.200 TX>020200
+09:30:01.300 RX<\rNO DATA\r\r
+09:30:01.400 TX>0121
+09:30:01.500 RX<\rNO DATA\r\r
+09:30:01.600 TX>0131
+09:30:01.700 RX<\rNO DATA\r\r
+09:30:01.800 TX>014D
+09:30:01.900 RX<\rNO DATA\r\r
+09:30:02.000 TX>014E
+09:30:02.100 RX<\rNO DATA\r\r
+09:30:02.200 TX>0130
+09:30:02.300 RX<\r7E8 03 41 30 07\r\r

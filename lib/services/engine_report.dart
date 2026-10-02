@@ -39,6 +39,17 @@ const Duration kEngineExtrasRefresh = Duration(minutes: 2);
 /// abandoned.
 const Duration kFlushSettle = Duration(milliseconds: 200);
 
+/// Worst-case wall-clock time for one ON-DEMAND context read (lamp, counters,
+/// snapshot). Unlike [kEngineReadBudget] it is never part of a scan: the rider
+/// asked for it. A silent bike ends a group after one window, so this is a
+/// ceiling for a slow one, not the usual cost.
+const Duration kContextReadBudget = Duration(seconds: 20);
+
+/// How long a context result may be shown as current. Counters keep changing
+/// while the bike is ridden, so an old reading is read again, not repeated.
+/// Every result also carries its own "Read at" time.
+const Duration kContextFreshness = Duration(minutes: 2);
+
 // ── Engine state and voltage ───────────────────────────────────────────────
 // ENGINEERING JUDGEMENT, NOT MEASURED ON A BIKE. Each of these must be
 // confirmed at the final live test before it is relied on.
@@ -81,6 +92,8 @@ class FaultReadTiming {
   Duration get extraCommandWindow => _s(kExtraCommandWindow);
   Duration get extrasRefresh => _s(kEngineExtrasRefresh);
   Duration get flushSettle => _s(kFlushSettle);
+  Duration get contextReadBudget => _s(kContextReadBudget);
+  Duration get contextFreshness => _s(kContextFreshness);
 
   /// The pending policy for a read, its overall bound clipped to [overall].
   PendingPolicy pendingPolicy({Duration? overall, Duration? perAttempt}) {

@@ -1,0 +1,28 @@
+# Danlite ELM session recording
+# started: 2026-10-02T09:30:00.000
+# transport: bluetooth
+# format: <time> TX> command | RX< reply (\r = carriage return); # lines are notes
+# FIXTURE: hand-written from documented ELM327 / SAE J1979 behaviour.
+# NOT recorded from a real bike.
+# The bike answers Mode 03 and the first lamp read, then goes silent on every
+# context request (a TX with no RX). Silence is "no answer" — never "no
+# snapshot", never "unsupported" — and it costs two windows, not the whole list.
+# timing: 0.1
+# expect engine: answered P0301
+# expect snapshot: noAnswer
+# expect counters: lampKm=noAnswer clearedKm=noAnswer lampMin=noAnswer clearedMin=noAnswer warmUps=noAnswer
+# expect readiness: noAnswer
+09:30:00.000 TX>ATZ
+09:30:00.100 RX<\r\rELM327 v1.5\r\r
+09:30:00.200 TX>ATE0
+09:30:00.300 RX<ATE0\rOK\r\r
+09:30:00.400 TX>0100
+09:30:00.500 RX<\r41 00 BE 3E B8 11\r\r
+09:30:00.600 TX>ATDPN
+09:30:00.700 RX<\rA6\r\r
+09:30:00.800 TX>03
+09:30:00.900 RX<\r7E8 04 43 01 03 01\r\r
+09:30:01.000 TX>0101
+09:30:01.100 RX<\r7E8 06 41 01 83 07 E5 04\r\r
+09:30:01.200 TX>020200
+09:30:01.300 TX>0101

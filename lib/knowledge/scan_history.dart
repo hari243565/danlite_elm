@@ -225,6 +225,15 @@ class ScanSession {
   final List<ScanFaultRow> faults;
 }
 
+/// When Clear Codes was attempted, for a `clear_check` record. Records written
+/// before Phase A-4 have no stored attempt time; they fall back to the time of
+/// the silent re-read, which is a few seconds later.
+DateTime clearAttemptedAt(ScanSession s) {
+  final raw = s.preClear?['attempted_at'];
+  final parsed = raw is String ? DateTime.tryParse(raw) : null;
+  return (parsed ?? s.startedAt).toUtc();
+}
+
 /// A VIN is 17 characters from this alphabet (no I, O, Q).
 final RegExp _vinShaped = RegExp(r'\b[A-HJ-NPR-Z0-9]{17}\b', caseSensitive: false);
 

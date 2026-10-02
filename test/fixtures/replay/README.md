@@ -54,6 +54,12 @@ says so in its header. None is recorded from a real bike yet.
 | `# expect absStatus: 2F` | the first ABS code's status byte |
 | `# expect module: 18DAF110` | the module the first engine code came from |
 | `# expect extras: none` | no optional extras were sent at all |
+| `# expect snapshot: answered P0301` / `noSnapshot` / `unsupported` / `noAnswer` / `refused 22` / `gated` | the on-demand Mode 02 snapshot read (Phase A-4); a fixture with any `snapshot`/`counters`/`readiness` line also runs the context read |
+| `# expect snapshotValues: 04=50.2 0C=1000` | PID (hex) = value for the numeric snapshot values that were read, exactly this set |
+| `# expect snapshotUnread: 05` / `none` | values the bike said it keeps but gave no usable answer |
+| `# expect counters: lampKm=120 clearedKm=unsupported warmUps=noAnswer` | the lamp / clear-codes counters (`lampKm`, `clearedKm`, `lampMin`, `clearedMin`, `warmUps`): a number, `unsupported`, `noAnswer` or `atLeast` |
+| `# expect readiness: misfire=complete evaporative=notComplete heatedCatalyst=notSupported` | emission self-check states (or `unsupported` / `noAnswer` for the whole read) |
+| `# expect contextWire: none` | none of the on-demand context requests were sent (a plain scan never sends them) |
 
 ## Adding a real recording
 

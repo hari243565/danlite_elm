@@ -12,6 +12,7 @@ import 'bluetooth_classic_service.dart';
 import 'chassis_address_memory.dart';
 import 'dtc_service.dart' show isManufacturerDefined;
 import 'engine_dtc_read.dart';
+import 'engine_context.dart';
 import 'engine_report.dart';
 import 'fault_decoders.dart';
 import 'response_pending.dart';
@@ -92,28 +93,14 @@ enum ClearDtcsOutcome {
   notCleared,
 }
 
-/// Static sensor snapshot captured by the ECU at the moment a DTC was set
-/// (OBD2 Mode 02). Any field may be null if that PID isn't supported by the
-/// vehicle or its response didn't parse.
-class FreezeFrameData {
-  final String? dtcCode;
-  final double? rpm;
-  final double? speed;
-  final double? coolantTemp;
-  final double? engineLoad;
-  final DateTime capturedAt;
-
-  const FreezeFrameData({
-    this.dtcCode,
-    this.rpm,
-    this.speed,
-    this.coolantTemp,
-    this.engineLoad,
-    required this.capturedAt,
-  });
-
-  bool get hasData =>
-      dtcCode != null || rpm != null || speed != null || coolantTemp != null || engineLoad != null;
+/// A context result with what it was read on: the connection and the Clear
+/// Codes generation. It is shown only while both are still current.
+class _Stamped<T> {
+  _Stamped(this.value, this.session, this.generation, this.at);
+  final T value;
+  final ObdSession? session;
+  final int generation;
+  final DateTime at;
 }
 
 class ObdService extends ChangeNotifier {
@@ -195,7 +182,7 @@ class ObdService extends ChangeNotifier {
   EngineReport? get engineReport => _engineReport;
 
   /// True while the extras are still reading, after the core result is out.
-  bool get engineExtrasInFlight => _extrasRunning;
+  bool get engineExtrasInFlight => _extrasRunning || _contextRunning;
 
   bool _extrasRunning = false;
   bool _extrasCancelRequested = false;
@@ -2004,7 +1991,19 @@ class ObdService extends ChangeNotifier {
   }
 
   /// Why the last [clearDtcs] call ended as it did. See [ClearDtcsOutcome].
-  ClearDtcsOutcome _lastClearOutcome = ClearDtcsOutcome.idle;
+  ClearDtcsOutcome _lastClearOutcomeValue = ClearDtcsOutcome.idle;
+  ClearDtcsOutcome get _lastClearOutcome => _lastClearOutcomeValue;
+
+  /// Every Clear Codes path ends by assigning this. The assignment also bumps
+  /// [_clearGeneration], so a context result read BEFORE a Clear (a snapshot
+  /// the erase has just removed from the bike) is never shown after it. Written
+  /// as a setter so that [clearDtcs] itself is not edited.
+  set _lastClearOutcome(ClearDtcsOutcome v) {
+    _lastClearOutcomeValue = v;
+    _clearGeneration++;
+  }
+
+  int _clearGeneration = 0;
   ClearDtcsOutcome get lastClearOutcome => _lastClearOutcome;
 
   Future<bool> clearDtcs() async {
@@ -2754,82 +2753,394 @@ class ObdService extends ChangeNotifier {
   }
 
   // ══════════════════════════════════════════════════════════════════════════
-  // FREEZE FRAME (Mode 02) — sensor snapshot captured when a DTC was set
+  // CONTEXT READS (fault Phase A-4) — freeze frame, lamp and clear counters,
+  // emission self-checks. ON DEMAND only.
   // ══════════════════════════════════════════════════════════════════════════
-  /// Fetches the Mode 02 freeze frame snapshot (DTC, RPM, speed, coolant
-  /// temp, engine load) using the same serial-safety mechanism as
-  /// clearDtcs(): lock the poll loop out of the socket, wait for any
-  /// in-flight live PID request to finish, run the freeze frame batch, then
-  /// always release the lock so live telemetry resumes immediately.
-  Future<FreezeFrameData?> fetchFreezeFrame() async {
-    if (!isConnected) return null;
 
+  /// What the freeze-frame read established, while it is still current: read on
+  /// this connection, after the last Clear Codes, and less than
+  /// [kContextFreshness] ago. Null otherwise — an old or foreign snapshot is
+  /// never shown as the current one.
+  FreezeFrameResult? get freezeFrameResult => _currentContext(_ctxSnapshot);
+
+  /// The lamp and clear-codes counters, under the same rules.
+  ContextCounters? get contextCounters => _currentContext(_ctxCounters);
+
+  /// The emission self-checks, under the same rules.
+  ReadinessRead? get readinessRead => _currentContext(_ctxReadiness);
+
+  /// The warning lamp, from the same PID 01 01 reply as the self-checks. Null
+  /// when unknown.
+  bool? get contextLampOn => readinessRead?.result.valueOrNull?.lampOn;
+
+  /// True while a context read is running.
+  bool get contextReadInFlight => _contextRunning;
+
+  bool _contextRunning = false;
+  bool _contextCancelRequested = false;
+  Future<void>? _contextFuture;
+  _Stamped<FreezeFrameResult>? _ctxSnapshot;
+  _Stamped<ContextCounters>? _ctxCounters;
+  _Stamped<ReadinessRead>? _ctxReadiness;
+
+  T? _currentContext<T>(_Stamped<T>? s) {
+    if (s == null) return null;
+    if (!identical(s.session, _session)) return null; // another connection
+    if (s.generation != _clearGeneration) return null; // before a Clear Codes
+    if (DateTime.now().difference(s.at) >= faultTiming.contextFreshness) return null;
+    return s.value;
+  }
+
+  bool get _hasCurrentContext =>
+      freezeFrameResult != null && contextCounters != null && readinessRead != null;
+
+  /// Stop a running context read at its next safe point. Safe at any time.
+  void cancelContextRead() {
+    if (_contextRunning) _contextCancelRequested = true;
+  }
+
+  /// Read the on-demand context: the snapshot recorded when the last fault was
+  /// set (Mode 02), the lamp and clear-codes counters (Mode 01 PID 21, 31, 4D,
+  /// 4E, 30) and the emission self-checks (PID 01 01). Results land in
+  /// [freezeFrameResult], [contextCounters] and [readinessRead] as each group
+  /// finishes.
+  ///
+  /// Never part of a scan. It waits for any engine read to hand the link back
+  /// and holds the engine job slot, so Clear Codes, the ABS scan and the next
+  /// manual read wait for it exactly as they do for the extras (and ask it to
+  /// stop). It refuses to start while Clear Codes or an ABS scan has the link.
+  /// Fresh results are reused unless [force]. A call made while a read is
+  /// running joins it.
+  Future<void> readEngineContext(
+      {bool force = false, bool Function()? isCancelled}) {
+    final running = _contextFuture;
+    if (running != null) return running;
+    if (!force && _hasCurrentContext) return Future<void>.value();
+    late final Future<void> f;
+    f = _runEngineContext(isCancelled).whenComplete(() {
+      if (identical(_contextFuture, f)) _contextFuture = null;
+    });
+    _contextFuture = f;
+    return f;
+  }
+
+  Future<void> _runEngineContext(bool Function()? isCancelled) async {
+    if (!isConnected) {
+      _storeSnapshot(FreezeFrameLinkLost(DateTime.now()));
+      return;
+    }
+    // Take a place on the link synchronously, so Clear Codes or an ABS scan
+    // that starts a moment later is seen below.
     _acquirePollLock();
+    _contextRunning = true;
+    _contextCancelRequested = false;
+    notifyListeners();
     await _waitForLinkIdle();
+    // Anything holding the poll lock besides this job (the lock is a counter)
+    // is Clear Codes, an ABS scan or the older freeze-frame path: not now.
+    if (_pollLockDepth > 1 ||
+        _engineJob != null ||
+        _engineReadInFlight != null ||
+        _chassisScanInFlight ||
+        !isConnected) {
+      _releasePollLock();
+      _contextRunning = false;
+      notifyListeners();
+      return;
+    }
+    final done = Completer<void>();
+    _engineJob = done.future;
+    final session = _session;
+    final generation = _clearGeneration;
+    final previousTimeout = _cmdTimeout;
+    final clock = Stopwatch()..start();
+    var budgetGone = false;
+    var silentInARow = 0;
+
+    bool stopped() =>
+        _contextCancelRequested ||
+        (isCancelled?.call() ?? false) ||
+        _linkWaiters > 0 ||
+        !isConnected ||
+        !_linkSynced ||
+        !identical(_session, session);
+
+    Duration left() => faultTiming.contextReadBudget - clock.elapsed;
+
+    /// One request through the shared pending helper: the reply, `null` when it
+    /// was not asked (stopped, or the budget is gone), or [_busyMarker].
+    Future<String?> ask(String request) async {
+      if (stopped()) return null;
+      final remaining = left();
+      if (remaining <= faultTiming.extraCommandWindow ~/ 10) {
+        budgetGone = true;
+        return null;
+      }
+      final window = remaining < faultTiming.pendingPerAttempt
+          ? remaining
+          : faultTiming.pendingPerAttempt;
+      final r = await _sendWithPending(request,
+          policy: faultTiming.pendingPolicy(overall: remaining, perAttempt: window),
+          isCancelled: stopped);
+      final reply = switch (r) {
+        PendingAnswered(:final reply) => reply,
+        PendingBusy() => _busyMarker,
+        PendingCancelled() => null,
+      };
+      if (reply != null && reply.trim().toUpperCase() == 'TIMEOUT') {
+        silentInARow++;
+      } else if (reply != null) {
+        silentInARow = 0;
+      }
+      return reply;
+    }
+
+    /// Two silences in a row: the bike is not answering, and asking the rest
+    /// would only spend the rider's time.
+    bool bikeIsSilent() => silentInARow >= 2;
+
+    bool linkLost(String reply) {
+      final u = reply.trim().toUpperCase();
+      return u == 'DISCONNECTED' ||
+          u == 'ERROR' ||
+          _classifyReply(reply) == ObdReplyClass.linkFailure;
+    }
+
+    ExtraRead<T> unasked<T>() => budgetGone
+        ? ExtraNoAnswer<T>('time budget used up')
+        : (stopped() ? ExtraCancelled<T>() : ExtraSkipped<T>('not asked'));
+
+    ExtraRead<T> extra<T>(String? reply, Decoded<T> Function(String) decode) {
+      if (reply == null) return unasked<T>();
+      if (reply == _busyMarker) return ExtraNoAnswer<T>('module kept reporting busy');
+      return extraFromDecoded(decode(reply));
+    }
 
     try {
-      if (!_linkSynced) {
-        final recovered = await _recoverAdapter();
-        if (!recovered) return null;
+      // The protocol decides whether this bus is read at all (K-line is off).
+      if (session != null && !session.protocol.isKnown && _linkSynced) {
+        final dpn = await _send('ATDPN');
+        if (!_isDeadResponse(dpn)) session.protocol = ObdProtocol.fromAtdpn(dpn);
+      }
+      if (!kKLineFaultReadingEnabled && session != null && session.protocol.isKLine) {
+        final at = DateTime.now();
+        _storeSnapshot(FreezeFrameGated(at), session: session, generation: generation);
+        _storeCounters(
+            ContextCounters(
+                at: at,
+                lampDistance: const ExtraSkipped<CounterValue>('k-line not read'),
+                clearedDistance: const ExtraSkipped<CounterValue>('k-line not read'),
+                lampTime: const ExtraSkipped<CounterValue>('k-line not read'),
+                clearedTime: const ExtraSkipped<CounterValue>('k-line not read'),
+                warmUps: const ExtraSkipped<CounterValue>('k-line not read')),
+            session: session,
+            generation: generation);
+        _storeReadiness(
+            ReadinessRead(at, const ExtraSkipped<ReadinessReport>('k-line not read')),
+            session: session,
+            generation: generation);
+        return;
       }
 
-      final responses = <String>[];
-      for (final cmd in const [
-        ObdPids.freezeFrameDtc,
-        ObdPids.freezeFrameRpm,
-        ObdPids.freezeFrameSpeed,
-        ObdPids.freezeFrameCoolantTemp,
-        ObdPids.freezeFrameEngineLoad,
-      ]) {
-        final r = await _send(cmd);
-        if (r == 'TIMEOUT') {
-          await _recoverAdapter();
-          return null;
-        }
-        responses.add(r);
-      }
-      final dtcResponse = responses[0];
-      final rpmResponse = responses[1];
-      final speedResponse = responses[2];
-      final coolantResponse = responses[3];
-      final loadResponse = responses[4];
-
-      final dtc = _isUsableResponse(dtcResponse)
-          ? ObdParser.parseFreezeFrameDtc(_stripCanHeaderForLivePid(dtcResponse))
-          : null;
-      final rpm = _isUsableResponse(rpmResponse)
-          ? ObdParser.parseFreezeFramePid(
-              ObdPids.freezeFrameRpm, _stripCanHeaderForLivePid(rpmResponse))
-          : null;
-      final speed = _isUsableResponse(speedResponse)
-          ? ObdParser.parseFreezeFramePid(
-              ObdPids.freezeFrameSpeed, _stripCanHeaderForLivePid(speedResponse))
-          : null;
-      final coolantTemp = _isUsableResponse(coolantResponse)
-          ? ObdParser.parseFreezeFramePid(ObdPids.freezeFrameCoolantTemp,
-              _stripCanHeaderForLivePid(coolantResponse))
-          : null;
-      final engineLoad = _isUsableResponse(loadResponse)
-          ? ObdParser.parseFreezeFramePid(
-              ObdPids.freezeFrameEngineLoad, _stripCanHeaderForLivePid(loadResponse))
-          : null;
-
-      final snapshot = FreezeFrameData(
-        dtcCode: dtc,
-        rpm: rpm,
-        speed: speed,
-        coolantTemp: coolantTemp,
-        engineLoad: engineLoad,
-        capturedAt: DateTime.now(),
+      // ── 1. The snapshot ────────────────────────────────────────────────
+      final snapshot = await _readSnapshotGroup(
+        ask: ask,
+        stopped: stopped,
+        linkLost: linkLost,
+        bikeIsSilent: bikeIsSilent,
+        budgetGone: () => budgetGone,
       );
+      if (snapshot != null) {
+        _storeSnapshot(snapshot, session: session, generation: generation);
+      }
 
-      return snapshot.hasData ? snapshot : null;
+      // ── 2. Lamp + self-checks (one reply), then the counters ───────────
+      if (!stopped() && !bikeIsSilent()) {
+        final at = DateTime.now();
+        final mil = await ask('0101');
+        if (mil == null && !budgetGone) {
+          // Stopped before it was asked: nothing to say.
+        } else if (mil != null && linkLost(mil)) {
+          // The link went away: say nothing about the bike.
+        } else {
+          // (A null reply here means the time budget ran out: said so.)
+          _storeReadiness(ReadinessRead(at, extra<ReadinessReport>(mil, decodeReadiness)),
+              session: session, generation: generation);
+          var counters = ContextCounters(at: at);
+          var finished = true;
+          for (final c in ContextCounter.values) {
+            if (bikeIsSilent()) {
+              counters = counters.withCounter(
+                  c, const ExtraNoAnswer<CounterValue>('no reply from the bike'));
+              continue;
+            }
+            final reply = await ask(c.request);
+            if (reply != null && linkLost(reply)) {
+              finished = false;
+              break;
+            }
+            if (reply == null && !budgetGone) {
+              finished = false; // stopped part-way: keep nothing half-read
+              break;
+            }
+            counters = counters.withCounter(
+                c, extra<CounterValue>(reply, (r) => decodeContextCounter(r, c)));
+          }
+          if (finished) {
+            _storeCounters(counters, session: session, generation: generation);
+          }
+        }
+      } else if (bikeIsSilent() && !stopped()) {
+        // Two silences already: the lamp and counters get the same verdict
+        // without spending more windows.
+        final at = DateTime.now();
+        _storeReadiness(
+            ReadinessRead(at, const ExtraNoAnswer<ReadinessReport>('no reply from the bike')),
+            session: session,
+            generation: generation);
+        _storeCounters(
+            ContextCounters(
+              at: at,
+              lampDistance: const ExtraNoAnswer<CounterValue>('no reply from the bike'),
+              clearedDistance: const ExtraNoAnswer<CounterValue>('no reply from the bike'),
+              lampTime: const ExtraNoAnswer<CounterValue>('no reply from the bike'),
+              clearedTime: const ExtraNoAnswer<CounterValue>('no reply from the bike'),
+              warmUps: const ExtraNoAnswer<CounterValue>('no reply from the bike'),
+            ),
+            session: session,
+            generation: generation);
+      }
     } catch (e) {
-      debugPrint('[ObdService] fetchFreezeFrame exception: $e');
-      return null;
+      // Only the type: no adapter traffic in logs.
+      debugPrint('[ObdService] context read stopped (${e.runtimeType})');
     } finally {
+      _cmdTimeout = previousTimeout;
       _releasePollLock();
+      _contextRunning = false;
+      _contextCancelRequested = false;
+      if (identical(_engineJob, done.future)) _engineJob = null;
+      done.complete();
+      recorder?.recordNote('context read finished');
+      notifyListeners();
     }
+  }
+
+  /// The snapshot group. Returns null when the read was stopped before it had
+  /// anything to say (cancel, another operation, disconnect).
+  Future<FreezeFrameResult?> _readSnapshotGroup({
+    required Future<String?> Function(String) ask,
+    required bool Function() stopped,
+    required bool Function(String) linkLost,
+    required bool Function() bikeIsSilent,
+    required bool Function() budgetGone,
+  }) async {
+    final started = DateTime.now();
+
+    // 1. PID 02: the code that caused the snapshot (0000 = nothing stored).
+    final first = await ask(SnapshotPid.triggerRequest);
+    if (first == null) {
+      return budgetGone() ? FreezeFrameNoAnswer(started, 'time budget used up') : null;
+    }
+    if (first == _busyMarker) {
+      return FreezeFrameNoAnswer(started, 'module kept reporting busy');
+    }
+    if (linkLost(first)) return FreezeFrameLinkLost(DateTime.now());
+    final trigger = decodeFreezeFrameTrigger(first);
+    final end = freezeFrameEndsHere(trigger, DateTime.now(),
+        vehicleAnswered: _session?.vehicleAnswered ?? false);
+    if (end != null) return end;
+    final code = ((trigger as DecodedValue<FreezeFrameTrigger>).value.code)!;
+
+    // 2. Which values this bike keeps in its snapshot.
+    final supported = <int>{};
+    var supportListUnreadable = false;
+    final block0 = await ask('020000');
+    if (block0 == null) {
+      if (!budgetGone()) return null;
+      supportListUnreadable = true;
+    } else if (block0 == _busyMarker) {
+      supportListUnreadable = true;
+    } else if (linkLost(block0)) {
+      return FreezeFrameLinkLost(DateTime.now());
+    } else {
+      final d = decodeSupportedPids(block0, service: 2, basePid: 0x00);
+      if (d is DecodedValue<Set<int>>) {
+        supported.addAll(d.value);
+        // PID 0x20 says the next block's list exists.
+        if (d.value.contains(0x20) &&
+            SnapshotPid.values.any((p) => p.supportBlock == 0x40) &&
+            !stopped() &&
+            !bikeIsSilent()) {
+          final block40 = await ask('024000');
+          if (block40 != null && block40 != _busyMarker && !linkLost(block40)) {
+            final d40 = decodeSupportedPids(block40, service: 2, basePid: 0x40);
+            if (d40 is DecodedValue<Set<int>>) supported.addAll(d40.value);
+          }
+        }
+      } else {
+        supportListUnreadable = true;
+      }
+    }
+    if (stopped() && !budgetGone()) return null;
+
+    // 3. The fixed set, for each value the bike keeps.
+    final values = <SnapshotValue>[];
+    final unread = <int>[];
+    for (final p in SnapshotPid.values) {
+      if (!supported.contains(p.pid)) continue; // not kept: simply absent
+      if (bikeIsSilent()) {
+        unread.add(p.pid);
+        continue;
+      }
+      final reply = await ask(p.request);
+      if (reply == null) {
+        if (!budgetGone()) return null; // stopped part-way
+        unread.add(p.pid);
+        continue;
+      }
+      if (reply != _busyMarker && linkLost(reply)) {
+        return FreezeFrameLinkLost(DateTime.now());
+      }
+      if (reply == _busyMarker) {
+        unread.add(p.pid);
+        continue;
+      }
+      final d = decodeFreezeFrameValue(reply, p);
+      switch (d) {
+        case DecodedValue(:final value):
+          values.add(value);
+        case DecodedUnsupported(:final nrc):
+          // The bike said, in so many words, that it does not keep this one:
+          // absent. A bare NO DATA after the list said it does is not that.
+          if (nrc == null) unread.add(p.pid);
+        case DecodedNegative():
+        case DecodedNoAnswer():
+        case DecodedUnparseable():
+          unread.add(p.pid);
+      }
+    }
+    return FreezeFrameAnswered(FreezeFrameSnapshot(
+      triggerCode: code,
+      readAt: DateTime.now(),
+      values: List<SnapshotValue>.unmodifiable(values),
+      unreadPids: List<int>.unmodifiable(unread),
+      supportListUnreadable: supportListUnreadable,
+    ));
+  }
+
+  void _storeSnapshot(FreezeFrameResult r, {ObdSession? session, int? generation}) {
+    _ctxSnapshot = _Stamped(r, session ?? _session, generation ?? _clearGeneration, r.at);
+    notifyListeners();
+  }
+
+  void _storeCounters(ContextCounters c, {ObdSession? session, int? generation}) {
+    _ctxCounters = _Stamped(c, session ?? _session, generation ?? _clearGeneration, c.at);
+    notifyListeners();
+  }
+
+  void _storeReadiness(ReadinessRead r, {ObdSession? session, int? generation}) {
+    _ctxReadiness = _Stamped(r, session ?? _session, generation ?? _clearGeneration, r.at);
+    notifyListeners();
   }
 
   /// Wait for any PID request the poll loop already had in flight to

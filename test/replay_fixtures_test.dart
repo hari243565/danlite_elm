@@ -7,6 +7,7 @@ library;
 
 import 'dart:io';
 
+import 'package:danlite_elm/services/engine_context.dart';
 import 'package:danlite_elm/services/fault_decoders.dart';
 import 'package:danlite_elm/services/obd_service.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -29,6 +30,116 @@ List<String> words(String s) =>
 /// Commands the optional extras send; a fixture expecting `extras: none`
 /// must see none of them.
 const extrasCommands = <String>['0101', '07', '0A', '0902', '0904'];
+
+/// Requests only the on-demand context read sends (not 0101, which the
+/// automatic extras also send).
+const contextCommands = <String>[
+  '020200', '020000', '024000', '0121', '0131', '014D', '014E', '0130',
+];
+
+/// `# expect snapshot: answered P0301` | `noSnapshot` | `unsupported` |
+/// `noAnswer` | `refused 22` | `gated`; `snapshotValues: 04=50.2 0C=1000`
+/// (hex PID = value); `snapshotUnread: 05`; `counters: lampKm=120
+/// clearedKm=unsupported warmUps=noAnswer clearedKm=atLeast`; `readiness:
+/// misfire=complete evaporative=notComplete heatedCatalyst=notSupported`.
+void checkContext(Transcript t, ObdService obd) {
+  final e = t.expect;
+
+  final snap = e['snapshot'];
+  if (snap != null) {
+    final w = words(snap);
+    final r = obd.freezeFrameResult;
+    switch (w.first) {
+      case 'answered':
+        expect(r, isA<FreezeFrameAnswered>(), reason: '${t.name}: snapshot is $r');
+        expect((r as FreezeFrameAnswered).snapshot.triggerCode, w[1], reason: t.name);
+      case 'noSnapshot':
+        expect(r, isA<FreezeFrameNoSnapshot>(), reason: t.name);
+      case 'unsupported':
+        expect(r, isA<FreezeFrameUnsupported>(), reason: t.name);
+      case 'noAnswer':
+        expect(r, isA<FreezeFrameNoAnswer>(), reason: t.name);
+      case 'refused':
+        expect(r, isA<FreezeFrameRefused>(), reason: t.name);
+        expect((r as FreezeFrameRefused).nrc, int.parse(w[1], radix: 16), reason: t.name);
+      case 'gated':
+        expect(r, isA<FreezeFrameGated>(), reason: t.name);
+      default:
+        fail('${t.name}: unknown snapshot expectation "$snap"');
+    }
+  }
+  final values = e['snapshotValues'];
+  if (values != null) {
+    final r = obd.freezeFrameResult as FreezeFrameAnswered;
+    final got = <String, double>{
+      for (final v in r.snapshot.values)
+        if (v is SnapshotNumber)
+          v.pid.pid.toRadixString(16).toUpperCase().padLeft(2, '0'): v.value,
+    };
+    final want = {
+      for (final p in words(values)) p.split('=')[0].toUpperCase(): double.parse(p.split('=')[1]),
+    };
+    expect(got.keys.toSet(), want.keys.toSet(), reason: '${t.name}: which values');
+    want.forEach((k, v) => expect(got[k], closeTo(v, 0.06), reason: '${t.name}: PID $k'));
+  }
+  final unread = e['snapshotUnread'];
+  if (unread != null) {
+    final r = obd.freezeFrameResult as FreezeFrameAnswered;
+    expect(
+        r.snapshot.unreadPids
+            .map((p) => p.toRadixString(16).toUpperCase().padLeft(2, '0'))
+            .toList(),
+        unread == 'none' ? isEmpty : words(unread).map((x) => x.toUpperCase()).toList(),
+        reason: t.name);
+  }
+
+  final counters = e['counters'];
+  if (counters != null) {
+    final c = obd.contextCounters;
+    expect(c, isNotNull, reason: '${t.name}: counters were read');
+    const byName = <String, ContextCounter>{
+      'lampKm': ContextCounter.lampDistance,
+      'clearedKm': ContextCounter.clearedDistance,
+      'lampMin': ContextCounter.lampTime,
+      'clearedMin': ContextCounter.clearedTime,
+      'warmUps': ContextCounter.warmUps,
+    };
+    for (final p in words(counters)) {
+      final kv = p.split('=');
+      final r = c!.of(byName[kv[0]]!);
+      switch (kv[1]) {
+        case 'unsupported':
+          expect(r, isA<ExtraUnsupported<CounterValue>>(), reason: '${t.name}: ${kv[0]}');
+        case 'noAnswer':
+          expect(r, isA<ExtraNoAnswer<CounterValue>>(), reason: '${t.name}: ${kv[0]}');
+        case 'atLeast':
+          expect((r as ExtraValue<CounterValue>).value.atLeast, isTrue, reason: kv[0]);
+        default:
+          expect(r, isA<ExtraValue<CounterValue>>(), reason: '${t.name}: ${kv[0]} is $r');
+          expect((r as ExtraValue<CounterValue>).value.value, int.parse(kv[1]),
+              reason: '${t.name}: ${kv[0]}');
+      }
+    }
+  }
+
+  final readiness = e['readiness'];
+  if (readiness != null) {
+    final r = obd.readinessRead?.result;
+    if (readiness == 'unsupported') {
+      expect(r, isA<ExtraUnsupported<ReadinessReport>>(), reason: t.name);
+    } else if (readiness == 'noAnswer') {
+      expect(r, isA<ExtraNoAnswer<ReadinessReport>>(), reason: t.name);
+    } else {
+      expect(r, isA<ExtraValue<ReadinessReport>>(), reason: '${t.name}: readiness is $r');
+      final report = (r as ExtraValue<ReadinessReport>).value;
+      for (final p in words(readiness)) {
+        final kv = p.split('=');
+        final m = Monitor.values.firstWhere((x) => x.name == kv[0]);
+        expect(report.states[m]!.name, kv[1], reason: '${t.name}: ${kv[0]}');
+      }
+    }
+  }
+}
 
 Future<void> runFixture(Transcript t) async {
   final scale = double.parse(t.directives['timing'] ?? '1.0');
@@ -163,6 +274,16 @@ Future<void> runFixture(Transcript t) async {
       }
     }
   }
+  // ── context reads (Phase A-4): only when the fixture expects something ──
+  if (e.keys.any(const {'snapshot', 'snapshotValues', 'snapshotUnread', 'counters', 'readiness'}.contains)) {
+    await obd.readEngineContext();
+    checkContext(t, obd);
+  }
+  if (e['contextWire'] == 'none') {
+    expect(transport.wire.where(contextCommands.contains), isEmpty,
+        reason: '${t.name}: no context request on a plain scan');
+  }
+
   if (e.containsKey('passesPending')) {
     expect(obd.session!.adapterPassesPending, e['passesPending'] == 'true',
         reason: t.name);
@@ -193,6 +314,15 @@ void main() {
           'adapter_handles_pending.txt',
           'adapter_passes_pending.txt',
           'zero_padded.txt',
+          // Phase A-4
+          'context_full_snapshot.txt',
+          'context_can29.txt',
+          'context_no_snapshot.txt',
+          'context_mode02_unsupported.txt',
+          'context_partial_support.txt',
+          'context_pending_passes.txt',
+          'context_silent.txt',
+          'context_refused.txt',
         ]));
   });
 

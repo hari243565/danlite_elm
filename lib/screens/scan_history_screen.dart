@@ -55,7 +55,9 @@ class _ScanHistoryScreenState extends State<ScanHistoryScreen> {
     final k = _k;
     if (k == null) return const <ScanSession>[];
     await k.start();
-    return await k.history?.list() ?? const <ScanSession>[];
+    // The internal Clear Codes record is listed too (a time-only row; its
+    // sentences are in the detail). It is still left out of Share.
+    return await k.history?.list(includeInternal: true) ?? const <ScanSession>[];
   }
 
   void _refresh() => setState(() => _sessions = _load());
@@ -108,6 +110,7 @@ class _ScanHistoryScreenState extends State<ScanHistoryScreen> {
       future: _sessions,
       builder: (context, snap) {
         final sessions = snap.data ?? const <ScanSession>[];
+        final shareable = sessions.any((s) => s.kind != SessionKind.clearCheck);
         return Scaffold(
           backgroundColor: _C.bg,
           appBar: AppBar(
@@ -118,7 +121,7 @@ class _ScanHistoryScreenState extends State<ScanHistoryScreen> {
             actions: [
               IconButton(
                 tooltip: context.tr('historyShare'),
-                onPressed: sessions.isEmpty ? null : () => _share(sessions),
+                onPressed: shareable ? () => _share(sessions) : null,
                 icon: const Icon(Icons.ios_share_rounded, color: _C.cyan),
               ),
               IconButton(
@@ -159,12 +162,61 @@ ResolvedFault _resolveRow(BuildContext context, ScanFaultRow f, SessionKind kind
       FaultResolver(index: KnowledgeIndex.empty).resolve(f.toRecord(), vehicle, lang, domain: domain);
 }
 
+/// The Clear Codes record's row: what it is and when. Its outcome is in the
+/// detail only.
+class _ClearRecordTile extends StatelessWidget {
+  const _ClearRecordTile(this.s);
+  final ScanSession s;
+
+  @override
+  Widget build(BuildContext context) => InkWell(
+        onTap: () => Navigator.of(context).push(
+            MaterialPageRoute<void>(builder: (_) => _SessionDetail(s))),
+        child: Container(
+          margin: const EdgeInsets.only(bottom: 8),
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: _C.card,
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(color: _C.border),
+          ),
+          child: Row(
+            children: [
+              const Icon(Icons.delete_sweep_rounded, size: 15, color: _C.cyan),
+              const SizedBox(width: 6),
+              Text(context.tr('clearCodes'),
+                  style: const TextStyle(
+                      color: _C.cyan, fontSize: 12, fontWeight: FontWeight.w800)),
+              const Spacer(),
+              Text(formatLocal(clearAttemptedAt(s)),
+                  style: const TextStyle(color: _C.textMuted, fontSize: 11)),
+            ],
+          ),
+        ),
+      );
+}
+
+/// "Clear attempted at …. After clearing: …" — neutral wording: what the bike
+/// reported afterwards, never a verdict on whether the clear "worked".
+String clearRecordSentence(ScanSession s, String Function(String key) tr) {
+  final attempt =
+      tr('historyClearAttempt').replaceAll('{time}', formatLocal(clearAttemptedAt(s)));
+  final after = switch (s.clearOutcome) {
+    ClearCheckOutcome.codesReturned =>
+      tr('historyClearAfterCodes').replaceAll('{n}', '${s.faults.length}'),
+    ClearCheckOutcome.clearedVerified => tr('historyClearAfterNone'),
+    ClearCheckOutcome.couldNotVerify || null => tr('historyClearAfterUnknown'),
+  };
+  return '$attempt $after';
+}
+
 class _SessionTile extends StatelessWidget {
   const _SessionTile(this.s);
   final ScanSession s;
 
   @override
   Widget build(BuildContext context) {
+    if (s.kind == SessionKind.clearCheck) return _ClearRecordTile(s);
     final facts = [
       if (s.engineState == 'running') context.tr('historyEngineRunning'),
       if (s.engineState == 'off') context.tr('historyEngineOff'),
@@ -232,21 +284,25 @@ class _SessionDetail extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isClearRecord = s.kind == SessionKind.clearCheck;
     return Scaffold(
       backgroundColor: _C.bg,
       appBar: AppBar(
         backgroundColor: _C.surface,
         iconTheme: const IconThemeData(color: _C.textMain),
-        title: Text(formatLocal(s.startedAt),
+        title: Text(formatLocal(isClearRecord ? clearAttemptedAt(s) : s.startedAt),
             style: const TextStyle(color: _C.textMain, fontWeight: FontWeight.w800)),
       ),
       body: ListView(
         padding: const EdgeInsets.fromLTRB(14, 12, 14, 24),
         children: [
-          Text(context.tr('historyReach_${s.reachState}'),
+          Text(
+              isClearRecord
+                  ? clearRecordSentence(s, context.tr)
+                  : context.tr('historyReach_${s.reachState}'),
               style: const TextStyle(color: _C.textMain, fontSize: 15, fontWeight: FontWeight.w800)),
           const SizedBox(height: 10),
-          if (s.faults.isEmpty)
+          if (s.faults.isEmpty && !isClearRecord)
             Text(context.tr('historyNoCodes'), style: const TextStyle(color: _C.textMuted)),
           for (final f in s.faults)
             Builder(builder: (context) {

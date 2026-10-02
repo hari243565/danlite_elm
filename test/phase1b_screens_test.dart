@@ -423,14 +423,35 @@ void main() {
       String between(String src, String a, String b) =>
           src.substring(src.indexOf(a), src.indexOf(b, src.indexOf(a)));
       // Dialog, button, message key, colour, duration, message text.
+      // Phase A-4 (S3) is the ONE allowed difference: `_clearOutcomeMessage`
+      // read the language with `context.tr` (a listening lookup) from an async
+      // handler, which asserts in debug builds and stopped the message from
+      // showing there. It now reads it with `context.read`. Same key, same
+      // text, same moment — see clear_codes_debug_message_test.dart. Every
+      // other byte of the function must still equal `main`.
+      const mainMessageLine =
+          '      context.tr(clearOutcomeMessageKey(ok, outcome));';
+      const debugSafeMessageLine =
+          '      AppStrings.get(clearOutcomeMessageKey(ok, outcome), '
+          'context.read<SettingsProvider>().locale.languageCode);';
       for (final pair in [
         ['String clearOutcomeMessageKey', 'class DtcScreen'],
         ['  Future<void> _clearCodes() async {', '    setState(() => _clearing = true);'],
         ['    ScaffoldMessenger.of(context).showSnackBar(SnackBar(', '    ));'],
         ['  String _clearOutcomeMessage(', '  Future<void> _showFreezeFrame'],
       ]) {
-        expect(between(now, pair[0], pair[1]), between(main, pair[0], pair[1]),
-            reason: pair[0]);
+        var expected = between(main, pair[0], pair[1]);
+        if (pair[0] == '  String _clearOutcomeMessage(') {
+          // Before A-4 is merged `main` has the old line; after, it already
+          // has the new one. Either way the function must equal the new form.
+          expect(
+              expected.contains(mainMessageLine) ||
+                  expected.contains(debugSafeMessageLine),
+              isTrue,
+              reason: 'main has a form of the message line this guard knows');
+          expected = expected.replaceFirst(mainMessageLine, debugSafeMessageLine);
+        }
+        expect(between(now, pair[0], pair[1]), expected, reason: pair[0]);
       }
       // The erase and the existing refresh, unchanged and in order.
       expect(now, contains('    final ok = await obd.clearDtcs();\n'

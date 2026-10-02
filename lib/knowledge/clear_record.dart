@@ -32,7 +32,7 @@ import 'scan_history.dart';
 const Duration kPreClearSnapshotMaxAge = Duration(seconds: 60);
 
 class PreClearSnapshot {
-  const PreClearSnapshot._(this.codes, this.readAt);
+  const PreClearSnapshot._(this.codes, this.readAt, [this.attemptedAt]);
 
   /// No answered read within [kPreClearSnapshotMaxAge] before the clear.
   static const PreClearSnapshot none = PreClearSnapshot._(null, null);
@@ -41,27 +41,38 @@ class PreClearSnapshot {
   final List<String>? codes;
   final DateTime? readAt;
 
+  /// When Clear Codes was attempted (the moment the snapshot was taken, just
+  /// before the erase went out). History shows this time, not the time of the
+  /// silent re-read that follows. Null on a record from before A-4.
+  final DateTime? attemptedAt;
+
   bool get present => codes != null;
 
   /// Take the snapshot from [obd] at [now] — synchronously, before the clear
   /// sends anything.
   factory PreClearSnapshot.capture(ObdService obd, DateTime now) {
     final read = obd.lastEngineRead;
-    if (read is! EngineAnswered) return none;
+    if (read is! EngineAnswered) return PreClearSnapshot._(null, null, now);
     final age = now.difference(read.at);
     // A read stamped in the future (clock moved back) is not trusted either.
-    if (age.isNegative || age > kPreClearSnapshotMaxAge) return none;
+    if (age.isNegative || age > kPreClearSnapshotMaxAge) {
+      return PreClearSnapshot._(null, null, now);
+    }
     return PreClearSnapshot._(
-        List<String>.unmodifiable(read.codes.map((c) => c.code)), read.at);
+        List<String>.unmodifiable(read.codes.map((c) => c.code)), read.at, now);
   }
 
-  Map<String, Object?> toJson() => present
-      ? <String, Object?>{
-          'snapshot': true,
-          'codes': codes,
-          'read_at': readAt!.toUtc().toIso8601String(),
-        }
-      : <String, Object?>{'snapshot': false};
+  Map<String, Object?> toJson() => <String, Object?>{
+        ...present
+            ? <String, Object?>{
+                'snapshot': true,
+                'codes': codes,
+                'read_at': readAt!.toUtc().toIso8601String(),
+              }
+            : <String, Object?>{'snapshot': false},
+        if (attemptedAt != null)
+          'attempted_at': attemptedAt!.toUtc().toIso8601String(),
+      };
 }
 
 ClearCheckOutcome clearCheckOutcomeOf(StoredCodesCheck c) => switch (c) {
