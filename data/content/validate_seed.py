@@ -501,6 +501,8 @@ NETWORK = ("Some electronic units on the bike cannot talk to each other, so warn
            "not work. If ABS is affected, your normal brakes still work, but ABS is off, so a wheel can lock in "
            "hard braking.")
 IDLE_FIRST = "If it stalls at stops or will not hold idle, ride gently, avoid heavy traffic and have it checked soon."
+IDLE_ONCE = "If it stalls once at a stop, ride gently, avoid heavy traffic and have it checked soon."
+IDLE_REPEAT = "If it stalls more than once or will not restart, do not keep riding."
 IDLE_PAIR = ("If it stalls once at a stop, ride gently, avoid heavy traffic and have it checked soon. If it stalls "
              "more than once or will not restart, do not keep riding.")
 BATTERY_HOT = "If the battery is hot or swollen, stop, switch off and do not ride on."
@@ -618,12 +620,17 @@ def check_v4(r, ctx, err, warn, tags, rk):
     # ---- R21 canonical sentences
     advice = r["rider_advice_en"]
     for sg in _sentences(advice):
-        if STALL_FAMILY.search(sg) and STALL not in sg and TWO_CASE not in sg:
+        if STALL_FAMILY.search(sg) and STALL not in sg and TWO_CASE not in sg and sg != IDLE_REPEAT:
             err(c, "R21", f"stall advice is not the canonical STALL sentence: '{sg}'")
-    if tagset & STALL_TAGS and lvl != "STOP" and STALL not in advice and TWO_CASE not in advice:
+    if tagset & STALL_TAGS and lvl != "STOP" and STALL not in advice and TWO_CASE not in advice \
+            and not (tagset & IDLE_TAGS and IDLE_REPEAT in advice):
         err(c, "R21", "entry needs the canonical STALL (or TWO-CASE) sentence (D4) in rider_advice_en")
-    if tagset & IDLE_TAGS and c not in IDLE_FIRST_EXEMPT and IDLE_FIRST not in advice:
-        err(c, "R21", "idle entries need the D3 sentence: " + IDLE_FIRST)
+    if tagset & IDLE_TAGS and STALL in advice:
+        err(c, "R21", "idle entries must not carry the stacked canonical STALL sentence (G5); use the idle pair")
+    if tagset & IDLE_TAGS and c not in IDLE_FIRST_EXEMPT and IDLE_PAIR not in advice:
+        err(c, "R21", "idle entries need the G5 pair of sentences: " + IDLE_PAIR)
+    if tagset & IDLE_TAGS and c in IDLE_FIRST_EXEMPT and IDLE_REPEAT not in advice:
+        err(c, "R21", "P0507 needs the second half of the G5 idle pair: " + IDLE_REPEAT)
     if (tagset & NETWORK_TAGS or c in NETWORK_CODES) and NETWORK not in advice:
         err(c, "R21", "bus fault entries need the canonical NETWORK sentence (D4) word for word")
     if (tagset & NETWORK_TAGS or c in NETWORK_CODES) and r["needs_independent_review"] is not True:
@@ -676,7 +683,7 @@ def check_q(r, ctx, err, tags, rk):
     fields4 = ("meaning_en", "rider_action_basis", "rider_advice_en", "can_ride_reason")
     # Q1: below STOP, the "if" before a stall or no-start claim must contain a real symptom
     if lvl != "STOP":
-        canon = {STALL, TWO_CASE, IDLE_FIRST, BATTERY, BATTERY_HOT, STOP_TAIL, PETROL, ABS_SENT, IDLE_PAIR}
+        canon = {STALL, TWO_CASE, IDLE_ONCE, IDLE_REPEAT, BATTERY, BATTERY_HOT, STOP_TAIL, PETROL, ABS_SENT, IDLE_PAIR}
         for f in fields4:
             for sg in _sentences(r[f]):
                 if sg in canon:
@@ -750,8 +757,8 @@ def check_q(r, ctx, err, tags, rk):
 
 
 
-# P0507 (idle too high) carries its own first sentence (throttle not closing fully) instead of the D3 sentence;
-# it still needs STALL, and the decision check in DECISIONS makes the throttle sentence mandatory.
+# P0507 (idle too high) carries its own first sentence (throttle not closing fully) instead of the G5 first sentence;
+# it still needs the second half of the pair, and the decision check in DECISIONS makes the throttle sentence mandatory.
 IDLE_FIRST_EXEMPT = {"P0507"}
 
 # ============================================================================
@@ -898,7 +905,7 @@ def check_entry(r, ctx, err, warn):
     # ---- R1 circular advice
     for field in ("rider_advice_en", "rider_action_basis", "meaning_en", "can_ride_reason"):
         for rx in R1_PATTERNS:
-            m = rx.search(r[field])
+            m = rx.search(r[field].replace(IDLE_ONCE, ""))  # "at a stop" in the owner's G5 sentence is a place, not advice
             if m:
                 err(c, "R1", f"circular advice in {field}: '{m.group(0)}' (if it has stalled the rider has already stopped)")
     # ---- R2 assumed hardware

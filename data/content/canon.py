@@ -15,7 +15,10 @@ NETWORK = ("Some electronic units on the bike cannot talk to each other, so warn
            "not work. If ABS is affected, your normal brakes still work, but ABS is off, so a wheel can lock in "
            "hard braking.")
 IDLE_FIRST = "If it stalls at stops or will not hold idle, ride gently, avoid heavy traffic and have it checked soon."
-IDLE = IDLE_FIRST + " " + STALL
+IDLE = IDLE_FIRST + " " + STALL  # V4 form, replaced by IDLE_PAIR in V5 (owner decision G5)
+IDLE_ONCE = "If it stalls once at a stop, ride gently, avoid heavy traffic and have it checked soon."
+IDLE_REPEAT = "If it stalls more than once or will not restart, do not keep riding."
+IDLE_PAIR = IDLE_ONCE + " " + IDLE_REPEAT
 BATTERY = ("If the battery is hot, swollen or smells of rotten eggs, or the lights are very bright or bulbs keep "
            "blowing, stop, switch off and do not ride on.")
 BATTERY_HOT = "If the battery is hot or swollen, stop, switch off and do not ride on."

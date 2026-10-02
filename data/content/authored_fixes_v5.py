@@ -50,3 +50,13 @@ fix("P2111", G4, "G4 owner decision: tell the rider how to slow down; confidence
     advice="Close the throttle, pull in the clutch, use both brakes to slow down, then stop safely and switch off. "
            "Pull over and do not keep riding; have the bike taken to a workshop.",
     confidence=MD)
+
+
+# ======================= G5: idle entries ==================================================================
+# One pair of sentences, nothing that can read as the opposite; the stacked canonical STALL sentence is removed.
+G5 = "G5"
+for _c in ("P0505", "P0506", "P0508", "P0509", "P050A", "P050D", "P0510", "P0511", "P0518", "P0519"):
+    fix(_c, G5, "G5 owner decision: idle pair replaces the stacked IDLE_FIRST + STALL sentences", advice=IDLE_PAIR)
+fix("P0507", G5, "G5: the throttle-not-closing stop sentence is mandatory and the advice may have only 2 sentences, so P0507 "
+                 "keeps it and carries the second half of the pair instead of the stacked STALL sentence",
+    advice="If the throttle does not snap fully shut when you let go, do not ride; have it checked first. " + IDLE_REPEAT)
