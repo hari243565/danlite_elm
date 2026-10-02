@@ -60,3 +60,11 @@ for _c in ("P0505", "P0506", "P0508", "P0509", "P050A", "P050D", "P0510", "P0511
 fix("P0507", G5, "G5: the throttle-not-closing stop sentence is mandatory and the advice may have only 2 sentences, so P0507 "
                  "keeps it and carries the second half of the pair instead of the stacked STALL sentence",
     advice="If the throttle does not snap fully shut when you let go, do not ride; have it checked first. " + IDLE_REPEAT)
+
+
+# ======================= G6: twin wording for the cylinder 1 ignition and injector STOP entries ==============
+# Levels stay as they are. One short clause joined to the first sentence (the advice may have only 2 sentences).
+G6 = "G6"
+for _c in ("P0201", "P0261", "P0262", "P0351", "P2300", "P2301", "P2302"):
+    fix(_c, G6, "G6 owner decision: twin wording clause for a cylinder 1 fault (levels unchanged)",
+        advice="The engine may misfire, lose power or stop; " + TWIN_CLAUSE + ". " + STOP_TAIL)

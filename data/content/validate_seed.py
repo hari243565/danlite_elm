@@ -501,6 +501,7 @@ NETWORK = ("Some electronic units on the bike cannot talk to each other, so warn
            "not work. If ABS is affected, your normal brakes still work, but ABS is off, so a wheel can lock in "
            "hard braking.")
 IDLE_FIRST = "If it stalls at stops or will not hold idle, ride gently, avoid heavy traffic and have it checked soon."
+TWIN_CLAUSE = "on a two-cylinder bike it may keep running on one cylinder, but have it checked soon"  # V5 G6
 IDLE_ONCE = "If it stalls once at a stop, ride gently, avoid heavy traffic and have it checked soon."
 IDLE_REPEAT = "If it stalls more than once or will not restart, do not keep riding."
 IDLE_PAIR = ("If it stalls once at a stop, ride gently, avoid heavy traffic and have it checked soon. If it stalls "
@@ -644,7 +645,7 @@ def check_v4(r, ctx, err, warn, tags, rk):
             if n > MAX_WORDS and sg != BATTERY:  # the owner's D1 BATTERY sentence (29 words) is fixed text
                 err(c, "R22", f"sentence of {n} words in {f} (limit {MAX_WORDS}): '{sg[:50]}...'")
     for f in fields + ["title_en"]:
-        m = IDIOMS.search(r[f])
+        m = IDIOMS.search(r[f].replace(TWIN_CLAUSE, ""))  # the owner's G6 clause says "running on one cylinder" on purpose
         if m:
             err(c, "R22", f"idiom or phrasal verb '{m.group(0)}' in {f}; use a plain glossary word")
     for x in list(r["likely_causes_en"]) + list(r["technician_hints_en"]):
@@ -756,6 +757,12 @@ def check_q(r, ctx, err, tags, rk):
                 err(c, "Q8", f"with_care entry permits normal riding in {f}: '{m.group(0)}'")
 
 
+
+# G6: the cylinder 1 ignition and injector STOP entries carry the owner's twin clause
+for _c in ("P0201", "P0261", "P0262", "P0351", "P2300", "P2301", "P2302"):
+    DECISIONS.setdefault(_c, []).append(
+        ("G6 twin clause in the advice, level unchanged STOP",
+         lambda r: TWIN_CLAUSE in r["rider_advice_en"] and r["rider_action_level"] == "STOP"))
 
 # P0507 (idle too high) carries its own first sentence (throttle not closing fully) instead of the G5 first sentence;
 # it still needs the second half of the pair, and the decision check in DECISIONS makes the throttle sentence mandatory.

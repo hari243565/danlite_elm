@@ -24,6 +24,7 @@ BATTERY = ("If the battery is hot, swollen or smells of rotten eggs, or the ligh
 BATTERY_HOT = "If the battery is hot or swollen, stop, switch off and do not ride on."
 TWO_CASE = ("If the engine runs normally, have it checked soon; if it stalls, loses power or will not start, "
             "do not keep riding.")
+TWIN_CLAUSE = "on a two-cylinder bike it may keep running on one cylinder, but have it checked soon"  # V5 G6
 STOP_TAIL = "Pull over safely, switch off and do not keep riding; have the bike taken to a workshop."
 OVERHEAT = "Pull over safely, switch off and let the engine cool; do not keep riding."
 ABS_TAIL = "Ride gently, brake early and get it checked soon."
