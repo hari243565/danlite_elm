@@ -62,7 +62,7 @@ final newKeys = <String>[
   'snapFuelSystem', 'snapShortTrim', 'snapLongTrim', 'snapIntakePressure',
   'snapIntakeAirTemp', 'snapModuleVoltage', 'fuelStatusOpenCold', 'fuelStatusClosed',
   'fuelStatusOpenLoad', 'fuelStatusOpenFault', 'fuelStatusClosedFault',
-  'fuelStatusUnknown', 'readinessNotApplicable', 'readinessUnavailable',
+  'fuelStatusUnknown', 'fuelStatusEngineOff', 'readinessNotApplicable', 'readinessUnavailable',
 ];
 
 Set<String> placeholders(String s) =>

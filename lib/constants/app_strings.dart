@@ -394,6 +394,7 @@ class AppStrings {
       'fuelStatusOpenFault': 'Open loop (system fault)',
       'fuelStatusClosedFault': 'Closed loop (sensor fault)',
       'fuelStatusUnknown': 'Unknown status',
+      'fuelStatusEngineOff': 'Engine off',
       'ctxLampKm': 'Warning lamp has been on for {n} km',
       'ctxLampMin': 'Warning lamp has been on for {n} min',
       'ctxClearedKm': 'Codes were cleared {n} km ago',
@@ -1383,6 +1384,7 @@ class AppStrings {
       'fuelStatusOpenFault': 'ओपन लूप (सिस्टम खराबी)', // proposed
       'fuelStatusClosedFault': 'क्लोज़्ड लूप (सेंसर खराबी)', // proposed
       'fuelStatusUnknown': 'अज्ञात स्थिति', // proposed
+      'fuelStatusEngineOff': 'इंजन बंद', // proposed
       'ctxLampKm': 'चेतावनी लैंप {n} km से चालू है',
       'ctxLampMin': 'चेतावनी लैंप {n} मिनट से चालू है',
       'ctxClearedKm': 'कोड {n} km पहले साफ़ किए गए थे',

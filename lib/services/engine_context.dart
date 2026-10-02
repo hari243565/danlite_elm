@@ -73,10 +73,13 @@ Decoded<B> _then<A, B>(Decoded<A> d, B Function(A) f) {
 
 /// One answer out of every module's reply. [dropFrame] (Mode 02): the first
 /// data byte is the frame number — it must be 0, the frame that was asked for,
-/// and is removed. [take] bytes are kept. Two modules that give DIFFERENT data
-/// give no value at all: which one is right is not something to guess.
+/// and is removed. [take] bytes are kept (fewer, down to [minTake], when the
+/// reply has an optional last byte and the bike left it out). Two modules that
+/// give DIFFERENT data give no value at all: which one is right is not
+/// something to guess.
 Decoded<List<int>> _agreed(Decoded<List<List<int>>> d,
-    {required int take, bool dropFrame = false}) {
+    {required int take, int? minTake, bool dropFrame = false}) {
+  final least = minTake ?? take;
   return _then<List<List<int>>, List<int>>(d, (rows) {
     final kept = <List<int>>[];
     for (final r in rows) {
@@ -87,8 +90,8 @@ Decoded<List<int>> _agreed(Decoded<List<List<int>>> d,
         }
         data = data.sublist(1);
       }
-      if (data.length < take) throw const FormatException('reply too short');
-      kept.add(data.sublist(0, take));
+      if (data.length < least) throw const FormatException('reply too short');
+      kept.add(data.sublist(0, data.length < take ? data.length : take));
     }
     for (final k in kept.skip(1)) {
       if (!_sameBytes(kept.first, k)) {
@@ -116,16 +119,19 @@ bool _headerOnOneLine(String raw, int service, int pid) {
 
 /// The [take] data bytes of Mode [service] PID [pid]'s reply (a Mode 02 reply
 /// has one more byte, the frame number, which [_agreed] checks and drops).
+/// [minTake] below [take]: the last bytes are optional.
 Decoded<List<int>> _agreedBytes(String? raw,
-    {required int service, required int pid, required int take}) {
+    {required int service, required int pid, required int take, int? minTake}) {
   final d = decodePidData(raw,
-      service: service, pid: pid, minBytes: take + (service == 2 ? 1 : 0));
+      service: service,
+      pid: pid,
+      minBytes: (minTake ?? take) + (service == 2 ? 1 : 0));
   if (d is DecodedValue<List<List<int>>> &&
       raw != null &&
       !_headerOnOneLine(raw, service, pid)) {
     return const DecodedUnparseable<List<int>>('reply lines do not hold the answer together');
   }
-  return _agreed(d, take: take, dropFrame: service == 2);
+  return _agreed(d, take: take, minTake: minTake, dropFrame: service == 2);
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -444,19 +450,24 @@ final class SnapshotNumber extends SnapshotValue {
 }
 
 enum FuelStatusKind {
-  /// The bike reports no status for this system (0).
+  /// There is no such system: the bike left the second byte out, or sent 0
+  /// there. Never shown.
   none,
+
+  /// 0 — engine off.
+  engineOff,
   openLoopCold,
   closedLoop,
   openLoopLoad,
   openLoopFault,
   closedLoopFault,
 
-  /// A value that is not one of the five documented ones.
+  /// A value that is not one of the documented ones.
   unknown;
 
+  /// System 1 (the first byte). 0 is a real state: engine off.
   static FuelStatusKind fromByte(int v) => switch (v) {
-        0 => none,
+        0 => engineOff,
         1 => openLoopCold,
         2 => closedLoop,
         4 => openLoopLoad,
@@ -465,8 +476,14 @@ enum FuelStatusKind {
         _ => unknown,
       };
 
+  /// System 2 (the optional second byte): absent or 0 means there is no second
+  /// system, not "engine off".
+  static FuelStatusKind fromOptionalByte(int? v) =>
+      v == null || v == 0 ? none : fromByte(v);
+
   String get labelKey => switch (this) {
         none => '',
+        engineOff => 'fuelStatusEngineOff',
         openLoopCold => 'fuelStatusOpenCold',
         closedLoop => 'fuelStatusClosed',
         openLoopLoad => 'fuelStatusOpenLoad',
@@ -491,11 +508,16 @@ final class SnapshotFuelSystem extends SnapshotValue {
 /// equivalent and is decoded here.
 Decoded<SnapshotValue> decodeFreezeFrameValue(String? raw, SnapshotPid p) {
   try {
-    final d = _agreedBytes(raw, service: 2, pid: p.pid, take: p.bytes);
+    // Fuel system status is one byte per system; system 2 is optional.
+    final d = _agreedBytes(raw,
+        service: 2,
+        pid: p.pid,
+        take: p.bytes,
+        minTake: p == SnapshotPid.fuelSystem ? 1 : null);
     return _then<List<int>, SnapshotValue>(d, (b) {
       if (p == SnapshotPid.fuelSystem) {
-        return SnapshotFuelSystem(
-            FuelStatusKind.fromByte(b[0]), FuelStatusKind.fromByte(b[1]));
+        return SnapshotFuelSystem(FuelStatusKind.fromByte(b[0]),
+            FuelStatusKind.fromOptionalByte(b.length > 1 ? b[1] : null));
       }
       final live = ObdParser.parsePid(
           '01${_hex2(p.pid)}', '41 ${_hex2(p.pid)} ${b.map(_hex2).join(' ')}');

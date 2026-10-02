@@ -413,23 +413,85 @@ void main() {
         return v as SnapshotFuelSystem;
       }
 
-      test('each documented value', () {
-        expect(fuel('42 03 00 01 00').system1, FuelStatusKind.openLoopCold);
-        expect(fuel('42 03 00 02 00').system1, FuelStatusKind.closedLoop);
-        expect(fuel('42 03 00 04 00').system1, FuelStatusKind.openLoopLoad);
-        expect(fuel('42 03 00 08 00').system1, FuelStatusKind.openLoopFault);
-        expect(fuel('42 03 00 10 00').system1, FuelStatusKind.closedLoopFault);
+      String hex(int b) => b.toRadixString(16).padLeft(2, '0');
+
+      // The confirmed J1979 table: 0 engine off; 1 open loop (engine too cold);
+      // 2 closed loop on oxygen sensor feedback; 4 open loop (load or fuel cut
+      // on deceleration); 8 open loop (system fault); 16 closed loop but a
+      // fault in the feedback system.
+      const table = <int, FuelStatusKind>{
+        0: FuelStatusKind.engineOff,
+        1: FuelStatusKind.openLoopCold,
+        2: FuelStatusKind.closedLoop,
+        4: FuelStatusKind.openLoopLoad,
+        8: FuelStatusKind.openLoopFault,
+        16: FuelStatusKind.closedLoopFault,
+      };
+
+      test('every documented value, as system 1', () {
+        table.forEach((byte, kind) {
+          expect(fuel('42 03 00 ${hex(byte)} 00').system1, kind, reason: 'value $byte');
+        });
+      });
+      test('every documented value, as system 2 (zero there means "no second system")', () {
+        table.forEach((byte, kind) {
+          expect(fuel('42 03 00 02 ${hex(byte)}').system2,
+              byte == 0 ? FuelStatusKind.none : kind,
+              reason: 'value $byte');
+        });
+      });
+      test('every other value (all 252 of them) is "unknown", never a made-up state', () {
+        for (var byte = 0; byte < 256; byte++) {
+          if (table.containsKey(byte)) continue;
+          final f = fuel('42 03 00 ${hex(byte)} ${hex(byte)}');
+          expect(f.system1, FuelStatusKind.unknown, reason: 'system 1 value $byte');
+          expect(f.system2, FuelStatusKind.unknown, reason: 'system 2 value $byte');
+        }
+        expect(fuel('42 03 00 03 00').system1, FuelStatusKind.unknown);
+        expect(fuel('42 03 00 40 00').system1, FuelStatusKind.unknown);
       });
       test('system 2 is shown only when the bike reports one', () {
         expect(fuel('42 03 00 02 00').system2, FuelStatusKind.none);
         expect(fuel('42 03 00 02 04').system2, FuelStatusKind.openLoopLoad);
       });
-      test('a value outside the table is "unknown", never a guess', () {
-        expect(fuel('42 03 00 03 00').system1, FuelStatusKind.unknown);
-        expect(fuel('42 03 00 40 00').system1, FuelStatusKind.unknown);
+      test('a reply with only ONE byte is system 1 alone', () {
+        for (final shape in shapes('42 03 00 02')) {
+          final f = fuel(shape);
+          expect(f.system1, FuelStatusKind.closedLoop, reason: shape);
+          expect(f.system2, FuelStatusKind.none, reason: shape);
+        }
+        table.forEach((byte, kind) {
+          final f = fuel('42 03 00 ${hex(byte)}');
+          expect(f.system1, kind, reason: 'value $byte');
+          expect(f.system2, FuelStatusKind.none);
+        });
+        expect(fuel('42 03 00 55').system1, FuelStatusKind.unknown);
       });
-      test('zero means the bike reports no status', () {
-        expect(fuel('42 03 00 00 00').system1, FuelStatusKind.none);
+      test('a reply with NO status byte is never a value', () {
+        expect(decodeFreezeFrameValue('42 03 00', SnapshotPid.fuelSystem),
+            isNot(isA<DecodedValue<SnapshotValue>>()));
+      });
+      test('zero is "engine off" (the J1979 meaning), not a hidden state', () {
+        final f = fuel('42 03 00 00 00');
+        expect(f.system1, FuelStatusKind.engineOff);
+        expect(f.system2, FuelStatusKind.none);
+        expect(f.reportsAnything, isTrue);
+      });
+      test('every state has an English and a Hindi sentence, and they differ', () {
+        final en = AppStrings.languageTable('en');
+        final hi = AppStrings.languageTable('hi');
+        for (final k in FuelStatusKind.values) {
+          if (k == FuelStatusKind.none) {
+            expect(k.labelKey, '', reason: 'none is "not present", never shown');
+            continue;
+          }
+          expect((en[k.labelKey] ?? '').trim(), isNotEmpty, reason: 'en $k');
+          expect((hi[k.labelKey] ?? '').trim(), isNotEmpty, reason: 'hi $k');
+          expect(hi[k.labelKey], isNot(en[k.labelKey]), reason: '$k');
+        }
+        expect(en['fuelStatusEngineOff'], 'Engine off');
+        expect(hi['fuelStatusEngineOff'], 'इंजन बंद');
+        expect(en['fuelStatusUnknown'], 'Unknown status');
       });
     });
 
