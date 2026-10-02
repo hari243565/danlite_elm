@@ -28,7 +28,14 @@ OBDEX = os.environ.get("OBDEX_DIR", "/tmp/obdex")
 CTX = V.build_context(OBDEX, os.path.join(HERE, "relevance_ranking.csv"))
 ROWS = [json.loads(line) for line in open(os.path.join(HERE, "generic_en_seed.jsonl"), encoding="utf-8")
         if line.strip()]
+_HELD = os.path.join(HERE, "held_entries_v5.jsonl")  # V5 G3: held-out entries stay usable as test material
 BY = {r["code"]: r for r in ROWS}
+if os.path.exists(_HELD):
+    for _line in open(_HELD, encoding="utf-8"):
+        if _line.strip():
+            _r = json.loads(_line)
+            _r.pop("held_reason", None)
+            BY[_r["code"]] = _r
 
 
 def errors_for(entry):

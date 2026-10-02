@@ -13,6 +13,7 @@ sys.path.insert(0, HERE)
 import authored_batch1  # noqa: E402
 import authored_fixes_v4  # noqa: E402
 import authored_pilot  # noqa: E402
+from held_v5 import HELD  # noqa: E402,F401  (build_seed.py moves these out of the shipped seed)
 
 BATCH_MODULES = ["authored_batch2", "authored_batch3", "authored_batch4"]
 

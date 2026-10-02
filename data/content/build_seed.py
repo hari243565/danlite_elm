@@ -105,9 +105,12 @@ def main(argv):
     if not append and os.path.exists(out):
         # rebuild: an entry that did not change keeps its old updated_at
         old = {}
-        for line in open(out, encoding="utf-8"):
+        held_path = os.path.join(os.path.dirname(os.path.abspath(out)), "held_entries_v5.jsonl")
+        for line in list(open(out, encoding="utf-8")) + (list(open(held_path, encoding="utf-8"))
+                                                         if os.path.exists(held_path) else []):
             if line.strip():
                 o = json.loads(line)
+                o.pop("held_reason", None)
                 old[o["code"]] = o
         for r in new:
             o = old.get(r["code"])
@@ -118,11 +121,21 @@ def main(argv):
                 b.pop("updated_at", None)
                 if a == b:
                     r["updated_at"] = o["updated_at"]
+    held = getattr(mod, "HELD", {})  # V5 group G3: entries held out of the shipped seed
+    held_rows = []
+    if held:
+        held_rows = [dict(r, held_reason=held[r["code"]]) for r in new if r["code"] in held]
+        new = [r for r in new if r["code"] not in held]
+        existing = [r for r in existing if r["code"] not in held]
+        with open(os.path.join(os.path.dirname(os.path.abspath(out)), "held_entries_v5.jsonl"), "w",
+                  encoding="utf-8") as fh:
+            for r in held_rows:
+                fh.write(json.dumps(r, ensure_ascii=False) + "\n")
     rows = existing + new
     with open(out, "w", encoding="utf-8") as fh:
         for r in rows:
             fh.write(json.dumps(r, ensure_ascii=False) + "\n")
-    print(f"wrote {len(rows)} entries ({len(new)} new) to {out}")
+    print(f"wrote {len(rows)} entries ({len(new)} new) to {out}; {len(held_rows)} held out")
 
 
 if __name__ == "__main__":
