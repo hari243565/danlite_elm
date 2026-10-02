@@ -257,7 +257,7 @@ void main() {
         expect(xs, contains(t('readinessHint', lang)));
         for (final m in [
           'monMisfire', 'monFuelSystem', 'monComponents', 'monCatalyst',
-          'monHeatedCatalyst', 'monEvaporative', 'monSecondaryAir', 'monAcRefrigerant',
+          'monHeatedCatalyst', 'monEvaporative', 'monSecondaryAir', 'monOtherSelfCheck',
           'monOxygenSensor', 'monOxygenSensorHeater', 'monEgr',
         ]) {
           expect(xs, contains(t(m, lang)), reason: m);

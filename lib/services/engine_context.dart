@@ -23,9 +23,13 @@
 ///     B bit 0/1/2 misfire / fuel system / components SUPPORTED, bit 3 ignition
 ///     type (0 spark, 1 compression), bit 4/5/6 the same three NOT complete.
 ///     C (spark ignition) bits 0–7 catalyst, heated catalyst, evaporative
-///     system, secondary air, A/C refrigerant, oxygen sensor, oxygen sensor
-///     heater, EGR/VVT SUPPORTED; D the same positions NOT complete (1 = not
-///     complete).
+///     system, secondary air, "other self-check" (bit 4), oxygen sensor, oxygen
+///     sensor heater, EGR/VVT SUPPORTED; D the same positions NOT complete
+///     (1 = not complete).
+///   * Bit 4 of C and D is deliberately NOT named. Editions of SAE J1979 define
+///     it differently — older ones "A/C system refrigerant", newer ones
+///     "gasoline particulate filter" — and neither exists on a motorcycle, so
+///     the app shows only a generic "other self-check" and its state.
 library;
 
 import '../constants/obd_pids.dart';
@@ -249,7 +253,10 @@ enum Monitor {
   heatedCatalyst('monHeatedCatalyst'),
   evaporative('monEvaporative'),
   secondaryAir('monSecondaryAir'),
-  acRefrigerant('monAcRefrigerant'),
+  /// Bit 4 of bytes C and D. Different editions of SAE J1979 name it A/C
+  /// refrigerant or gasoline particulate filter; neither exists on a
+  /// motorcycle, so it is never named.
+  otherSelfCheck('monOtherSelfCheck'),
   oxygenSensor('monOxygenSensor'),
   oxygenSensorHeater('monOxygenSensorHeater'),
   egr('monEgr');
@@ -304,7 +311,7 @@ ReadinessReport decodeReadinessBytes(int a, int b, int c, int d) {
     Monitor.heatedCatalyst,
     Monitor.evaporative,
     Monitor.secondaryAir,
-    Monitor.acRefrigerant,
+    Monitor.otherSelfCheck,
     Monitor.oxygenSensor,
     Monitor.oxygenSensorHeater,
     Monitor.egr,

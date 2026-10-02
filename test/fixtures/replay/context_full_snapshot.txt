@@ -13,7 +13,7 @@
 # expect snapshotValues: 04=50.2 05=83 06=12.5 07=0 0B=99 0C=1000 0D=60 0F=25 11=100 42=14.0
 # expect snapshotUnread: none
 # expect counters: lampKm=120 clearedKm=480 lampMin=95 clearedMin=310 warmUps=7
-# expect readiness: misfire=complete fuelSystem=complete components=complete catalyst=complete heatedCatalyst=notSupported evaporative=notComplete secondaryAir=notSupported acRefrigerant=notSupported oxygenSensor=complete oxygenSensorHeater=complete egr=complete
+# expect readiness: misfire=complete fuelSystem=complete components=complete catalyst=complete heatedCatalyst=notSupported evaporative=notComplete secondaryAir=notSupported otherSelfCheck=notSupported oxygenSensor=complete oxygenSensorHeater=complete egr=complete
 # expect lamp: on
 09:30:00.000 TX>ATZ
 09:30:00.100 RX<\r\rELM327 v1.5\r\r

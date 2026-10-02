@@ -12,6 +12,7 @@
 ///   flags.
 library;
 
+import 'package:danlite_elm/constants/app_strings.dart';
 import 'package:danlite_elm/services/engine_context.dart';
 import 'package:danlite_elm/services/fault_decoders.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -179,7 +180,7 @@ void main() {
         Monitor.heatedCatalyst, // 1
         Monitor.evaporative, // 2
         Monitor.secondaryAir, // 3
-        Monitor.acRefrigerant, // 4
+        Monitor.otherSelfCheck, // 4 (J1979 editions differ: never named)
         Monitor.oxygenSensor, // 5
         Monitor.oxygenSensorHeater, // 6
         Monitor.egr, // 7
@@ -203,6 +204,30 @@ void main() {
       }
     });
 
+    test('bit 4 of C and D is a generic "other self-check", never A/C or a particulate filter', () {
+      // SAE J1979 editions disagree on this bit (older: A/C refrigerant, newer:
+      // gasoline particulate filter); neither exists on a motorcycle.
+      final done = decodeReadinessBytes(0x00, 0x00, 0x10, 0x00);
+      final notDone = decodeReadinessBytes(0x00, 0x00, 0x10, 0x10);
+      final absent = decodeReadinessBytes(0x00, 0x00, 0x00, 0x10);
+      expect(s(done, Monitor.otherSelfCheck), MonitorState.complete);
+      expect(s(notDone, Monitor.otherSelfCheck), MonitorState.notComplete);
+      expect(s(absent, Monitor.otherSelfCheck), MonitorState.notSupported);
+      expect(Monitor.otherSelfCheck.labelKey, 'monOtherSelfCheck');
+      expect(Monitor.values.map((m) => m.name.toLowerCase()),
+          isNot(contains(anyOf('acrefrigerant', 'particulatefilter'))));
+      for (final lang in ['en', 'hi']) {
+        final t = AppStrings.languageTable(lang);
+        expect(t.containsKey('monAcRefrigerant'), isFalse, reason: lang);
+        for (final v in [t['monOtherSelfCheck']!]) {
+          expect(RegExp(r'A/C|refrigerant|रेफ्रिजरेंट|particulate', caseSensitive: false).hasMatch(v),
+              isFalse, reason: '$lang: $v');
+        }
+      }
+      expect(AppStrings.get('monOtherSelfCheck', 'en'), 'Other self-check');
+      expect(AppStrings.get('monOtherSelfCheck', 'hi'), 'अन्य सेल्फ-चेक');
+    });
+
     test('byte A carries the lamp and the stored count', () {
       final r = decodeReadinessBytes(0x83, 0x00, 0x00, 0x00);
       expect(r.lampOn, isTrue);
@@ -217,7 +242,7 @@ void main() {
       expect(r.compressionIgnition, isTrue);
       for (final m in [
         Monitor.catalyst, Monitor.heatedCatalyst, Monitor.evaporative,
-        Monitor.secondaryAir, Monitor.acRefrigerant, Monitor.oxygenSensor,
+        Monitor.secondaryAir, Monitor.otherSelfCheck, Monitor.oxygenSensor,
         Monitor.oxygenSensorHeater, Monitor.egr,
       ]) {
         expect(s(r, m), MonitorState.notApplicable, reason: '$m');

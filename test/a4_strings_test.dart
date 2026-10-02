@@ -33,7 +33,7 @@ const ownerHindi = <String, String>{
   'monHeatedCatalyst': 'हीटेड कैटेलिस्ट',
   'monEvaporative': 'इवैपोरेटिव सिस्टम',
   'monSecondaryAir': 'सेकेंडरी एयर',
-  'monAcRefrigerant': 'A/C रेफ्रिजरेंट',
+  'monOtherSelfCheck': 'अन्य सेल्फ-चेक',
   'monOxygenSensor': 'ऑक्सीजन सेंसर',
   'monOxygenSensorHeater': 'ऑक्सीजन सेंसर हीटर',
   'monEgr': 'EGR / VVT',
