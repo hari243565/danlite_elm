@@ -198,4 +198,4 @@ booleans; they are placeholders and not shown anywhere. I did not change any Dar
 `basic_hi_titles.tsv`, `basic_common.py`, `basic_hi.py`, `build_basic.py`, `validate_basic.py`,
 `validator_basic_selftest.py`; changed: `title_agreement.py` (new `--all`), `CANONICAL_HI.md` (new section).
 
-Branch `content/seed-20261001`, last content commit: see the line below.
+Branch `content/seed-20261001`, last content commit `08bbbfd` (this line was added in the commit right after it).
