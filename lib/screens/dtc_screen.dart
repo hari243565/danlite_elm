@@ -6,11 +6,13 @@ import '../constants/app_strings.dart';
 import '../constants/chassis_dtc_dictionary.dart';
 import '../constants/chassis_modules.dart';
 import '../knowledge/clear_record.dart';
+import '../knowledge/fault_domain.dart';
 import '../knowledge/fault_resolver.dart';
 import '../knowledge/history_recorder.dart';
 import '../knowledge/kb_models.dart' show RiderAction;
 import '../knowledge/knowledge_service.dart';
 import '../knowledge/legacy_text.dart';
+import '../models/fault_record.dart' show FaultSystem;
 import '../providers/settings_provider.dart';
 import '../providers/vehicle_provider.dart';
 import '../services/dtc_service.dart';
@@ -39,6 +41,9 @@ ResolvedFault resolveForCard(BuildContext context, DtcCode code,
   return FaultResolver(index: KnowledgeIndex.empty, legacy: legacyEngineText)
       .resolve(record, vehicle, lang, domain: domain);
 }
+
+/// What the section strip and the section list are built from, once per build.
+typedef _SectionData = ({List<FoundCode> found, List<SectionSummary> summaries});
 
 // Unified Telemetry Design System Palette (matches home_screen._NC / realtime_screen._RC)
 class _RC {
@@ -133,6 +138,11 @@ class _DtcScreenState extends State<DtcScreen> {
   /// profile to a different model re-gates automatically instead of silently
   /// inheriting a decision made about another bike.
   String? _gateBypassedForPlatform;
+
+  /// The section card the rider tapped, or null for "All". A section is a
+  /// view over the codes the engine and ABS scans already found; choosing one
+  /// reads nothing from the bike.
+  FaultSection? _section;
 
   @override
   void initState() {
@@ -375,6 +385,7 @@ class _DtcScreenState extends State<DtcScreen> {
     final codes = _sanitize(obd.dtcCodes);
     // Optional so screens and tests built without the recorder still work.
     final recorder = Provider.of<SessionRecorder?>(context);
+    final sections = obd.isConnected ? _sectionData(context, obd) : null;
 
     return Scaffold(
       backgroundColor: _RC.bg,
@@ -411,11 +422,12 @@ class _DtcScreenState extends State<DtcScreen> {
         children: [
           if (recorder?.enabled ?? false) _recorderStrip(context),
           _buildModuleSelector(context),
+          if (sections != null) _buildSectionStrip(context, sections.summaries),
           Expanded(
             child: obd.isConnected
                 ? (_module == DtcModule.engine
-                    ? _buildConnected(context, codes, obd)
-                    : _buildChassis(context, obd))
+                    ? _buildConnected(context, codes, obd, sections!)
+                    : _buildChassis(context, obd, sections!))
                 : _buildDisconnected(context),
           ),
         ],
@@ -442,6 +454,274 @@ class _DtcScreenState extends State<DtcScreen> {
           ],
         ),
       );
+
+  // ── Domain sections (Phase 4B, B1) ────────────────────────────────────────
+  // Six cards over the codes the engine and ABS scans already found. Nothing
+  // here scans: a card says what a scan established, or that none has.
+
+  _SectionData _sectionData(BuildContext context, ObdService obd) {
+    final read = obd.lastEngineRead;
+    final vehicle =
+        activeVehicleSnapshot(context.watch<VehicleProvider>().active).context;
+    final engineCodes =
+        read is EngineAnswered ? _sanitize(obd.engineDisplayCodes) : <DtcCode>[];
+    FaultSystem? knowledgeSystemOf(DtcCode c) =>
+        resolveForCard(context, c, vehicle: vehicle).structure?.system;
+    final found = foundCodes(
+      engineRead: read,
+      engineCodes: engineCodes,
+      absOutcome: obd.chassisScanOutcome,
+      absCodes: obd.chassisDtcCodes,
+      knowledgeSystemOf: knowledgeSystemOf,
+    );
+    final summaries = summariseSections(
+      engineRead: read,
+      engineScanning: _reading,
+      engineCodes: engineCodes,
+      absOutcome: obd.chassisScanOutcome,
+      absScanning: obd.chassisScanInFlight,
+      absCodes: obd.chassisDtcCodes,
+      knowledgeSystemOf: knowledgeSystemOf,
+    );
+    return (found: found, summaries: summaries);
+  }
+
+  String _sectionName(BuildContext context, FaultSection s) => context.tr(switch (s) {
+        FaultSection.engine => 'sectionEngine',
+        FaultSection.brakes => 'sectionBrakes',
+        FaultSection.body => 'sectionBody',
+        FaultSection.network => 'sectionNetwork',
+        FaultSection.transmission => 'sectionTransmission',
+        FaultSection.other => 'sectionOther',
+      });
+
+  /// The one short, honest line a card shows. Engine and Brakes & ABS reuse
+  /// the wording of their own scan results; the other four only ever say
+  /// "not scanned yet", "none found" or "N found".
+  String _sectionState(BuildContext context, SectionSummary s) {
+    String count() => s.count == 1
+        ? context.tr('sectionFaultOne')
+        : context.trArgs('sectionFaultsN', {'n': '${s.count}'});
+    switch (s.section) {
+      case FaultSection.engine:
+        return switch (s.status) {
+          SectionStatus.notScanned => context.tr('sectionNotScanned'),
+          SectionStatus.scanning => context.tr('sectionScanning'),
+          SectionStatus.noAnswer => context.tr('dtcNoAnswerTitle'),
+          SectionStatus.moduleBusy => context.tr('sectionEngineBusy'),
+          SectionStatus.refused => context.tr('dtcRefusedTitle'),
+          SectionStatus.linkLost => context.tr('dtcLinkLostTitle'),
+          SectionStatus.notReadable => context.tr('sectionNotReadable'),
+          SectionStatus.adapterLimited => context.tr('dtcNoAnswerTitle'),
+          SectionStatus.noFaults => context.tr('sectionNoFaults'),
+          SectionStatus.found => count(),
+        };
+      case FaultSection.brakes:
+        return switch (s.status) {
+          SectionStatus.notScanned => context.tr('sectionNotScanned'),
+          SectionStatus.scanning => context.tr('sectionScanning'),
+          SectionStatus.noAnswer => context.tr('absNoModule'),
+          SectionStatus.moduleBusy => context.tr('absModuleBusyTitle'),
+          SectionStatus.refused => context.tr('dtcRefusedTitle'),
+          SectionStatus.linkLost => context.tr('dtcLinkLostTitle'),
+          SectionStatus.notReadable => context.tr('sectionNotReadable'),
+          SectionStatus.adapterLimited => context.tr('absAddressingUnsupported'),
+          SectionStatus.noFaults => context.tr('sectionNoFaults'),
+          SectionStatus.found => count(),
+        };
+      default:
+        return switch (s.status) {
+          SectionStatus.found =>
+            context.trArgs('sectionFoundN', {'n': '${s.count}'}),
+          SectionStatus.noFaults => context.tr('sectionNoneFound'),
+          _ => context.tr('sectionNotScannedYet'),
+        };
+    }
+  }
+
+  /// The small caption under a card's state, when it has something to add.
+  String? _sectionCaption(BuildContext context, SectionSummary s) {
+    switch (s.section) {
+      case FaultSection.engine:
+        return null;
+      case FaultSection.brakes:
+        return s.fromEngineScanOnly ? context.tr('sectionFromEngineScan') : null;
+      default:
+        return context.tr('sectionBasedOn');
+    }
+  }
+
+  Widget _buildSectionStrip(
+      BuildContext context, List<SectionSummary> summaries) {
+    return Container(
+      height: 112,
+      decoration: const BoxDecoration(
+        color: _RC.surface,
+        border: Border(bottom: BorderSide(color: _RC.border)),
+      ),
+      child: ListView(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.fromLTRB(14, 10, 14, 10),
+        children: [
+          _sectionCard(
+            key: const ValueKey('section-card-all'),
+            title: context.tr('sectionAll'),
+            selected: _section == null,
+            width: 76,
+            onTap: () => setState(() => _section = null),
+          ),
+          for (final s in summaries) ...[
+            const SizedBox(width: 8),
+            _sectionCard(
+              key: ValueKey('section-card-${s.section.name}'),
+              title: _sectionName(context, s.section),
+              state: _sectionState(context, s),
+              caption: _sectionCaption(context, s),
+              badge: s.status == SectionStatus.found ? s.count : null,
+              selected: _section == s.section,
+              width: 152,
+              onTap: () => setState(
+                  () => _section = _section == s.section ? null : s.section),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _sectionCard({
+    required Key key,
+    required String title,
+    required bool selected,
+    required VoidCallback onTap,
+    required double width,
+    String? state,
+    String? caption,
+    int? badge,
+  }) {
+    final accent = selected ? _RC.neonCyan : _RC.textMuted;
+    return Semantics(
+      button: true,
+      selected: selected,
+      child: GestureDetector(
+        key: key,
+        onTap: onTap,
+        behavior: HitTestBehavior.opaque,
+        child: Container(
+          width: width,
+          padding: const EdgeInsets.fromLTRB(10, 8, 10, 8),
+          decoration: BoxDecoration(
+            color: selected ? _RC.neonCyan.withValues(alpha: 0.10) : _RC.card,
+            borderRadius: BorderRadius.circular(11),
+            border: Border.all(
+                color: selected
+                    ? _RC.neonCyan.withValues(alpha: 0.6)
+                    : _RC.border),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(title,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                            color: selected ? _RC.neonCyan : _RC.textMain,
+                            fontSize: 11.5,
+                            height: 1.2,
+                            fontWeight: FontWeight.w800)),
+                  ),
+                  if (badge != null) ...[
+                    const SizedBox(width: 6),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 6, vertical: 1),
+                      decoration: BoxDecoration(
+                          color: _RC.neonAmber.withValues(alpha: 0.18),
+                          borderRadius: BorderRadius.circular(8)),
+                      child: Text('$badge',
+                          style: const TextStyle(
+                              color: _RC.neonAmber,
+                              fontSize: 11,
+                              fontWeight: FontWeight.w900)),
+                    ),
+                  ],
+                ],
+              ),
+              if (state != null) ...[
+                const SizedBox(height: 4),
+                Text(state,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                        color: accent, fontSize: 10.5, height: 1.25)),
+              ],
+              if (caption != null) ...[
+                const Spacer(),
+                Text(caption,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style:
+                        const TextStyle(color: _RC.textMuted, fontSize: 9)),
+              ],
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// The code list for the chosen section: every code the engine and ABS
+  /// scans found that belongs to it. Empty says why, in the card's own words.
+  Widget _buildSectionList(BuildContext context, ObdService obd,
+      _SectionData data) {
+    final section = _section!;
+    final items = filterBySection(data.found, section);
+    final summary = data.summaries.firstWhere((s) => s.section == section);
+    if (items.isEmpty) {
+      return ListView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        padding: const EdgeInsets.fromLTRB(14, 12, 14, 20),
+        children: [
+          _engineNotice(
+            icon: Icons.filter_list_rounded,
+            color: _RC.textMuted,
+            title: _sectionName(context, section),
+            body: _sectionState(context, summary),
+            detail: _sectionCaption(context, summary),
+          ),
+        ],
+      );
+    }
+    final vehicle = _activeVehicle;
+    final platformKey =
+        ChassisPlatforms.resolve(vehicle?.make, vehicle?.model);
+    final snapshot = activeVehicleSnapshot(vehicle).context;
+    final engineItems = [for (final f in items) if (!f.fromAbs) f]
+      ..sort((a, b) => _cardRank(a.code, resolveForCard(context, a.code, vehicle: snapshot))
+          .compareTo(_cardRank(b.code, resolveForCard(context, b.code, vehicle: snapshot))));
+    final absItems = [for (final f in items) if (f.fromAbs) f];
+    return ListView(
+      physics: const AlwaysScrollableScrollPhysics(),
+      padding: const EdgeInsets.fromLTRB(14, 12, 14, 20),
+      children: [
+        for (final f in engineItems)
+          _HazardCard(
+              key: ValueKey('section-engine-${f.code.code}'),
+              code: f.code,
+              lowVoltage: obd.batteryVoltageLow,
+              showContext: true),
+        for (final f in absItems)
+          _HazardCard(
+              key: ValueKey('section-abs-${f.code.code}'),
+              code: f.code,
+              platformKey: platformKey,
+              lowVoltage: obd.chassisReadWhileLowVoltage),
+      ],
+    );
+  }
 
   // ── Module selector ───────────────────────────────────────────────────────
   // One diagnostics screen, module as a selectable category within it — the
@@ -560,8 +840,8 @@ class _DtcScreenState extends State<DtcScreen> {
         ),
       );
 
-  Widget _buildConnected(
-      BuildContext context, List<DtcCode> codes, ObdService obd) {
+  Widget _buildConnected(BuildContext context, List<DtcCode> codes,
+      ObdService obd, _SectionData sections) {
     final read = obd.lastEngineRead;
     final readAt = obd.dtcCodesReadAt;
     // Every card for the current answer: Mode 03 plus any pending- or
@@ -595,7 +875,9 @@ class _DtcScreenState extends State<DtcScreen> {
             color: _RC.neonCyan,
             backgroundColor: _RC.card,
             onRefresh: () => _readCodes(manual: true),
-            child: _buildEngineResults(context, read, shown, readAt, obd),
+            child: _section != null
+                ? _buildSectionList(context, obd, sections)
+                : _buildEngineResults(context, read, shown, readAt, obd),
           ),
         ),
       ],
@@ -976,7 +1258,8 @@ class _DtcScreenState extends State<DtcScreen> {
   // Same results list and same fault card as the engine category; only the
   // action bar, the summary and the empty states differ, because a chassis
   // scan has genuinely different outcomes to report.
-  Widget _buildChassis(BuildContext context, ObdService obd) {
+  Widget _buildChassis(
+      BuildContext context, ObdService obd, _SectionData sections) {
     // watch, not read: editing the make or model on the vehicle profile must
     // re-resolve which platform dictionary describes the codes already shown.
     final vehicle = context.watch<VehicleProvider>().active;
@@ -1018,7 +1301,9 @@ class _DtcScreenState extends State<DtcScreen> {
             color: _RC.neonCyan,
             backgroundColor: _RC.card,
             onRefresh: _scanChassis,
-            child: codes.isEmpty
+            child: _section != null
+                ? _buildSectionList(context, obd, sections)
+                : codes.isEmpty
                 ? _buildChassisEmptyState(context, obd)
                 : ListView.builder(
                     physics: const AlwaysScrollableScrollPhysics(),

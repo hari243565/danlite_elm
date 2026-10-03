@@ -596,6 +596,27 @@ class AppStrings {
           'whole rather than per code, so the same guidance is shown on every '
           'entry.',
 
+      // ── Phase 4B: sections by domain (English; the Hindi is below) ─────────
+      'sectionEngine': 'Engine & emissions',
+      'sectionBrakes': 'Brakes & ABS',
+      'sectionBody': 'Body & instruments',
+      'sectionNetwork': 'Network',
+      'sectionTransmission': 'Transmission & riding aids',
+      'sectionOther': 'Other',
+      'sectionAll': 'All',
+      'sectionNotScanned': 'Not scanned',
+      'sectionNotScannedYet': 'Not scanned yet',
+      'sectionScanning': 'Scanning…',
+      'sectionFaultOne': '1 fault',
+      'sectionFaultsN': '{n} faults',
+      'sectionFoundN': '{n} found',
+      'sectionNoFaults': 'No faults',
+      'sectionNoneFound': 'None found',
+      'sectionBasedOn': 'Based on the engine and ABS scans.',
+      'sectionFromEngineScan': 'Reported by the engine scan.',
+      'sectionEngineBusy': 'The engine computer is busy',
+      'sectionNotReadable': 'Connection type not readable yet',
+
       'emissionReadiness': 'Emission Readiness',
       'freezeFrameTitle': 'Freeze Frame Data',
       'freezeFrameDesc':
@@ -1569,6 +1590,28 @@ class AppStrings {
           'स्रोत: Honda सर्विस मैनुअल की ABS DTC तालिका, जो Honda के ABS मॉडलों में एक '
           'जैसी है। उपाय संबंधी मार्गदर्शन हर कोड के लिए अलग नहीं, बल्कि पूरी तालिका के '
           'लिए एक साथ प्रकाशित है, इसलिए वही मार्गदर्शन हर प्रविष्टि पर दिखाया जाता है।',
+
+      // ── Phase 4B: sections by domain. PROPOSED Hindi (not the owner's own
+      // wording); technician register, Latin digits, ABS/ECU in Latin script.
+      'sectionEngine': 'इंजन और उत्सर्जन',
+      'sectionBrakes': 'ब्रेक और ABS',
+      'sectionBody': 'बॉडी और इंस्ट्रूमेंट',
+      'sectionNetwork': 'नेटवर्क',
+      'sectionTransmission': 'ट्रांसमिशन और राइडिंग एड्स',
+      'sectionOther': 'अन्य',
+      'sectionAll': 'सभी',
+      'sectionNotScanned': 'स्कैन नहीं हुआ',
+      'sectionNotScannedYet': 'अभी स्कैन नहीं हुआ',
+      'sectionScanning': 'स्कैन हो रहा है…',
+      'sectionFaultOne': '1 फ़ॉल्ट',
+      'sectionFaultsN': '{n} फ़ॉल्ट',
+      'sectionFoundN': '{n} मिले',
+      'sectionNoFaults': 'कोई फ़ॉल्ट नहीं',
+      'sectionNoneFound': 'कोई नहीं मिला',
+      'sectionBasedOn': 'यह इंजन और ABS स्कैन पर आधारित है।',
+      'sectionFromEngineScan': 'इंजन स्कैन से मिला।',
+      'sectionEngineBusy': 'इंजन ECU व्यस्त है',
+      'sectionNotReadable': 'कनेक्शन प्रकार अभी पढ़ा नहीं जा सकता',
 
       'emissionReadiness': 'उत्सर्जन तत्परता',
       'freezeFrameDesc':
