@@ -587,3 +587,68 @@ at low limit	निचली सीमा पर
 at high limit	ऊपरी सीमा पर
 stuck in locked position	लॉक्ड पोज़ीशन में अटका
 air in system	सिस्टम में हवा
+# round 8 (batches P14, P15, C01)
+abs	ABS
+acceleration	एक्सेलरेशन
+angle	एंगल
+applied	लगाया गया
+awd	AWD
+axis	एक्सिस
+axle	एक्सल
+belt	बेल्ट
+blending	ब्लेंडिंग
+bscm	BSCM
+chamber	चैंबर
+channel	चैनल
+cut	कट
+dam	डैम
+deactivation	डीएक्टिवेशन
+diameter	डायमीटर
+dosing	डोज़िंग
+driving	ड्राइविंग
+dynamics	डायनामिक्स
+ebbc	EBBC
+effort	एफ़र्ट
+empty	खाली
+exceedance	सीमा पार
+exceedence	सीमा पार
+excitation	एक्साइटेशन
+external	बाहरी
+feedgas	फ़ीडगैस
+half	हाफ़
+inductive	इंडक्टिव
+installed	लगा हुआ
+insulation	इन्सुलेशन
+integrated	इंटीग्रेटेड
+interface	इंटरफ़ेस
+interruption	रुकावट
+interruption of reagent dosing activity	रिएजेंट डोज़िंग गतिविधि में रुकावट
+interstage	इंटरस्टेज
+lift	लिफ़्ट
+lining	लाइनिंग
+longitude	लॉन्गिट्यूड
+longitudinal	लॉन्गिट्यूडिनल
+master	मास्टर
+pwm	PWM
+random	रैंडम
+rate	रेट
+reagent	रिएजेंट
+rear	रियर
+release	रिलीज़
+safety	सेफ़्टी
+selection	सिलेक्शन
+sensors	सेंसर
+separation	सेपरेशन
+sequence	सीक्वेंस
+stability	स्टेबिलिटी
+stabilization	स्टेबिलाइज़ेशन
+sulfur	सल्फ़र
+tcs	TCS
+tensioner	टेंशनर
+thickness	मोटाई
+tire	टायर
+travel	ट्रैवल
+wear	वियर
+yaw	यॉ
+# round 8b: phrase
+detected with low fuel	लो फ़्यूल के साथ पाया गया
