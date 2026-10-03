@@ -2151,7 +2151,7 @@ class _HazardCard extends StatelessWidget {
     // (cause, action, severity note) stay exactly as they were for an answer
     // that still comes from the older table.
     final waiting = _awaitingKnowledge(context, r);
-    final storeGuidance = !waiting && r.provenance.isStoreGuidance;
+    final storeGuidance = !waiting && r.showsGuidance;
     final legacyAnswer = !waiting && r.provenance == Provenance.legacyTable;
     return Container(
       margin: const EdgeInsets.only(bottom: 10),

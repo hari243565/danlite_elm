@@ -91,14 +91,23 @@ class _ScanHistoryScreenState extends State<ScanHistoryScreen> {
   }
 
   Future<void> _share(List<ScanSession> sessions) async {
+    // Each code is explained for the profile its session was saved on.
+    final owner = <ScanFaultRow, ScanSession>{
+      for (final s in sessions)
+        for (final f in s.faults) f: s,
+    };
     final text = buildHistoryReport(
       sessions,
       tr: (k) => AppStrings.get(k, context.read<SettingsProvider>().locale.languageCode),
-      meaning: (f, kind) => describeResolved(context, _resolveRow(context, f, kind)),
+      meaning: (f, kind) =>
+          describeResolved(context, _resolveRow(context, f, kind, owner[f]?.profileId)),
     );
     try {
-      await historyShareChannel.invokeMethod<void>(
-          'shareText', <String, String>{'text': text, 'subject': context.tr('historyTitle')});
+      await historyShareChannel.invokeMethod<void>('shareText', <String, String>{
+        'text': text,
+        'subject': AppStrings.get(
+            'historyTitle', context.read<SettingsProvider>().locale.languageCode),
+      });
     } catch (e) {
       debugPrint('[history] share unavailable (${e.runtimeType})');
     }
@@ -153,9 +162,18 @@ class _ScanHistoryScreenState extends State<ScanHistoryScreen> {
 }
 
 /// Re-resolve a saved code in today's language for today's vehicle profile.
-ResolvedFault _resolveRow(BuildContext context, ScanFaultRow f, SessionKind kind) {
+///
+/// A manufacturer's table belongs to one bike. A scan saved on another profile
+/// (or on none) is never explained with the active bike's maker table, so
+/// [sessionProfileId] must be the active profile for that table to apply.
+ResolvedFault _resolveRow(BuildContext context, ScanFaultRow f, SessionKind kind,
+    String? sessionProfileId) {
   final lang = context.read<SettingsProvider>().locale.languageCode;
-  final vehicle = activeVehicleSnapshot(context.read<VehicleProvider>().active).context;
+  final active = context.read<VehicleProvider>().active;
+  var vehicle = activeVehicleSnapshot(active).context;
+  if (sessionProfileId == null || sessionProfileId != active?.id) {
+    vehicle = vehicle.withoutVehicleKey();
+  }
   final domain = kind == SessionKind.abs ? FaultDomain.abs : FaultDomain.engine;
   final k = Provider.of<KnowledgeService?>(context, listen: false);
   return k?.resolve(f.toRecord(), vehicle, lang, domain: domain) ??
@@ -306,7 +324,7 @@ class _SessionDetail extends StatelessWidget {
             Text(context.tr('historyNoCodes'), style: const TextStyle(color: _C.textMuted)),
           for (final f in s.faults)
             Builder(builder: (context) {
-              final r = _resolveRow(context, f, s.kind);
+              final r = _resolveRow(context, f, s.kind, s.profileId);
               return Container(
                 margin: const EdgeInsets.only(bottom: 8),
                 padding: const EdgeInsets.all(12),

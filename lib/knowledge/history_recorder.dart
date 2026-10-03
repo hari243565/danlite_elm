@@ -46,7 +46,7 @@ VehicleSnapshot activeVehicleSnapshot(VehicleProfile? v) => v == null
         profileId: v.id,
         label: '${v.make} ${v.model}'.trim(),
         context: VehicleContext.fromProfile(
-            profileId: v.id, make: v.make, model: v.model),
+            profileId: v.id, make: v.make, model: v.model, year: v.year),
       );
 
 /// The adapter's own name from its `ATZ` banner, trimmed to plain characters.

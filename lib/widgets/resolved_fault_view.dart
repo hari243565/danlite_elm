@@ -10,6 +10,7 @@ library;
 import 'package:flutter/material.dart';
 
 import '../constants/app_strings.dart';
+import '../constants/maker_engine_tables.dart' show MakerRowCheck;
 import '../knowledge/fault_resolver.dart';
 import '../knowledge/kb_models.dart';
 
@@ -170,6 +171,27 @@ class ResolvedGuidance extends StatelessWidget {
         ],
       );
 
+  /// The maker's own name in the language of the screen.
+  String _makerName(MakerFacts m) => r.languageRequested == 'hi' ? m.makerNameHi : m.makerName;
+
+  /// "Yamaha says ..." — one plain line from the manual's fail-safe columns.
+  String _failSafeLine(BuildContext context, MakerFacts m) => context.trArgs(
+      !m.engineStarts
+          ? 'makerFailSafeNoStart'
+          : (!m.canDrive ? 'makerFailSafeNoDrive' : 'makerFailSafeCanDrive'),
+      {'make': _makerName(m)});
+
+  /// What only a mechanic needs from a manufacturer's row: the dealer-tool
+  /// item, whether the row still has to be checked, and where it comes from.
+  List<String> _makerMechanicRows(BuildContext context, MakerFacts m) => [
+        if (m.dealerItem != null)
+          context.trArgs(
+              'makerDealerItem', {'make': _makerName(m), 'item': m.dealerItem!}),
+        if (m.check == MakerRowCheck.reconstructed) context.tr('makerCheckReconstructed'),
+        if (m.check == MakerRowCheck.inferred) context.tr('makerCheckInferred'),
+        context.tr('makerSourceR15'),
+      ];
+
   @override
   Widget build(BuildContext context) {
     // A name-only card shows its title once: the "Standard name: <title>."
@@ -185,6 +207,11 @@ class ResolvedGuidance extends StatelessWidget {
       for (final k in (r.conditions ?? const <String, Object?>{}).keys)
         if (kAppliesNoteKeys.containsKey(k)) context.tr(kAppliesNoteKeys[k]!),
     ];
+    final maker = r.maker;
+    final mechanic = [
+      ...r.hints,
+      if (maker != null) ..._makerMechanicRows(context, maker),
+    ];
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -195,6 +222,29 @@ class ResolvedGuidance extends StatelessWidget {
                 style: const TextStyle(
                     color: FaultPalette.textMain, fontSize: 13, height: 1.4)),
           ),
+        // A manufacturer's row: the maker's fail-safe columns in one plain
+        // line, then the model-year note when the bike's year is not known.
+        if (maker != null) ...[
+          Padding(
+            padding: const EdgeInsets.only(top: 6),
+            child: Text(_failSafeLine(context, maker),
+                style: const TextStyle(
+                    color: FaultPalette.textMain,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    height: 1.4)),
+          ),
+          if (maker.yearUnknown)
+            Padding(
+              padding: const EdgeInsets.only(top: 6),
+              child: Text(context.tr('makerYearNoteR15'),
+                  style: const TextStyle(
+                      color: FaultPalette.amber,
+                      fontSize: 11.5,
+                      fontWeight: FontWeight.w700,
+                      height: 1.35)),
+            ),
+        ],
         for (final c in conditions)
           Padding(
             padding: const EdgeInsets.only(top: 6),
@@ -248,9 +298,9 @@ class ResolvedGuidance extends StatelessWidget {
               ],
             ),
           ),
-        if (showHints && r.hints.isNotEmpty) ...[
+        if (showHints && mechanic.isNotEmpty) ...[
           _label(context.tr('faultForMechanic')),
-          _bullets(r.hints, FaultPalette.textMuted),
+          _bullets(mechanic, FaultPalette.textMuted),
         ],
         ProvenanceLine(r),
       ],
@@ -312,6 +362,32 @@ class ProvenanceLine extends StatelessWidget {
             ],
           ),
         ),
+        // A manufacturer's row: the action word and the ride answer are the
+        // app's own reading of the maker's fail-safe columns. Say so.
+        if (r.maker != null)
+          Padding(
+            padding: const EdgeInsets.only(top: 4),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Icon(Icons.info_outline_rounded, size: 13, color: FaultPalette.textMuted),
+                const SizedBox(width: 5),
+                Expanded(
+                  child: Text(
+                      context.trArgs('makerJudgementNote', {
+                        'make': r.languageRequested == 'hi'
+                            ? r.maker!.makerNameHi
+                            : r.maker!.makerName
+                      }),
+                      style: const TextStyle(
+                          color: FaultPalette.textMuted,
+                          fontSize: 10.5,
+                          fontStyle: FontStyle.italic,
+                          height: 1.4)),
+                ),
+              ],
+            ),
+          ),
         // Hindi from a machine-translated row: one short line under the draft
         // line. Never on English or on anything the app wrote itself.
         if (r.hindiMachine)

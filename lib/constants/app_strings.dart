@@ -297,6 +297,24 @@ class AppStrings {
       'provenanceManual': 'From the manufacturer\'s service manual',
       'provenanceManualNoMeaning':
           'Listed in the manufacturer\'s service manual without a meaning',
+      'makerFailSafeNoStart':
+          '{make} says the engine will not start and the bike cannot be driven',
+      'makerFailSafeNoDrive': '{make} says the bike cannot be driven',
+      'makerFailSafeCanDrive': '{make} says the bike can still be driven',
+      'makerJudgementNote':
+          'The action word and the ride answer are Danlite\'s own reading of '
+          '{make}\'s fail-safe column, not {make}\'s wording',
+      'makerYearNoteR15':
+          'This table is from the 2022 R15/R15M manual; check your model year.',
+      'makerDealerItem': '{make} dealer-tool item: {item}',
+      'makerCheckReconstructed':
+          'This row is to be checked against the manual page: it was '
+          'reconstructed, not read from the page',
+      'makerCheckInferred':
+          'This row is to be checked against the manual page: its place in '
+          'the table was worked out, not read from the page',
+      'makerSourceR15':
+          'Source: Yamaha R15 / R15M / YZF155-A 2022 service manual, page 8-47',
       'provenanceDealerReadout': 'From a dealer tool\'s reading of the Bosch '
           'ABS module, not a service manual',
       'provenanceLegacyTable': 'Older app text; its source is not recorded',
@@ -1402,6 +1420,24 @@ class AppStrings {
       'provenanceManual': 'निर्माता के सर्विस मैनुअल से',
       'provenanceManualNoMeaning':
           'निर्माता के सर्विस मैनुअल में यह कोड है, पर इसका मतलब नहीं दिया गया',
+      'makerFailSafeNoStart':
+          '{make} के अनुसार इंजन स्टार्ट नहीं होगा और बाइक चलाई नहीं जा सकती',
+      'makerFailSafeNoDrive': '{make} के अनुसार बाइक चलाई नहीं जा सकती',
+      'makerFailSafeCanDrive': '{make} के अनुसार बाइक अभी भी चलाई जा सकती है',
+      'makerJudgementNote':
+          'कार्रवाई का शब्द और सवारी का जवाब {make} के फ़ेल-सेफ़ कॉलम की '
+          'Danlite की अपनी व्याख्या है, {make} के अपने शब्द नहीं',
+      'makerYearNoteR15':
+          'यह तालिका 2022 की R15/R15M मैनुअल से है; अपना मॉडल वर्ष जाँच लें।',
+      'makerDealerItem': '{make} डीलर-टूल आइटम: {item}',
+      'makerCheckReconstructed':
+          'इस पंक्ति का मैनुअल के पन्ने से मिलान होना बाकी है: यह पन्ने से '
+          'पढ़ी नहीं गई, दोबारा बनाई गई है',
+      'makerCheckInferred':
+          'इस पंक्ति का मैनुअल के पन्ने से मिलान होना बाकी है: तालिका में '
+          'इसकी जगह अनुमान से तय की गई है',
+      'makerSourceR15':
+          'स्रोत: यामाहा R15 / R15M / YZF155-A 2022 सर्विस मैनुअल, पन्ना 8-47',
       'provenanceDealerReadout':
           'Bosch ABS मॉड्यूल की डीलर टूल रीडिंग से, सर्विस मैनुअल से नहीं',
       'provenanceLegacyTable': 'ऐप का पुराना टेक्स्ट; इसका स्रोत दर्ज नहीं है',

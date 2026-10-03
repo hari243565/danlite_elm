@@ -343,7 +343,7 @@ class CodeLookupDetailScreen extends StatelessWidget {
             if ((r.riderAdvice ?? '').isNotEmpty)
               _row(context.tr('recommendedAction'), r.riderAdvice!),
           ],
-          if (r.provenance.isStoreGuidance)
+          if (r.showsGuidance)
             ResolvedGuidance(r, showHints: true)
           else
             ProvenanceLine(r),

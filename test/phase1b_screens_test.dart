@@ -66,6 +66,7 @@ Future<Env> setUp(WidgetTester tester,
     {String lang = 'en',
     String? make,
     String? model,
+    int? year,
     EngineSim? sim,
     bool abs = false,
     bool knowledge = true,
@@ -78,7 +79,8 @@ Future<Env> setUp(WidgetTester tester,
     await settings.setLanguage(lang);
     final vehicles = VehicleProvider();
     if (make != null) {
-      await vehicles.addVehicle(VehicleProfile(id: 'v1', name: '', make: make, model: model ?? ''));
+      await vehicles.addVehicle(VehicleProfile(
+          id: 'v1', name: '', make: make, model: model ?? '', year: year ?? 2020));
     }
     KnowledgeService? k;
     if (knowledge) {

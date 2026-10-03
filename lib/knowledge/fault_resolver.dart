@@ -36,6 +36,7 @@ library;
 import '../constants/chassis_dtc_dictionary.dart';
 import '../constants/chassis_dtc_dictionary_hi.dart';
 import '../constants/dtc_ranges.dart';
+import '../constants/maker_engine_tables.dart';
 import '../models/fault_record.dart';
 import 'kb_models.dart';
 
@@ -104,6 +105,7 @@ class VehicleContext {
     this.liquidCooled,
     this.rideByWire,
     this.absFitted,
+    this.modelYear,
   });
 
   /// No vehicle identified: generic meanings only.
@@ -112,16 +114,39 @@ class VehicleContext {
   /// From the free-text make and model of a vehicle profile, through the same
   /// exact-alias resolution the ABS screen uses — an unrecognised make or
   /// model identifies nothing, so nothing is borrowed from another make.
+  ///
+  /// [year] is the profile's model year (null when not known). The same exact
+  /// make-and-model rule picks a manufacturer ENGINE table for the bike
+  /// ([MakerEngineTables]), carried as [vehicleKey]; the table's own year rule
+  /// is applied by the resolver.
   factory VehicleContext.fromProfile(
-      {String? profileId, String? make, String? model}) {
+      {String? profileId, String? make, String? model, int? year}) {
     return VehicleContext(
       profileId: profileId,
       make: make,
       model: model,
       manufacturerKey: ChassisManufacturers.resolveKey(make),
       platformKey: ChassisPlatforms.resolve(make, model),
+      vehicleKey: MakerEngineTables.vehicleKeyFor(make, model),
+      modelYear: year,
     );
   }
+
+  /// The same bike without its model-specific manufacturer table: for text
+  /// saved on a different profile, which must never be explained with this
+  /// bike's maker table.
+  VehicleContext withoutVehicleKey() => VehicleContext(
+        profileId: profileId,
+        make: make,
+        model: model,
+        manufacturerKey: manufacturerKey,
+        platformKey: platformKey,
+        cylinders: cylinders,
+        liquidCooled: liquidCooled,
+        rideByWire: rideByWire,
+        absFitted: absFitted,
+        modelYear: modelYear,
+      );
 
   final String? profileId;
   final String? make;
@@ -129,8 +154,12 @@ class VehicleContext {
   final String? manufacturerKey;
   final String? platformKey;
 
-  /// Hook for L1 (a specific variant). Nothing sets it yet.
+  /// L1: a specific bike with its own manufacturer table (see
+  /// [MakerEngineTables]); null for every other bike.
   final String? vehicleKey;
+
+  /// The profile's model year; null when not known.
+  final int? modelYear;
 
   final int? cylinders;
   final bool? liquidCooled;
@@ -191,6 +220,40 @@ class PlatformDetail {
   final String remedy;
 }
 
+/// What a manufacturer's own table said about a code on this bike, for the
+/// screens: the fail-safe columns, the mechanic-only item number and how sure
+/// the transcription is. The rider-facing sentences are `AppStrings` keys.
+class MakerFacts {
+  const MakerFacts({
+    required this.tableKey,
+    required this.makerName,
+    required this.makerNameHi,
+    required this.sourcePage,
+    required this.engineStarts,
+    required this.canDrive,
+    required this.dealerItem,
+    required this.check,
+    required this.yearUnknown,
+  });
+
+  final String tableKey;
+  final String makerName;
+  final String makerNameHi;
+  final String sourcePage;
+
+  /// The manual's fail-safe columns.
+  final bool engineStarts;
+  final bool canDrive;
+
+  /// The maker's dealer-tool item number; mechanic section only.
+  final String? dealerItem;
+  final MakerRowCheck check;
+
+  /// The bike's profile has no model year, so the table is shown with a note
+  /// asking the rider to check it.
+  final bool yearUnknown;
+}
+
 class ResolvedFault {
   const ResolvedFault({
     required this.level,
@@ -217,6 +280,7 @@ class ResolvedFault {
     this.legacySeverity,
     this.scopeLabel,
     this.hindiMachine = false,
+    this.maker,
   });
 
   final ResolvedLevel level;
@@ -264,6 +328,13 @@ class ResolvedFault {
   /// The text shown is Hindi from a row marked `machine`: translated by a
   /// program and not yet read by a person. The card says so.
   final bool hindiMachine;
+
+  /// Set when the answer is a manufacturer's table row for this exact bike.
+  final MakerFacts? maker;
+
+  /// The screens lay this answer out as guidance: store content (guidance or
+  /// a bare name) or a manufacturer's table row for this bike.
+  bool get showsGuidance => provenance.isStoreGuidance || maker != null;
 
   /// The answer is a bare standard name and nothing more
   /// (`verification: standard_title_only`). The screens give it a neutral
@@ -318,8 +389,19 @@ class FaultResolver {
     final entries = index.entriesFor(code);
     final platform = vehicle.platform;
     final absAllowed = domain != FaultDomain.engine;
+    final isSae = _saeCode.hasMatch(code) &&
+        record.format != DtcFormat.blink &&
+        record.format != DtcFormat.hexH;
 
     // ── L1 vehicle ───────────────────────────────────────────────────────
+    // The manufacturer's own table for THIS bike beats everything else: a
+    // generic guidance row, a bare name and the older table. Engine-side
+    // standard codes only; the table's make, model and year rule decide
+    // whether this bike gets it.
+    if (domain != FaultDomain.abs && isSae) {
+      final m = _fromMakerTable(record, code, vehicle, language);
+      if (m != null) return m;
+    }
     final vk = vehicle.vehicleKey;
     if (vk != null) {
       final r = _fromStore(entries, ScopeKind.vehicle, vk, record, code, vehicle,
@@ -352,9 +434,6 @@ class FaultResolver {
     }
 
     // ── L4 generic ───────────────────────────────────────────────────────
-    final isSae = _saeCode.hasMatch(code) &&
-        record.format != DtcFormat.blink &&
-        record.format != DtcFormat.hexH;
     final platformOwnsCode = platform != null &&
         platform.brakeSystem == ChassisBrakeSystem.abs &&
         (domain == FaultDomain.abs || (domain == FaultDomain.unknown && code.startsWith('C')));
@@ -421,6 +500,50 @@ class FaultResolver {
         subsystemKey: subsystemKeyFor(code),
         manufacturerDefined: isManufacturerDefined(code),
         failureType: record.failureType,
+      ),
+    );
+  }
+
+  /// A row of the manufacturer's table for this exact bike, or null. The
+  /// vehicle key alone is not trusted: the make must also be the table's make,
+  /// and the model year must not be older than the manual the table was
+  /// transcribed from. An unknown year shows the table with a note.
+  ResolvedFault? _fromMakerTable(
+      FaultRecord record, String code, VehicleContext v, String language) {
+    final table = MakerEngineTables.byKey(v.vehicleKey);
+    if (table == null || v.manufacturerKey != table.manufacturerKey) return null;
+    final year = v.modelYear;
+    if (year != null && year < table.firstModelYear) return null;
+    final row = table.row(code);
+    if (row == null) return null;
+    final hi = language == 'hi';
+    final stop = row.isStop;
+    return ResolvedFault(
+      level: ResolvedLevel.l1Vehicle,
+      provenance: Provenance.serviceManual,
+      code: code,
+      displayCode: record.displayCode,
+      languageRequested: language,
+      languageUsed: hi ? 'hi' : 'en',
+      title: hi ? row.meaningHi : row.meaningEn,
+      // The app's judgement from the maker's fail-safe columns (and the
+      // provenance note says so): Stop where the maker says the engine will
+      // not start or the bike cannot be driven.
+      riderAction: stop ? RiderAction.stop : RiderAction.serviceSoon,
+      canRide: stop ? CanRide.no : CanRide.withCare,
+      draft: row.check != MakerRowCheck.none,
+      contentId: 'maker:${table.key}:$code',
+      hindiMachine: hi,
+      maker: MakerFacts(
+        tableKey: table.key,
+        makerName: table.makerName,
+        makerNameHi: table.makerNameHi,
+        sourcePage: table.sourcePage,
+        engineStarts: row.engineStarts,
+        canDrive: row.canDrive,
+        dealerItem: row.dealerItem,
+        check: row.check,
+        yearUnknown: year == null,
       ),
     );
   }
