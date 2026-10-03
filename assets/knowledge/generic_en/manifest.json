@@ -2,14 +2,14 @@
   "pack_id": "generic_en",
   "scope": "generic",
   "language": "en",
-  "version": 1,
-  "entries_count": 140,
-  "content_sha256": "6e16ebcba2b6e70d37de0ed74be4c5b2ea4160fc0045098cb1acf0f5ac393629",
-  "created_at": "2026-10-01",
+  "version": 2,
+  "entries_count": 308,
+  "content_sha256": "fcbbf1e132a66be3fa9d8e0bbefb521f1b229a034cef215ad21c15ee5aa75253",
+  "created_at": "2026-10-03",
   "min_app_version": "1.0.0",
   "review_state": "draft",
   "revoked": [],
   "signature": null,
   "source": "bundled",
-  "content_origin": "content/seed-20261001 @ d923c4a4af60c3c877f584e1c9b1cc28692e2400, data/content/generic_en_seed.jsonl, copied byte for byte. AI-authored DRAFT guidance, not independently reviewed in full. 'source' is informational: the importer decides the source from how a pack arrives, never from this file."
+  "content_origin": "content/seed-20261001 @ ad45aa8237ea004a45d597bd3b446c38ad05a444, data/content/generic_en_seed.jsonl (last changed in fb8a22e), copied byte for byte. 308 entries; supersedes the 140-entry version 1 (C0035 is held out of this version on purpose). AI-authored DRAFT guidance, not independently reviewed in full. 'source' is informational: the importer decides the source from how a pack arrives, never from this file."
 }

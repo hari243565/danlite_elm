@@ -2,3 +2,7 @@
 # git rewrite their line endings on checkout, or the bundled pack's hash breaks
 # on a Windows machine with core.autocrlf=true.
 assets/knowledge/** -text
+
+# The 140-entry pack the earlier app versions shipped, kept as a fixture for the
+# upgrade test; same rule: hashed byte for byte, never rewrite line endings.
+test/fixtures/knowledge_v1_140/** -text

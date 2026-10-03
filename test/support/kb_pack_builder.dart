@@ -13,6 +13,14 @@ import 'package:danlite_elm/knowledge/pack_signature.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 const String kBundledDir = 'assets/knowledge/generic_en';
+const String kBundledHiDir = 'assets/knowledge/generic_hi';
+
+/// What the shipped packs contain (Phase 4A: the final 308-entry content).
+/// Hard-coded on purpose: a pack that quietly changes size fails a test.
+const int kBundledEnCount = 308;
+const int kBundledEnVersion = 2;
+const int kBundledHiCount = 308;
+const int kBundledHiVersion = 1;
 
 /// The real bundled seed lines, decoded.
 List<Map<String, Object?>> seedLines() => [
@@ -86,6 +94,14 @@ Future<ImportOutcome> importBundledFromDisk(KnowledgeStore store) =>
     store.importPack(
       manifestBytes: File('$kBundledDir/manifest.json').readAsBytesSync(),
       entriesBytes: File('$kBundledDir/entries.jsonl').readAsBytesSync(),
+      source: PackSource.bundled,
+      appVersion: '1.0.0',
+    );
+
+Future<ImportOutcome> importBundledHindiFromDisk(KnowledgeStore store) =>
+    store.importPack(
+      manifestBytes: File('$kBundledHiDir/manifest.json').readAsBytesSync(),
+      entriesBytes: File('$kBundledHiDir/entries.jsonl').readAsBytesSync(),
       source: PackSource.bundled,
       appVersion: '1.0.0',
     );

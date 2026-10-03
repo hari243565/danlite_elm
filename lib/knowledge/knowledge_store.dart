@@ -153,6 +153,13 @@ class KnowledgeStore {
       "LEFT JOIN kb_pack p ON p.pack_id = e.pack_id WHERE e.status = 'active'",
       const <Object?>[]);
 
+  /// How many languages the active entries are written in. A code has one
+  /// row per language, so a search that wants N codes must fetch up to
+  /// N times this many rows.
+  Future<int> languageCount() async => (await db.rawQuery(
+          "SELECT COUNT(DISTINCT language) AS n FROM kb_entry WHERE status = 'active'"))
+      .first['n'] as int;
+
   /// Active entries whose code is one of [codes] or starts with one of
   /// [prefixes], then entries whose title or meaning contains every word in
   /// [words]. At most [limit] rows overall.

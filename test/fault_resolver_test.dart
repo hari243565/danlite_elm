@@ -26,7 +26,7 @@ PackManifest _manifest({String scope = 'generic', String language = 'en', String
       'review_state': 'draft',
     }, <String>[])!;
 
-/// The 140 real seed entries, through the real validator.
+/// The real bundled English entries, through the real validator.
 final List<KbEntry> seedEntries = [
   for (final l in seedLines()) validateEntry(l, _manifest()).entry!,
 ];
@@ -109,8 +109,8 @@ FaultResolver resolverWith(List<KbEntry> extra,
 void main() {
   final r = resolverWith(const <KbEntry>[]);
 
-  test('the seed validates: 140 entries, none manufacturer-defined', () {
-    expect(seedEntries, hasLength(140));
+  test('the seed validates: 308 entries, none manufacturer-defined', () {
+    expect(seedEntries, hasLength(308));
   });
 
   group('L1 vehicle', () {
@@ -291,23 +291,23 @@ void main() {
       expect(r.resolve(obd('P0100'), VehicleContext.generic, 'en', domain: FaultDomain.abs).level,
           ResolvedLevel.l5Structure);
     });
-    test('an identified ABS platform owns its ABS codes: no generic C0035', () {
-      final res = r.resolve(obd('C0035'), classic350, 'en', domain: FaultDomain.abs);
+    test('an identified ABS platform owns its ABS codes: no generic C0020', () {
+      final res = r.resolve(obd('C0020'), classic350, 'en', domain: FaultDomain.abs);
       expect(res.level, ResolvedLevel.l5Structure);
     });
     test('typed with an ABS platform selected: C codes are the platform\'s, P codes generic', () {
-      expect(r.resolve(typed('C0035'), classic350, 'en').level, ResolvedLevel.l5Structure);
+      expect(r.resolve(typed('C0020'), classic350, 'en').level, ResolvedLevel.l5Structure);
       expect(r.resolve(typed('P0120'), classic350, 'en').level, ResolvedLevel.l4Generic);
     });
     test('no platform identified: a standard ABS code may use the generic entry', () {
-      final res = r.resolve(obd('C0035'), VehicleContext.generic, 'en', domain: FaultDomain.abs);
+      final res = r.resolve(obd('C0020'), VehicleContext.generic, 'en', domain: FaultDomain.abs);
       expect(res.level, ResolvedLevel.l4Generic);
-      expect(res.title, 'Wheel speed sensor fault (front or rear wheel)');
+      expect(res.title, 'ABS pump motor: circuit fault');
     });
     test('a Bosch raw platform: even a standard-looking value is a module number', () {
-      final res = r.resolve(obd('C0035'), profile('Yamaha', 'R15'), 'en', domain: FaultDomain.abs);
+      final res = r.resolve(obd('C0020'), profile('Yamaha', 'R15'), 'en', domain: FaultDomain.abs);
       expect(res.level, ResolvedLevel.l6Raw);
-      expect(res.rawModuleLabel, '0x4035');
+      expect(res.rawModuleLabel, '0x4020');
     });
   });
 

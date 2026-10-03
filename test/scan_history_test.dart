@@ -73,7 +73,7 @@ void main() {
       await k2.start();
       expect(k2.bundledImport, isNull, reason: 'installed version is current');
       expect(k2.state, KnowledgeState.ready);
-      expect((await k2.store!.activeEntries()).length, 140);
+      expect((await k2.store!.activeEntries()).length, 616);
       await k2.store!.close();
     });
 
@@ -246,7 +246,7 @@ void main() {
 
   test('B8 a bundled import and a history save at the same moment both land', () async {
     final k = await startedKnowledge();
-    final v2 = await buildPack(lines: seedLines(), version: 2);
+    final v2 = await buildPack(lines: seedLines(), version: kBundledEnVersion + 1);
     final results = await Future.wait<Object>([
       k.store!.importPack(
           manifestBytes: v2.manifestBytes, entriesBytes: v2.entriesBytes,
@@ -256,7 +256,7 @@ void main() {
     ]);
     expect((results.first as ImportOutcome).imported, isTrue);
     expect(await k.history!.list(), hasLength(5));
-    expect((await k.store!.activeEntries()).length, 140);
+    expect((await k.store!.activeEntries()).length, 616);
     await k.store!.close();
   });
 

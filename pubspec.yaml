@@ -99,6 +99,7 @@ flutter:
     # Bundled baseline knowledge pack (fault Phase 1B). Trusted because the
     # signed APK carries it; see lib/knowledge/knowledge_service.dart.
     - assets/knowledge/generic_en/
+    - assets/knowledge/generic_hi/
     # Supabase URL + anon key. Gitignored; see .env.example.
     - .env
 flutter_launcher_icons:

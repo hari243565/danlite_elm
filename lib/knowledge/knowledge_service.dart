@@ -31,7 +31,14 @@ import 'knowledge_store.dart';
 import 'legacy_text.dart';
 import 'scan_history.dart';
 
-/// Where the bundled baseline pack lives in the APK.
+/// Where the bundled baseline packs live in the APK: English first (the
+/// resolver falls back to it field by field), then Hindi.
+const List<String> kBundledPackDirs = <String>[
+  'assets/knowledge/generic_en',
+  'assets/knowledge/generic_hi',
+];
+
+/// The English pack's folder (kept for callers that mean "the baseline").
 const String kBundledPackDir = 'assets/knowledge/generic_en';
 
 /// The database file name inside the no-backup folder.
@@ -78,9 +85,14 @@ class KnowledgeService extends ChangeNotifier {
   /// Null until ready (or when the store could not open).
   ScanHistoryStore? get history => _history;
 
-  /// What the last bundled import did (null when it was not needed).
-  ImportOutcome? _bundledImport;
-  ImportOutcome? get bundledImport => _bundledImport;
+  /// What each bundled import did, in [kBundledPackDirs] order. A pack that
+  /// was already current is not listed.
+  List<ImportOutcome> _bundledImports = const <ImportOutcome>[];
+  List<ImportOutcome> get bundledImports => _bundledImports;
+
+  /// The first bundled import that ran (null when none was needed).
+  ImportOutcome? get bundledImport =>
+      _bundledImports.isEmpty ? null : _bundledImports.first;
 
   late FaultResolver _resolver = FaultResolver(index: KnowledgeIndex.empty, legacy: legacy);
   FaultResolver get resolver => _resolver;
@@ -95,9 +107,9 @@ class KnowledgeService extends ChangeNotifier {
       final store = await _openStore();
       _store = store;
       _history = ScanHistoryStore(store.db, clock: _clock);
-      _bundledImport = await _importBundledIfNewer(store);
-      if (_bundledImport != null && !_bundledImport!.imported) {
-        debugPrint('[knowledge] bundled pack not imported: $_bundledImport');
+      _bundledImports = await _importBundledIfNewer(store);
+      for (final o in _bundledImports.where((o) => !o.imported)) {
+        debugPrint('[knowledge] bundled pack not imported: $o');
       }
       await reload();
       _state = KnowledgeState.ready;
@@ -108,8 +120,23 @@ class KnowledgeService extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<ImportOutcome?> _importBundledIfNewer(KnowledgeStore store) async {
-    final manifestBytes = await _loadAsset('$kBundledPackDir/manifest.json');
+  /// Import each bundled pack that is newer than the installed one. One pack
+  /// failing (or its asset missing) never stops the next.
+  Future<List<ImportOutcome>> _importBundledIfNewer(KnowledgeStore store) async {
+    final outcomes = <ImportOutcome>[];
+    for (final dir in kBundledPackDirs) {
+      try {
+        final o = await _importOneBundled(store, dir);
+        if (o != null) outcomes.add(o);
+      } catch (e) {
+        debugPrint('[knowledge] bundled pack $dir unavailable (${e.runtimeType})');
+      }
+    }
+    return outcomes;
+  }
+
+  Future<ImportOutcome?> _importOneBundled(KnowledgeStore store, String dir) async {
+    final manifestBytes = await _loadAsset('$dir/manifest.json');
     final manifest = jsonDecode(utf8.decode(manifestBytes)) as Map<String, dynamic>;
     final installed = await store.pack(manifest['pack_id'] as String);
     final version = manifest['version'];
@@ -118,7 +145,7 @@ class KnowledgeService extends ChangeNotifier {
     }
     return store.importPack(
       manifestBytes: manifestBytes,
-      entriesBytes: await _loadAsset('$kBundledPackDir/entries.jsonl'),
+      entriesBytes: await _loadAsset('$dir/entries.jsonl'),
       source: PackSource.bundled,
       appVersion: await _appVersion(),
       now: _clock(),

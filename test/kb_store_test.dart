@@ -88,7 +88,7 @@ void main() {
       expect((await importBundledFromDisk(store)).imported, isTrue);
       await store.close();
       store = await KnowledgeStore.open(databaseFactoryFfi, path);
-      expect(await count(store), 140);
+      expect(await count(store), kBundledEnCount);
       expect(await store.schemaVersion(), 1);
     });
 
@@ -120,14 +120,14 @@ void main() {
       expect(File('.gitattributes').readAsStringSync(), contains('assets/knowledge/** -text'));
     });
 
-    test('imports all 140 entries, active, as source bundled', () async {
+    test('imports all 308 entries, active, as source bundled', () async {
       final r = await importBundledFromDisk(store);
       expect(r.imported, isTrue, reason: '$r');
-      expect(r.count, 140);
-      expect(await count(store, "status = 'active'"), 140);
+      expect(r.count, kBundledEnCount);
+      expect(await count(store, "status = 'active'"), kBundledEnCount);
       final info = await store.pack('generic_en');
       expect(info!.source, PackSource.bundled);
-      expect(info.version, 1);
+      expect(info.version, kBundledEnVersion);
       expect(info.reviewState, 'draft');
       final e = (await store.activeEntries()).firstWhere((e) => e.code == 'P0120');
       expect(e.title, 'Throttle position sensor A: circuit fault');
@@ -143,7 +143,7 @@ void main() {
       expect((await importBundledFromDisk(store)).imported, isTrue);
       final again = await importBundledFromDisk(store);
       expect(again.refusal, ImportRefusal.notNewer);
-      expect(await count(store), 140);
+      expect(await count(store), kBundledEnCount);
     });
 
     test('a manifest claiming "bundled" does not change how it is treated', () async {
@@ -193,9 +193,9 @@ void main() {
         for (final l in lines.skip(3))
           Map<String, Object?>.from(l)..['updated_at'] = '2026-11-01',
       ];
-      final r = await imp(store, await buildPack(lines: next, version: 2));
+      final r = await imp(store, await buildPack(lines: next, version: kBundledEnVersion + 1));
       expect(r.imported, isTrue, reason: '$r');
-      expect(await count(store), 137);
+      expect(await count(store), kBundledEnCount - 3);
     });
   });
 
@@ -208,7 +208,7 @@ void main() {
         for (final l in seedLines())
           Map<String, Object?>.from(l)..['title_en'] = 'HALF-WRITTEN ${l['code']}',
       ];
-      final r = await imp(store, await buildPack(lines: v2lines, version: 2), hook: (phase) async {
+      final r = await imp(store, await buildPack(lines: v2lines, version: kBundledEnVersion + 1), hook: (phase) async {
         if (phase != 'half') return;
         // The exact bytes on disk at this instant: database file and its
         // rollback journal, as a sudden power loss would leave them.
@@ -221,14 +221,14 @@ void main() {
       });
       expect(r.refusal, ImportRefusal.storageError);
       // The live database rolled back.
-      expect(await count(store), 140);
+      expect(await count(store), kBundledEnCount);
       expect(await count(store, "title LIKE 'HALF-WRITTEN%'"), 0);
-      expect((await store.pack('generic_en'))!.version, 1);
+      expect((await store.pack('generic_en'))!.version, kBundledEnVersion);
       // The crash image, opened fresh (SQLite replays the hot journal).
       final crashed = await KnowledgeStore.open(databaseFactoryFfi, crashPath);
-      expect(await count(crashed), 140);
+      expect(await count(crashed), kBundledEnCount);
       expect(await count(crashed, "title LIKE 'HALF-WRITTEN%'"), 0);
-      expect((await crashed.pack('generic_en'))!.version, 1);
+      expect((await crashed.pack('generic_en'))!.version, kBundledEnVersion);
       await crashed.close();
     });
 
@@ -253,59 +253,59 @@ void main() {
         {PackSource source = PackSource.bundled, List<int>? key}) async {
       final r = await imp(store, p, source: source, key: key);
       expect(r.refusal, want, reason: '$r');
-      expect(await count(store), 140);
-      expect((await store.pack('generic_en'))!.version, 1);
+      expect(await count(store), kBundledEnCount);
+      expect((await store.pack('generic_en'))!.version, kBundledEnVersion);
     }
 
     test('entries altered after the manifest was made', () async {
-      final p = await buildPack(lines: seedLines(), version: 2);
+      final p = await buildPack(lines: seedLines(), version: kBundledEnVersion + 1);
       final bytes = [...p.entriesBytes]..[10] ^= 1;
       await refused(BuiltPack(p.manifestBytes, bytes, p.manifest), ImportRefusal.hashMismatch);
     });
 
     test('a line missing a required field', () async {
       final bad = Map<String, Object?>.from(seedLines().first)..remove('meaning_en');
-      await refused(await buildPack(lines: [bad], version: 2), ImportRefusal.entriesInvalid);
+      await refused(await buildPack(lines: [bad], version: kBundledEnVersion + 1), ImportRefusal.entriesInvalid);
     });
 
     test('an enum value out of range, and a D4 can-ride mismatch', () async {
       final a = Map<String, Object?>.from(seedLine('P0120'))..['rider_action_level'] = 'PANIC';
-      await refused(await buildPack(lines: [a], version: 2), ImportRefusal.entriesInvalid);
+      await refused(await buildPack(lines: [a], version: kBundledEnVersion + 1), ImportRefusal.entriesInvalid);
       final b = Map<String, Object?>.from(seedLine('P0120'))..['can_ride_to_workshop'] = 'no';
-      await refused(await buildPack(lines: [b], version: 2), ImportRefusal.entriesInvalid);
+      await refused(await buildPack(lines: [b], version: kBundledEnVersion + 1), ImportRefusal.entriesInvalid);
     });
 
     test('very long text is refused, not truncated onto the screen', () async {
       final l = Map<String, Object?>.from(seedLine('P0120'))..['meaning_en'] = '${'x' * 400}.';
-      await refused(await buildPack(lines: [l], version: 2), ImportRefusal.entriesInvalid);
+      await refused(await buildPack(lines: [l], version: kBundledEnVersion + 1), ImportRefusal.entriesInvalid);
     });
 
     test('a manufacturer-defined code can never ride in a generic pack', () async {
       final l = Map<String, Object?>.from(seedLine('P0120'))
         ..['code'] = 'P1120'
         ..['content_id'] = 'generic:P1120:en';
-      await refused(await buildPack(lines: [l], version: 2), ImportRefusal.entriesInvalid);
+      await refused(await buildPack(lines: [l], version: kBundledEnVersion + 1), ImportRefusal.entriesInvalid);
     });
 
     test('the word "verified" in any text is refused (D6)', () async {
       final l = Map<String, Object?>.from(seedLine('P0120'))
         ..['rider_advice_en'] = 'This meaning is verified by the maker.';
-      await refused(await buildPack(lines: [l], version: 2), ImportRefusal.entriesInvalid);
+      await refused(await buildPack(lines: [l], version: kBundledEnVersion + 1), ImportRefusal.entriesInvalid);
     });
 
     test('content_id that does not match the code, scope or language', () async {
       final l = Map<String, Object?>.from(seedLine('P0120'))..['content_id'] = 'generic:P0120:hi';
-      await refused(await buildPack(lines: [l], version: 2), ImportRefusal.entriesInvalid);
+      await refused(await buildPack(lines: [l], version: kBundledEnVersion + 1), ImportRefusal.entriesInvalid);
     });
 
     test('the declared count disagrees with the file', () async {
-      await refused(await buildPack(lines: seedLines().take(4).toList(), version: 2, entriesCount: 5),
+      await refused(await buildPack(lines: seedLines().take(4).toList(), version: kBundledEnVersion + 1, entriesCount: 5),
           ImportRefusal.countMismatch);
     });
 
     test('the same content_id twice', () async {
       final l = seedLine('P0120');
-      await refused(await buildPack(lines: [l, l], version: 2), ImportRefusal.duplicateEntry);
+      await refused(await buildPack(lines: [l, l], version: kBundledEnVersion + 1), ImportRefusal.duplicateEntry);
     });
 
     test('a pack trying to take over another pack\'s entries', () async {
@@ -313,38 +313,38 @@ void main() {
           await buildPack(lines: [seedLine('P0120')], packId: 'generic_en_extra'));
       expect(r.refusal, ImportRefusal.contentIdOwnedElsewhere);
       expect(await store.pack('generic_en_extra'), isNull);
-      expect(await count(store), 140);
+      expect(await count(store), kBundledEnCount);
     });
 
     test('broken manifest JSON and a missing manifest field', () async {
-      final p = await buildPack(lines: seedLines(), version: 2);
+      final p = await buildPack(lines: seedLines(), version: kBundledEnVersion + 1);
       await refused(BuiltPack(utf8.encode('{nope'), p.entriesBytes, p.manifest),
           ImportRefusal.manifestInvalid);
-      final q = await buildPack(lines: seedLines(), version: 2,
+      final q = await buildPack(lines: seedLines(), version: kBundledEnVersion + 1,
           tamperManifest: (m) => m.remove('content_sha256'));
       await refused(q, ImportRefusal.manifestInvalid);
     });
 
     test('a pack needing a newer app', () async {
-      await refused(await buildPack(lines: seedLines(), version: 2, minAppVersion: '9.0.0'),
+      await refused(await buildPack(lines: seedLines(), version: kBundledEnVersion + 1, minAppVersion: '9.0.0'),
           ImportRefusal.appTooOld);
     });
 
     test('not UTF-8', () async {
       final bytes = [0xff, 0xfe, 0x00, 0x41];
       await refused(
-          await buildPack(lines: seedLines(), version: 2, entriesOverride: bytes),
+          await buildPack(lines: seedLines(), version: kBundledEnVersion + 1, entriesOverride: bytes),
           ImportRefusal.notUtf8);
     });
 
     test('a debug pack outside a debug path', () async {
-      await refused(await buildPack(lines: seedLines(), version: 2), ImportRefusal.debugNotAllowed,
+      await refused(await buildPack(lines: seedLines(), version: kBundledEnVersion + 1), ImportRefusal.debugNotAllowed,
           source: PackSource.debug);
     });
 
     test('a gzip file that expands past the cap', () async {
       final bomb = gzip.encode(List<int>.filled(kMaxPackDecodedBytes + 1024, 0x20));
-      await refused(await buildPack(lines: seedLines(), version: 2, entriesOverride: bomb),
+      await refused(await buildPack(lines: seedLines(), version: kBundledEnVersion + 1, entriesOverride: bomb),
           ImportRefusal.tooLarge);
     });
   });
@@ -427,7 +427,7 @@ void main() {
   group('B3 revocations and languages', () {
     test('revoked ids are applied and survive another pack\'s import', () async {
       expect((await importBundledFromDisk(store)).imported, isTrue);
-      final v2 = await buildPack(lines: seedLines(), version: 2, revoked: ['generic:P0120:en']);
+      final v2 = await buildPack(lines: seedLines(), version: kBundledEnVersion + 1, revoked: ['generic:P0120:en']);
       expect((await imp(store, v2)).imported, isTrue);
       expect(await count(store, "status = 'revoked'"), 1);
       expect((await store.activeEntries()).any((e) => e.code == 'P0120'), isFalse);
@@ -457,7 +457,7 @@ void main() {
       expect(p0120.hiStatus, HiStatus.reviewed);
       expect(p0120.riderAdvice, isNull, reason: 'missing fields stay empty for fallback');
       expect(rows.firstWhere((e) => e.code == 'P0105').hiStatus, HiStatus.machine);
-      expect(await count(store, "language = 'en'"), 140);
+      expect(await count(store, "language = 'en'"), kBundledEnCount);
     });
   });
 }

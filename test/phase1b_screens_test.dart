@@ -116,6 +116,14 @@ Future<List<String>> showDtc(WidgetTester tester, Env env, {bool abs = false}) a
   return texts(tester);
 }
 
+/// The bundled Hindi pack removed, so the store holds English only (the
+/// "this entry has no Hindi yet" case, which the real content no longer has).
+Future<void> dropBundledHindi(KnowledgeService k) async {
+  await k.store!.db.delete('kb_entry', where: "language = 'hi'");
+  await k.store!.db.delete('kb_pack', where: "pack_id = 'generic_hi'");
+  await k.reload();
+}
+
 bool anyHas(List<String> xs, String s) => xs.any((x) => x.contains(s));
 
 void main() {
@@ -146,7 +154,10 @@ void main() {
 
     testWidgets('[hi] English-only entry: Hindi chip and labels, "showing English" note',
         (tester) async {
-      final env = await setUp(tester, lang: 'hi', sim: EngineSim(mode03: '7E8 04 43 01 01 20'));
+      final env = await setUp(tester,
+          lang: 'hi',
+          sim: EngineSim(mode03: '7E8 04 43 01 01 20'),
+          beforeRead: dropBundledHindi);
       final xs = await showDtc(tester, env);
       expect(xs, contains(seedLine('P0120')['title_en']));
       expect(xs, contains(t('riderActionServiceSoon', 'hi')));
@@ -161,6 +172,7 @@ void main() {
       final env = await setUp(tester,
           lang: 'hi',
           sim: EngineSim(mode03: '7E8 04 43 01 01 20'), beforeRead: (k) async {
+        await dropBundledHindi(k);
         final p = await buildPack(packId: 'generic_hi', language: 'hi', lines: [
           translatedLine('P0120', 'hi', {'title_hi': hiTitle}),
         ]);
@@ -290,7 +302,7 @@ void main() {
       final injection = await searchCodes(parseLookupQuery("%'; DROP TABLE kb_entry; --"),
           store: k.store, language: 'en');
       expect(injection.items, isEmpty);
-      expect((await k.store!.activeEntries()).length, 140);
+      expect((await k.store!.activeEntries()).length, 616);
       await k.store!.close();
     });
   });

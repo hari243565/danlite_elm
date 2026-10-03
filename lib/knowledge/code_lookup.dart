@@ -136,8 +136,14 @@ Future<LookupResults> searchCodes(LookupQuery q,
 
   // ── knowledge store ────────────────────────────────────────────────────
   if (store != null) {
+    // A code has one row per language: ask for enough rows that the
+    // one-result-per-code merge below still sees a full page of codes.
+    final languages = await store.languageCount();
     final rows = await store.search(
-        codes: q.codes, prefixes: q.prefixes, words: q.words, limit: kLookupMaxResults + 1);
+        codes: q.codes,
+        prefixes: q.prefixes,
+        words: q.words,
+        limit: (kLookupMaxResults + 1) * (languages < 1 ? 1 : languages));
     // One result per code and scope, in the asked language when present.
     final best = <String, KbEntry>{};
     for (final e in rows) {

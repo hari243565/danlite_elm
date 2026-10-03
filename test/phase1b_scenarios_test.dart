@@ -57,7 +57,11 @@ void main() {
   test('Scenario 18: a language missing for a code falls back to English, '
       'visibly, and never to corrupted text', () async {
     final k = await startedKnowledge();
-    // Hindi asked; the store has only English: English with the note.
+    // Hindi asked; take the bundled Hindi pack away so the store has only
+    // English: English with the note.
+    await k.store!.db.delete('kb_entry', where: "language = 'hi'");
+    await k.store!.db.delete('kb_pack', where: "pack_id = 'generic_hi'");
+    await k.reload();
     final hi = k.resolve(obd('P0120'), VehicleContext.generic, 'hi');
     expect(hi.languageUsed, 'en');
     expect(hi.languageFallback, isTrue);
@@ -88,12 +92,12 @@ void main() {
     expect(found.items.first.code, 'P0120');
     expect(k.resolve(obd('P0120'), VehicleContext.generic, 'en').level, ResolvedLevel.l4Generic);
     // A newer pack arriving as a download is refused: no production key yet.
-    final newer = await buildPack(lines: seedLines(), version: 2);
+    final newer = await buildPack(lines: seedLines(), version: kBundledEnVersion + 1);
     final r = await k.store!.importPack(
         manifestBytes: newer.manifestBytes, entriesBytes: newer.entriesBytes,
         source: PackSource.downloaded, appVersion: '1.0.0');
     expect(r.refusal, ImportRefusal.noProductionKey);
-    expect((await k.store!.pack('generic_en'))!.version, 1);
+    expect((await k.store!.pack('generic_en'))!.version, kBundledEnVersion);
     // The app makes no network call for knowledge.
     for (final f in Directory('lib/knowledge').listSync().whereType<File>()) {
       expect(f.readAsStringSync().contains(RegExp(r'HttpClient|package:http|Supabase|functions\.invoke')),

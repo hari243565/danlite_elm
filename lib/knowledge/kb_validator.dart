@@ -48,11 +48,22 @@ const Map<RiderAction, Set<CanRide>> _rideAllowed = {
 };
 
 /// `applies_when` keys and the only value each may take.
+///
+/// The same set as `APPLIES_KEYS` in `data/content/validate_seed.py`: the
+/// content pipeline may only use keys this importer accepts, and the resolver
+/// shows an unknown one with a note (`kAppliesNoteKeys`).
 final Map<String, bool Function(Object?)> _appliesKeys = {
   'cylinders_min': (v) => v == 2,
-  'liquid_cooled': (v) => v == true,
-  'ride_by_wire': (v) => v == true,
-  'abs_fitted': (v) => v == true,
+  for (final k in const [
+    'liquid_cooled', 'ride_by_wire', 'abs_fitted', 'knock_sensor_fitted',
+    'camshaft_sensor_fitted', 'oil_temp_sensor_fitted',
+    'closed_throttle_switch_fitted', 'evap_fitted', 'secondary_air_fitted',
+    'cooling_fan_fitted', 'oil_pressure_sensor_fitted',
+    'ambient_temp_sensor_fitted', 'fuel_level_sensor_fitted',
+    'gear_position_sensor_fitted', 'clutch_switch_fitted',
+    'downstream_o2_sensor_fitted', 'can_bus_fitted',
+  ])
+    k: (Object? v) => v == true,
 };
 
 /// English length caps from the content validator.
@@ -107,6 +118,9 @@ const List<String> _commonRequired = [
   'needs_independent_review',
   'updated_at',
 ];
+
+/// A value as text, or null when it is not text (a pack line is untrusted).
+String? _str(Object? v) => v is String ? v : null;
 
 class EntryValidation {
   EntryValidation(this.entry, this.errors);
@@ -183,9 +197,9 @@ EntryValidation validateEntry(Object? line, PackManifest manifest) {
   }
 
   // ── enums and types ────────────────────────────────────────────────────
-  final level = RiderAction.fromDb(r['rider_action_level'] as String?);
+  final level = RiderAction.fromDb(_str(r['rider_action_level']));
   if (level == null) err('bad rider_action_level ${r['rider_action_level']}');
-  final ride = CanRide.fromDb(r['can_ride_to_workshop'] as String?);
+  final ride = CanRide.fromDb(_str(r['can_ride_to_workshop']));
   if (ride == null) {
     err('bad can_ride_to_workshop ${r['can_ride_to_workshop']}');
   } else if (level != null && !_rideAllowed[level]!.contains(ride)) {
@@ -236,7 +250,7 @@ EntryValidation validateEntry(Object? line, PackManifest manifest) {
     if (hs == null) {
       hiStatus = lang == 'hi' ? HiStatus.machine : HiStatus.none;
     } else {
-      final parsed = HiStatus.fromDb(hs as String?);
+      final parsed = hs is String ? HiStatus.fromDb(hs) : null;
       if (parsed == null || parsed == HiStatus.none) {
         err('hi_status must be machine or reviewed');
       } else {

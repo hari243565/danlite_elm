@@ -45,11 +45,28 @@ String riderActionKey(RiderAction a) => switch (a) {
       RiderAction.info => 'riderActionInfo',
     };
 
-const Map<String, String> _conditionKeys = {
+/// `applies_when` key -> the note shown when the bike's matching detail is
+/// unknown. Every key a shipped pack uses must be here, or its condition
+/// would be dropped silently (a test checks the bundled packs).
+const Map<String, String> kAppliesNoteKeys = {
   'cylinders_min': 'appliesCylindersMin2',
   'liquid_cooled': 'appliesLiquidCooled',
   'ride_by_wire': 'appliesRideByWire',
   'abs_fitted': 'appliesAbsFitted',
+  'knock_sensor_fitted': 'appliesKnockSensor',
+  'camshaft_sensor_fitted': 'appliesCamshaftSensor',
+  'oil_temp_sensor_fitted': 'appliesOilTempSensor',
+  'closed_throttle_switch_fitted': 'appliesClosedThrottleSwitch',
+  'evap_fitted': 'appliesEvap',
+  'secondary_air_fitted': 'appliesSecondaryAir',
+  'cooling_fan_fitted': 'appliesCoolingFan',
+  'oil_pressure_sensor_fitted': 'appliesOilPressureSensor',
+  'ambient_temp_sensor_fitted': 'appliesAmbientTempSensor',
+  'fuel_level_sensor_fitted': 'appliesFuelLevelSensor',
+  'gear_position_sensor_fitted': 'appliesGearPositionSensor',
+  'clutch_switch_fitted': 'appliesClutchSwitch',
+  'downstream_o2_sensor_fitted': 'appliesDownstreamO2',
+  'can_bus_fitted': 'appliesCanBus',
 };
 
 /// "Stop" / "Service soon" / "Monitor" / "Info" — icon and word.
@@ -115,7 +132,7 @@ class ResolvedGuidance extends StatelessWidget {
     final reason = r.canRideReason ?? '';
     final conditions = [
       for (final k in (r.conditions ?? const <String, Object?>{}).keys)
-        if (_conditionKeys.containsKey(k)) context.tr(_conditionKeys[k]!),
+        if (kAppliesNoteKeys.containsKey(k)) context.tr(kAppliesNoteKeys[k]!),
     ];
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
