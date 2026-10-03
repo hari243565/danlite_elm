@@ -459,6 +459,26 @@
 "en": "The speedometer or other speed-based functions may be wrong.",
 "hi": "स्पीडोमीटर या स्पीड पर आधारित दूसरे फ़ंक्शन गलत हो सकते हैं।"
 },
+"A0139": {
+"en": "If the bike will not start, do not try to bypass the immobiliser.",
+"hi": "अगर बाइक स्टार्ट न हो, तो इम्मोबिलाइज़र को बाइपास करने की कोशिश न करें।"
+},
+"A0140": {
+"en": "The engine may warm up slowly or run cooler than normal; get it checked soon.",
+"hi": "इंजन धीरे गर्म हो सकता है या सामान्य से ठंडा चल सकता है; जल्द जाँच कराएँ।"
+},
+"A0141": {
+"en": "Check that the fuel cap is on and closed tightly; otherwise get it checked at the next service.",
+"hi": "जाँचें कि फ़्यूल कैप लगा है और कसकर बंद है; वरना अगली सर्विस पर जाँच कराएँ।"
+},
+"A0142": {
+"en": "Check that the fuel cap is on and closed tightly; the code may clear by itself after a few rides.",
+"hi": "जाँचें कि फ़्यूल कैप लगा है और कसकर बंद है; हो सकता है कि कुछ सवारी के बाद कोड अपने आप मिट जाए।"
+},
+"A0143": {
+"en": "Otherwise have the charging system checked soon.",
+"hi": "वरना चार्जिंग सिस्टम की जल्द जाँच कराएँ।"
+},
 "C0001": {
 "en": "Worn or faulty throttle position sensor",
 "hi": "थ्रॉटल पोज़ीशन सेंसर घिस गया है या खराब है"
@@ -1646,6 +1666,218 @@
 "C0297": {
 "en": "ECU supply voltage outside the allowed range",
 "hi": "ECU का सप्लाई वोल्टेज तय रेंज से बाहर है"
+},
+"C0298": {
+"en": "Noisy ECU ground",
+"hi": "ECU के ग्राउंड में नॉइज़ है"
+},
+"C0299": {
+"en": "Software error in the ECU",
+"hi": "ECU में सॉफ़्टवेयर एरर"
+},
+"C0300": {
+"en": "ECU not coded or set up for this bike",
+"hi": "ECU इस बाइक के लिए कोड या सेट अप नहीं है"
+},
+"C0301": {
+"en": "ECU taken from another bike",
+"hi": "ECU किसी दूसरी बाइक से लिया गया है"
+},
+"C0302": {
+"en": "Corrupted stored data in the ECU",
+"hi": "ECU में सेव डेटा खराब हो गया है"
+},
+"C0303": {
+"en": "Chassis number not programmed into the ECU",
+"hi": "वाहन पहचान संख्या ECU में प्रोग्राम नहीं की गई"
+},
+"C0304": {
+"en": "Heat trapped around the ECU",
+"hi": "ECU के आसपास गर्मी फँसी हुई है"
+},
+"C0305": {
+"en": "Fault in the internal timer of the ECU",
+"hi": "ECU के अंदरूनी टाइमर में खराबी"
+},
+"C0306": {
+"en": "Unstable ECU power when the ignition is off",
+"hi": "इग्निशन बंद होने पर ECU की पावर अस्थिर है"
+},
+"C0307": {
+"en": "Body control unit not getting power",
+"hi": "बॉडी कंट्रोल यूनिट को पावर नहीं मिल रही"
+},
+"C0308": {
+"en": "Water in the body control unit",
+"hi": "बॉडी कंट्रोल यूनिट में पानी"
+},
+"C0309": {
+"en": "Broken communication wiring",
+"hi": "संचार वायरिंग टूटी है"
+},
+"C0310": {
+"en": "Gateway not getting power (fuse if fitted, ground, supply)",
+"hi": "गेटवे को पावर नहीं मिल रही (फ़्यूज़ अगर लगा हो, ग्राउंड, सप्लाई)"
+},
+"C0311": {
+"en": "Failed gateway unit",
+"hi": "गेटवे यूनिट खराब हो गई है"
+},
+"C0312": {
+"en": "Immobiliser unit not getting power",
+"hi": "इम्मोबिलाइज़र यूनिट को पावर नहीं मिल रही"
+},
+"C0313": {
+"en": "Failed immobiliser antenna ring",
+"hi": "इम्मोबिलाइज़र एंटीना रिंग खराब हो गई है"
+},
+"C0314": {
+"en": "Seized or worn fan motor",
+"hi": "फ़ैन मोटर जाम या घिसी है"
+},
+"C0315": {
+"en": "Seized fan motor",
+"hi": "फ़ैन मोटर जाम है"
+},
+"C0316": {
+"en": "Wiring short under load",
+"hi": "लोड में वायरिंग शॉर्ट हो जाती है"
+},
+"C0317": {
+"en": "Open or corroded ground connection",
+"hi": "ग्राउंड कनेक्शन ओपन है या उसमें जंग है"
+},
+"C0318": {
+"en": "Fault in the fan supply wiring",
+"hi": "फ़ैन की सप्लाई वायरिंग में खराबी"
+},
+"C0319": {
+"en": "Damaged connector",
+"hi": "कनेक्टर खराब हो गया है"
+},
+"C0320": {
+"en": "Low coolant level",
+"hi": "कूलेंट लेवल कम है"
+},
+"C0321": {
+"en": "Cooling fan stuck on (if fitted)",
+"hi": "कूलिंग फ़ैन चालू अटका है (अगर लगा हो)"
+},
+"C0322": {
+"en": "Failed pressure sensor",
+"hi": "प्रेशर सेंसर खराब हो गया है"
+},
+"C0323": {
+"en": "Drifting or noisy pressure sensor",
+"hi": "प्रेशर सेंसर ड्रिफ़्ट कर रहा है या उसकी रीडिंग अस्थिर है"
+},
+"C0324": {
+"en": "Aged sensor",
+"hi": "सेंसर पुराना है"
+},
+"C0325": {
+"en": "Fuel cap missing or not closed properly",
+"hi": "फ़्यूल कैप गायब है या ठीक से बंद नहीं है"
+},
+"C0326": {
+"en": "Disconnected vapour line",
+"hi": "वेपर लाइन अलग हो गई है"
+},
+"C0327": {
+"en": "Cracked vapour canister",
+"hi": "वेपर कैनिस्टर में दरार है"
+},
+"C0328": {
+"en": "Hardened or worn fuel cap seal",
+"hi": "फ़्यूल कैप की सील सख्त या घिसी है"
+},
+"C0329": {
+"en": "Slightly leaking purge or vent valve",
+"hi": "पर्ज या वेंट वाल्व थोड़ा लीक कर रहा है"
+},
+"C0330": {
+"en": "Hairline crack in a vapour line",
+"hi": "वेपर लाइन में बाल जितनी महीन दरार"
+},
+"C0331": {
+"en": "Fuel cap loose, missing or worn",
+"hi": "फ़्यूल कैप ढीला, गायब या घिसा है"
+},
+"C0332": {
+"en": "Damaged filler neck",
+"hi": "फ़िलर नेक खराब है"
+},
+"C0333": {
+"en": "Purge valve stuck open",
+"hi": "पर्ज वाल्व खुला अटका है"
+},
+"C0334": {
+"en": "Cracked or disconnected vapour line",
+"hi": "वेपर लाइन में दरार है या वह अलग हो गई है"
+},
+"C0335": {
+"en": "Purge valve sticking partly closed",
+"hi": "पर्ज वाल्व आंशिक बंद होकर अटक रहा है"
+},
+"C0336": {
+"en": "Purge line kinked or blocked",
+"hi": "पर्ज लाइन मुड़ी या बंद है"
+},
+"C0337": {
+"en": "Shorted vent valve",
+"hi": "वेंट वाल्व शॉर्ट है"
+},
+"C0338": {
+"en": "Open control wire",
+"hi": "कंट्रोल वायर ओपन है"
+},
+"C0339": {
+"en": "Check valve clogged with carbon",
+"hi": "चेक वाल्व कार्बन से जाम है"
+},
+"C0340": {
+"en": "Software mismatch between control units",
+"hi": "कंट्रोल यूनिट के बीच सॉफ़्टवेयर का मेल नहीं"
+},
+"C0341": {
+"en": "Used control unit from another bike fitted",
+"hi": "दूसरी बाइक की पुरानी कंट्रोल यूनिट लगी है"
+},
+"C0342": {
+"en": "Update that was not finished",
+"hi": "अपडेट पूरा नहीं हुआ"
+},
+"C0343": {
+"en": "Software mismatch with the ECU",
+"hi": "ECU के साथ सॉफ़्टवेयर का मेल नहीं"
+},
+"C0344": {
+"en": "Used ECU from another bike fitted",
+"hi": "दूसरी बाइक का पुराना ECU लगा है"
+},
+"C0345": {
+"en": "Corrupted messages on the CAN bus",
+"hi": "CAN बस पर संदेश खराब हो गए हैं"
+},
+"C0346": {
+"en": "Fault inside the ABS control unit",
+"hi": "ABS कंट्रोल यूनिट के अंदर खराबी"
+},
+"C0347": {
+"en": "Wheel speed sensor fault feeding the ABS unit",
+"hi": "ABS यूनिट को सिग्नल देने वाले व्हील स्पीड सेंसर में खराबी"
+},
+"C0348": {
+"en": "ABS software error",
+"hi": "ABS सॉफ़्टवेयर एरर"
+},
+"C0349": {
+"en": "Alternator output fault",
+"hi": "अल्टरनेटर आउटपुट में खराबी"
+},
+"C0350": {
+"en": "Faulty voltage regulator",
+"hi": "वोल्टेज रेगुलेटर खराब है"
 },
 "H0001": {
 "en": "Check the sensor connector for water, corrosion and bent pins",
@@ -2963,6 +3195,218 @@
 "en": "Check the signal wiring and connectors between the ECU and the other units",
 "hi": "ECU और दूसरी यूनिट के बीच सिग्नल वायरिंग और कनेक्टर जाँचें"
 },
+"H0330": {
+"en": "Check the ECU ground connections",
+"hi": "ECU के ग्राउंड कनेक्शन जाँचें"
+},
+"H0331": {
+"en": "Compare several sensor readings with real conditions",
+"hi": "कई सेंसर की रीडिंग की तुलना असली हालात से करें"
+},
+"H0332": {
+"en": "Check the twist grip sensor signals against each other",
+"hi": "ट्विस्ट ग्रिप सेंसर के सिग्नल की आपस में तुलना करें"
+},
+"H0333": {
+"en": "Check the throttle position signals against each other",
+"hi": "थ्रॉटल पोज़ीशन सिग्नल की आपस में तुलना करें"
+},
+"H0334": {
+"en": "Compare the engine temperature reading with the real engine temperature",
+"hi": "इंजन तापमान की रीडिंग की तुलना इंजन के असली तापमान से करें"
+},
+"H0335": {
+"en": "Check that the ECU part and its setup match the bike",
+"hi": "जाँचें कि ECU का पार्ट और उसका सेटअप बाइक से मेल खाते हैं"
+},
+"H0336": {
+"en": "Ask the workshop to set up the ECU for this bike",
+"hi": "वर्कशॉप से कहें कि वह ECU को इस बाइक के लिए सेट अप करे"
+},
+"H0337": {
+"en": "Check the ECU supply voltage and ground",
+"hi": "ECU का सप्लाई वोल्टेज और ग्राउंड जाँचें"
+},
+"H0338": {
+"en": "Ask the workshop whether the ECU settings can be reloaded",
+"hi": "वर्कशॉप से पूछें कि ECU की सेटिंग दोबारा लोड हो सकती हैं या नहीं"
+},
+"H0339": {
+"en": "Check the chassis number stored in the ECU against the bike",
+"hi": "ECU में सेव वाहन पहचान संख्या की तुलना बाइक से करें"
+},
+"H0340": {
+"en": "Ask the workshop to program the chassis number",
+"hi": "वर्कशॉप से वाहन पहचान संख्या प्रोग्राम कराएँ"
+},
+"H0341": {
+"en": "Check that the ECU has airflow and is not next to a hot part",
+"hi": "जाँचें कि ECU को हवा मिल रही है और वह किसी गर्म पुर्ज़े के पास नहीं है"
+},
+"H0342": {
+"en": "Check the ECU supply voltage",
+"hi": "ECU का सप्लाई वोल्टेज जाँचें"
+},
+"H0343": {
+"en": "Check the ECU power connection for looseness",
+"hi": "ECU का पावर कनेक्शन ढीला तो नहीं, यह जाँचें"
+},
+"H0344": {
+"en": "Check the bus terminating resistance and the ground connections",
+"hi": "बस की टर्मिनेशन रेज़िस्टेंस और ग्राउंड कनेक्शन जाँचें"
+},
+"H0345": {
+"en": "Check which units use this bus and which also report communication codes",
+"hi": "जाँचें कि कौन सी यूनिट इस बस का उपयोग करती हैं और कौन सी संचार कोड भी बताती हैं"
+},
+"H0346": {
+"en": "Check the supply and ground connections of the body control unit",
+"hi": "बॉडी कंट्रोल यूनिट के सप्लाई और ग्राउंड कनेक्शन जाँचें"
+},
+"H0347": {
+"en": "Check the communication wiring and connectors",
+"hi": "संचार वायरिंग और कनेक्टर जाँचें"
+},
+"H0348": {
+"en": "Check the gateway fuse (if fitted), ground and supply connections",
+"hi": "गेटवे फ़्यूज़ (अगर लगा हो), ग्राउंड और सप्लाई कनेक्शन जाँचें"
+},
+"H0349": {
+"en": "Check the immobiliser supply and ground connections",
+"hi": "इम्मोबिलाइज़र के सप्लाई और ग्राउंड कनेक्शन जाँचें"
+},
+"H0350": {
+"en": "Check the antenna ring and the communication wiring",
+"hi": "एंटीना रिंग और संचार वायरिंग जाँचें"
+},
+"H0351": {
+"en": "Check that the fan runs only when commanded",
+"hi": "जाँचें कि फ़ैन सिर्फ़ कमांड मिलने पर चलता है"
+},
+"H0352": {
+"en": "Check that the fan turns freely by hand with the engine off and cold",
+"hi": "इंजन बंद और ठंडा होने पर जाँचें कि फ़ैन हाथ से आसानी से घूमता है"
+},
+"H0353": {
+"en": "Check the fan wiring for a short under load",
+"hi": "लोड में फ़ैन वायरिंग का शॉर्ट जाँचें"
+},
+"H0354": {
+"en": "Check the fan ground and supply connections for corrosion and looseness",
+"hi": "फ़ैन के ग्राउंड और सप्लाई कनेक्शन में जंग और ढीलापन जाँचें"
+},
+"H0355": {
+"en": "Check the fan relay (if fitted) and the connector",
+"hi": "फ़ैन रिले (अगर लगा हो) और कनेक्टर जाँचें"
+},
+"H0356": {
+"en": "Check the coolant level and that the thermostat opens only when hot",
+"hi": "कूलेंट लेवल जाँचें और यह भी कि थर्मोस्टैट सिर्फ़ गर्म होने पर खुलता है"
+},
+"H0357": {
+"en": "Check the pressure sensor connector and wiring",
+"hi": "प्रेशर सेंसर का कनेक्टर और वायरिंग जाँचें"
+},
+"H0358": {
+"en": "Check the pressure sensor reading on the scan tool at key-on",
+"hi": "इग्निशन चालू करने पर स्कैन टूल पर प्रेशर सेंसर की रीडिंग जाँचें"
+},
+"H0359": {
+"en": "Watch the pressure reading while the cap is opened and closed",
+"hi": "फ़्यूल कैप खोलते और बंद करते समय प्रेशर रीडिंग देखें"
+},
+"H0360": {
+"en": "Check the sensor mounting and connector",
+"hi": "सेंसर की माउंटिंग और कनेक्टर जाँचें"
+},
+"H0361": {
+"en": "Check the signal wire for a short to ground",
+"hi": "सिग्नल वायर में ग्राउंड से शॉर्ट जाँचें"
+},
+"H0362": {
+"en": "Check the pressure sensor connector",
+"hi": "प्रेशर सेंसर का कनेक्टर जाँचें"
+},
+"H0363": {
+"en": "Check the signal wire for a short to battery supply",
+"hi": "सिग्नल वायर में बैटरी सप्लाई से शॉर्ट जाँचें"
+},
+"H0364": {
+"en": "Check the fuel cap first",
+"hi": "पहले फ़्यूल कैप जाँचें"
+},
+"H0365": {
+"en": "Check the vapour lines and the canister for damage",
+"hi": "वेपर लाइनों और कैनिस्टर में नुकसान जाँचें"
+},
+"H0366": {
+"en": "Check the fuel cap seal first",
+"hi": "पहले फ़्यूल कैप की सील जाँचें"
+},
+"H0367": {
+"en": "Check the purge valve, the vent valve and the vapour lines for leaks",
+"hi": "पर्ज वाल्व, वेंट वाल्व और वेपर लाइनों में लीक जाँचें"
+},
+"H0368": {
+"en": "Check the filler neck for damage",
+"hi": "फ़िलर नेक में नुकसान जाँचें"
+},
+"H0369": {
+"en": "Check that the purge valve closes fully when not commanded",
+"hi": "जाँचें कि कमांड न मिलने पर पर्ज वाल्व पूरा बंद होता है"
+},
+"H0370": {
+"en": "Check the vapour lines for cracks and loose connections",
+"hi": "वेपर लाइनों में दरार और ढीले कनेक्शन जाँचें"
+},
+"H0371": {
+"en": "Check that the purge valve opens fully when commanded",
+"hi": "जाँचें कि कमांड मिलने पर पर्ज वाल्व पूरा खुलता है"
+},
+"H0372": {
+"en": "Check the vent valve control wire for a short to ground",
+"hi": "वेंट वाल्व कंट्रोल वायर में ग्राउंड से शॉर्ट जाँचें"
+},
+"H0373": {
+"en": "Check the vent valve coil and the connector",
+"hi": "वेंट वाल्व कॉइल और कनेक्टर जाँचें"
+},
+"H0374": {
+"en": "Check the vent valve control wire for a break or a short to battery supply",
+"hi": "वेंट वाल्व कंट्रोल वायर में टूटन या बैटरी सप्लाई से शॉर्ट जाँचें"
+},
+"H0375": {
+"en": "Check the check valve and the air passages for carbon blockage",
+"hi": "चेक वाल्व और एयर पैसेज में कार्बन की रुकावट जाँचें"
+},
+"H0376": {
+"en": "Check which control units report software or communication codes",
+"hi": "जाँचें कि कौन सी कंट्रोल यूनिट सॉफ़्टवेयर या संचार कोड बता रही हैं"
+},
+"H0377": {
+"en": "Ask the workshop whether the software can be updated or matched",
+"hi": "वर्कशॉप से पूछें कि सॉफ़्टवेयर अपडेट या मैच हो सकता है या नहीं"
+},
+"H0378": {
+"en": "Check the ECU data on the scan tool for values that make no sense",
+"hi": "स्कैन टूल पर ECU के डेटा में बेमतलब वैल्यू देखें"
+},
+"H0379": {
+"en": "Check the CAN wiring and connectors for water and chafing",
+"hi": "CAN वायरिंग और कनेक्टर में पानी और रगड़ जाँचें"
+},
+"H0380": {
+"en": "Check the wheel speed sensors and their signals first",
+"hi": "पहले व्हील स्पीड सेंसर और उनके सिग्नल जाँचें"
+},
+"H0381": {
+"en": "Check the CAN wiring to the ABS unit",
+"hi": "ABS यूनिट तक जाने वाली CAN वायरिंग जाँचें"
+},
+"H0382": {
+"en": "Check the battery condition and the charging wiring",
+"hi": "बैटरी की हालत और चार्जिंग वायरिंग जाँचें"
+},
 "M0001": {
 "en": "The bike's computer (ECU) cannot get a reliable reading of how far the throttle is open.",
 "hi": "बाइक का कंप्यूटर (ECU) थ्रॉटल कितना खुला है, इसकी भरोसेमंद रीडिंग नहीं ले पा रहा है।"
@@ -3923,6 +4367,166 @@
 "en": "The bike's computer (ECU) found an error in the processor that supervises its main processor, so it may control the engine poorly.",
 "hi": "बाइक के कंप्यूटर (ECU) को अपने मुख्य प्रोसेसर की निगरानी करने वाले प्रोसेसर में एरर मिला है, इसलिए इंजन का कंट्रोल कमज़ोर हो सकता है।"
 },
+"M0241": {
+"en": "The bike's computer (ECU) found an error in the part that turns sensor signals into numbers, so sensor readings may be wrong.",
+"hi": "बाइक के कंप्यूटर (ECU) को सेंसर सिग्नल को नंबरों में बदलने वाले हिस्से में एरर मिला है, इसलिए सेंसर रीडिंग गलत हो सकती हैं।"
+},
+"M0242": {
+"en": "The bike's computer (ECU) found a fault in its main processor, so it may control the engine poorly.",
+"hi": "बाइक के कंप्यूटर (ECU) को अपने मुख्य प्रोसेसर में खराबी मिली है, इसलिए हो सकता है कि वह इंजन को ठीक से कंट्रोल न करे।"
+},
+"M0243": {
+"en": "The bike's computer (ECU) found an error in how it processes the twist grip position, so it may misjudge the rider's request.",
+"hi": "बाइक के कंप्यूटर (ECU) को ट्विस्ट ग्रिप पोज़ीशन प्रोसेस करने में एरर मिला है, इसलिए हो सकता है कि वह राइडर की माँग का गलत अंदाज़ा लगाए।"
+},
+"M0244": {
+"en": "The bike's computer (ECU) found an error in how it processes the throttle position, so it may misjudge the throttle.",
+"hi": "बाइक के कंप्यूटर (ECU) को थ्रॉटल पोज़ीशन प्रोसेस करने में एरर मिला है, इसलिए हो सकता है कि वह थ्रॉटल का गलत अंदाज़ा लगाए।"
+},
+"M0245": {
+"en": "The bike's computer (ECU) found an error in how it processes the engine temperature, so it may misjudge how hot the engine is.",
+"hi": "बाइक के कंप्यूटर (ECU) को इंजन का तापमान प्रोसेस करने में एरर मिला है, इसलिए हो सकता है कि वह गलत आँके कि इंजन कितना गर्म है।"
+},
+"M0246": {
+"en": "The bike's computer (ECU) has a bike setup that does not match the connected parts, often after the ECU was replaced or swapped.",
+"hi": "बाइक के कंप्यूटर (ECU) में बाइक का सेटअप जुड़े हुए पुर्ज़ों से मेल नहीं खाता, जो अक्सर ECU बदलने या अदला-बदली के बाद होता है।"
+},
+"M0247": {
+"en": "The bike's computer (ECU) found an error in the memory that keeps its stored settings, so the saved settings may be wrong.",
+"hi": "बाइक के कंप्यूटर (ECU) को सेटिंग रखने वाली मेमोरी में एरर मिला है, इसलिए सेव की हुई सेटिंग गलत हो सकती हैं।"
+},
+"M0248": {
+"en": "The bike's computer (ECU) has no chassis number (VIN) stored, or the number does not match, which can happen after an ECU was replaced.",
+"hi": "बाइक के कंप्यूटर (ECU) में वाहन पहचान संख्या (VIN) सेव नहीं है, या संख्या मेल नहीं खाती, जो ECU बदलने के बाद हो सकता है।"
+},
+"M0249": {
+"en": "The bike's computer (ECU) found that its own temperature is too high.",
+"hi": "बाइक के कंप्यूटर (ECU) ने पाया कि उसका अपना तापमान बहुत ज़्यादा है।"
+},
+"M0250": {
+"en": "The bike's computer (ECU) found an error in its own engine-off timer, which it uses for cold-start and emission checks.",
+"hi": "बाइक के कंप्यूटर (ECU) को अपने इंजन-ऑफ़ टाइमर में एरर मिला है, जिसे वह कोल्ड स्टार्ट और उत्सर्जन जाँच के लिए इस्तेमाल करता है।"
+},
+"M0251": {
+"en": "A control unit stopped using CAN bus A (the bike's data network) because it is not working, so units cannot talk.",
+"hi": "एक कंट्रोल यूनिट ने CAN बस A (बाइक के डेटा नेटवर्क) का इस्तेमाल बंद कर दिया क्योंकि वह काम नहीं कर रही, इसलिए यूनिट संपर्क नहीं कर पातीं।"
+},
+"M0252": {
+"en": "A control unit stopped using CAN bus B (the bike's data network) because it is not working, so units cannot talk.",
+"hi": "एक कंट्रोल यूनिट ने CAN बस B (बाइक के डेटा नेटवर्क) का इस्तेमाल बंद कर दिया क्योंकि वह काम नहीं कर रही, इसलिए यूनिट संपर्क नहीं कर पातीं।"
+},
+"M0253": {
+"en": "A control unit stopped using communication bus C because the bus is not working, so units cannot talk to each other.",
+"hi": "एक कंट्रोल यूनिट ने संचार बस C का इस्तेमाल बंद कर दिया क्योंकि बस काम नहीं कर रही, इसलिए यूनिट आपस में संपर्क नहीं कर पातीं।"
+},
+"M0254": {
+"en": "A control unit stopped using communication bus D because the bus is not working, so units cannot talk to each other.",
+"hi": "एक कंट्रोल यूनिट ने संचार बस D का इस्तेमाल बंद कर दिया क्योंकि बस काम नहीं कर रही, इसलिए यूनिट आपस में संपर्क नहीं कर पातीं।"
+},
+"M0255": {
+"en": "A control unit stopped using communication bus E because the bus is not working, so units cannot talk to each other.",
+"hi": "एक कंट्रोल यूनिट ने संचार बस E का इस्तेमाल बंद कर दिया क्योंकि बस काम नहीं कर रही, इसलिए यूनिट आपस में संपर्क नहीं कर पातीं।"
+},
+"M0256": {
+"en": "The bike's computer (ECU) or another unit stopped receiving messages from the body control unit, which runs lamps and similar functions.",
+"hi": "बाइक के कंप्यूटर (ECU) या किसी दूसरी यूनिट को बॉडी कंट्रोल यूनिट से संदेश मिलना बंद हो गया है, जो लैंप और ऐसे दूसरे फ़ंक्शन चलाती है।"
+},
+"M0257": {
+"en": "The bike's computer (ECU) or another unit stopped receiving messages from the gateway, the unit that passes messages between data networks.",
+"hi": "बाइक के कंप्यूटर (ECU) या किसी दूसरी यूनिट को गेटवे से संदेश मिलना बंद हो गया है, यानी उस यूनिट से जो डेटा नेटवर्कों के बीच संदेश पहुँचाती है।"
+},
+"M0258": {
+"en": "The bike's computer (ECU) or another unit stopped receiving messages from the immobiliser (the key-code anti-theft start lock).",
+"hi": "बाइक के कंप्यूटर (ECU) या किसी दूसरी यूनिट को इम्मोबिलाइज़र (चाबी-कोड वाला एंटी-थेफ़्ट स्टार्ट लॉक) से संदेश मिलना बंद हो गया है।"
+},
+"M0259": {
+"en": "The cooling fan does not do what the bike's computer (ECU) commands, so it may run without a command or fail to run.",
+"hi": "कूलिंग फ़ैन वह नहीं करता जो बाइक का कंप्यूटर (ECU) कमांड देता है, इसलिए वह बिना कमांड के चल सकता है या चल नहीं पाए।"
+},
+"M0260": {
+"en": "The cooling fan draws more current than allowed, often because the fan motor is seized or worn.",
+"hi": "कूलिंग फ़ैन तय सीमा से ज़्यादा करंट खींचता है, जो अक्सर फ़ैन मोटर के जाम या घिसे होने से होता है।"
+},
+"M0261": {
+"en": "The bike's computer (ECU) found a fault in the supply or ground path of the cooling fan, so the fan may not run reliably.",
+"hi": "बाइक के कंप्यूटर (ECU) को कूलिंग फ़ैन के सप्लाई या ग्राउंड रास्ते में खराबी मिली है, इसलिए हो सकता है कि फ़ैन भरोसेमंद ढंग से न चले।"
+},
+"M0262": {
+"en": "The engine is not reaching or keeping its normal temperature, often because the thermostat is stuck open.",
+"hi": "इंजन अपना सामान्य तापमान पा नहीं रहा या बनाए नहीं रख रहा, जो अक्सर थर्मोस्टैट के खुला अटकने से होता है।"
+},
+"M0263": {
+"en": "The bike's computer (ECU) found an electrical fault in the evaporative system pressure sensor, which is used for the system leak check.",
+"hi": "बाइक के कंप्यूटर (ECU) को इवेपोरेटिव सिस्टम के प्रेशर सेंसर में इलेक्ट्रिकल खराबी मिली है, जो सिस्टम की लीक जाँच में इस्तेमाल होता है।"
+},
+"M0264": {
+"en": "The evaporative system pressure reading is noisy or does not respond to known pressure changes, so the sensor may be wrong.",
+"hi": "इवेपोरेटिव सिस्टम के प्रेशर की रीडिंग में उतार-चढ़ाव है या वह जाने-पहचाने प्रेशर बदलाव पर प्रतिक्रिया नहीं देती, इसलिए सेंसर गलत हो सकता है।"
+},
+"M0265": {
+"en": "The evaporative system pressure signal is too low for the bike's computer (ECU), often from a short to ground or a failed sensor.",
+"hi": "इवेपोरेटिव सिस्टम के प्रेशर का सिग्नल बाइक के कंप्यूटर (ECU) के लिए बहुत कम है, जो अक्सर ग्राउंड से शॉर्ट या सेंसर खराब होने से होता है।"
+},
+"M0266": {
+"en": "The evaporative system pressure signal is too high for the bike's computer (ECU), often from a short to battery supply or a failed sensor.",
+"hi": "इवेपोरेटिव सिस्टम के प्रेशर का सिग्नल बाइक के कंप्यूटर (ECU) के लिए बहुत ज़्यादा है, जो अक्सर बैटरी सप्लाई से शॉर्ट या सेंसर खराब होने से होता है।"
+},
+"M0267": {
+"en": "The evaporative system pressure signal is lost or changes suddenly at times, so the bike's computer (ECU) sometimes gets a wrong reading.",
+"hi": "इवेपोरेटिव सिस्टम के प्रेशर का सिग्नल कभी-कभी गायब हो जाता है या अचानक बदल जाता है, इसलिए बाइक के कंप्यूटर (ECU) को कभी-कभी गलत रीडिंग मिलती है।"
+},
+"M0268": {
+"en": "The bike's computer (ECU) found a large leak in the fuel vapour system, often a missing or badly closed fuel cap.",
+"hi": "बाइक के कंप्यूटर (ECU) को फ़्यूल वेपर सिस्टम में बड़ा लीक मिला है, जो अक्सर फ़्यूल कैप गायब होने या ठीक से बंद न होने से होता है।"
+},
+"M0269": {
+"en": "The bike's computer (ECU) found a very small leak in the fuel vapour system, often from a worn fuel cap seal.",
+"hi": "बाइक के कंप्यूटर (ECU) को फ़्यूल वेपर सिस्टम में बहुत छोटा लीक मिला है, जो अक्सर घिसी हुई फ़्यूल कैप सील से होता है।"
+},
+"M0270": {
+"en": "The bike's computer (ECU) found a large leak that usually means the fuel cap is loose or missing.",
+"hi": "बाइक के कंप्यूटर (ECU) को बड़ा लीक मिला है, जिसका मतलब आमतौर पर फ़्यूल कैप का ढीला या गायब होना है।"
+},
+"M0271": {
+"en": "More vapour flows into the engine than the bike's computer (ECU) commands, often from a stuck-open purge valve.",
+"hi": "इंजन में बाइक के कंप्यूटर (ECU) के कमांड से ज़्यादा वेपर जा रहा है, जो अक्सर पर्ज वाल्व के खुला अटकने से होता है।"
+},
+"M0272": {
+"en": "Less vapour flows into the engine than the bike's computer (ECU) commands, often from a blocked purge line or a sticking purge valve.",
+"hi": "इंजन में बाइक के कंप्यूटर (ECU) के कमांड से कम वेपर जा रहा है, जो अक्सर बंद पर्ज लाइन या अटकते पर्ज वाल्व से होता है।"
+},
+"M0273": {
+"en": "The vent valve control signal is too low for the bike's computer (ECU), often from a short to ground or a shorted valve.",
+"hi": "वेंट वाल्व का कंट्रोल सिग्नल बाइक के कंप्यूटर (ECU) के लिए बहुत कम है, जो अक्सर ग्राउंड से शॉर्ट या शॉर्ट वाल्व से होता है।"
+},
+"M0274": {
+"en": "The vent valve control signal is too high for the bike's computer (ECU), often from an open circuit or a short to battery supply.",
+"hi": "वेंट वाल्व का कंट्रोल सिग्नल बाइक के कंप्यूटर (ECU) के लिए बहुत ज़्यादा है, जो अक्सर ओपन सर्किट या बैटरी सप्लाई से शॉर्ट से होता है।"
+},
+"M0275": {
+"en": "The air flow in the secondary air system is below what the bike's computer (ECU) expects during a cold-start check.",
+"hi": "कोल्ड-स्टार्ट जाँच के दौरान सेकंडरी एयर सिस्टम में हवा का फ़्लो बाइक के कंप्यूटर (ECU) की उम्मीद से कम है।"
+},
+"M0276": {
+"en": "A control unit on the bike has software that does not match another unit, for example after a partial update or a swapped unit.",
+"hi": "बाइक की एक कंट्रोल यूनिट का सॉफ़्टवेयर दूसरी यूनिट से मेल नहीं खाता, जैसे आंशिक अपडेट या बदली हुई यूनिट के बाद।"
+},
+"M0277": {
+"en": "Software in a control unit does not match the bike's computer (ECU), for example after a partial update or a swapped ECU.",
+"hi": "एक कंट्रोल यूनिट का सॉफ़्टवेयर बाइक के कंप्यूटर (ECU) से मेल नहीं खाता, जैसे आंशिक अपडेट या बदले हुए ECU के बाद।"
+},
+"M0278": {
+"en": "Another control unit receives data from the bike's computer (ECU) that makes no sense, so that unit rejects it.",
+"hi": "दूसरी कंट्रोल यूनिट को बाइक के कंप्यूटर (ECU) से ऐसा डेटा मिल रहा है जिसका कोई मतलब नहीं बनता, इसलिए वह यूनिट उसे अस्वीकार कर देती है।"
+},
+"M0279": {
+"en": "Another control unit receives data from the ABS control unit that makes no sense, so ABS may be switched off.",
+"hi": "दूसरी कंट्रोल यूनिट को ABS कंट्रोल यूनिट से ऐसा डेटा मिल रहा है जिसका कोई मतलब नहीं बनता, इसलिए ABS बंद हो सकता है।"
+},
+"M0280": {
+"en": "The charging system voltage is outside the range that the bike's computer (ECU) expects; the code does not say if it is high or low.",
+"hi": "चार्जिंग सिस्टम का वोल्टेज उस रेंज से बाहर है जिसकी बाइक के कंप्यूटर (ECU) को उम्मीद है; कोड यह नहीं बताता कि वह ज़्यादा है या कम।"
+},
 "R0001": {
 "en": "idle may be uneven; avoid traffic and long trips",
 "hi": "आइडल अस्थिर हो सकता है; ट्रैफ़िक और लंबे सफ़र से बचें"
@@ -4278,6 +4882,10 @@
 "R0089": {
 "en": "speed readout may be wrong; ride carefully",
 "hi": "स्पीड रीडआउट गलत हो सकता है; सावधानी से चलाएँ"
+},
+"R0090": {
+"en": "may run cooler than normal; watch for overheating",
+"hi": "सामान्य से ठंडा चल सकता है; ओवरहीट पर नज़र रखें"
 },
 "T0001": {
 "en": "Throttle position sensor A: circuit fault",
@@ -5238,5 +5846,165 @@
 "T0240": {
 "en": "ECU internal fault: monitoring processor",
 "hi": "ECU के अंदर खराबी: मॉनिटरिंग प्रोसेसर"
+},
+"T0241": {
+"en": "ECU internal fault: sensor signal conversion",
+"hi": "ECU के अंदर खराबी: सेंसर सिग्नल कन्वर्ज़न"
+},
+"T0242": {
+"en": "ECU internal fault: main processor performance",
+"hi": "ECU के अंदर खराबी: मुख्य प्रोसेसर की परफ़ॉर्मेंस"
+},
+"T0243": {
+"en": "ECU internal fault: twist grip position processing",
+"hi": "ECU के अंदर खराबी: ट्विस्ट ग्रिप पोज़ीशन प्रोसेसिंग"
+},
+"T0244": {
+"en": "ECU internal fault: throttle position processing",
+"hi": "ECU के अंदर खराबी: थ्रॉटल पोज़ीशन प्रोसेसिंग"
+},
+"T0245": {
+"en": "ECU internal fault: engine temperature processing",
+"hi": "ECU के अंदर खराबी: इंजन तापमान प्रोसेसिंग"
+},
+"T0246": {
+"en": "ECU: bike options setting is wrong",
+"hi": "ECU: बाइक ऑप्शन सेटिंग गलत है"
+},
+"T0247": {
+"en": "ECU internal fault: stored settings error",
+"hi": "ECU के अंदर खराबी: सेव की हुई सेटिंग में एरर"
+},
+"T0248": {
+"en": "ECU: chassis number (VIN) not programmed or wrong",
+"hi": "ECU: वाहन पहचान संख्या (VIN) प्रोग्राम नहीं की गई या गलत है"
+},
+"T0249": {
+"en": "ECU internal temperature too high",
+"hi": "ECU का अंदरूनी तापमान बहुत ज़्यादा"
+},
+"T0250": {
+"en": "ECU internal fault: engine-off timer",
+"hi": "ECU के अंदर खराबी: इंजन-ऑफ़ टाइमर"
+},
+"T0251": {
+"en": "CAN bus A: communication lost (bus off)",
+"hi": "CAN बस A: संचार टूट गया (बस ऑफ़)"
+},
+"T0252": {
+"en": "CAN bus B: communication lost (bus off)",
+"hi": "CAN बस B: संचार टूट गया (बस ऑफ़)"
+},
+"T0253": {
+"en": "Communication bus C: communication lost (bus off)",
+"hi": "संचार बस C: संचार टूट गया (बस ऑफ़)"
+},
+"T0254": {
+"en": "Communication bus D: communication lost (bus off)",
+"hi": "संचार बस D: संचार टूट गया (बस ऑफ़)"
+},
+"T0255": {
+"en": "Communication bus E: communication lost (bus off)",
+"hi": "संचार बस E: संचार टूट गया (बस ऑफ़)"
+},
+"T0256": {
+"en": "Body control unit: communication lost",
+"hi": "बॉडी कंट्रोल यूनिट: संचार टूट गया"
+},
+"T0257": {
+"en": "Gateway unit: communication lost",
+"hi": "गेटवे यूनिट: संचार टूट गया"
+},
+"T0258": {
+"en": "Immobiliser unit: communication lost",
+"hi": "इम्मोबिलाइज़र यूनिट: संचार टूट गया"
+},
+"T0259": {
+"en": "Cooling fan: performance or incorrect operation",
+"hi": "कूलिंग फ़ैन: परफ़ॉर्मेंस या गलत कामकाज"
+},
+"T0260": {
+"en": "Cooling fan: current above threshold",
+"hi": "कूलिंग फ़ैन: करंट सीमा से ज़्यादा"
+},
+"T0261": {
+"en": "Cooling fan: power or ground circuit fault",
+"hi": "कूलिंग फ़ैन: पावर या ग्राउंड सर्किट में खराबी"
+},
+"T0262": {
+"en": "Cooling system: performance or incorrect operation",
+"hi": "कूलिंग सिस्टम: परफ़ॉर्मेंस या गलत कामकाज"
+},
+"T0263": {
+"en": "Evaporative pressure sensor: circuit fault",
+"hi": "इवेपोरेटिव प्रेशर सेंसर: सर्किट में खराबी"
+},
+"T0264": {
+"en": "Evaporative pressure sensor: performance or incorrect operation",
+"hi": "इवेपोरेटिव प्रेशर सेंसर: परफ़ॉर्मेंस या गलत कामकाज"
+},
+"T0265": {
+"en": "Evaporative pressure sensor: voltage below threshold",
+"hi": "इवेपोरेटिव प्रेशर सेंसर: वोल्टेज सीमा से कम"
+},
+"T0266": {
+"en": "Evaporative pressure sensor: voltage above threshold",
+"hi": "इवेपोरेटिव प्रेशर सेंसर: वोल्टेज सीमा से ज़्यादा"
+},
+"T0267": {
+"en": "Evaporative pressure sensor: intermittent circuit fault",
+"hi": "इवेपोरेटिव प्रेशर सेंसर: सर्किट में बीच-बीच में खराबी"
+},
+"T0268": {
+"en": "Evaporative emission system: large leak detected",
+"hi": "इवेपोरेटिव उत्सर्जन सिस्टम: बड़ा लीक पाया गया"
+},
+"T0269": {
+"en": "Evaporative emission system: very small leak detected",
+"hi": "इवेपोरेटिव उत्सर्जन सिस्टम: बहुत छोटा लीक पाया गया"
+},
+"T0270": {
+"en": "Evaporative emission system: fuel cap loose or off",
+"hi": "इवेपोरेटिव उत्सर्जन सिस्टम: फ़्यूल कैप ढीला या खुला"
+},
+"T0271": {
+"en": "Evaporative purge flow: higher than commanded",
+"hi": "इवेपोरेटिव पर्ज फ़्लो: कमांड से ज़्यादा"
+},
+"T0272": {
+"en": "Evaporative purge flow: lower than commanded",
+"hi": "इवेपोरेटिव पर्ज फ़्लो: कमांड से कम"
+},
+"T0273": {
+"en": "Evaporative vent valve: voltage below threshold",
+"hi": "इवेपोरेटिव वेंट वाल्व: वोल्टेज सीमा से कम"
+},
+"T0274": {
+"en": "Evaporative vent valve: voltage above threshold",
+"hi": "इवेपोरेटिव वेंट वाल्व: वोल्टेज सीमा से ज़्यादा"
+},
+"T0275": {
+"en": "Secondary air system: insufficient flow",
+"hi": "सेकंडरी एयर सिस्टम: अपर्याप्त फ़्लो"
+},
+"T0276": {
+"en": "Control unit software: not compatible",
+"hi": "कंट्रोल यूनिट सॉफ़्टवेयर: असंगत"
+},
+"T0277": {
+"en": "Control unit software: not compatible with the ECU",
+"hi": "कंट्रोल यूनिट सॉफ़्टवेयर: ECU के साथ असंगत"
+},
+"T0278": {
+"en": "Invalid data received from the ECU",
+"hi": "ECU से अमान्य डेटा मिला"
+},
+"T0279": {
+"en": "Invalid data received from the ABS control unit",
+"hi": "ABS कंट्रोल यूनिट से अमान्य डेटा मिला"
+},
+"T0280": {
+"en": "Charging system voltage: signal out of range",
+"hi": "चार्जिंग सिस्टम वोल्टेज: सिग्नल रेंज से बाहर"
 }
 }
