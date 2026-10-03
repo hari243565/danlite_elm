@@ -427,6 +427,38 @@
 "en": "The bike usually rides normally, but the emission system cannot be checked well.",
 "hi": "बाइक आमतौर पर सामान्य चलती है, लेकिन उत्सर्जन सिस्टम को ठीक से जाँचा नहीं जा सकता।"
 },
+"A0131": {
+"en": "The bike usually rides normally, but it may use more fuel and emissions may rise.",
+"hi": "बाइक आमतौर पर सामान्य चलती है, लेकिन वह ज़्यादा ईंधन इस्तेमाल कर सकती है और उत्सर्जन बढ़ सकता है।"
+},
+"A0132": {
+"en": "The engine may idle roughly, and a lean mixture can overheat the engine.",
+"hi": "इंजन आइडल पर रफ़ चल सकता है, और लीन मिक्सचर से इंजन ओवरहीट हो सकता है।"
+},
+"A0133": {
+"en": "Expect black smoke at idle or poor mileage; get it checked soon.",
+"hi": "आइडल पर काले धुएँ या कम माइलेज की उम्मीद रखें; जल्द जाँच कराएँ।"
+},
+"A0134": {
+"en": "The engine may be hard to start or run poorly; get it checked soon.",
+"hi": "इंजन को स्टार्ट करना मुश्किल हो सकता है या वह ठीक से नहीं चल सकता; जल्द जाँच कराएँ।"
+},
+"A0135": {
+"en": "The engine may run poorly, and the battery may be overcharged; get it checked soon.",
+"hi": "इंजन ठीक से नहीं चल सकता, और बैटरी ओवरचार्ज हो सकती है; जल्द जाँच कराएँ।"
+},
+"A0136": {
+"en": "The engine may misfire for a short time after a cold start.",
+"hi": "कोल्ड स्टार्ट के बाद इंजन कुछ देर के लिए मिसफ़ायर कर सकता है।"
+},
+"A0137": {
+"en": "Get it checked soon; stop if it runs very rough, backfires or loses power badly.",
+"hi": "जल्द जाँच कराएँ; अगर इंजन बहुत रफ़ चले, बैकफ़ायर करे या पावर बहुत घट जाए, तो रुकें।"
+},
+"A0138": {
+"en": "The speedometer or other speed-based functions may be wrong.",
+"hi": "स्पीडोमीटर या स्पीड पर आधारित दूसरे फ़ंक्शन गलत हो सकते हैं।"
+},
 "C0001": {
 "en": "Worn or faulty throttle position sensor",
 "hi": "थ्रॉटल पोज़ीशन सेंसर घिस गया है या खराब है"
@@ -1466,6 +1498,154 @@
 "C0260": {
 "en": "Aged upstream oxygen sensor",
 "hi": "अपस्ट्रीम ऑक्सीजन सेंसर पुराना है"
+},
+"C0261": {
+"en": "Contaminated downstream sensor",
+"hi": "डाउनस्ट्रीम सेंसर दूषित है"
+},
+"C0262": {
+"en": "Aged oxygen sensor",
+"hi": "ऑक्सीजन सेंसर पुराना है"
+},
+"C0263": {
+"en": "Sensor contaminated by oil or silicone",
+"hi": "सेंसर ऑयल या सिलिकॉन से दूषित है"
+},
+"C0264": {
+"en": "Open heater element in the sensor",
+"hi": "सेंसर का हीटर एलिमेंट ओपन है"
+},
+"C0265": {
+"en": "Chafed wiring",
+"hi": "वायरिंग रगड़ खाई हुई है"
+},
+"C0266": {
+"en": "Pinched wiring",
+"hi": "वायरिंग दबी हुई है"
+},
+"C0267": {
+"en": "Aged heater element",
+"hi": "हीटर एलिमेंट पुराना है"
+},
+"C0268": {
+"en": "Loose sensor mounting",
+"hi": "सेंसर की माउंटिंग ढीली है"
+},
+"C0269": {
+"en": "Drifting downstream oxygen sensor",
+"hi": "डाउनस्ट्रीम ऑक्सीजन सेंसर ड्रिफ़्ट कर रहा है"
+},
+"C0270": {
+"en": "Contaminated or aged downstream oxygen sensor",
+"hi": "डाउनस्ट्रीम ऑक्सीजन सेंसर दूषित या पुराना है"
+},
+"C0271": {
+"en": "Leaking fuel injector",
+"hi": "फ़्यूल इंजेक्टर लीक कर रहा है"
+},
+"C0272": {
+"en": "Fuel pressure too high",
+"hi": "फ़्यूल प्रेशर बहुत ज़्यादा है"
+},
+"C0273": {
+"en": "Stuck-open purge valve (if fitted)",
+"hi": "पर्ज वाल्व खुला अटका है (अगर लगा हो)"
+},
+"C0274": {
+"en": "Cracked intake gasket or boot",
+"hi": "इनटेक गैस्केट या बूट में दरार है"
+},
+"C0275": {
+"en": "Leaking fuel injector at idle",
+"hi": "आइडल पर फ़्यूल इंजेक्टर लीक कर रहा है"
+},
+"C0276": {
+"en": "Blown injector fuse (if fitted)",
+"hi": "इंजेक्टर का फ़्यूज़ उड़ गया है (अगर लगा हो)"
+},
+"C0277": {
+"en": "Faulty injector supply relay (if fitted)",
+"hi": "इंजेक्टर सप्लाई रिले खराब है (अगर लगा हो)"
+},
+"C0278": {
+"en": "Broken supply wiring",
+"hi": "सप्लाई वायरिंग टूटी है"
+},
+"C0279": {
+"en": "Supply wire short to ground",
+"hi": "सप्लाई वायर का ग्राउंड से शॉर्ट"
+},
+"C0280": {
+"en": "Weak battery",
+"hi": "बैटरी कमज़ोर है"
+},
+"C0281": {
+"en": "Supply wire short to battery supply",
+"hi": "सप्लाई वायर का बैटरी सप्लाई से शॉर्ट"
+},
+"C0282": {
+"en": "Charging system overvoltage",
+"hi": "चार्जिंग सिस्टम का ओवरवोल्टेज"
+},
+"C0283": {
+"en": "Spark plug fouled when cold",
+"hi": "ठंडे में स्पार्क प्लग गंदा हो जाता है"
+},
+"C0284": {
+"en": "Weak ignition coil when cold",
+"hi": "ठंडे में इग्निशन कॉइल कमज़ोर है"
+},
+"C0285": {
+"en": "Cold-start mixture too lean",
+"hi": "कोल्ड स्टार्ट में मिक्सचर बहुत लीन है"
+},
+"C0286": {
+"en": "Shorted ignition coil winding",
+"hi": "इग्निशन कॉइल की वाइंडिंग शॉर्ट है"
+},
+"C0287": {
+"en": "Primary wire short to ground",
+"hi": "प्राइमरी वायर का ग्राउंड से शॉर्ट"
+},
+"C0288": {
+"en": "Open ignition coil winding",
+"hi": "इग्निशन कॉइल की वाइंडिंग ओपन है"
+},
+"C0289": {
+"en": "Primary wire short to battery supply",
+"hi": "प्राइमरी वायर का बैटरी सप्लाई से शॉर्ट"
+},
+"C0290": {
+"en": "Worn or fouled spark plug",
+"hi": "स्पार्क प्लग घिसा या गंदा है"
+},
+"C0291": {
+"en": "Failed secondary winding in the coil",
+"hi": "कॉइल की सेकंडरी वाइंडिंग खराब हो गई है"
+},
+"C0292": {
+"en": "Damaged spark plug wire (if fitted)",
+"hi": "स्पार्क प्लग वायर खराब है (अगर लगा हो)"
+},
+"C0293": {
+"en": "Pin pushed out of a connector",
+"hi": "कनेक्टर से पिन बाहर निकल गया है"
+},
+"C0294": {
+"en": "Fault in the ECU output stage",
+"hi": "ECU के आउटपुट स्टेज में खराबी"
+},
+"C0295": {
+"en": "Fault in the signal wiring to the other units",
+"hi": "दूसरी यूनिट तक जाने वाली सिग्नल वायरिंग में खराबी"
+},
+"C0296": {
+"en": "Fault in the ECU output driver",
+"hi": "ECU के आउटपुट ड्राइवर में खराबी"
+},
+"C0297": {
+"en": "ECU supply voltage outside the allowed range",
+"hi": "ECU का सप्लाई वोल्टेज तय रेंज से बाहर है"
 },
 "H0001": {
 "en": "Check the sensor connector for water, corrosion and bent pins",
@@ -2619,6 +2799,170 @@
 "en": "Check the upstream sensor reaction on the scan tool",
 "hi": "स्कैन टूल पर अपस्ट्रीम सेंसर की प्रतिक्रिया जाँचें"
 },
+"H0289": {
+"en": "Check the downstream sensor signal while the engine runs",
+"hi": "इंजन चलते समय डाउनस्ट्रीम सेंसर का सिग्नल जाँचें"
+},
+"H0290": {
+"en": "Check the sensor for oil or coolant contamination",
+"hi": "सेंसर में ऑयल या कूलेंट का असर जाँचें"
+},
+"H0291": {
+"en": "Check the upstream sensor signal on the scan tool",
+"hi": "स्कैन टूल पर अपस्ट्रीम सेंसर का सिग्नल जाँचें"
+},
+"H0292": {
+"en": "Check the sensor for contamination and its wiring for damage",
+"hi": "सेंसर में गंदगी और उसकी वायरिंग में नुकसान जाँचें"
+},
+"H0293": {
+"en": "Check the downstream sensor signal on the scan tool",
+"hi": "स्कैन टूल पर डाउनस्ट्रीम सेंसर का सिग्नल जाँचें"
+},
+"H0294": {
+"en": "Check the heater supply and control wiring",
+"hi": "हीटर की सप्लाई और कंट्रोल वायरिंग जाँचें"
+},
+"H0295": {
+"en": "Check the heater fuse (if fitted) and the sensor connector",
+"hi": "हीटर का फ़्यूज़ (अगर लगा हो) और सेंसर कनेक्टर जाँचें"
+},
+"H0296": {
+"en": "Check the heater control wire for chafing and a short to ground",
+"hi": "हीटर कंट्रोल वायर में रगड़ और ग्राउंड से शॉर्ट जाँचें"
+},
+"H0297": {
+"en": "Check the sensor connector for corrosion",
+"hi": "सेंसर कनेक्टर में जंग जाँचें"
+},
+"H0298": {
+"en": "Check the heater control wire for a short to battery supply",
+"hi": "हीटर कंट्रोल वायर में बैटरी सप्लाई से शॉर्ट जाँचें"
+},
+"H0299": {
+"en": "Measure the sensor heater resistance and compare it with the service manual",
+"hi": "सेंसर हीटर का रेज़िस्टेंस नापें और सर्विस मैनुअल से तुलना करें"
+},
+"H0300": {
+"en": "Check how fast the sensor heats up on the scan tool",
+"hi": "स्कैन टूल पर देखें कि सेंसर कितनी तेज़ी से गर्म होता है"
+},
+"H0301": {
+"en": "Check the sensor mounting and its connector",
+"hi": "सेंसर की माउंटिंग और उसका कनेक्टर जाँचें"
+},
+"H0302": {
+"en": "Compare the downstream sensor signal with the upstream sensor",
+"hi": "डाउनस्ट्रीम सेंसर के सिग्नल की तुलना अपस्ट्रीम सेंसर से करें"
+},
+"H0303": {
+"en": "Check the downstream sensor and its wiring",
+"hi": "डाउनस्ट्रीम सेंसर और उसकी वायरिंग जाँचें"
+},
+"H0304": {
+"en": "Check the injector for leaking and the fuel pressure",
+"hi": "इंजेक्टर में लीक और फ़्यूल प्रेशर जाँचें"
+},
+"H0305": {
+"en": "Check that the purge valve (if fitted) closes fully",
+"hi": "जाँचें कि पर्ज वाल्व (अगर लगा हो) पूरा बंद होता है"
+},
+"H0306": {
+"en": "Look for intake air leaks at idle, for example with a smoke test",
+"hi": "आइडल पर इनटेक में हवा का रिसाव खोजें, जैसे स्मोक टेस्ट से"
+},
+"H0307": {
+"en": "Check the injector for leaking at idle",
+"hi": "आइडल पर इंजेक्टर में लीक जाँचें"
+},
+"H0308": {
+"en": "Check the injector supply at the connector with the ignition on",
+"hi": "इग्निशन चालू करके कनेक्टर पर इंजेक्टर की सप्लाई जाँचें"
+},
+"H0309": {
+"en": "Check the injector fuse (if fitted) and supply relay (if fitted)",
+"hi": "इंजेक्टर का फ़्यूज़ (अगर लगा हो) और सप्लाई रिले (अगर लगा हो) जाँचें"
+},
+"H0310": {
+"en": "Check the battery and the injector supply voltage while cranking",
+"hi": "क्रैंकिंग के समय बैटरी और इंजेक्टर का सप्लाई वोल्टेज जाँचें"
+},
+"H0311": {
+"en": "Check the supply wire for chafing",
+"hi": "सप्लाई वायर में रगड़ जाँचें"
+},
+"H0312": {
+"en": "Check the charging voltage at idle and at higher engine speed",
+"hi": "आइडल पर और ऊँची इंजन स्पीड पर चार्जिंग वोल्टेज जाँचें"
+},
+"H0313": {
+"en": "Check the supply wire for a short to battery supply",
+"hi": "सप्लाई वायर में बैटरी सप्लाई से शॉर्ट जाँचें"
+},
+"H0314": {
+"en": "Check the spark plug condition and gap",
+"hi": "स्पार्क प्लग की हालत और गैप जाँचें"
+},
+"H0315": {
+"en": "Check the ignition coil and the cold-start fuelling",
+"hi": "इग्निशन कॉइल और कोल्ड स्टार्ट में ईंधन की मात्रा जाँचें"
+},
+"H0316": {
+"en": "Check the coil primary wire for chafing against metal",
+"hi": "धातु से कॉइल प्राइमरी वायर की रगड़ जाँचें"
+},
+"H0317": {
+"en": "Check the coil winding and the connector",
+"hi": "कॉइल की वाइंडिंग और कनेक्टर जाँचें"
+},
+"H0318": {
+"en": "Check that the coil connector is fully plugged in",
+"hi": "जाँचें कि कॉइल कनेक्टर पूरा लगा है"
+},
+"H0319": {
+"en": "Check the coil winding and the primary wire",
+"hi": "कॉइल की वाइंडिंग और प्राइमरी वायर जाँचें"
+},
+"H0320": {
+"en": "Check the spark plug condition and gap first",
+"hi": "पहले स्पार्क प्लग की हालत और गैप जाँचें"
+},
+"H0321": {
+"en": "Check the coil and its spark plug connection for cracks",
+"hi": "कॉइल और उसके स्पार्क प्लग कनेक्शन में दरार जाँचें"
+},
+"H0322": {
+"en": "Check the sensor connectors that share supply B for breaks and corrosion",
+"hi": "सप्लाई B साझा करने वाले सेंसर कनेक्टर में टूटन और जंग जाँचें"
+},
+"H0323": {
+"en": "Unplug the sensors on supply B one at a time while watching the supply",
+"hi": "सप्लाई देखते हुए सप्लाई B के सेंसर एक-एक करके निकालें"
+},
+"H0324": {
+"en": "Check the wiring for chafing and the connectors for corrosion",
+"hi": "वायरिंग में रगड़ और कनेक्टर में जंग जाँचें"
+},
+"H0325": {
+"en": "Check the wiring for pinching and the connectors for corrosion",
+"hi": "वायरिंग में दबने के निशान और कनेक्टर में जंग जाँचें"
+},
+"H0326": {
+"en": "Check the sensor connectors that share supply C for breaks and corrosion",
+"hi": "सप्लाई C साझा करने वाले सेंसर कनेक्टर में टूटन और जंग जाँचें"
+},
+"H0327": {
+"en": "Unplug the sensors on supply C one at a time while watching the supply",
+"hi": "सप्लाई देखते हुए सप्लाई C के सेंसर एक-एक करके निकालें"
+},
+"H0328": {
+"en": "Compare the speed signal at the ECU output with the speed on the speedometer",
+"hi": "ECU आउटपुट पर स्पीड सिग्नल की तुलना स्पीडोमीटर की स्पीड से करें"
+},
+"H0329": {
+"en": "Check the signal wiring and connectors between the ECU and the other units",
+"hi": "ECU और दूसरी यूनिट के बीच सिग्नल वायरिंग और कनेक्टर जाँचें"
+},
 "M0001": {
 "en": "The bike's computer (ECU) cannot get a reliable reading of how far the throttle is open.",
 "hi": "बाइक का कंप्यूटर (ECU) थ्रॉटल कितना खुला है, इसकी भरोसेमंद रीडिंग नहीं ले पा रहा है।"
@@ -3419,6 +3763,166 @@
 "en": "The upstream oxygen sensor reacts too slowly when the mixture changes from rich to lean, so the fuel mixture cannot be corrected quickly.",
 "hi": "मिक्सचर रिच से लीन होने पर अपस्ट्रीम ऑक्सीजन सेंसर बहुत धीरे प्रतिक्रिया देता है, इसलिए ईंधन मिक्सचर को जल्दी ठीक नहीं किया जा सकता।"
 },
+"M0201": {
+"en": "The upstream oxygen sensor reacts too slowly when the mixture changes from lean to rich, so the fuel mixture cannot be corrected quickly.",
+"hi": "मिक्सचर लीन से रिच होने पर अपस्ट्रीम ऑक्सीजन सेंसर बहुत धीरे प्रतिक्रिया देता है, इसलिए ईंधन मिक्सचर को जल्दी ठीक नहीं किया जा सकता।"
+},
+"M0202": {
+"en": "The upstream oxygen sensor reacts only after a delay when the mixture changes from rich to lean.",
+"hi": "मिक्सचर रिच से लीन होने पर अपस्ट्रीम ऑक्सीजन सेंसर कुछ देर बाद ही प्रतिक्रिया देता है।"
+},
+"M0203": {
+"en": "The upstream oxygen sensor reacts only after a delay when the mixture changes from lean to rich.",
+"hi": "मिक्सचर लीन से रिच होने पर अपस्ट्रीम ऑक्सीजन सेंसर कुछ देर बाद ही प्रतिक्रिया देता है।"
+},
+"M0204": {
+"en": "The downstream oxygen sensor signal stays on lean all the time, so the bike's computer (ECU) cannot trust it.",
+"hi": "डाउनस्ट्रीम ऑक्सीजन सेंसर का सिग्नल हर समय लीन पर बना रहता है, इसलिए बाइक का कंप्यूटर (ECU) उस पर भरोसा नहीं कर सकता।"
+},
+"M0205": {
+"en": "The downstream oxygen sensor signal stays on rich all the time, so the bike's computer (ECU) cannot trust it.",
+"hi": "डाउनस्ट्रीम ऑक्सीजन सेंसर का सिग्नल हर समय रिच पर बना रहता है, इसलिए बाइक का कंप्यूटर (ECU) उस पर भरोसा नहीं कर सकता।"
+},
+"M0206": {
+"en": "The upstream oxygen sensor signal does not behave as expected, so the bike's computer (ECU) cannot trust it to adjust the mixture.",
+"hi": "अपस्ट्रीम ऑक्सीजन सेंसर का सिग्नल उम्मीद के मुताबिक व्यवहार नहीं कर रहा, इसलिए बाइक का कंप्यूटर (ECU) मिक्सचर एडजस्ट करने के लिए उस पर भरोसा नहीं कर सकता।"
+},
+"M0207": {
+"en": "The downstream oxygen sensor signal does not behave as expected, so the sensor or the emission system may be at fault.",
+"hi": "डाउनस्ट्रीम ऑक्सीजन सेंसर का सिग्नल उम्मीद के मुताबिक व्यवहार नहीं कर रहा, इसलिए सेंसर या उत्सर्जन सिस्टम खराब हो सकता है।"
+},
+"M0208": {
+"en": "The bike's computer (ECU) found a fault in the downstream oxygen sensor heater control circuit, so the sensor may warm up slowly.",
+"hi": "बाइक के कंप्यूटर (ECU) को डाउनस्ट्रीम ऑक्सीजन सेंसर के हीटर कंट्रोल सर्किट में खराबी मिली है, इसलिए सेंसर धीरे गर्म हो सकता है।"
+},
+"M0209": {
+"en": "The downstream oxygen sensor heater control signal is too low for the bike's computer (ECU), often from a short to ground.",
+"hi": "डाउनस्ट्रीम ऑक्सीजन सेंसर हीटर कंट्रोल का सिग्नल बाइक के कंप्यूटर (ECU) के लिए बहुत कम है, जो अक्सर ग्राउंड से शॉर्ट से होता है।"
+},
+"M0210": {
+"en": "The downstream oxygen sensor heater control signal is too high for the bike's computer (ECU), often from a short to battery supply.",
+"hi": "डाउनस्ट्रीम ऑक्सीजन सेंसर हीटर कंट्रोल का सिग्नल बाइक के कंप्यूटर (ECU) के लिए बहुत ज़्यादा है, जो अक्सर बैटरी सप्लाई से शॉर्ट से होता है।"
+},
+"M0211": {
+"en": "The heater resistance of the upstream oxygen sensor is outside the expected range, so the sensor may warm up poorly.",
+"hi": "अपस्ट्रीम ऑक्सीजन सेंसर के हीटर का रेज़िस्टेंस उम्मीद की रेंज से बाहर है, इसलिए हो सकता है कि सेंसर ठीक से गर्म न हो।"
+},
+"M0212": {
+"en": "The heater resistance of the downstream oxygen sensor is outside the expected range, so the sensor may warm up poorly.",
+"hi": "डाउनस्ट्रीम ऑक्सीजन सेंसर के हीटर का रेज़िस्टेंस उम्मीद की रेंज से बाहर है, इसलिए हो सकता है कि सेंसर ठीक से गर्म न हो।"
+},
+"M0213": {
+"en": "The heater of the upstream oxygen sensor does not warm the sensor as expected.",
+"hi": "अपस्ट्रीम ऑक्सीजन सेंसर का हीटर सेंसर को उम्मीद के मुताबिक गर्म नहीं कर रहा।"
+},
+"M0214": {
+"en": "The heater circuit of the downstream oxygen sensor works electrically but does not warm the sensor as expected.",
+"hi": "डाउनस्ट्रीम ऑक्सीजन सेंसर का हीटर सर्किट इलेक्ट्रिकली काम करता है, लेकिन सेंसर को उम्मीद के मुताबिक गर्म नहीं करता।"
+},
+"M0215": {
+"en": "The bike's computer (ECU) found a fault in the downstream oxygen sensor heater circuit, so the sensor may warm up slowly.",
+"hi": "बाइक के कंप्यूटर (ECU) को डाउनस्ट्रीम ऑक्सीजन सेंसर के हीटर सर्किट में खराबी मिली है, इसलिए सेंसर धीरे गर्म हो सकता है।"
+},
+"M0216": {
+"en": "The fine fuel correction that uses the downstream oxygen sensor has reached its lean limit, so the mixture is too lean.",
+"hi": "डाउनस्ट्रीम ऑक्सीजन सेंसर वाला सटीक ईंधन सुधार अपनी लीन सीमा तक पहुँच गया है, इसलिए मिक्सचर बहुत लीन है।"
+},
+"M0217": {
+"en": "The fine fuel correction that uses the downstream oxygen sensor has reached its rich limit, so the mixture is too rich.",
+"hi": "डाउनस्ट्रीम ऑक्सीजन सेंसर वाला सटीक ईंधन सुधार अपनी रिच सीमा तक पहुँच गया है, इसलिए मिक्सचर बहुत रिच है।"
+},
+"M0218": {
+"en": "The bike's computer (ECU) has to add a lot of fuel above idle, so the engine is getting too much air or too little fuel.",
+"hi": "बाइक के कंप्यूटर (ECU) को आइडल से ऊपर बहुत ज़्यादा ईंधन डालना पड़ रहा है, यानी इंजन को बहुत ज़्यादा हवा या बहुत कम ईंधन मिल रहा है।"
+},
+"M0219": {
+"en": "The bike's computer (ECU) has to remove a lot of fuel above idle, so the engine is getting too much fuel or too little air.",
+"hi": "बाइक के कंप्यूटर (ECU) को आइडल से ऊपर बहुत ज़्यादा ईंधन घटाना पड़ रहा है, यानी इंजन को बहुत ज़्यादा ईंधन या बहुत कम हवा मिल रही है।"
+},
+"M0220": {
+"en": "The bike's computer (ECU) has to add a lot of fuel at idle, which usually means an intake air leak.",
+"hi": "बाइक के कंप्यूटर (ECU) को आइडल पर बहुत ज़्यादा ईंधन डालना पड़ रहा है, जिसका मतलब आमतौर पर इनटेक में हवा का रिसाव होता है।"
+},
+"M0221": {
+"en": "The bike's computer (ECU) has to remove a lot of fuel at idle, so the engine is getting too much fuel at low load.",
+"hi": "बाइक के कंप्यूटर (ECU) को आइडल पर बहुत ज़्यादा ईंधन घटाना पड़ रहा है, यानी इंजन को कम लोड पर बहुत ज़्यादा ईंधन मिल रहा है।"
+},
+"M0222": {
+"en": "The bike's computer (ECU) found a break in the supply to the injector, so the injector may get no power.",
+"hi": "बाइक के कंप्यूटर (ECU) को इंजेक्टर की सप्लाई में टूटन मिली है, इसलिए हो सकता है कि इंजेक्टर को पावर न मिले।"
+},
+"M0223": {
+"en": "The supply voltage at the injector is too low for the bike's computer (ECU), from a short to ground or a weak battery.",
+"hi": "इंजेक्टर पर सप्लाई वोल्टेज बाइक के कंप्यूटर (ECU) के लिए बहुत कम है, जो ग्राउंड से शॉर्ट या कमज़ोर बैटरी से होता है।"
+},
+"M0224": {
+"en": "The supply voltage at the injector is too high for the bike's computer (ECU), often from a short to battery supply.",
+"hi": "इंजेक्टर पर सप्लाई वोल्टेज बाइक के कंप्यूटर (ECU) के लिए बहुत ज़्यादा है, जो अक्सर बैटरी सप्लाई से शॉर्ट से होता है।"
+},
+"M0225": {
+"en": "The bike's computer (ECU) detected misfires just after starting, but the engine then ran normally.",
+"hi": "बाइक के कंप्यूटर (ECU) ने स्टार्ट होने के ठीक बाद मिसफ़ायर पकड़े, लेकिन इंजन फिर सामान्य चला।"
+},
+"M0226": {
+"en": "The primary circuit of ignition coil A reads too low for the bike's computer (ECU), often from a short to ground.",
+"hi": "इग्निशन कॉइल A का प्राइमरी सर्किट बाइक के कंप्यूटर (ECU) को बहुत कम पढ़ रहा है, जो अक्सर ग्राउंड से शॉर्ट से होता है।"
+},
+"M0227": {
+"en": "The primary circuit of ignition coil A reads too high for the bike's computer (ECU), often from an open circuit.",
+"hi": "इग्निशन कॉइल A का प्राइमरी सर्किट बाइक के कंप्यूटर (ECU) को बहुत ज़्यादा पढ़ रहा है, जो अक्सर ओपन सर्किट से होता है।"
+},
+"M0228": {
+"en": "The bike's computer (ECU) found a fault on the high-voltage side of ignition coil A, so the spark may be weak or missing.",
+"hi": "बाइक के कंप्यूटर (ECU) को इग्निशन कॉइल A के हाई-वोल्टेज वाले हिस्से में खराबी मिली है, इसलिए स्पार्क कमज़ोर हो सकता है या नहीं भी बन सकता।"
+},
+"M0229": {
+"en": "The primary circuit of ignition coil B reads too low for the bike's computer (ECU), often from a short to ground.",
+"hi": "इग्निशन कॉइल B का प्राइमरी सर्किट बाइक के कंप्यूटर (ECU) को बहुत कम पढ़ रहा है, जो अक्सर ग्राउंड से शॉर्ट से होता है।"
+},
+"M0230": {
+"en": "The primary circuit of ignition coil B reads too high for the bike's computer (ECU), often from an open circuit.",
+"hi": "इग्निशन कॉइल B का प्राइमरी सर्किट बाइक के कंप्यूटर (ECU) को बहुत ज़्यादा पढ़ रहा है, जो अक्सर ओपन सर्किट से होता है।"
+},
+"M0231": {
+"en": "The bike's computer (ECU) found a fault on the high-voltage side of ignition coil B, so the spark may be weak or missing.",
+"hi": "बाइक के कंप्यूटर (ECU) को इग्निशन कॉइल B के हाई-वोल्टेज वाले हिस्से में खराबी मिली है, इसलिए स्पार्क कमज़ोर हो सकता है या नहीं भी बन सकता।"
+},
+"M0232": {
+"en": "The bike's computer (ECU) found a break in the second shared supply it gives its sensors, so several sensors may read wrongly.",
+"hi": "बाइक के कंप्यूटर (ECU) को अपने सेंसरों को दी जाने वाली दूसरी साझा सप्लाई में टूटन मिली है, इसलिए कई सेंसर गलत रीडिंग दे सकते हैं।"
+},
+"M0233": {
+"en": "The second shared supply that the bike's computer (ECU) gives its sensors is too low, often from a short to ground in one of them.",
+"hi": "बाइक का कंप्यूटर (ECU) अपने सेंसरों को जो दूसरी साझा सप्लाई देता है वह बहुत कम है, जो अक्सर उनमें से किसी एक में ग्राउंड से शॉर्ट से होता है।"
+},
+"M0234": {
+"en": "The second shared supply that the bike's computer (ECU) gives its sensors is too high, often from a short to battery supply.",
+"hi": "बाइक का कंप्यूटर (ECU) अपने सेंसरों को जो दूसरी साझा सप्लाई देता है वह बहुत ज़्यादा है, जो अक्सर बैटरी सप्लाई से शॉर्ट से होता है।"
+},
+"M0235": {
+"en": "The bike's computer (ECU) found a break in the third shared supply it gives its sensors, so several sensors may read wrongly.",
+"hi": "बाइक के कंप्यूटर (ECU) को अपने सेंसरों को दी जाने वाली तीसरी साझा सप्लाई में टूटन मिली है, इसलिए कई सेंसर गलत रीडिंग दे सकते हैं।"
+},
+"M0236": {
+"en": "The third shared supply that the bike's computer (ECU) gives its sensors is too low, often from a short to ground in one of them.",
+"hi": "बाइक का कंप्यूटर (ECU) अपने सेंसरों को जो तीसरी साझा सप्लाई देता है वह बहुत कम है, जो अक्सर उनमें से किसी एक में ग्राउंड से शॉर्ट से होता है।"
+},
+"M0237": {
+"en": "The third shared supply that the bike's computer (ECU) gives its sensors is too high, often from a short to battery supply.",
+"hi": "बाइक का कंप्यूटर (ECU) अपने सेंसरों को जो तीसरी साझा सप्लाई देता है वह बहुत ज़्यादा है, जो अक्सर बैटरी सप्लाई से शॉर्ट से होता है।"
+},
+"M0238": {
+"en": "The vehicle speed signal that the bike's computer (ECU) sends to other units is faulty, so they may use a wrong speed.",
+"hi": "बाइक का कंप्यूटर (ECU) दूसरी यूनिट को जो वाहन स्पीड सिग्नल भेजता है वह खराब है, इसलिए वे गलत स्पीड इस्तेमाल कर सकती हैं।"
+},
+"M0239": {
+"en": "The second vehicle speed signal that the bike's computer (ECU) sends to other units is faulty, so they may use a wrong speed.",
+"hi": "बाइक का कंप्यूटर (ECU) दूसरी यूनिट को जो दूसरा वाहन स्पीड सिग्नल भेजता है वह खराब है, इसलिए वे गलत स्पीड इस्तेमाल कर सकती हैं।"
+},
+"M0240": {
+"en": "The bike's computer (ECU) found an error in the processor that supervises its main processor, so it may control the engine poorly.",
+"hi": "बाइक के कंप्यूटर (ECU) को अपने मुख्य प्रोसेसर की निगरानी करने वाले प्रोसेसर में एरर मिला है, इसलिए इंजन का कंट्रोल कमज़ोर हो सकता है।"
+},
 "R0001": {
 "en": "idle may be uneven; avoid traffic and long trips",
 "hi": "आइडल अस्थिर हो सकता है; ट्रैफ़िक और लंबे सफ़र से बचें"
@@ -3754,6 +4258,26 @@
 "R0084": {
 "en": "emission check only; the bike should run normally",
 "hi": "सिर्फ़ उत्सर्जन जाँच की बात; बाइक सामान्य चलनी चाहिए"
+},
+"R0085": {
+"en": "usually rideable; mixture slightly off",
+"hi": "आमतौर पर चलाने लायक; मिक्सचर थोड़ा गड़बड़"
+},
+"R0086": {
+"en": "injector may get no power; arrange transport",
+"hi": "इंजेक्टर को पावर न मिले; बाइक ले जाने का इंतज़ाम करें"
+},
+"R0087": {
+"en": "may start hard or run poorly; short trip to a workshop",
+"hi": "स्टार्ट मुश्किल या ठीक से न चले; वर्कशॉप तक छोटा सफ़र"
+},
+"R0088": {
+"en": "misfires only just after starting; ride gently",
+"hi": "मिसफ़ायर सिर्फ़ स्टार्ट के ठीक बाद; धीरे चलाएँ"
+},
+"R0089": {
+"en": "speed readout may be wrong; ride carefully",
+"hi": "स्पीड रीडआउट गलत हो सकता है; सावधानी से चलाएँ"
 },
 "T0001": {
 "en": "Throttle position sensor A: circuit fault",
@@ -4554,5 +5078,165 @@
 "T0200": {
 "en": "Oxygen (O2) sensor, upstream: slow response, rich to lean",
 "hi": "ऑक्सीजन (O2) सेंसर, अपस्ट्रीम: धीमी प्रतिक्रिया, रिच से लीन"
+},
+"T0201": {
+"en": "Oxygen (O2) sensor, upstream: slow response, lean to rich",
+"hi": "ऑक्सीजन (O2) सेंसर, अपस्ट्रीम: धीमी प्रतिक्रिया, लीन से रिच"
+},
+"T0202": {
+"en": "Oxygen (O2) sensor, upstream: delayed response, rich to lean",
+"hi": "ऑक्सीजन (O2) सेंसर, अपस्ट्रीम: देर से प्रतिक्रिया, रिच से लीन"
+},
+"T0203": {
+"en": "Oxygen (O2) sensor, upstream: delayed response, lean to rich",
+"hi": "ऑक्सीजन (O2) सेंसर, अपस्ट्रीम: देर से प्रतिक्रिया, लीन से रिच"
+},
+"T0204": {
+"en": "Oxygen (O2) sensor, downstream: signal stuck lean",
+"hi": "ऑक्सीजन (O2) सेंसर, डाउनस्ट्रीम: सिग्नल लीन पर अटका"
+},
+"T0205": {
+"en": "Oxygen (O2) sensor, downstream: signal stuck rich",
+"hi": "ऑक्सीजन (O2) सेंसर, डाउनस्ट्रीम: सिग्नल रिच पर अटका"
+},
+"T0206": {
+"en": "Oxygen (O2) sensor, upstream: performance or incorrect operation",
+"hi": "ऑक्सीजन (O2) सेंसर, अपस्ट्रीम: परफ़ॉर्मेंस या गलत कामकाज"
+},
+"T0207": {
+"en": "Oxygen (O2) sensor, downstream: performance or incorrect operation",
+"hi": "ऑक्सीजन (O2) सेंसर, डाउनस्ट्रीम: परफ़ॉर्मेंस या गलत कामकाज"
+},
+"T0208": {
+"en": "Oxygen sensor heater control (downstream): circuit fault",
+"hi": "ऑक्सीजन सेंसर हीटर कंट्रोल (डाउनस्ट्रीम): सर्किट में खराबी"
+},
+"T0209": {
+"en": "Oxygen sensor heater control (downstream): voltage below threshold",
+"hi": "ऑक्सीजन सेंसर हीटर कंट्रोल (डाउनस्ट्रीम): वोल्टेज सीमा से कम"
+},
+"T0210": {
+"en": "Oxygen sensor heater control (downstream): voltage above threshold",
+"hi": "ऑक्सीजन सेंसर हीटर कंट्रोल (डाउनस्ट्रीम): वोल्टेज सीमा से ज़्यादा"
+},
+"T0211": {
+"en": "Oxygen sensor heater (upstream): resistance out of range",
+"hi": "ऑक्सीजन सेंसर हीटर (अपस्ट्रीम): रेज़िस्टेंस रेंज से बाहर"
+},
+"T0212": {
+"en": "Oxygen sensor heater (downstream): resistance out of range",
+"hi": "ऑक्सीजन सेंसर हीटर (डाउनस्ट्रीम): रेज़िस्टेंस रेंज से बाहर"
+},
+"T0213": {
+"en": "Oxygen sensor heater (upstream): performance or incorrect operation",
+"hi": "ऑक्सीजन सेंसर हीटर (अपस्ट्रीम): परफ़ॉर्मेंस या गलत कामकाज"
+},
+"T0214": {
+"en": "Oxygen sensor heater (downstream): performance or incorrect operation",
+"hi": "ऑक्सीजन सेंसर हीटर (डाउनस्ट्रीम): परफ़ॉर्मेंस या गलत कामकाज"
+},
+"T0215": {
+"en": "Oxygen sensor heater (downstream): circuit fault",
+"hi": "ऑक्सीजन सेंसर हीटर (डाउनस्ट्रीम): सर्किट में खराबी"
+},
+"T0216": {
+"en": "Fuel mixture too lean (downstream correction)",
+"hi": "ईंधन मिक्सचर बहुत लीन (डाउनस्ट्रीम सुधार)"
+},
+"T0217": {
+"en": "Fuel mixture too rich (downstream correction)",
+"hi": "ईंधन मिक्सचर बहुत रिच (डाउनस्ट्रीम सुधार)"
+},
+"T0218": {
+"en": "Fuel mixture too lean (above idle)",
+"hi": "ईंधन मिक्सचर बहुत लीन (आइडल से ऊपर)"
+},
+"T0219": {
+"en": "Fuel mixture too rich (above idle)",
+"hi": "ईंधन मिक्सचर बहुत रिच (आइडल से ऊपर)"
+},
+"T0220": {
+"en": "Fuel mixture too lean (at idle)",
+"hi": "ईंधन मिक्सचर बहुत लीन (आइडल पर)"
+},
+"T0221": {
+"en": "Fuel mixture too rich (at idle)",
+"hi": "ईंधन मिक्सचर बहुत रिच (आइडल पर)"
+},
+"T0222": {
+"en": "Fuel injector supply: open circuit",
+"hi": "फ़्यूल इंजेक्टर सप्लाई: ओपन सर्किट"
+},
+"T0223": {
+"en": "Fuel injector supply: voltage below threshold",
+"hi": "फ़्यूल इंजेक्टर सप्लाई: वोल्टेज सीमा से कम"
+},
+"T0224": {
+"en": "Fuel injector supply: voltage above threshold",
+"hi": "फ़्यूल इंजेक्टर सप्लाई: वोल्टेज सीमा से ज़्यादा"
+},
+"T0225": {
+"en": "Misfire detected just after starting",
+"hi": "स्टार्ट होने के ठीक बाद मिसफ़ायर पाया गया"
+},
+"T0226": {
+"en": "Ignition coil A primary circuit: voltage below threshold",
+"hi": "इग्निशन कॉइल A प्राइमरी सर्किट: वोल्टेज सीमा से कम"
+},
+"T0227": {
+"en": "Ignition coil A primary circuit: voltage above threshold",
+"hi": "इग्निशन कॉइल A प्राइमरी सर्किट: वोल्टेज सीमा से ज़्यादा"
+},
+"T0228": {
+"en": "Ignition coil A secondary circuit: fault",
+"hi": "इग्निशन कॉइल A सेकंडरी सर्किट: खराबी"
+},
+"T0229": {
+"en": "Ignition coil B primary circuit: voltage below threshold",
+"hi": "इग्निशन कॉइल B प्राइमरी सर्किट: वोल्टेज सीमा से कम"
+},
+"T0230": {
+"en": "Ignition coil B primary circuit: voltage above threshold",
+"hi": "इग्निशन कॉइल B प्राइमरी सर्किट: वोल्टेज सीमा से ज़्यादा"
+},
+"T0231": {
+"en": "Ignition coil B secondary circuit: fault",
+"hi": "इग्निशन कॉइल B सेकंडरी सर्किट: खराबी"
+},
+"T0232": {
+"en": "Sensor supply B: open circuit",
+"hi": "सेंसर सप्लाई B: ओपन सर्किट"
+},
+"T0233": {
+"en": "Sensor supply B: voltage below threshold",
+"hi": "सेंसर सप्लाई B: वोल्टेज सीमा से कम"
+},
+"T0234": {
+"en": "Sensor supply B: voltage above threshold",
+"hi": "सेंसर सप्लाई B: वोल्टेज सीमा से ज़्यादा"
+},
+"T0235": {
+"en": "Sensor supply C: open circuit",
+"hi": "सेंसर सप्लाई C: ओपन सर्किट"
+},
+"T0236": {
+"en": "Sensor supply C: voltage below threshold",
+"hi": "सेंसर सप्लाई C: वोल्टेज सीमा से कम"
+},
+"T0237": {
+"en": "Sensor supply C: voltage above threshold",
+"hi": "सेंसर सप्लाई C: वोल्टेज सीमा से ज़्यादा"
+},
+"T0238": {
+"en": "ECU vehicle speed output A: fault",
+"hi": "ECU वाहन स्पीड आउटपुट A: खराबी"
+},
+"T0239": {
+"en": "ECU vehicle speed output B: fault",
+"hi": "ECU वाहन स्पीड आउटपुट B: खराबी"
+},
+"T0240": {
+"en": "ECU internal fault: monitoring processor",
+"hi": "ECU के अंदर खराबी: मॉनिटरिंग प्रोसेसर"
 }
 }
