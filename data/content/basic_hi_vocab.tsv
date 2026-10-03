@@ -525,3 +525,65 @@ off idle	आइडल से बाहर
 closed loop	क्लोज़्ड लूप
 water in fuel	फ़्यूल में पानी
 unable to achieve locked position	लॉक्ड पोज़ीशन तक पहुँचने में असमर्थ
+# round 7 (batches P11-P13)
+absolute	एब्सोल्यूट
+accessory	एक्सेसरी
+additive	एडिटिव
+afcm	AFCM
+alignment	अलाइनमेंट
+apply	एप्लाई
+arm	आर्म
+center	सेंटर
+chassis	चैसिस
+cleaner	क्लीनर
+compression	कंप्रेशन
+data	डेटा
+degassing	डीगैसिंग
+direct	डायरेक्ट
+disengaged	डिसएंगेज्ड
+disengagement	डिसएंगेजमेंट
+distribution	डिस्ट्रीब्यूशन
+dry	ड्राई
+electronic	इलेक्ट्रॉनिक
+engagement	एंगेजमेंट
+event	इवेंट
+fast	तेज़
+too fast	बहुत तेज़
+fork	फ़ोर्क
+front	फ्रंट
+hood	हुड
+indicated	दर्शाया गया
+kick	किक
+left	लेफ़्ट
+locked	लॉक्ड
+movement	मूवमेंट
+nh3	NH3
+number	नंबर
+ozone	ओज़ोन
+piston	पिस्टन
+presence	मौजूदगी
+prndl	PRNDL
+pulse	पल्स
+recorder	रिकॉर्डर
+reduction	रिडक्शन
+reservoir	रिज़र्वॉयर
+return	रिटर्न
+right	राइट
+rocker	रॉकर
+run	रन
+selector	सिलेक्टर
+sound	साउंड
+stabilizer	स्टेबलाइज़र
+stroke	स्ट्रोक
+unexpected	अप्रत्याशित
+unmetered	अनमीटर्ड
+unrequested	अनरिक्वेस्टेड
+values	वैल्यू
+vaporizer	वेपोराइज़र
+warning	चेतावनी
+warning lamp	चेतावनी लैंप
+# round 7b: phrases
+at low limit	निचली सीमा पर
+at high limit	ऊपरी सीमा पर
+stuck in locked position	लॉक्ड पोज़ीशन में अटका
+air in system	सिस्टम में हवा
