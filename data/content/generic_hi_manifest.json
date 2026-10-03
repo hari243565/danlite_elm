@@ -1,0 +1,15 @@
+{
+  "pack_id": "generic_hi",
+  "scope": "generic",
+  "language": "hi",
+  "version": 1,
+  "entries_count": 308,
+  "content_sha256": "f43f145d710461bc1b1b218faa5df53436f20509b278da5362cf289c9a90ee59",
+  "created_at": "2026-10-03",
+  "min_app_version": "1.0.0",
+  "review_state": "draft",
+  "revoked": [],
+  "signature": null,
+  "source": "bundled",
+  "content_origin": "content/seed-20261001, data/content/generic_hi_seed.jsonl, built by build_hi.py from generic_en_seed.jsonl. AI-translated DRAFT Hindi, hi_status machine, not read by any person. content_sha256 is of the file with LF line endings, byte for byte as shipped."
+}

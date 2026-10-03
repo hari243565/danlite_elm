@@ -785,7 +785,7 @@
 },
 "C0068": {
 "en": "Sticky or dirty idle air control valve",
-"hi": "आइडल एयर कंट्रोल वाल्व चिपचिपा या गंदा है"
+"hi": "आइडल एयर कंट्रोल वाल्व चिपक रहा है या गंदा है"
 },
 "C0069": {
 "en": "Dirty throttle body",
@@ -1061,11 +1061,11 @@
 },
 "C0137": {
 "en": "Low compression on one cylinder when cold",
-"hi": "ठंडे में एक सिलेंडर पर कंप्रेशन कम है"
+"hi": "ठंडे इंजन में एक सिलेंडर पर कंप्रेशन कम है"
 },
 "C0138": {
 "en": "Sticky valves when cold",
-"hi": "ठंडे में वाल्व चिपचिपे हैं"
+"hi": "ठंडे इंजन में वाल्व चिपक रहे हैं"
 },
 "C0139": {
 "en": "Faulty closed throttle switch",
@@ -1645,11 +1645,11 @@
 },
 "C0283": {
 "en": "Spark plug fouled when cold",
-"hi": "ठंडे में स्पार्क प्लग गंदा हो जाता है"
+"hi": "ठंडे इंजन में स्पार्क प्लग गंदा हो जाता है"
 },
 "C0284": {
 "en": "Weak ignition coil when cold",
-"hi": "ठंडे में इग्निशन कॉइल कमज़ोर है"
+"hi": "ठंडे इंजन में इग्निशन कॉइल कमज़ोर है"
 },
 "C0285": {
 "en": "Cold-start mixture too lean",
@@ -5005,7 +5005,7 @@
 },
 "R0011": {
 "en": "hard cold start; short trip, avoid very hot weather",
-"hi": "ठंडे में स्टार्ट मुश्किल; छोटा सफ़र करें, बहुत गर्म मौसम से बचें"
+"hi": "ठंडे इंजन में स्टार्ट मुश्किल; छोटा सफ़र करें, बहुत गर्म मौसम से बचें"
 },
 "R0012": {
 "en": "reduced power and vibration; ride gently, short trip",
@@ -5169,11 +5169,11 @@
 },
 "R0052": {
 "en": "cold idle may be unsteady; avoid heavy traffic",
-"hi": "ठंडे में आइडल अस्थिर हो सकता है; भारी ट्रैफ़िक से बचें"
+"hi": "ठंडे इंजन में आइडल अस्थिर हो सकता है; भारी ट्रैफ़िक से बचें"
 },
 "R0053": {
 "en": "cold idle may be rough; avoid heavy traffic",
-"hi": "ठंडे में आइडल रफ़ हो सकता है; भारी ट्रैफ़िक से बचें"
+"hi": "ठंडे इंजन में आइडल रफ़ हो सकता है; भारी ट्रैफ़िक से बचें"
 },
 "R0054": {
 "en": "idle may be unsteady at times; avoid heavy traffic",

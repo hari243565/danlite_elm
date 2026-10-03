@@ -15,6 +15,7 @@ The token <TWIN> inside a Hindi sentence is replaced by the fixed twin clause.
 hi_tm.json (written by every build) records the English text next to each Hindi string; if the English seed changes
 under an id the build stops and says which one, so a changed English sentence cannot keep a stale translation.
 """
+import hashlib
 import json
 import os
 import sys
@@ -146,6 +147,22 @@ def main():
         json.dump(rec, f, ensure_ascii=False, indent=0, sort_keys=True)
         f.write("\n")
     print(f"wrote {len(out)} Hindi rows (batches 1..{upto}) to {os.path.basename(C.HI_SEED)}")
+    if len(out) == len(en_rows):
+        # manifest in the same shape as assets/knowledge/generic_en/manifest.json, for the app's importer
+        digest = hashlib.sha256(open(C.HI_SEED, "rb").read()).hexdigest()
+        manifest = {
+            "pack_id": "generic_hi", "scope": "generic", "language": "hi", "version": 1,
+            "entries_count": len(out), "content_sha256": digest, "created_at": UPDATED_AT,
+            "min_app_version": "1.0.0", "review_state": "draft", "revoked": [], "signature": None,
+            "source": "bundled",
+            "content_origin": "content/seed-20261001, data/content/generic_hi_seed.jsonl, built by build_hi.py from "
+                              "generic_en_seed.jsonl. AI-translated DRAFT Hindi, hi_status machine, not read by any "
+                              "person. content_sha256 is of the file with LF line endings, byte for byte as shipped.",
+        }
+        with open(os.path.join(C.HERE, "generic_hi_manifest.json"), "w", encoding="utf-8", newline="\n") as f:
+            json.dump(manifest, f, ensure_ascii=False, indent=2)
+            f.write("\n")
+        print(f"wrote generic_hi_manifest.json (sha256 {digest[:12]}...)")
 
 
 if __name__ == "__main__":
