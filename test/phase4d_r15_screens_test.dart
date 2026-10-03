@@ -110,12 +110,12 @@ void main() {
       await env.close(tester);
     });
 
-    testWidgets('[en] an unverified row (P2195) shows the Draft line on the card, not the check note',
+    testWidgets('[en] the one visible unverified row (P0132) shows the Draft line on the card, not the check note',
         (tester) async {
       final env = await screens.setUp(tester,
-          make: 'Yamaha', model: 'R15', year: 2022, sim: EngineSim(mode03: mode03('P2195')));
+          make: 'Yamaha', model: 'R15', year: 2022, sim: EngineSim(mode03: mode03('P0132')));
       final xs = await screens.showDtc(tester, env);
-      expect(xs, contains('O2 sensor, open circuit'));
+      expect(xs, contains('O2 sensor, short to power'));
       expect(xs, contains('${t('provenanceManual')}. ${t('provenanceDraft')}'));
       expect(has(xs, 'to be checked against the manual page'), isFalse,
           reason: 'that note is for the mechanic section');
@@ -271,19 +271,43 @@ void main() {
       await env.close(tester);
     });
 
-    testWidgets('[en] reconstructed and inferred rows say they are to be checked', (tester) async {
+    testWidgets('[en] the inferred row says it is to be checked; a verified row does not', (tester) async {
       final env = await screens.setUp(tester, make: 'Yamaha', model: 'R15', year: 2022);
-      var xs = await detail(tester, env, 'P00D1');
-      expect(has(xs, t('makerCheckReconstructed')), isTrue);
+      var xs = await detail(tester, env, 'P0132');
       expect(has(xs, t('provenanceDraft')), isTrue);
-      xs = await detail(tester, env, 'P2195');
-      expect(has(xs, t('makerCheckReconstructed')), isTrue);
       xs = await detail(tester, env, 'P0132');
       expect(has(xs, t('makerCheckInferred')), isTrue);
       expect(has(xs, t('provenanceDraft')), isTrue);
       xs = await detail(tester, env, 'P0030');
       expect(has(xs, 'to be checked against the manual page'), isFalse);
       await env.close(tester);
+    });
+
+    testWidgets('M5: P00D1 and P2195 on an R15 show the generic standard meaning and no Yamaha text',
+        (tester) async {
+      for (final code in ['P00D1', 'P2195']) {
+        for (final lang in ['en', 'hi']) {
+          final env = await screens.setUp(tester,
+              lang: lang, make: 'Yamaha', model: 'R15', year: 2022,
+              sim: EngineSim(mode03: mode03(code)));
+          final xs = await screens.showDtc(tester, env);
+          expect(has(xs, 'O2 sensor, open circuit'), isFalse, reason: code);
+          expect(has(xs, 'O2 sensor, no normal signal while driving'), isFalse, reason: code);
+          for (final m in makerMarkers(lang)) {
+            expect(has(xs, m), isFalse, reason: '$code $m');
+          }
+          expect(xs, isNot(contains(t('provenanceManual', lang))));
+          final r = env.knowledge!.resolve(
+              FaultRecord.fromObdCode(code, source: ReadSource.mode03, readAt: DateTime.utc(2026, 10, 4)),
+              VehicleContext.fromProfile(make: 'Yamaha', model: 'R15', year: 2022),
+              lang,
+              domain: FaultDomain.engine);
+          expect(r.provenance, anyOf(Provenance.aiGuidance, Provenance.standardTitleOnly),
+              reason: '$code is answered by the generic standard text');
+          expect(has(xs, r.title!), isTrue, reason: '$code $lang shows the generic title');
+          await env.close(tester);
+        }
+      }
     });
 
     testWidgets('[hi] Hindi detail', (tester) async {

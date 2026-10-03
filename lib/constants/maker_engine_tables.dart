@@ -48,6 +48,7 @@ class MakerEngineRow {
     this.canDrive = true,
     this.dealerItem,
     this.check = MakerRowCheck.none,
+    this.withheld = false,
   });
 
   final String code;
@@ -64,6 +65,12 @@ class MakerEngineRow {
   final String? dealerItem;
 
   final MakerRowCheck check;
+
+  /// The row is kept in the data but NOT shown: the bike falls back to the
+  /// generic standard meaning for this code. Used while a row's wording
+  /// conflicts with the standard's own name and nobody has checked the manual
+  /// page. Set it back to false to restore the maker text.
+  final bool withheld;
 
   /// The app's judgement from the fail-safe columns: Stop when the maker says
   /// the engine will not start or the bike cannot be driven.
@@ -101,9 +108,11 @@ class MakerEngineTable {
 
   final List<MakerEngineRow> rows;
 
+  /// The row to show for [code], or null when the table has none or the row is
+  /// withheld (see [MakerEngineRow.withheld]).
   MakerEngineRow? row(String code) {
     for (final r in rows) {
-      if (r.code == code) return r;
+      if (r.code == code) return r.withheld ? null : r;
     }
     return null;
   }
@@ -143,14 +152,19 @@ class MakerEngineTables {
   // YZF155-A). Read by the owner's assistant on 2026-10-03: 21 rows of
   // standard P-codes with the maker's fail-safe columns.
   //
-  // Three rows are NOT read straight from the page and carry a check mark;
-  // their rows show the "Draft" line, and the mechanic section says they are
-  // to be checked against the manual page:
-  //   P00D1  reconstructed
-  //   P2195  reconstructed
-  //   P0132  row alignment inferred
-  // (For P2195 and P00D1 the standard's own name differs from this meaning —
-  // one more reason they are to be checked.)
+  // Three rows are NOT read straight from the page and carry a check mark:
+  //   P00D1  reconstructed  — WITHHELD (not shown)
+  //   P2195  reconstructed  — WITHHELD (not shown)
+  //   P0132  row alignment inferred — shown, with the "Draft" line and a
+  //          "to be checked against the manual page" note in the mechanic
+  //          section
+  // P00D1 and P2195 are withheld because their wording conflicts with the
+  // standard's own names (P2195 is "O2 sensor signal stuck lean" in the
+  // standard, here "open circuit"; P00D1 is "heater performance" in the
+  // standard, here "no normal signal while driving"). A bike with this table
+  // gets the generic standard meaning for those two codes. Their rows stay
+  // below so they can be restored: once someone has checked manual page 8-47,
+  // delete `withheld: true` (and, if the page differs, correct the wording).
   // ════════════════════════════════════════════════════════════════════════
   static const MakerEngineTable _yamahaR15 = MakerEngineTable(
     key: kYamahaR15TableKey,
@@ -184,12 +198,14 @@ class MakerEngineTables {
         'O2 sensor, no normal signal while driving',
         'O2 सेंसर, चलते समय सामान्य सिग्नल नहीं मिल रहा',
         check: MakerRowCheck.reconstructed,
+        withheld: true, // reconstructed; conflicts with the standard name
       ),
       MakerEngineRow(
         'P2195',
         'O2 sensor, open circuit',
         'O2 सेंसर, ओपन सर्किट',
         check: MakerRowCheck.reconstructed,
+        withheld: true, // reconstructed; conflicts with the standard name
       ),
       MakerEngineRow(
         'P0106',

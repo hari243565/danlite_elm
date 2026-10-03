@@ -45,6 +45,10 @@ const List<Row> brief = [
   ('P0563', 'Battery charging voltage abnormal, overcharged', true, true, null, 'none'),
 ];
 
+/// Rows kept in the data but not shown (their wording conflicts with the
+/// standard's own names; restore once manual page 8-47 is checked).
+const Set<String> withheldCodes = {'P00D1', 'P2195'};
+
 FaultRecord obd(String code) => FaultRecord.fromObdCode(code,
     source: ReadSource.mode03, readAt: DateTime.utc(2026, 10, 4));
 
@@ -121,6 +125,18 @@ void main() {
         expect(RegExp(r'^P[0-3][0-9A-F]{3}$').hasMatch(r.code), isTrue);
         expect(r.code.startsWith('P1'), isFalse);
       }
+    });
+
+    test('only P00D1 and P2195 are withheld; the rows stay in the data', () {
+      expect({for (final r in rows) if (r.withheld) r.code}, withheldCodes);
+      expect(rows.firstWhere((r) => r.code == 'P00D1').meaningEn,
+          'O2 sensor, no normal signal while driving');
+      expect(rows.firstWhere((r) => r.code == 'P2195').meaningEn, 'O2 sensor, open circuit');
+      expect(rows.firstWhere((r) => r.code == 'P00D1').check, MakerRowCheck.reconstructed);
+      expect(rows.firstWhere((r) => r.code == 'P2195').check, MakerRowCheck.reconstructed);
+      expect(MakerEngineTables.byKey(kYamahaR15TableKey)!.row('P00D1'), isNull);
+      expect(MakerEngineTables.byKey(kYamahaR15TableKey)!.row('P2195'), isNull);
+      expect(MakerEngineTables.byKey(kYamahaR15TableKey)!.row('P0132'), isNotNull);
     });
 
     test('the three marked rows are exactly the unverified ones', () {
@@ -295,7 +311,7 @@ void main() {
 
   group('M3 what each row says about riding', () {
     final v = bike('Yamaha', 'R15');
-    for (final b in brief) {
+    for (final b in brief.where((b) => !withheldCodes.contains(b.$1))) {
       final stop = !b.$3 || !b.$4;
       test('${b.$1}: ${stop ? 'Stop, cannot ride' : 'Service soon, with care'}', () {
         final r = resolve(v, b.$1);
@@ -305,7 +321,7 @@ void main() {
         expect(r.maker!.canDrive, b.$4);
         expect(r.maker!.dealerItem, b.$5);
         expect(r.maker!.check.name, b.$6);
-        expect(r.draft, b.$6 != 'none', reason: 'the draft line only on the unverified rows');
+        expect(r.draft, b.$6 != 'none', reason: 'the draft line only on the unverified row (P0132)');
         expect(r.provenance, Provenance.serviceManual);
         expect(r.level, ResolvedLevel.l1Vehicle);
         expect(r.hasMeaning, isTrue);
@@ -317,7 +333,7 @@ void main() {
     test('the Stop rows are exactly P0201, P0335 and P0351', () {
       final stops = [
         for (final b in brief)
-          if (resolve(v, b.$1).riderAction == RiderAction.stop) b.$1
+          if (resolve(v, b.$1).maker != null && resolve(v, b.$1).riderAction == RiderAction.stop) b.$1
       ];
       expect(stops, ['P0201', 'P0335', 'P0351']);
     });
@@ -325,8 +341,61 @@ void main() {
     test('every answer obeys the app rule: Stop means cannot ride', () {
       for (final b in brief) {
         final r = resolve(v, b.$1);
+        if (r.riderAction == null) continue; // a withheld row: no maker answer
         expect(r.riderAction == RiderAction.stop, r.canRide == CanRide.no, reason: b.$1);
       }
+    });
+  });
+
+  group('M5 the two withheld rows fall back to the generic standard meaning', () {
+    for (final code in withheldCodes) {
+      for (final year in <int?>[2022, 2025, null]) {
+        test('$code on an R15 ($year): generic guidance, never the maker text', () {
+          final r = resolve(bike('Yamaha', 'R15', year: year), code,
+              store: [generic(code, 'ai_authored_from_standard_title', title: 'Standard meaning')]);
+          expect(r.maker, isNull);
+          expect(r.provenance, Provenance.aiGuidance);
+          expect(r.level, ResolvedLevel.l4Generic);
+          expect(r.title, 'Standard meaning');
+          expect(r.draft, isTrue, reason: 'the ordinary generic draft line');
+        });
+      }
+
+      test('$code on an R15: a bare standard name, and no store at all', () {
+        final bare = resolve(bike('Yamaha', 'R15'), code,
+            store: [generic(code, 'standard_title_only', title: 'Bare name')]);
+        expect(bare.maker, isNull);
+        expect(bare.provenance, Provenance.standardTitleOnly);
+        final none = resolve(bike('Yamaha', 'R15'), code);
+        expect(none.maker, isNull);
+        expect(none.provenance, isNot(Provenance.serviceManual));
+      });
+
+      test('$code on an R15, Hindi: the generic Hindi row, no machine-Yamaha line', () {
+        final r = resolve(bike('Yamaha', 'R15'), code, lang: 'hi', store: [
+          generic(code, 'ai_authored_from_standard_title', title: 'Standard meaning'),
+          generic(code, 'ai_authored_from_standard_title', lang: 'hi', title: 'मानक अर्थ'),
+        ]);
+        expect(r.maker, isNull);
+        expect(r.title, 'मानक अर्थ');
+      });
+    }
+
+    test('P0132 stays visible with the Draft line', () {
+      final r = resolve(bike('Yamaha', 'R15'), 'P0132');
+      expect(r.maker, isNotNull);
+      expect(r.maker!.check, MakerRowCheck.inferred);
+      expect(r.draft, isTrue);
+      expect(r.title, 'O2 sensor, short to power');
+    });
+
+    test('the 19 other rows are all still shown', () {
+      final shown = [
+        for (final b in brief)
+          if (resolve(bike('Yamaha', 'R15'), b.$1).maker != null) b.$1
+      ];
+      expect(shown, [for (final b in brief) if (!withheldCodes.contains(b.$1)) b.$1]);
+      expect(shown, hasLength(19));
     });
   });
 
