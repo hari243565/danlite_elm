@@ -1,19 +1,14 @@
 /// Fault-code safety release — S5 (manufacturer-defined codes), S6 (cause and
-/// advice shown), S7 (legacy-text switch and Hindi lookup order), S10 (C1024).
+/// advice shown), S7 (what a code with no text shows), S10 (C1024).
 ///
-/// Unlike the earlier suites, these load the REAL engine knowledge assets
-/// (`assets/dtc_translations.json` and `DtcDictionaryHi`), so the resolution
-/// the rider actually sees is what is tested.
+/// Phase 4C: the borrowed engine text (the translations asset and the Hindi
+/// dictionary) is gone, so the tests that read it are gone with it; what is
+/// left checks the rules that outlive it.
 library;
 
-import 'dart:convert';
-import 'dart:io';
-
 import 'package:danlite_elm/constants/app_strings.dart';
-import 'package:danlite_elm/constants/build_flags.dart';
 import 'package:danlite_elm/constants/chassis_dtc_dictionary.dart';
 import 'package:danlite_elm/constants/dtc_descriptions.dart';
-import 'package:danlite_elm/constants/dtc_dictionary_hi.dart';
 import 'package:danlite_elm/providers/settings_provider.dart';
 import 'package:danlite_elm/providers/vehicle_provider.dart';
 import 'package:danlite_elm/screens/dtc_screen.dart';
@@ -26,42 +21,6 @@ import 'package:provider/provider.dart';
 import 'support/engine_sim.dart';
 
 String en(String key) => AppStrings.get(key, 'en');
-
-final String _jsonRaw = File('assets/dtc_translations.json').readAsStringSync();
-final Map<String, dynamic> _json = json.decode(_jsonRaw) as Map<String, dynamic>;
-Map<String, String> get jsonEn => Map<String, String>.from(_json['en'] as Map);
-Map<String, String> get jsonHi => Map<String, String>.from(_json['hi'] as Map);
-
-// ── The audit's broken-Hindi detectors (FAULT_ASSET_INVENTORY.md §D4) ──────
-// A Devanagari token is flagged when it starts with a combining mark, holds
-// two dependent vowel signs in a row, ends in a bare virama, or is one of the
-// recurring broken forms the audit tabulated (§D4.2).
-final _devanagariToken = RegExp(r'[ऀ-ॿ]+');
-final _startsWithCombining =
-    RegExp(r'^[ऀ-ःऺ-ॏ॑-ॗॢॣ]');
-final _twoVowelSigns = RegExp(r'[ा-ौ][ा-ौ]');
-final _endsInVirama = RegExp(r'्$');
-const _knownBroken = <String>{
-  'सतकि', 'वोल्टेर्', 'कं', 'टर', 'ोल', 'तनयंत्रण', 'ऑक्सीर्न', 'तसस्टम',
-  'प्रदशिन', 'तसलेंडर', 'इंर्ेक्टर', 'तशफ्ट', 'इंर्न', 'िापमान', 'ईंिन',
-  'स्िच', 'तसिल', 'कै', 'रेंर्', 'इतिशन', 'पिा', 'पोर्ीशन', 'इंर्ेक्शन',
-  'ररले', 'पोतर्शन', 'इंटरतमटेंट', 'ांसतमशन', 'संदिि', 'डर', 'ाइव', 'ाइवर',
-  'कू', 'तलंग', 'टबोचार्िर', 'फै', 'अतिक', 'तमसफायर', 'सीररयल', 'टाइतमंग',
-  'बहुि', 'अपयािप्त', 'रीसर्क्ुिलेशन', 'उत्सर्िन', 'टॉकि', 'मैतनफोल्ड', 'पर्ि',
-  'इलेस्क्टरकल', 'तगयर', 'तटरम', 'टेतलस्ट', 'गलि', 'अनुपाि', 'तनकास',
-  'मीटररंग', 'हातन', 'सहसंबंि', 'गतितवति', 'प्रतितक्रया', 'दक्षिा', 'टतमिनल',
-  'सतक्रय', 'क्रूर्', 'र्ेनरेटर',
-};
-
-/// The broken tokens in [text]; empty when it is clean.
-List<String> brokenHindiTokens(String text) => [
-      for (final m in _devanagariToken.allMatches(text))
-        if (_startsWithCombining.hasMatch(m.group(0)!) ||
-            _twoVowelSigns.hasMatch(m.group(0)!) ||
-            _endsInVirama.hasMatch(m.group(0)!) ||
-            _knownBroken.contains(m.group(0)!))
-          m.group(0)!,
-    ];
 
 Widget screenFor(ObdService obd) => MultiProvider(
       providers: [
@@ -88,7 +47,6 @@ Future<List<String>> renderedTexts(WidgetTester tester, ObdService obd) async {
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
-  setUpAll(() => DtcLocalizations.loadJsonForTesting(_jsonRaw));
 
   // ══════════════════════════════════════════════════════════════════════════
   // S5 — manufacturer-defined codes never get another make's meaning
@@ -105,34 +63,6 @@ void main() {
       for (final c in no) {
         expect(isManufacturerDefined(c), isFalse, reason: c);
       }
-    });
-
-    test('none of the 436 P1 asset entries is ever returned', () {
-      final p1 = jsonEn.keys.where((k) => k.startsWith('P1')).toList();
-      expect(p1.length, 436, reason: 'the audit counted 436');
-      for (final code in p1) {
-        for (final lang in ['en', 'hi', 'ta']) {
-          expect(
-              DtcLocalizations.description(code, lang, englishFallback: ''),
-              isEmpty,
-              reason: '$code/$lang');
-        }
-      }
-      // The corrupted Hindi file's 391 P1 entries are equally unreachable.
-      for (final code
-          in DtcDictionaryHi.descriptions.keys.where((k) => k.startsWith('P1'))) {
-        expect(DtcLocalizations.description(code, 'hi', englishFallback: ''),
-            isEmpty,
-            reason: code);
-      }
-    });
-
-    test('a standard P0 code resolves exactly as before', () {
-      expect(DtcLocalizations.description('P0198', 'en', englishFallback: ''),
-          jsonEn['P0198']);
-      expect(DtcLocalizations.description('P0100', 'en',
-              englishFallback: DtcDatabase.codes['P0100']!['desc']!),
-          DtcDatabase.codes['P0100']!['desc']);
     });
 
     test('Royal Enfield ABS codes still resolve from their platform table', () {
@@ -154,12 +84,10 @@ void main() {
         obd = await connectSim(sim);
         await obd.readEngineDtcs();
       });
-      expect(jsonEn['P1100'], isNotNull,
-          reason: 'there IS a fixed asset text it must not show');
       final texts = await renderedTexts(tester, obd);
       expect(texts, contains(en('dtcManufacturerSpecific')));
-      expect(texts, isNot(contains(jsonEn['P1100'])));
-      expect(texts, contains(jsonEn['P0198']));
+      // P0198 has no text anywhere now: structure and the dealer line.
+      expect(texts, contains(en('faultRawShowDealer')));
       await tester.runAsync(() async {
         await obd.disconnect();
         await sim.close();
@@ -200,90 +128,10 @@ void main() {
   });
 
   // ══════════════════════════════════════════════════════════════════════════
-  // S7 — the legacy-text switch and the Hindi lookup order
+  // S7 — a code with no text shows its structure, not a guess
   // ══════════════════════════════════════════════════════════════════════════
   group('S7', () {
-    test('the switch is on in this (non-store) build', () {
-      expect(kStoreBuild, isFalse);
-      expect(kUseLegacyEngineText, isTrue);
-    });
-
-    test('a store build can never have it on', () {
-      expect(legacyEngineTextAllowed(storeBuild: true), isFalse);
-      expect(legacyEngineTextAllowed(storeBuild: false), isTrue);
-      expect(kUseLegacyEngineText,
-          legacyEngineTextAllowed(storeBuild: kStoreBuild));
-    });
-
-    test('script: every corrupted-dictionary code has clean JSON Hindi', () {
-      final dict = DtcDictionaryHi.descriptions;
-      expect(dict.length, 999);
-      final missing = [
-        for (final code in dict.keys)
-          if ((jsonHi[code] ?? '').trim().isEmpty) code
-      ];
-      expect(missing, isEmpty);
-      expect(jsonEn.length, 1709);
-      expect(jsonHi.length, 1709);
-    });
-
-    test('the detectors do find the corruption they were built for', () {
-      final flagged = DtcDictionaryHi.descriptions.values
-          .where((t) => brokenHindiTokens(t).isNotEmpty)
-          .length;
-      expect(flagged / DtcDictionaryHi.descriptions.length,
-          greaterThan(0.85),
-          reason: 'the audit measured 88.3% of entries with a broken token');
-      final cleanFlagged = jsonHi.values
-          .where((t) => brokenHindiTokens(t).isNotEmpty)
-          .toList();
-      expect(cleanFlagged, isEmpty,
-          reason: 'and find nothing in the clean JSON Hindi');
-    });
-
-    test('no corrupted Hindi token is ever returned', () {
-      final codes = <String>{...DtcDictionaryHi.descriptions.keys, ...jsonHi.keys};
-      final bad = <String, List<String>>{};
-      for (final code in codes) {
-        final shown =
-            DtcLocalizations.description(code, 'hi', englishFallback: '');
-        final broken = brokenHindiTokens(shown);
-        if (broken.isNotEmpty) bad[code] = broken;
-      }
-      expect(bad, isEmpty);
-    });
-
-    test('Hindi with the switch on: clean JSON Hindi, never the old file', () {
-      // P0198: the audit's own trace example.
-      final shown =
-          DtcLocalizations.description('P0198', 'hi', englishFallback: '');
-      expect(shown, jsonHi['P0198']);
-      expect(shown, isNot(DtcDictionaryHi.descriptions['P0198']));
-    });
-
-    test('Hindi falls back to English, never to corrupted text', () {
-      // DtcDatabase-only codes have no Hindi anywhere.
-      final u0100 = DtcDatabase.codes['U0100']!['desc']!;
-      expect(
-          DtcLocalizations.description('U0100', 'hi', englishFallback: u0100),
-          u0100);
-    });
-
-    test('switch off: legacy text is not used; structure instead', () {
-      expect(
-          DtcLocalizations.description('P0198', 'en',
-              englishFallback: '', useLegacyText: false),
-          isEmpty);
-      expect(
-          DtcLocalizations.description('P0198', 'hi',
-              englishFallback: '', useLegacyText: false),
-          isEmpty);
-      // The 31-entry table is not Torque-derived and stays.
-      final p0100 = DtcDatabase.codes['P0100']!['desc']!;
-      expect(
-          DtcLocalizations.description('P0100', 'hi',
-              englishFallback: p0100, useLegacyText: false),
-          p0100);
+    test('subsystem names for standard codes; none for manufacturer codes', () {
       expect(DtcLocalizations.subsystemKey('P0198'), 'dtcSubFuelAir');
       expect(DtcLocalizations.subsystemKey('P0301'), 'dtcSubIgnition');
       expect(DtcLocalizations.subsystemKey('U0100'), 'dtcSubNetworkComms');
@@ -298,32 +146,25 @@ void main() {
       }
     });
 
-    testWidgets('an unknown standard code shows system, subsystem, no text',
+    testWidgets('an unknown standard code shows system, subsystem, no text, and the dealer line',
         (tester) async {
       late ObdService obd;
       late EngineSim sim;
       await tester.runAsync(() async {
-        // P0017: a standard code no asset describes.
+        // P0017: a standard code no content describes.
         sim = EngineSim(mode03: '43 01 00 17');
         obd = await connectSim(sim);
         await obd.readEngineDtcs();
       });
-      expect(jsonEn['P0017'], isNull);
       final texts = await renderedTexts(tester, obd);
       expect(texts, contains('POWERTRAIN'));
       expect(texts, contains(en('dtcSubsystem').toUpperCase()));
       expect(texts, contains(en('dtcSubFuelAir')));
-      expect(texts, contains(en('dtcNoVerifiedDescription')));
+      expect(texts, contains(en('faultRawShowDealer')));
       await tester.runAsync(() async {
         await obd.disconnect();
         await sim.close();
       });
-    });
-
-    test('the stale "999 entries" comment is gone', () {
-      final src = File('lib/services/dtc_service.dart').readAsStringSync();
-      expect(src.contains('999 entries'), isFalse);
-      expect(src.contains('1,709'), isTrue);
     });
   });
 

@@ -108,7 +108,6 @@ void main() {
 
   test('the other Hindi sources (dictionaries, failure types) carry no old spelling', () {
     for (final path in const [
-      'lib/constants/dtc_dictionary_hi.dart',
       'lib/constants/chassis_dtc_dictionary_hi.dart',
       'lib/services/fault_decoders.dart',
     ]) {

@@ -10,8 +10,8 @@
 ///                        moved or edited)
 ///   L3 module family     store entries, then the Bosch shared 5200H
 ///   L4 generic           a knowledge-store entry — ONLY for standard-defined
-///                        codes — then the 31-entry table, then the legacy
-///                        JSON text while `kUseLegacyEngineText` is on
+///                        codes — then the 31-entry table (which beats a
+///                        name-only entry: it has a cause and an action)
 ///   L5 structure         system, subsystem, "defined by the manufacturer",
 ///                        failure type; never a part name
 ///   L6 raw               the raw value and "show this to your dealer"
@@ -33,7 +33,6 @@
 /// names) is returned as `AppStrings` keys.
 library;
 
-import '../constants/build_flags.dart';
 import '../constants/chassis_dtc_dictionary.dart';
 import '../constants/chassis_dtc_dictionary_hi.dart';
 import '../constants/dtc_ranges.dart';
@@ -69,9 +68,6 @@ enum Provenance {
 
   /// The 31-entry table that predates this design; source not recorded.
   legacyTable('provenanceLegacyTable'),
-
-  /// The imported legacy text (test builds only; licence not recorded).
-  legacyImported('provenanceLegacyImported'),
 
   /// No meaning: the code's structure only.
   structureOnly('provenanceStructure'),
@@ -157,31 +153,21 @@ class VehicleContext {
 
 const String kBoschAbsFamily = 'bosch_abs';
 
-/// The 31-entry table and the legacy JSON, supplied by the app (they live
-/// behind Flutter asset loading). Null when there is none for [code].
+/// A row of the 31-entry table, supplied by the app. English only.
 class LegacyText {
   const LegacyText({
     required this.title,
-    required this.language,
-    required this.imported,
     this.cause = '',
     this.action = '',
     this.severity = 'unknown',
   });
   final String title;
-
-  /// Language of [title]. Cause and action are always English.
-  final String language;
-
-  /// True when [title] came from the imported legacy JSON.
-  final bool imported;
   final String cause;
   final String action;
   final String severity;
 }
 
-typedef LegacyTextLookup = LegacyText? Function(String code, String language,
-    {required bool useImported});
+typedef LegacyTextLookup = LegacyText? Function(String code, String language);
 
 /// The structure of a code, for L5. Labels are rendered by the UI.
 class StructuralFacts {
@@ -309,17 +295,10 @@ final RegExp _saeCode = RegExp(r'^[PCBU][0-3][0-9A-F]{3}$');
 bool _nameOnly(KbEntry e) => e.verification == kVerificationStandardTitleOnly;
 
 class FaultResolver {
-  FaultResolver({
-    required this.index,
-    this.legacy,
-    this.useImportedLegacyText = kUseLegacyEngineText,
-  });
+  FaultResolver({required this.index, this.legacy});
 
   final KnowledgeIndex index;
   final LegacyTextLookup? legacy;
-
-  /// The `kUseLegacyEngineText` switch; tests pass it.
-  final bool useImportedLegacyText;
 
   ResolvedFault resolve(FaultRecord record, VehicleContext vehicle, String language,
       {FaultDomain domain = FaultDomain.unknown}) {
@@ -374,30 +353,19 @@ class FaultResolver {
           language, ResolvedLevel.l4Generic);
       if (r != null && r.provenance != Provenance.standardTitleOnly) return r;
       if (domain != FaultDomain.abs) {
-        final l = legacy?.call(code, language, useImported: useImportedLegacyText);
-        // The 31-entry table has a cause and an action, so it beats a bare
-        // name; the imported legacy text does not (it is a name too).
-        if (l != null && l.title.isNotEmpty && !(r != null && l.imported)) {
-          // Cause and action are English only. When the title is in the asked
-          // (non-English) language, they are the English parts; when the title
-          // itself is English, languageUsed already says so.
-          final english = l.language == language && language != 'en'
-              ? <String>{
-                  if (l.cause.isNotEmpty) 'causes',
-                  if (l.action.isNotEmpty) 'riderAdvice',
-                }
-              : const <String>{};
+        final l = legacy?.call(code, language);
+        if (l != null && l.title.isNotEmpty) {
+          // The table is English only; a Hindi rider is told so (languageUsed).
           return ResolvedFault(
             level: ResolvedLevel.l4Generic,
-            provenance: l.imported ? Provenance.legacyImported : Provenance.legacyTable,
+            provenance: Provenance.legacyTable,
             code: code,
             displayCode: record.displayCode,
             languageRequested: language,
-            languageUsed: l.language,
+            languageUsed: 'en',
             title: l.title,
             causes: l.cause.isEmpty ? const <String>[] : <String>[l.cause],
             riderAdvice: l.action.isEmpty ? null : l.action,
-            englishFields: english,
             legacySeverity: l.severity,
           );
         }

@@ -13,7 +13,6 @@ import 'services/obd_service.dart';
 import 'services/session_recorder.dart';
 import 'services/supabase_service.dart';
 import 'services/trip_logger.dart';
-import 'services/dtc_service.dart';
 import 'knowledge/history_recorder.dart';
 import 'knowledge/knowledge_service.dart';
 import 'app.dart';
@@ -70,8 +69,6 @@ void main() {
         ),
       );
     };
-
-    await DtcLocalizations.init();
 
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,

@@ -256,11 +256,11 @@ class _Tile extends StatelessWidget {
 String describeResolved(BuildContext context, ResolvedFault r) {
   final t = r.title ?? '';
   if (t.isNotEmpty) return t;
-  if (r.level == ResolvedLevel.l6Raw) return context.tr('faultRawShowDealer');
   if (r.structure?.manufacturerDefined ?? false) {
     return context.tr('dtcManufacturerSpecific');
   }
-  return context.tr('dtcNoVerifiedDescription');
+  // A standard code none of the content describes (L5), or no code at all (L6).
+  return context.tr('faultRawShowDealer');
 }
 
 /// What one code means for the rider's vehicle — the resolver's answer.
@@ -302,8 +302,7 @@ class CodeLookupDetailScreen extends StatelessWidget {
         !(r.level == ResolvedLevel.l2Platform || r.level == ResolvedLevel.l3ModuleFamily);
     final structure = r.structure;
     final detail = r.platformDetail;
-    final legacy = r.provenance == Provenance.legacyTable ||
-        r.provenance == Provenance.legacyImported;
+    final legacy = r.provenance == Provenance.legacyTable;
     return Scaffold(
       backgroundColor: _C.bg,
       appBar: AppBar(

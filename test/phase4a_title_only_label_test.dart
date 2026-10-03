@@ -93,9 +93,9 @@ void main() {
       }
       expect(Provenance.values.map((p) => p.labelKey).toList(), [
         'provenanceAi', 'provenanceManual', 'provenanceManualNoMeaning',
-        'provenanceDealerReadout', 'provenanceLegacyTable', 'provenanceLegacyImported',
+        'provenanceDealerReadout', 'provenanceLegacyTable',
         'provenanceStructure', 'provenanceRaw', 'provenanceStandardTitleOnly',
-      ], reason: 'the eight old keys keep their order and names; the new one is last');
+      ], reason: 'the old keys keep their order and names (the retired imported-text label is gone); the new one is last');
     });
 
     // Phase 4C: real guidance in either language now beats a bare name (the

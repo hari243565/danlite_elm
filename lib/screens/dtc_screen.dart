@@ -2056,8 +2056,9 @@ class _HazardCard extends StatelessWidget {
     if (isManufacturerDefined(code.code)) {
       return context.tr('dtcManufacturerSpecific');
     }
-    if (r.level == ResolvedLevel.l6Raw) return context.tr('faultRawShowDealer');
-    return context.tr('dtcNoVerifiedDescription');
+    // A standard code none of the content describes (L5), or no code at all
+    // (L6): say so plainly and point to the dealer.
+    return context.tr('faultRawShowDealer');
   }
 
   /// Subsystem label for an engine code shown by its structure (no verified
@@ -2148,9 +2149,7 @@ class _HazardCard extends StatelessWidget {
     // that still comes from the older table.
     final waiting = _awaitingKnowledge(context, r);
     final storeGuidance = !waiting && r.provenance.isStoreGuidance;
-    final legacyAnswer = !waiting &&
-        (r.provenance == Provenance.legacyTable ||
-            r.provenance == Provenance.legacyImported);
+    final legacyAnswer = !waiting && r.provenance == Provenance.legacyTable;
     return Container(
       margin: const EdgeInsets.only(bottom: 10),
       decoration: BoxDecoration(

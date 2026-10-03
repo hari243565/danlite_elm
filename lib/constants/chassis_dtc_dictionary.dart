@@ -22,10 +22,10 @@
 /// rather than picking one.
 ///
 /// ── Bilingual convention ─────────────────────────────────────────────────
-/// This file mirrors the split already used for engine codes:
-///   • English master lives here            (as `DtcDatabase.codes` does)
+/// English master and Hindi parallel are two files keyed identically:
+///   • English master lives here
 ///   • Hindi parallel lives in
-///     `chassis_dtc_dictionary_hi.dart`     (as `DtcDictionaryHi` does)
+///     `chassis_dtc_dictionary_hi.dart`
 ///   • Both are resolved through the single langCode-aware entry point in
 ///     `DtcLocalizations` (`dtc_service.dart`), never read directly by the UI.
 /// Adding a code is one entry here plus one entry in the Hindi file — no code

@@ -1,11 +1,9 @@
 /// Danlite ELM — Chassis / ABS DTC Dictionary (Hindi parallel)
 ///
 /// Hindi counterpart to `chassis_dtc_dictionary.dart`, keyed by the same
-/// platform key and the same code, exactly as `dtc_dictionary_hi.dart`
-/// parallels `dtc_descriptions.dart` for engine codes.
+/// platform key and the same code.
 ///
-/// Structural note: the engine-code Hindi map carries a description only,
-/// because that is all the engine card renders in Hindi. A chassis card renders
+/// Structural note: a chassis card renders
 /// three translatable columns (Description, Query, Remedy), so each entry here
 /// is a small record of those three rather than a bare string. The convention
 /// it is matching is the one that matters — English master in one file, Hindi

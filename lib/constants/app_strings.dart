@@ -299,8 +299,6 @@ class AppStrings {
       'provenanceDealerReadout': 'From a dealer tool\'s reading of the Bosch '
           'ABS module, not a service manual',
       'provenanceLegacyTable': 'Older app text; its source is not recorded',
-      'provenanceLegacyImported':
-          'Older imported text, test builds only; its licence is not recorded',
       'provenanceStructure': 'Structure only, no verified meaning',
       'provenanceRaw': 'Raw code only, no meaning known',
       'provenanceDraft': 'Draft: not yet independently reviewed.',
@@ -1403,8 +1401,6 @@ class AppStrings {
       'provenanceDealerReadout':
           'Bosch ABS मॉड्यूल की डीलर टूल रीडिंग से, सर्विस मैनुअल से नहीं',
       'provenanceLegacyTable': 'ऐप का पुराना टेक्स्ट; इसका स्रोत दर्ज नहीं है',
-      'provenanceLegacyImported':
-          'पुराना आयात किया गया टेक्स्ट, सिर्फ़ टेस्ट बिल्ड में; इसका लाइसेंस दर्ज नहीं है',
       'provenanceStructure': 'सिर्फ़ कोड का ढाँचा, सत्यापित मतलब नहीं',
       'provenanceRaw': 'सिर्फ़ कच्चा कोड, कोई मतलब मालूम नहीं',
       'provenanceDraft': 'ड्राफ़्ट: अभी किसी दूसरे व्यक्ति ने जाँचा नहीं है।',

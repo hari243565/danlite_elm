@@ -206,9 +206,6 @@ void main() {
     });
 
     test('generic P-code localisation is unaffected', () {
-      final hi = DtcLocalizations.description('P0122', 'hi',
-          englishFallback: 'Throttle Position Sensor Circuit Low');
-      expect(hi, isNotEmpty);
       expect(DtcLocalizations.categoryHeader('P0122', 'en'), 'POWERTRAIN');
       expect(DtcLocalizations.categoryHeader('C1015', 'en'), 'CHASSIS');
       expect(DtcLocalizations.categoryHeader('C1015', 'hi'), 'चेसिस');

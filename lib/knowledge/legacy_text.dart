@@ -1,45 +1,30 @@
-/// Danlite ELM — the engine text that predates the knowledge store, offered
-/// to the resolver at L4 AFTER the store, in exactly the order Phase 0 set:
+/// Danlite ELM — the 31-entry table that predates the knowledge store, offered
+/// to the resolver at L4 AFTER the store (Phase 0 kept it: it is not
+/// Torque-derived; its source is simply not recorded).
 ///
-///  * Hindi from the legacy JSON (only while `kUseLegacyEngineText` is on);
-///  * the 31-entry `DtcDatabase` English (outside the switch — Phase 0 kept
-///    it: it is not Torque-derived);
-///  * English from the legacy JSON (only while the switch is on).
+/// English only. The borrowed Torque-Pro text (the translations asset and the
+/// corrupted Hindi dictionary) was deleted in Phase 4C: the shipped guidance
+/// and the name-only packs replace it, and a code none of them describes now
+/// gets its structure, its raw value and "show it to your dealer".
 ///
-/// The corrupted `DtcDictionaryHi` is never consulted. A manufacturer-defined
-/// code never reaches this (the resolver stops it before L4).
-///
-/// Separate from the pure resolver because the JSON lives behind Flutter
-/// asset loading (`DtcLocalizations`).
+/// A manufacturer-defined code never reaches this (the resolver stops it before
+/// L4), and it is refused here as well.
 library;
 
 import '../constants/dtc_descriptions.dart';
-import '../services/dtc_service.dart';
+import '../constants/dtc_ranges.dart';
 import 'fault_resolver.dart';
 
-LegacyText? legacyEngineText(String code, String language,
-    {required bool useImported}) {
-  final table = DtcDatabase.codes[code];
-  final tableTitle = table?['desc'] ?? '';
-  final title = DtcLocalizations.description(code, language,
-      englishFallback: tableTitle, useLegacyText: useImported);
+LegacyText? legacyEngineText(String code, String language) {
+  final upper = code.toUpperCase();
+  if (isManufacturerDefined(upper)) return null;
+  final table = DtcDatabase.codes[upper];
+  final title = table?['desc'] ?? '';
   if (title.isEmpty) return null;
-  final fromTable = title == tableTitle && tableTitle.isNotEmpty;
   return LegacyText(
     title: title,
-    // Only the JSON carries Hindi; anything else is English.
-    language: fromTable ? 'en' : (language == 'hi' && title != _jsonEnglish(code, useImported)
-        ? 'hi'
-        : 'en'),
-    imported: !fromTable,
     cause: table?['cause'] ?? '',
     action: table?['action'] ?? '',
     severity: table?['severity'] ?? 'unknown',
   );
-}
-
-String? _jsonEnglish(String code, bool useImported) {
-  final en = DtcLocalizations.description(code, 'en',
-      englishFallback: '', useLegacyText: useImported);
-  return en.isEmpty ? null : en;
 }

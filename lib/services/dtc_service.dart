@@ -7,16 +7,12 @@
 ///   • a localized category header for that category
 ///   • a localized human-readable description
 ///
-/// ── Engine description sources, and what is no longer used ─────────────
-/// `DtcDictionaryHi` (999 Hindi entries, generated from a Torque Pro text
-/// file by [parseRawDictionary]) is corrupted by PDF text extraction — 88% of
-/// its entries carry broken words (FAULT_ASSET_INVENTORY.md §D4) — and it is
-/// NOT used at runtime any more. Every one of its 999 codes has a clean Hindi
-/// entry in `assets/dtc_translations.json`, which is what Hindi now reads
-/// (verified by `test/fault_text_resolution_test.dart`). The file is kept,
-/// not deleted. Both engine sources name Torque Pro and have no recorded
-/// licence, so both sit behind [kUseLegacyEngineText], which a store build
-/// forces off.
+/// ── Engine descriptions ────────────────────────────────────────────────
+/// This service no longer holds any engine description text. The borrowed
+/// Torque-Pro text (a translations asset and a corrupted Hindi dictionary,
+/// neither with a recorded licence) was deleted in Phase 4C; engine meanings
+/// now come from the knowledge store (`lib/knowledge/`) and the 31-entry
+/// `DtcDatabase` (`legacy_text.dart`).
 ///
 /// Manufacturer-defined codes ([isManufacturerDefined]) are never resolved
 /// from any of these generic tables: their meaning depends on the maker.
@@ -32,10 +28,6 @@
 /// was and branch on it in [description].
 library;
 
-import 'dart:convert';
-import 'package:flutter/foundation.dart';
-import 'package:flutter/services.dart';
-import '../constants/build_flags.dart';
 import '../constants/chassis_dtc_dictionary.dart';
 import '../constants/chassis_dtc_dictionary_hi.dart';
 import '../constants/dtc_ranges.dart';
@@ -59,34 +51,6 @@ class DtcLocalizations {
   static const List<String> supportedHeaderLanguages = [
     'en', 'hi', 'bn', 'te', 'mr', 'ta', 'gu', 'kn', 'ml', 'pa',
   ];
-
-  /// en/hi engine descriptions from `assets/dtc_translations.json`, which
-  /// holds 1,709 P codes per language (an earlier version held 999). Its
-  /// header in the source history names a Torque Pro export; no licence is
-  /// recorded. Loaded only while [kUseLegacyEngineText] is on. It carries no
-  /// severity/cause/action, so it never replaces the `DtcDatabase` lookup.
-  static Map<String, Map<String, String>> _jsonDescriptions = {};
-
-  static Future<void> init() async {
-    // A store build never even reads the asset.
-    if (!kUseLegacyEngineText) return;
-    try {
-      final raw = await rootBundle.loadString('assets/dtc_translations.json');
-      loadJsonForTesting(raw);
-    } catch (e) {
-      debugPrint('[DtcLocalizations] Failed to load dtc_translations.json: $e');
-    }
-  }
-
-  /// Parse the translations asset's `{en:{code:text}, hi:{code:text}}` shape.
-  /// Public for tests, which read the real asset from disk.
-  @visibleForTesting
-  static void loadJsonForTesting(String raw) {
-    final decoded = json.decode(raw) as Map<String, dynamic>;
-    _jsonDescriptions = decoded.map(
-      (lang, entry) => MapEntry(lang, Map<String, String>.from(entry as Map)),
-    );
-  }
 
   /// Classify a raw code by its leading character (P/C/B/U).
   static DtcCategory categoryOf(String code) {
@@ -113,41 +77,6 @@ class DtcLocalizations {
     final category = categoryOf(code);
     final table = _categoryHeaders[langCode] ?? _categoryHeaders['en']!;
     return table[category] ?? _categoryHeaders['en']![category]!;
-  }
-
-  /// Localized description for an ENGINE [code] in [langCode], or `''` when
-  /// nothing verified-enough exists — the card then shows the code's
-  /// structure instead (see [subsystemKey]).
-  ///
-  /// Order:
-  ///   1. A manufacturer-defined code ([isManufacturerDefined]) resolves to
-  ///      `''`, always: no generic or engine table may describe it, because
-  ///      its meaning depends on the bike's maker.
-  ///   2. Hindi, when [useLegacyText] is on: the clean JSON Hindi. The
-  ///      corrupted `DtcDictionaryHi` is never consulted.
-  ///   3. [englishFallback] — the English already on the code (`DtcDatabase`).
-  ///   4. JSON English, when [useLegacyText] is on.
-  ///
-  /// Hindi with no clean entry falls back to English, never to corrupted text.
-  /// [useLegacyText] defaults to [kUseLegacyEngineText]; tests pass it.
-  static String description(
-    String code,
-    String langCode, {
-    required String englishFallback,
-    bool useLegacyText = kUseLegacyEngineText,
-  }) {
-    final upper = code.toUpperCase();
-    if (isManufacturerDefined(upper)) return '';
-    if (langCode == 'hi' && useLegacyText) {
-      final jsonHi = _jsonDescriptions['hi']?[upper];
-      if (jsonHi != null && jsonHi.isNotEmpty) return jsonHi;
-    }
-    if (englishFallback.isNotEmpty) return englishFallback;
-    if (useLegacyText) {
-      final jsonEn = _jsonDescriptions['en']?[upper];
-      if (jsonEn != null && jsonEn.isNotEmpty) return jsonEn;
-    }
-    return '';
   }
 
   /// `AppStrings` key naming the subsystem a STANDARD code belongs to, or
@@ -281,57 +210,6 @@ class DtcLocalizations {
       DtcCategory.unknown: 'ਅਣਜਾਣ',
     },
   };
-
-  // ── Canonical raw-master parser ───────────────────────────────────────────
-  /// Parse the `hindi_dtcs_raw.txt` master format into a `code → description`
-  /// map. This is the single ingestion routine that produced
-  /// [DtcDictionaryHi.descriptions]; feed the raw file's contents through it to
-  /// regenerate that map whenever the master text changes.
-  ///
-  /// Format handled:
-  ///   • Entries are separated by blank lines.
-  ///   • An entry begins with a `[PCBU]####` code token; the remainder of that
-  ///     line plus any following non-blank lines form the description (the
-  ///     master wraps long descriptions across physical lines).
-  ///   • A leading "- " on the joined description is stripped.
-  ///   • Internal runs of whitespace are collapsed to a single space.
-  static Map<String, String> parseRawDictionary(String raw) {
-    final result = <String, String>{};
-    final codeRe = RegExp(r'^([PCBU][0-9A-F]{4})');
-    String? currentCode;
-    final buffer = StringBuffer();
-
-    void flush() {
-      final code = currentCode;
-      if (code != null) {
-        var desc = buffer.toString().replaceAll(RegExp(r'\s+'), ' ').trim();
-        if (desc.startsWith('- ')) desc = desc.substring(2).trim();
-        if (desc.isNotEmpty) result[code] = desc;
-      }
-      currentCode = null;
-      buffer.clear();
-    }
-
-    for (final rawLine in raw.split('\n')) {
-      final line = rawLine.trim();
-      if (line.isEmpty) {
-        flush();
-        continue;
-      }
-      final m = codeRe.firstMatch(line);
-      if (m != null) {
-        flush();
-        currentCode = m.group(1);
-        buffer.write(line.substring(m.end));
-      } else if (currentCode != null) {
-        buffer
-          ..write(' ')
-          ..write(line);
-      }
-    }
-    flush();
-    return result;
-  }
 }
 
 /// A chassis/ABS dictionary entry already resolved into the app's active

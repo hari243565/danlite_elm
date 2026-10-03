@@ -84,27 +84,17 @@ const classic350 = VehicleContext(
 VehicleContext profile(String make, String model) =>
     VehicleContext.fromProfile(make: make, model: model);
 
-/// A legacy source standing in for the 31-entry table + JSON.
-LegacyText? fakeLegacy(String code, String lang, {required bool useImported}) {
+/// A legacy source standing in for the 31-entry table.
+LegacyText? fakeLegacy(String code, String lang) {
   if (code == 'P0100') {
     return const LegacyText(
-        title: 'Old table text', language: 'en', imported: false,
-        cause: 'old cause', action: 'old action', severity: 'high');
-  }
-  if (code == 'P0017' && useImported) {
-    return LegacyText(
-        title: lang == 'hi' ? 'पुराना टेक्स्ट' : 'Old imported text',
-        language: lang == 'hi' ? 'hi' : 'en', imported: true);
+        title: 'Old table text', cause: 'old cause', action: 'old action', severity: 'high');
   }
   return null;
 }
 
-FaultResolver resolverWith(List<KbEntry> extra,
-        {bool seed = true, bool imported = true}) =>
-    FaultResolver(
-        index: KnowledgeIndex([if (seed) ...seedEntries, ...extra]),
-        legacy: fakeLegacy,
-        useImportedLegacyText: imported);
+FaultResolver resolverWith(List<KbEntry> extra, {bool seed = true}) => FaultResolver(
+    index: KnowledgeIndex([if (seed) ...seedEntries, ...extra]), legacy: fakeLegacy);
 
 void main() {
   final r = resolverWith(const <KbEntry>[]);
@@ -280,11 +270,8 @@ void main() {
       expect(res.legacySeverity, 'high');
       expect(res.riderAction, isNull);
     });
-    test('the imported legacy text only while the switch is on', () {
-      expect(r.resolve(obd('P0017'), VehicleContext.generic, 'en').provenance,
-          Provenance.legacyImported);
-      final off = resolverWith(const <KbEntry>[], imported: false);
-      expect(off.resolve(obd('P0017'), VehicleContext.generic, 'en').level,
+    test('a standard code in neither the store nor the table is structure only', () {
+      expect(r.resolve(obd('P0017'), VehicleContext.generic, 'en').level,
           ResolvedLevel.l5Structure);
     });
     test('legacy engine text is never used for an ABS code', () {
@@ -445,7 +432,7 @@ void main() {
 
   group('L5 structure and L6 raw', () {
     test('a standard code nobody describes: system and subsystem, no text', () {
-      final res = resolverWith(const <KbEntry>[], imported: false)
+      final res = resolverWith(const <KbEntry>[])
           .resolve(obd('P0017'), VehicleContext.generic, 'en');
       expect(res.level, ResolvedLevel.l5Structure);
       expect(res.provenance, Provenance.structureOnly);
