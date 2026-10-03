@@ -40,9 +40,9 @@ ResolvedFault _resolve(BuildContext context, String code, DtcFormat format) {
   final record = lookupRecord(code, format);
   final k = Provider.of<KnowledgeService?>(context);
   return k != null
-      ? k.resolve(record, vehicle, lang)
+      ? k.resolve(record, vehicle, lang, domain: FaultDomain.lookup)
       : FaultResolver(index: KnowledgeIndex.empty, legacy: legacyEngineText)
-          .resolve(record, vehicle, lang);
+          .resolve(record, vehicle, lang, domain: FaultDomain.lookup);
 }
 
 String _scopeName(BuildContext context, LookupResult r) => switch (r.scope) {
@@ -347,6 +347,16 @@ class CodeLookupDetailScreen extends StatelessWidget {
             ResolvedGuidance(r, showHints: true)
           else
             ProvenanceLine(r),
+          // A code in a manufacturer range: what it means can differ by make.
+          // Only for a standard-format code; a Bosch raw module code is not one.
+          if (format != DtcFormat.hexH &&
+              format != DtcFormat.blink &&
+              isManufacturerDefined(code)) ...[
+            const SizedBox(height: 12),
+            Text(context.tr('lookupMfrRangeNote'),
+                style: const TextStyle(
+                    color: _C.amber, fontSize: 12, fontWeight: FontWeight.w700, height: 1.45)),
+          ],
           if (otherScope) ...[
             const SizedBox(height: 14),
             Text(context.trArgs('lookupOtherScope', {'scope': _scopeName(context, listed)}),

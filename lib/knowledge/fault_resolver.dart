@@ -42,7 +42,13 @@ import 'kb_models.dart';
 
 /// Which module reported the code. ABS manual tables only describe ABS codes;
 /// the engine's legacy text only describes engine codes.
-enum FaultDomain { engine, abs, unknown }
+///
+/// [lookup] is "Look up a code": the rider typed the code, no module reported
+/// it. A code in standard format is then explained through the generic path on
+/// every make (a Bosch ABS make's raw-value rule is about values READ from its
+/// module, which a typed code is not); a Bosch raw module code (5043H) is not a
+/// standard-format code and keeps its raw handling.
+enum FaultDomain { engine, abs, unknown, lookup }
 
 enum ResolvedLevel {
   l1Vehicle,
@@ -437,8 +443,10 @@ class FaultResolver {
     final platformOwnsCode = platform != null &&
         platform.brakeSystem == ChassisBrakeSystem.abs &&
         (domain == FaultDomain.abs || (domain == FaultDomain.unknown && code.startsWith('C')));
-    final rawPlatform =
-        (platform?.showsRawUnverifiedCodes ?? false) && domain != FaultDomain.engine;
+    final typedStandardCode = domain == FaultDomain.lookup && isSae;
+    final rawPlatform = (platform?.showsRawUnverifiedCodes ?? false) &&
+        domain != FaultDomain.engine &&
+        !typedStandardCode;
     if (isSae && !isManufacturerDefined(code) && !platformOwnsCode && !rawPlatform) {
       final r = _fromStore(entries, ScopeKind.generic, '', record, code, vehicle,
           language, ResolvedLevel.l4Generic);

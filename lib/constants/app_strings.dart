@@ -365,6 +365,7 @@ class AppStrings {
       'lookupScopeGeneric': 'Generic (all bikes)',
       'lookupScopeBosch': 'Bosch ABS module',
       'lookupNotReadNote': 'Looked up, not read from the bike.',
+      'lookupMfrRangeNote': 'Meaning of manufacturer-defined codes can differ by make',
       'historyTitle': 'Scan history',
       'historyEmpty':
           'No scans saved yet. Each engine and ABS read is saved here.',
@@ -1514,6 +1515,7 @@ class AppStrings {
       'lookupScopeGeneric': 'सामान्य (सभी बाइक)',
       'lookupScopeBosch': 'Bosch ABS मॉड्यूल',
       'lookupNotReadNote': 'यह खोजा गया है, बाइक से पढ़ा नहीं गया।',
+      'lookupMfrRangeNote': 'निर्माता-परिभाषित कोड का मतलब अलग-अलग मेक में अलग हो सकता है',
       'historyTitle': 'स्कैन हिस्ट्री',
       'historyEmpty':
           'अभी कोई स्कैन सेव नहीं है। हर इंजन और ABS रीड यहाँ सेव होता है।',
