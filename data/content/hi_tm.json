@@ -479,6 +479,42 @@
 "en": "Otherwise have the charging system checked soon.",
 "hi": "वरना चार्जिंग सिस्टम की जल्द जाँच कराएँ।"
 },
+"A0144": {
+"en": "A flat battery while riding stops the engine, so avoid night and long rides and get it checked soon.",
+"hi": "चलते समय बैटरी डिस्चार्ज होने पर इंजन बंद हो जाता है, इसलिए रात में और लंबी सवारी से बचें और जल्द जाँच कराएँ।"
+},
+"A0145": {
+"en": "Avoid revving the engine too high, and get it checked at the next service.",
+"hi": "इंजन को बहुत ज़्यादा रेव करने से बचें, और अगली सर्विस पर जाँच कराएँ।"
+},
+"A0146": {
+"en": "The fuel level display may be wrong, so refuel by distance, not by the display.",
+"hi": "फ़्यूल लेवल डिस्प्ले गलत हो सकता है, इसलिए डिस्प्ले की बजाय चली हुई दूरी के हिसाब से फ़्यूल भरवाएँ।"
+},
+"A0147": {
+"en": "The brake light may not work correctly.",
+"hi": "हो सकता है कि ब्रेक लाइट ठीक से काम न करे।"
+},
+"A0148": {
+"en": "Check that the brake light comes on when you brake; if it does not, get it fixed before riding.",
+"hi": "जाँचें कि ब्रेक लगाने पर ब्रेक लाइट जलती है; अगर न जले, तो चलाने से पहले उसे ठीक कराएँ।"
+},
+"A0149": {
+"en": "Starting may be affected, and other clutch-based functions may not work.",
+"hi": "स्टार्टिंग प्रभावित हो सकती है, और क्लच पर आधारित दूसरे फ़ंक्शन काम नहीं कर सकते।"
+},
+"A0150": {
+"en": "The bike may respond poorly to the twist grip or lose power.",
+"hi": "बाइक ट्विस्ट ग्रिप पर खराब प्रतिक्रिया दे सकती है या पावर घट सकती है।"
+},
+"A0151": {
+"en": "The ECU may limit power strongly, and the bike may respond poorly to the twist grip.",
+"hi": "ECU पावर को काफ़ी सीमित कर सकता है, और बाइक ट्विस्ट ग्रिप पर खराब प्रतिक्रिया दे सकती है।"
+},
+"A0152": {
+"en": "Ride gently, brake early, avoid wet roads and get it checked soon.",
+"hi": "धीरे चलाएँ, पहले से ब्रेक लगाएँ, गीली सड़क से बचें और जल्द जाँच कराएँ।"
+},
 "C0001": {
 "en": "Worn or faulty throttle position sensor",
 "hi": "थ्रॉटल पोज़ीशन सेंसर घिस गया है या खराब है"
@@ -1878,6 +1914,150 @@
 "C0350": {
 "en": "Faulty voltage regulator",
 "hi": "वोल्टेज रेगुलेटर खराब है"
+},
+"C0351": {
+"en": "Weak alternator output",
+"hi": "अल्टरनेटर का आउटपुट कमज़ोर है"
+},
+"C0352": {
+"en": "Poor alternator ground",
+"hi": "अल्टरनेटर का ग्राउंड खराब है"
+},
+"C0353": {
+"en": "Stretched timing chain (rare)",
+"hi": "टाइमिंग चेन खिंच गई है (दुर्लभ)"
+},
+"C0354": {
+"en": "Worn or stuck chain tensioner (rare)",
+"hi": "चेन टेंशनर घिसा या अटका हुआ है (दुर्लभ)"
+},
+"C0355": {
+"en": "Faulty crankshaft or camshaft position sensor",
+"hi": "क्रैंकशाफ़्ट या कैमशाफ़्ट पोज़ीशन सेंसर खराब है"
+},
+"C0356": {
+"en": "Worn or slipped timing chain (rare)",
+"hi": "टाइमिंग चेन घिसी है या खिसक गई है (दुर्लभ)"
+},
+"C0357": {
+"en": "Corrupted crankshaft or camshaft sensor signal",
+"hi": "क्रैंकशाफ़्ट या कैमशाफ़्ट सेंसर का सिग्नल खराब हो गया है"
+},
+"C0358": {
+"en": "Failed pickup or crankshaft position sensor",
+"hi": "पिकअप या क्रैंकशाफ़्ट पोज़ीशन सेंसर खराब हो गया है"
+},
+"C0359": {
+"en": "Drifting sensor or wrong sensor gap",
+"hi": "सेंसर ड्रिफ़्ट कर रहा है या सेंसर का गैप गलत है"
+},
+"C0360": {
+"en": "Failed pickup",
+"hi": "पिकअप खराब हो गया है"
+},
+"C0361": {
+"en": "Sensor gap too wide",
+"hi": "सेंसर का गैप बहुत ज़्यादा है"
+},
+"C0362": {
+"en": "Broken wiring",
+"hi": "वायरिंग टूटी है"
+},
+"C0363": {
+"en": "Engine revved too high, for example after a missed downshift",
+"hi": "इंजन बहुत ज़्यादा रेव हुआ, जैसे डाउनशिफ़्ट छूटने के बाद"
+},
+"C0364": {
+"en": "Spike in the crankshaft position signal",
+"hi": "क्रैंकशाफ़्ट पोज़ीशन सिग्नल में स्पाइक"
+},
+"C0365": {
+"en": "Failed fuel level sensor",
+"hi": "फ़्यूल लेवल सेंसर खराब हो गया है"
+},
+"C0366": {
+"en": "Sticking float arm",
+"hi": "फ़्लोट आर्म अटक रहा है"
+},
+"C0367": {
+"en": "Aged fuel level sensor",
+"hi": "फ़्यूल लेवल सेंसर पुराना है"
+},
+"C0368": {
+"en": "Open signal wire",
+"hi": "सिग्नल वायर ओपन है"
+},
+"C0369": {
+"en": "Corroded sensor contact",
+"hi": "सेंसर के कॉन्टैक्ट में जंग लगा है"
+},
+"C0370": {
+"en": "Failed ambient air temperature sensor",
+"hi": "बाहरी हवा तापमान सेंसर खराब हो गया है"
+},
+"C0371": {
+"en": "Open wiring or loose connector",
+"hi": "वायरिंग ओपन है या कनेक्टर ढीला है"
+},
+"C0372": {
+"en": "Drifted ambient air temperature sensor",
+"hi": "बाहरी हवा तापमान सेंसर ड्रिफ़्ट कर गया है"
+},
+"C0373": {
+"en": "Sensor heated by engine heat",
+"hi": "सेंसर इंजन की गर्मी से गर्म हो गया है"
+},
+"C0374": {
+"en": "Brake switch out of adjustment",
+"hi": "ब्रेक स्विच एडजस्टमेंट से बाहर है"
+},
+"C0375": {
+"en": "Faulty brake switch",
+"hi": "ब्रेक स्विच खराब है"
+},
+"C0376": {
+"en": "Open circuit in the switch or its wiring",
+"hi": "स्विच या उसकी वायरिंग में ओपन सर्किट"
+},
+"C0377": {
+"en": "Faulty clutch switch",
+"hi": "क्लच स्विच खराब है"
+},
+"C0378": {
+"en": "Worn throttle (twist grip) position sensor track",
+"hi": "थ्रॉटल (ट्विस्ट ग्रिप) पोज़ीशन सेंसर का ट्रैक घिसा है"
+},
+"C0379": {
+"en": "Open sensor ground",
+"hi": "सेंसर ग्राउंड ओपन है"
+},
+"C0380": {
+"en": "Worn or contaminated throttle (twist grip) position sensor",
+"hi": "थ्रॉटल (ट्विस्ट ग्रिप) पोज़ीशन सेंसर घिसा या दूषित है"
+},
+"C0381": {
+"en": "Corroded twist grip connector",
+"hi": "ट्विस्ट ग्रिप कनेक्टर में जंग लगा है"
+},
+"C0382": {
+"en": "Pump motor seized after long inactivity",
+"hi": "लंबे समय तक इस्तेमाल न होने से पंप मोटर जाम हो गई है"
+},
+"C0383": {
+"en": "Faulty ABS pump motor relay (if fitted)",
+"hi": "ABS पंप मोटर रिले खराब है (अगर लगा हो)"
+},
+"C0384": {
+"en": "Corroded power supply connection",
+"hi": "पावर सप्लाई कनेक्शन में जंग लगा है"
+},
+"C0385": {
+"en": "Heavy or long ABS use",
+"hi": "ABS का भारी या लंबा इस्तेमाल"
+},
+"C0386": {
+"en": "Heat around the ABS unit",
+"hi": "ABS यूनिट के आसपास गर्मी"
 },
 "H0001": {
 "en": "Check the sensor connector for water, corrosion and bent pins",
@@ -3407,6 +3587,150 @@
 "en": "Check the battery condition and the charging wiring",
 "hi": "बैटरी की हालत और चार्जिंग वायरिंग जाँचें"
 },
+"H0383": {
+"en": "Check the voltage regulator and the alternator ground",
+"hi": "वोल्टेज रेगुलेटर और अल्टरनेटर का ग्राउंड जाँचें"
+},
+"H0384": {
+"en": "Compare the crankshaft and camshaft signals on the scan tool",
+"hi": "स्कैन टूल पर क्रैंकशाफ़्ट और कैमशाफ़्ट के सिग्नल की तुलना करें"
+},
+"H0385": {
+"en": "Check the timing marks and the chain tensioner as the service manual says",
+"hi": "सर्विस मैनुअल के अनुसार टाइमिंग मार्क और चेन टेंशनर जाँचें"
+},
+"H0386": {
+"en": "Check the timing marks and the sensor wiring as the service manual says",
+"hi": "सर्विस मैनुअल के अनुसार टाइमिंग मार्क और सेंसर वायरिंग जाँचें"
+},
+"H0387": {
+"en": "Check the pickup or crankshaft position sensor and its connector",
+"hi": "पिकअप या क्रैंकशाफ़्ट पोज़ीशन सेंसर और उसका कनेक्टर जाँचें"
+},
+"H0388": {
+"en": "Check the sensor gap and the wiring",
+"hi": "सेंसर का गैप और वायरिंग जाँचें"
+},
+"H0389": {
+"en": "Check the sensor gap and mounting",
+"hi": "सेंसर का गैप और माउंटिंग जाँचें"
+},
+"H0390": {
+"en": "Compare the engine speed signal on the scan tool with a known good signal",
+"hi": "स्कैन टूल पर इंजन स्पीड सिग्नल की तुलना किसी ठीक सिग्नल से करें"
+},
+"H0391": {
+"en": "Check the pickup and its connector",
+"hi": "पिकअप और उसका कनेक्टर जाँचें"
+},
+"H0392": {
+"en": "Check the sensor gap and the wiring for a break",
+"hi": "सेंसर का गैप और वायरिंग में टूटन जाँचें"
+},
+"H0393": {
+"en": "Wiggle the harness and connector while watching the engine speed signal",
+"hi": "इंजन स्पीड सिग्नल देखते हुए वायरिंग हार्नेस और कनेक्टर को हिलाएँ"
+},
+"H0394": {
+"en": "Check the stored engine speed data for the over-rev event",
+"hi": "ओवर-रेव की घटना के लिए सेव की हुई इंजन स्पीड का डेटा जाँचें"
+},
+"H0395": {
+"en": "Check the crankshaft position sensor signal for spikes",
+"hi": "क्रैंकशाफ़्ट पोज़ीशन सेंसर के सिग्नल में स्पाइक जाँचें"
+},
+"H0396": {
+"en": "Check the fuel level sensor connector and wiring",
+"hi": "फ़्यूल लेवल सेंसर का कनेक्टर और वायरिंग जाँचें"
+},
+"H0397": {
+"en": "Compare the fuel level reading with the real level",
+"hi": "फ़्यूल लेवल की रीडिंग की तुलना असली लेवल से करें"
+},
+"H0398": {
+"en": "Compare the fuel level reading with the real level at several fill levels",
+"hi": "कई फ़्यूल लेवल पर रीडिंग की तुलना असली लेवल से करें"
+},
+"H0399": {
+"en": "Check the float arm moves freely",
+"hi": "जाँचें कि फ़्लोट आर्म आसानी से हिलता है"
+},
+"H0400": {
+"en": "Check the fuel level signal wire for chafing and a short to ground",
+"hi": "फ़्यूल लेवल सिग्नल वायर में रगड़ और ग्राउंड से शॉर्ट जाँचें"
+},
+"H0401": {
+"en": "Check the fuel level signal wire for a break or a short to battery supply",
+"hi": "फ़्यूल लेवल सिग्नल वायर में टूटन या बैटरी सप्लाई से शॉर्ट जाँचें"
+},
+"H0402": {
+"en": "Wiggle the harness and connector while watching the fuel level reading",
+"hi": "फ़्यूल लेवल की रीडिंग देखते हुए वायरिंग हार्नेस और कनेक्टर को हिलाएँ"
+},
+"H0403": {
+"en": "Check the sensor contacts and the connector for corrosion",
+"hi": "सेंसर के कॉन्टैक्ट और कनेक्टर में जंग जाँचें"
+},
+"H0404": {
+"en": "Compare the reading with the real outside air temperature",
+"hi": "रीडिंग की तुलना बाहर की हवा के असली तापमान से करें"
+},
+"H0405": {
+"en": "Check the sensor connector and wiring",
+"hi": "सेंसर कनेक्टर और वायरिंग जाँचें"
+},
+"H0406": {
+"en": "Compare the reading with the intake air temperature on a cold bike",
+"hi": "ठंडी बाइक पर रीडिंग की तुलना इनटेक हवा तापमान से करें"
+},
+"H0407": {
+"en": "Check that the sensor is not heated by the engine",
+"hi": "जाँचें कि सेंसर इंजन की गर्मी से गर्म तो नहीं हो रहा"
+},
+"H0408": {
+"en": "Check the sensor and its connector",
+"hi": "सेंसर और उसका कनेक्टर जाँचें"
+},
+"H0409": {
+"en": "Check the signal wire for a break",
+"hi": "सिग्नल वायर में टूटन जाँचें"
+},
+"H0410": {
+"en": "Check both brake switches for adjustment and the brake light operation",
+"hi": "दोनों ब्रेक स्विच का एडजस्टमेंट और ब्रेक लाइट का काम जाँचें"
+},
+"H0411": {
+"en": "Check the brake switch wiring and connectors",
+"hi": "ब्रेक स्विच की वायरिंग और कनेक्टर जाँचें"
+},
+"H0412": {
+"en": "Check the clutch switch connector and wiring",
+"hi": "क्लच स्विच का कनेक्टर और वायरिंग जाँचें"
+},
+"H0413": {
+"en": "Check that the switch changes state when the clutch lever is pulled",
+"hi": "जाँचें कि क्लच लीवर खींचने पर स्विच की स्थिति बदलती है"
+},
+"H0414": {
+"en": "Compare the signals of throttle (twist grip) sensors D and E from closed to fully open",
+"hi": "बंद से पूरा खुलने तक थ्रॉटल (ट्विस्ट ग्रिप) सेंसर D और E के सिग्नल की तुलना करें"
+},
+"H0415": {
+"en": "Check the ABS pump motor supply and ground connections",
+"hi": "ABS पंप मोटर के सप्लाई और ग्राउंड कनेक्शन जाँचें"
+},
+"H0416": {
+"en": "Check the pump motor relay (if fitted) and its connector",
+"hi": "पंप मोटर रिले (अगर लगा हो) और उसका कनेक्टर जाँचें"
+},
+"H0417": {
+"en": "Check the ABS unit for heat sources and poor airflow",
+"hi": "ABS यूनिट के आसपास गर्मी के स्रोत और हवा की कमी जाँचें"
+},
+"H0418": {
+"en": "Check the ABS unit supply and ground connections",
+"hi": "ABS यूनिट के सप्लाई और ग्राउंड कनेक्शन जाँचें"
+},
 "M0001": {
 "en": "The bike's computer (ECU) cannot get a reliable reading of how far the throttle is open.",
 "hi": "बाइक का कंप्यूटर (ECU) थ्रॉटल कितना खुला है, इसकी भरोसेमंद रीडिंग नहीं ले पा रहा है।"
@@ -4527,6 +4851,118 @@
 "en": "The charging system voltage is outside the range that the bike's computer (ECU) expects; the code does not say if it is high or low.",
 "hi": "चार्जिंग सिस्टम का वोल्टेज उस रेंज से बाहर है जिसकी बाइक के कंप्यूटर (ECU) को उम्मीद है; कोड यह नहीं बताता कि वह ज़्यादा है या कम।"
 },
+"M0281": {
+"en": "The system voltage while the engine runs stays below the level that the bike's computer (ECU) expects, so the battery may go flat.",
+"hi": "इंजन चलते समय सिस्टम वोल्टेज उस स्तर से नीचे रहता है जिसकी बाइक के कंप्यूटर (ECU) को उम्मीद है, इसलिए बैटरी डिस्चार्ज हो सकती है।"
+},
+"M0282": {
+"en": "The system voltage stays above the level that the bike's computer (ECU) expects, so the battery may be overcharged.",
+"hi": "सिस्टम वोल्टेज उस स्तर से ऊपर रहता है जिसकी बाइक के कंप्यूटर (ECU) को उम्मीद है, इसलिए बैटरी ओवरचार्ज हो सकती है।"
+},
+"M0283": {
+"en": "The crankshaft and camshaft position signals do not match as expected, so the engine timing may be wrong.",
+"hi": "क्रैंकशाफ़्ट और कैमशाफ़्ट पोज़ीशन के सिग्नल उम्मीद के मुताबिक मेल नहीं खाते, इसलिए इंजन टाइमिंग गलत हो सकती है।"
+},
+"M0284": {
+"en": "The bike's computer (ECU) lost the match between the crankshaft and camshaft positions, so the engine timing may be wrong.",
+"hi": "बाइक के कंप्यूटर (ECU) का क्रैंकशाफ़्ट और कैमशाफ़्ट पोज़ीशन के बीच का मेल टूट गया है, इसलिए इंजन टाइमिंग गलत हो सकती है।"
+},
+"M0285": {
+"en": "The bike's computer (ECU) found a fault in the engine speed signal that feeds the ignition, so spark timing may be wrong.",
+"hi": "बाइक के कंप्यूटर (ECU) को इग्निशन तक जाने वाले इंजन स्पीड सिग्नल में खराबी मिली है, इसलिए स्पार्क टाइमिंग गलत हो सकती है।"
+},
+"M0286": {
+"en": "The engine speed signal does not match what the bike's computer (ECU) expects, so the engine speed may be misread.",
+"hi": "इंजन स्पीड सिग्नल बाइक के कंप्यूटर (ECU) की उम्मीद से मेल नहीं खाता, इसलिए इंजन स्पीड गलत पढ़ी जा सकती है।"
+},
+"M0287": {
+"en": "The bike's computer (ECU) gets no engine speed signal for the ignition, so the engine may not run.",
+"hi": "बाइक के कंप्यूटर (ECU) को इग्निशन के लिए इंजन स्पीड सिग्नल नहीं मिल रहा, इसलिए हो सकता है कि इंजन न चले।"
+},
+"M0288": {
+"en": "The engine speed signal is lost or changes suddenly at times, so the engine may stop suddenly.",
+"hi": "इंजन स्पीड सिग्नल कभी-कभी गायब हो जाता है या अचानक बदल जाता है, इसलिए इंजन अचानक बंद हो सकता है।"
+},
+"M0289": {
+"en": "The bike's computer (ECU) recorded an engine speed above the safe limit.",
+"hi": "बाइक के कंप्यूटर (ECU) ने सुरक्षित सीमा से ऊपर की इंजन स्पीड दर्ज की।"
+},
+"M0290": {
+"en": "The bike's computer (ECU) found a fault in the fuel level sensor circuit, so the fuel level may be shown wrongly.",
+"hi": "बाइक के कंप्यूटर (ECU) को फ़्यूल लेवल सेंसर के सर्किट में खराबी मिली है, इसलिए फ़्यूल लेवल गलत दिख सकता है।"
+},
+"M0291": {
+"en": "The fuel level reading does not match use, for example it sticks or changes suddenly, so the level may be shown wrongly.",
+"hi": "फ़्यूल लेवल की रीडिंग इस्तेमाल से मेल नहीं खाती, जैसे वह अटक जाती है या अचानक बदलती है, इसलिए फ़्यूल लेवल गलत दिख सकता है।"
+},
+"M0292": {
+"en": "The fuel level signal is too low for the bike's computer (ECU), often from a short to ground.",
+"hi": "फ़्यूल लेवल का सिग्नल बाइक के कंप्यूटर (ECU) के लिए बहुत कम है, जो अक्सर ग्राउंड से शॉर्ट से होता है।"
+},
+"M0293": {
+"en": "The fuel level signal is too high for the bike's computer (ECU), often from an open circuit or a short to battery supply.",
+"hi": "फ़्यूल लेवल का सिग्नल बाइक के कंप्यूटर (ECU) के लिए बहुत ज़्यादा है, जो अक्सर ओपन सर्किट या बैटरी सप्लाई से शॉर्ट से होता है।"
+},
+"M0294": {
+"en": "The fuel level signal is lost or changes suddenly at times, so the fuel level may be shown wrongly.",
+"hi": "फ़्यूल लेवल का सिग्नल कभी-कभी गायब हो जाता है या अचानक बदल जाता है, इसलिए फ़्यूल लेवल गलत दिख सकता है।"
+},
+"M0295": {
+"en": "The bike's computer (ECU) cannot get a reliable outside air temperature reading, so cold-start fuelling may be slightly off.",
+"hi": "बाइक का कंप्यूटर (ECU) बाहर की हवा के तापमान की भरोसेमंद रीडिंग नहीं ले पा रहा है, इसलिए कोल्ड स्टार्ट में ईंधन की मात्रा थोड़ी गड़बड़ हो सकती है।"
+},
+"M0296": {
+"en": "The outside air temperature reading does not match other temperature readings, so cold-start fuelling may be slightly off.",
+"hi": "बाहर की हवा के तापमान की रीडिंग दूसरी तापमान रीडिंग से मेल नहीं खाती, इसलिए कोल्ड स्टार्ट में ईंधन की मात्रा थोड़ी गड़बड़ हो सकती है।"
+},
+"M0297": {
+"en": "The outside air temperature signal is too low for the bike's computer (ECU), so the air looks hotter than it is.",
+"hi": "बाहर की हवा के तापमान का सिग्नल बाइक के कंप्यूटर (ECU) के लिए बहुत कम है, इसलिए हवा असल से ज़्यादा गर्म दिखती है।"
+},
+"M0298": {
+"en": "The outside air temperature signal is too high for the bike's computer (ECU), so the air looks colder than it is.",
+"hi": "बाहर की हवा के तापमान का सिग्नल बाइक के कंप्यूटर (ECU) के लिए बहुत ज़्यादा है, इसलिए हवा असल से ज़्यादा ठंडी दिखती है।"
+},
+"M0299": {
+"en": "The outside air temperature signal is lost or changes suddenly at times, so cold-start fuelling may be slightly off.",
+"hi": "बाहर की हवा के तापमान का सिग्नल कभी-कभी गायब हो जाता है या अचानक बदल जाता है, इसलिए कोल्ड स्टार्ट में ईंधन की मात्रा थोड़ी गड़बड़ हो सकती है।"
+},
+"M0300": {
+"en": "The two brake switch signals do not agree, so the bike's computer (ECU) may misjudge when the brake is pressed.",
+"hi": "ब्रेक स्विच के दोनों सिग्नल आपस में मेल नहीं खाते, इसलिए बाइक का कंप्यूटर (ECU) ब्रेक दबने का गलत अंदाज़ा लगा सकता है।"
+},
+"M0301": {
+"en": "The bike's computer (ECU) found a fault in the clutch switch circuit, so it may not know when the clutch lever is pulled.",
+"hi": "बाइक के कंप्यूटर (ECU) को क्लच स्विच के सर्किट में खराबी मिली है, इसलिए हो सकता है कि उसे पता न चले कि क्लच लीवर कब खींचा गया।"
+},
+"M0302": {
+"en": "The signal of throttle (twist grip) position sensor D is too low for the bike's computer (ECU), often from a short to ground.",
+"hi": "थ्रॉटल (ट्विस्ट ग्रिप) पोज़ीशन सेंसर D का सिग्नल बाइक के कंप्यूटर (ECU) के लिए बहुत कम है, जो अक्सर ग्राउंड से शॉर्ट से होता है।"
+},
+"M0303": {
+"en": "The signal of throttle (twist grip) position sensor D is too high for the bike's computer (ECU), often from a short to battery supply.",
+"hi": "थ्रॉटल (ट्विस्ट ग्रिप) पोज़ीशन सेंसर D का सिग्नल बाइक के कंप्यूटर (ECU) के लिए बहुत ज़्यादा है, जो अक्सर बैटरी सप्लाई से शॉर्ट से होता है।"
+},
+"M0304": {
+"en": "The signal of throttle (twist grip) position sensor E is too low for the bike's computer (ECU), often from a short to ground.",
+"hi": "थ्रॉटल (ट्विस्ट ग्रिप) पोज़ीशन सेंसर E का सिग्नल बाइक के कंप्यूटर (ECU) के लिए बहुत कम है, जो अक्सर ग्राउंड से शॉर्ट से होता है।"
+},
+"M0305": {
+"en": "The signal of throttle (twist grip) position sensor E is too high for the bike's computer (ECU), often from a short to battery supply.",
+"hi": "थ्रॉटल (ट्विस्ट ग्रिप) पोज़ीशन सेंसर E का सिग्नल बाइक के कंप्यूटर (ECU) के लिए बहुत ज़्यादा है, जो अक्सर बैटरी सप्लाई से शॉर्ट से होता है।"
+},
+"M0306": {
+"en": "The two throttle (twist grip) position sensor signals disagree by more than the bike's computer (ECU) allows, so it cannot trust the twist grip position.",
+"hi": "थ्रॉटल (ट्विस्ट ग्रिप) पोज़ीशन सेंसर के दोनों सिग्नल बाइक के कंप्यूटर (ECU) की इजाज़त से ज़्यादा अलग हैं, इसलिए वह ट्विस्ट ग्रिप की पोज़ीशन पर भरोसा नहीं कर सकता।"
+},
+"M0307": {
+"en": "The ABS control unit found an electrical fault in the ABS pump motor circuit, so ABS is probably switched off.",
+"hi": "ABS कंट्रोल यूनिट को ABS पंप मोटर के सर्किट में इलेक्ट्रिकल खराबी मिली है, इसलिए ABS शायद बंद है।"
+},
+"M0308": {
+"en": "The ABS control unit got hotter than its safe limit, so ABS may be switched off for a while.",
+"hi": "ABS कंट्रोल यूनिट अपनी सुरक्षित सीमा से ज़्यादा गर्म हो गई, इसलिए ABS कुछ देर के लिए बंद हो सकता है।"
+},
 "R0001": {
 "en": "idle may be uneven; avoid traffic and long trips",
 "hi": "आइडल अस्थिर हो सकता है; ट्रैफ़िक और लंबे सफ़र से बचें"
@@ -4886,6 +5322,30 @@
 "R0090": {
 "en": "may run cooler than normal; watch for overheating",
 "hi": "सामान्य से ठंडा चल सकता है; ओवरहीट पर नज़र रखें"
+},
+"R0091": {
+"en": "timing may be wrong; short trip, stop if it runs very rough",
+"hi": "टाइमिंग गलत हो सकती है; छोटा सफ़र करें, इंजन बहुत रफ़ चले तो रुकें"
+},
+"R0092": {
+"en": "engine speed signal may be lost; arrange transport",
+"hi": "इंजन स्पीड सिग्नल गायब हो सकता है; बाइक ले जाने का इंतज़ाम करें"
+},
+"R0093": {
+"en": "informational; the bike should run normally",
+"hi": "सिर्फ़ जानकारी; बाइक सामान्य चलनी चाहिए"
+},
+"R0094": {
+"en": "fuel level display only; refuel by distance",
+"hi": "सिर्फ़ फ़्यूल लेवल डिस्प्ले की बात; चली हुई दूरी के हिसाब से फ़्यूल भरवाएँ"
+},
+"R0095": {
+"en": "ride only if the brake light works; ride gently",
+"hi": "सिर्फ़ तब चलाएँ जब ब्रेक लाइट काम करे; धीरे चलाएँ"
+},
+"R0096": {
+"en": "starting may be affected; short trip to a workshop",
+"hi": "स्टार्टिंग प्रभावित हो सकती है; वर्कशॉप तक छोटा सफ़र"
 },
 "T0001": {
 "en": "Throttle position sensor A: circuit fault",
@@ -6006,5 +6466,117 @@
 "T0280": {
 "en": "Charging system voltage: signal out of range",
 "hi": "चार्जिंग सिस्टम वोल्टेज: सिग्नल रेंज से बाहर"
+},
+"T0281": {
+"en": "Charging system voltage: voltage below threshold",
+"hi": "चार्जिंग सिस्टम वोल्टेज: वोल्टेज सीमा से कम"
+},
+"T0282": {
+"en": "Charging system voltage: voltage above threshold",
+"hi": "चार्जिंग सिस्टम वोल्टेज: वोल्टेज सीमा से ज़्यादा"
+},
+"T0283": {
+"en": "Crankshaft and camshaft position: signal plausibility fault",
+"hi": "क्रैंकशाफ़्ट और कैमशाफ़्ट पोज़ीशन: सिग्नल प्लॉज़िबिलिटी फ़ॉल्ट"
+},
+"T0284": {
+"en": "Crankshaft and camshaft position: synchronisation lost",
+"hi": "क्रैंकशाफ़्ट और कैमशाफ़्ट पोज़ीशन: सिंक्रोनाइज़ेशन टूट गया"
+},
+"T0285": {
+"en": "Engine speed signal: circuit fault",
+"hi": "इंजन स्पीड सिग्नल: सर्किट में खराबी"
+},
+"T0286": {
+"en": "Engine speed signal: performance or incorrect operation",
+"hi": "इंजन स्पीड सिग्नल: परफ़ॉर्मेंस या गलत कामकाज"
+},
+"T0287": {
+"en": "Engine speed signal: no signal",
+"hi": "इंजन स्पीड सिग्नल: कोई सिग्नल नहीं"
+},
+"T0288": {
+"en": "Engine speed signal: intermittent circuit fault",
+"hi": "इंजन स्पीड सिग्नल: सर्किट में बीच-बीच में खराबी"
+},
+"T0289": {
+"en": "Engine overspeed detected",
+"hi": "इंजन ओवरस्पीड पाया गया"
+},
+"T0290": {
+"en": "Fuel level sensor A: circuit fault",
+"hi": "फ़्यूल लेवल सेंसर A: सर्किट में खराबी"
+},
+"T0291": {
+"en": "Fuel level sensor A: performance or incorrect operation",
+"hi": "फ़्यूल लेवल सेंसर A: परफ़ॉर्मेंस या गलत कामकाज"
+},
+"T0292": {
+"en": "Fuel level sensor A: voltage below threshold",
+"hi": "फ़्यूल लेवल सेंसर A: वोल्टेज सीमा से कम"
+},
+"T0293": {
+"en": "Fuel level sensor A: voltage above threshold",
+"hi": "फ़्यूल लेवल सेंसर A: वोल्टेज सीमा से ज़्यादा"
+},
+"T0294": {
+"en": "Fuel level sensor A: intermittent circuit fault",
+"hi": "फ़्यूल लेवल सेंसर A: सर्किट में बीच-बीच में खराबी"
+},
+"T0295": {
+"en": "Ambient air temperature sensor A: circuit fault",
+"hi": "बाहरी हवा तापमान सेंसर A: सर्किट में खराबी"
+},
+"T0296": {
+"en": "Ambient air temperature sensor A: performance or incorrect operation",
+"hi": "बाहरी हवा तापमान सेंसर A: परफ़ॉर्मेंस या गलत कामकाज"
+},
+"T0297": {
+"en": "Ambient air temperature sensor A: voltage below threshold",
+"hi": "बाहरी हवा तापमान सेंसर A: वोल्टेज सीमा से कम"
+},
+"T0298": {
+"en": "Ambient air temperature sensor A: voltage above threshold",
+"hi": "बाहरी हवा तापमान सेंसर A: वोल्टेज सीमा से ज़्यादा"
+},
+"T0299": {
+"en": "Ambient air temperature sensor A: intermittent circuit fault",
+"hi": "बाहरी हवा तापमान सेंसर A: सर्किट में बीच-बीच में खराबी"
+},
+"T0300": {
+"en": "Brake switch A and B: signal plausibility fault",
+"hi": "ब्रेक स्विच A और B: सिग्नल प्लॉज़िबिलिटी फ़ॉल्ट"
+},
+"T0301": {
+"en": "Clutch switch input: circuit fault",
+"hi": "क्लच स्विच इनपुट: सर्किट में खराबी"
+},
+"T0302": {
+"en": "Throttle (twist grip) position sensor D: voltage below threshold",
+"hi": "थ्रॉटल (ट्विस्ट ग्रिप) पोज़ीशन सेंसर D: वोल्टेज सीमा से कम"
+},
+"T0303": {
+"en": "Throttle (twist grip) position sensor D: voltage above threshold",
+"hi": "थ्रॉटल (ट्विस्ट ग्रिप) पोज़ीशन सेंसर D: वोल्टेज सीमा से ज़्यादा"
+},
+"T0304": {
+"en": "Throttle (twist grip) position sensor E: voltage below threshold",
+"hi": "थ्रॉटल (ट्विस्ट ग्रिप) पोज़ीशन सेंसर E: वोल्टेज सीमा से कम"
+},
+"T0305": {
+"en": "Throttle (twist grip) position sensor E: voltage above threshold",
+"hi": "थ्रॉटल (ट्विस्ट ग्रिप) पोज़ीशन सेंसर E: वोल्टेज सीमा से ज़्यादा"
+},
+"T0306": {
+"en": "Throttle (twist grip) sensors D and E: signal plausibility fault",
+"hi": "थ्रॉटल (ट्विस्ट ग्रिप) सेंसर D और E: सिग्नल प्लॉज़िबिलिटी फ़ॉल्ट"
+},
+"T0307": {
+"en": "ABS pump motor: circuit fault",
+"hi": "ABS पंप मोटर: सर्किट में खराबी"
+},
+"T0308": {
+"en": "ABS control unit: over temperature",
+"hi": "ABS कंट्रोल यूनिट: तापमान सीमा से ज़्यादा"
 }
 }

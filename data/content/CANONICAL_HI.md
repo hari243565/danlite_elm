@@ -65,6 +65,7 @@ Latin script, native verbs for actions (रुकें, जाँचें, क
 | HEDGE-HOSE | if hose-fed | अगर होज़ से जुड़ा हो |
 | HEDGE-LESS | less common | कम आम |
 | HEDGE-LIQUID | liquid-cooled | लिक्विड-कूल्ड |
+| HEDGE-RARE | rare | दुर्लभ |
 | HEDGE-IF-BIKE | if your bike | अगर आपकी बाइक |
 
 ## Stop and do-not-ride wording (used by validator check 9)
