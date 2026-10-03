@@ -1,0 +1,15 @@
+{
+  "pack_id": "generic_basic_hi",
+  "scope": "generic",
+  "language": "hi",
+  "version": 1,
+  "entries_count": 7672,
+  "content_sha256": "4823cfb92868608d19c854791f40a8361ecd61b0f1301f0b1d6e0e34f3c6328e",
+  "created_at": "2026-10-03",
+  "min_app_version": "1.0.0",
+  "review_state": "draft",
+  "revoked": [],
+  "signature": null,
+  "source": "bundled",
+  "content_origin": "content/seed-20261001, data/content/generic_basic_hi.jsonl, built by build_basic.py. Standard code names only (verification standard_title_only): no cause, part or advice. Titles agreed by OBDex (bc58b0e) and Wal33D (04c43d7). content_sha256 is of the file with LF line endings, byte for byte as shipped. AI-translated DRAFT Hindi, hi_status machine, not read by any person."
+}

@@ -31,11 +31,14 @@ import 'knowledge_store.dart';
 import 'legacy_text.dart';
 import 'scan_history.dart';
 
-/// Where the bundled baseline packs live in the APK: English first (the
-/// resolver falls back to it field by field), then Hindi.
+/// Where the bundled packs live in the APK: the guidance packs first, English
+/// before Hindi (the resolver falls back to English field by field), then the
+/// name-only packs (standard code names, no guidance) in the same order.
 const List<String> kBundledPackDirs = <String>[
   'assets/knowledge/generic_en',
   'assets/knowledge/generic_hi',
+  'assets/knowledge/generic_basic_en',
+  'assets/knowledge/generic_basic_hi',
 ];
 
 /// The English pack's folder (kept for callers that mean "the baseline").

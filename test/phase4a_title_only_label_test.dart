@@ -16,6 +16,7 @@ import 'package:danlite_elm/models/fault_record.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'phase1b_screens_test.dart' as screens;
+import 'phase4c_name_only_validator_test.dart' show nameOnlyEn;
 import 'support/engine_sim.dart';
 import 'support/kb_pack_builder.dart';
 
@@ -97,18 +98,30 @@ void main() {
       ], reason: 'the eight old keys keep their order and names; the new one is last');
     });
 
-    test('Hindi asked: the less-claiming label wins if either language row says title only',
-        () {
+    // Phase 4C: real guidance in either language now beats a bare name (the
+    // old "mixed rows" case); the label is title-only only when every row is.
+    test('Hindi asked: guidance in either language beats a bare name in the other', () {
       final r = resolverOf([
         entry('ai_authored_from_standard_title', meaning: 'English meaning.'),
-        entry('standard_title_only', lang: 'hi', title: 'थ्रॉटल पोज़ीशन सेंसर A'),
+        entry('standard_title_only', lang: 'hi', title: 'थ्रॉटल पोज़ीशन सेंसर A', meaning: 'म.'),
       ]).resolve(obd('P0120'), VehicleContext.generic, 'hi');
-      expect(r.provenance, Provenance.standardTitleOnly);
+      expect(r.provenance, Provenance.aiGuidance);
+      expect(r.languageUsed, 'en');
       final r2 = resolverOf([
         entry('standard_title_only', meaning: 'x.'),
         entry('ai_authored_from_standard_title', lang: 'hi', title: 'थ्रॉटल', meaning: 'म.'),
       ]).resolve(obd('P0120'), VehicleContext.generic, 'hi');
-      expect(r2.provenance, Provenance.standardTitleOnly);
+      expect(r2.provenance, Provenance.aiGuidance);
+      expect(r2.languageUsed, 'hi');
+    });
+
+    test('Hindi asked: when every row is a bare name, the label says so', () {
+      final r = resolverOf([
+        entry('standard_title_only', meaning: 'x.'),
+        entry('standard_title_only', lang: 'hi', title: 'थ्रॉटल', meaning: 'म.'),
+      ]).resolve(obd('P0120'), VehicleContext.generic, 'hi');
+      expect(r.provenance, Provenance.standardTitleOnly);
+      expect(r.title, 'थ्रॉटल');
     });
 
     test('only guidance entries count as store guidance for the screens', () {
@@ -121,7 +134,8 @@ void main() {
     test('accepts the new verification value and still refuses every other unknown one',
         () async {
       final base = seedLine('P0120');
-      final good = Map<String, Object?>.from(base)..['verification'] = 'standard_title_only';
+      // Phase 4C: a title-only line is a name-only line (no causes, hints, can-ride).
+      final good = nameOnlyEn('P0120');
       final (store, _) = await openTempStore();
       final ok = await buildPack(lines: [good]);
       expect((await store.importPack(
@@ -150,24 +164,23 @@ void main() {
           (tester) async {
         final env = await screens.setUp(tester,
             lang: lang,
-            sim: EngineSim(mode03: '7E8 04 43 01 01 20'), beforeRead: (k) async {
-          // P0120 re-issued as title-only (English and Hindi rows), a newer version.
-          final en = Map<String, Object?>.from(seedLine('P0120'))
-            ..['verification'] = 'standard_title_only';
+            sim: EngineSim(mode03: '7E8 04 43 01 01 21'), beforeRead: (k) async {
+          // P0121 (not in the 31-entry table, which would beat a bare name) re-issued as title-only (English and Hindi rows), a newer version.
+          final en = nameOnlyEn('P0121');
           final pack = await buildPack(
-              lines: [for (final l in seedLines()) l['code'] == 'P0120' ? en : l],
+              lines: [for (final l in seedLines()) l['code'] == 'P0121' ? en : l],
               version: kBundledEnVersion + 1);
           expect((await k.store!.importPack(
                   manifestBytes: pack.manifestBytes, entriesBytes: pack.entriesBytes,
                   source: PackSource.debug, appVersion: '1.0.0', allowDebug: true))
               .imported, isTrue);
           final hiLine = (jsonDecode(jsonEncode(
-                  (await k.store!.db.query('kb_entry', where: "content_id = 'generic:P0120:hi'"))
+                  (await k.store!.db.query('kb_entry', where: "content_id = 'generic:P0121:hi'"))
                       .first)) as Map)
               .cast<String, Object?>();
           expect(hiLine['language'], 'hi');
           await k.store!.db.update('kb_entry', {'verification': 'standard_title_only'},
-              where: "content_id = 'generic:P0120:hi'");
+              where: "content_id = 'generic:P0121:hi'");
           await k.reload();
         });
         final xs = await screens.showDtc(tester, env);

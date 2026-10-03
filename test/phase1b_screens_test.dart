@@ -231,7 +231,9 @@ void main() {
     });
 
     testWidgets('L5: a standard code nobody describes shows structure only', (tester) async {
-      final env = await setUp(tester, sim: EngineSim(mode03: '7E8 04 43 01 00 17'));
+      // P0134 is in neither the guidance packs nor the name-only packs (the
+      // content owner holds it out), and not in the 31-entry table.
+      final env = await setUp(tester, sim: EngineSim(mode03: '7E8 04 43 01 01 34'));
       final xs = await showDtc(tester, env);
       expect(xs, contains(t('dtcSubFuelAir')));
       expect(xs, contains(t('provenanceStructure')));
@@ -302,7 +304,7 @@ void main() {
       final injection = await searchCodes(parseLookupQuery("%'; DROP TABLE kb_entry; --"),
           store: k.store, language: 'en');
       expect(injection.items, isEmpty);
-      expect((await k.store!.activeEntries()).length, 616);
+      expect((await k.store!.activeEntries()).length, kBundledTotalRows);
       await k.store!.close();
     });
   });

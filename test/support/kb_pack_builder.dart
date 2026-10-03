@@ -22,6 +22,11 @@ const int kBundledEnVersion = 2;
 const int kBundledHiCount = 308;
 const int kBundledHiVersion = 1;
 
+/// Phase 4C: the name-only packs shipped next to them (7,672 English and 7,672
+/// Hindi standard code names), and every row a fresh install holds.
+const int kBasicCount = 7672;
+const int kBundledTotalRows = kBundledEnCount + kBundledHiCount + 2 * kBasicCount;
+
 /// The real bundled seed lines, decoded.
 List<Map<String, Object?>> seedLines() => [
       for (final l in File('$kBundledDir/entries.jsonl').readAsLinesSync())

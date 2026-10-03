@@ -123,9 +123,10 @@ void main() {
       final s = k.store!;
       expect(k.state, KnowledgeState.ready);
       expect(k.bundledImports.every((o) => o.imported), isTrue, reason: '${k.bundledImports}');
-      expect(await count(s), 616);
-      expect(await count(s, "language = 'en' AND status = 'active'"), 308);
-      expect(await count(s, "language = 'hi' AND status = 'active'"), 308);
+      // The two guidance packs (the name-only packs have their own test).
+      expect(await count(s, "pack_id IN ('generic_en', 'generic_hi')"), 616);
+      expect(await count(s, "pack_id = 'generic_en' AND language = 'en' AND status = 'active'"), 308);
+      expect(await count(s, "pack_id = 'generic_hi' AND language = 'hi' AND status = 'active'"), 308);
       for (final id in ['generic_en', 'generic_hi']) {
         final p = (await s.pack(id))!;
         expect(p.source, PackSource.bundled);
@@ -149,7 +150,7 @@ void main() {
       final b = knowledgeAt(path);
       await b.start();
       expect(b.bundledImports, isEmpty);
-      expect(await count(b.store!), 616);
+      expect(await count(b.store!), kBundledTotalRows);
       await b.store!.close();
     });
   });
@@ -194,11 +195,13 @@ void main() {
       expect(k.bundledImports.map((o) => o.toString()), [
         'imported generic_en v$kBundledEnVersion (308 entries)',
         'imported generic_hi v$kBundledHiVersion (308 entries)',
+        'imported generic_basic_en v1 ($kBasicCount entries)',
+        'imported generic_basic_hi v1 ($kBasicCount entries)',
       ]);
-      expect(await count(s), 616);
+      expect(await count(s), kBundledTotalRows);
       expect(await count(s, "pack_id = 'generic_en'"), 308, reason: 'old rows replaced, not added');
-      expect(await count(s, "language = 'en'"), 308);
-      expect(await count(s, "language = 'hi'"), 308);
+      expect(await count(s, "pack_id = 'generic_en' AND language = 'en'"), 308);
+      expect(await count(s, "pack_id = 'generic_hi' AND language = 'hi'"), 308);
       expect(await s.db.rawQuery(
           'SELECT content_id FROM kb_entry GROUP BY content_id HAVING COUNT(*) > 1'), isEmpty);
 
@@ -229,11 +232,11 @@ void main() {
           source: PackSource.bundled,
           appVersion: '1.0.0');
       await old.close();
-      for (final expectImports in [2, 0]) {
+      for (final expectImports in [4, 0]) {
         final k = knowledgeAt(path);
         await k.start();
         expect(k.bundledImports, hasLength(expectImports));
-        expect(await count(k.store!), 616);
+        expect(await count(k.store!), kBundledTotalRows);
         await k.store!.close();
       }
     });
@@ -248,8 +251,8 @@ void main() {
       );
       await k.start();
       expect(k.state, KnowledgeState.ready);
-      expect(await count(k.store!, "language = 'hi'"), 308);
-      expect(await count(k.store!, "language = 'en'"), 0);
+      expect(await count(k.store!, "pack_id = 'generic_hi'"), 308);
+      expect(await count(k.store!, "pack_id = 'generic_en'"), 0);
       await k.store!.close();
     });
   });
@@ -257,7 +260,7 @@ void main() {
   group('H1 (d) the Hindi rows', () {
     test('every imported Hindi row is machine-status, none reviewed or unmarked', () async {
       final k = await startedKnowledge();
-      final rows = await k.store!.db.query('kb_entry', where: "language = 'hi'");
+      final rows = await k.store!.db.query('kb_entry', where: "pack_id = 'generic_hi'");
       expect(rows, hasLength(308));
       expect(rows.every((r) => r['hi_status'] == 'machine'), isTrue);
       expect(rows.every((r) => r['needs_independent_review'] == 1), isTrue,

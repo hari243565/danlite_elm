@@ -73,7 +73,7 @@ void main() {
       await k2.start();
       expect(k2.bundledImport, isNull, reason: 'installed version is current');
       expect(k2.state, KnowledgeState.ready);
-      expect((await k2.store!.activeEntries()).length, 616);
+      expect((await k2.store!.activeEntries()).length, kBundledTotalRows);
       await k2.store!.close();
     });
 
@@ -256,7 +256,7 @@ void main() {
     ]);
     expect((results.first as ImportOutcome).imported, isTrue);
     expect(await k.history!.list(), hasLength(5));
-    expect((await k.store!.activeEntries()).length, 616);
+    expect((await k.store!.activeEntries()).length, kBundledTotalRows);
     await k.store!.close();
   });
 

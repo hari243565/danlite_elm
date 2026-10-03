@@ -306,6 +306,8 @@ class KnowledgeIndex {
 
 final RegExp _saeCode = RegExp(r'^[PCBU][0-3][0-9A-F]{3}$');
 
+bool _nameOnly(KbEntry e) => e.verification == kVerificationStandardTitleOnly;
+
 class FaultResolver {
   FaultResolver({
     required this.index,
@@ -370,10 +372,12 @@ class FaultResolver {
     if (isSae && !isManufacturerDefined(code) && !platformOwnsCode && !rawPlatform) {
       final r = _fromStore(entries, ScopeKind.generic, '', record, code, vehicle,
           language, ResolvedLevel.l4Generic);
-      if (r != null) return r;
+      if (r != null && r.provenance != Provenance.standardTitleOnly) return r;
       if (domain != FaultDomain.abs) {
         final l = legacy?.call(code, language, useImported: useImportedLegacyText);
-        if (l != null && l.title.isNotEmpty) {
+        // The 31-entry table has a cause and an action, so it beats a bare
+        // name; the imported legacy text does not (it is a name too).
+        if (l != null && l.title.isNotEmpty && !(r != null && l.imported)) {
           // Cause and action are English only. When the title is in the asked
           // (non-English) language, they are the English parts; when the title
           // itself is English, languageUsed already says so.
@@ -398,6 +402,7 @@ class FaultResolver {
           );
         }
       }
+      if (r != null) return r;
     }
 
     // ── L6 raw, for what has no SAE structure to describe ────────────────
@@ -444,11 +449,16 @@ class FaultResolver {
   ResolvedFault? _fromStore(List<KbEntry> all, ScopeKind kind, String ref,
       FaultRecord record, String code, VehicleContext vehicle, String language,
       ResolvedLevel level) {
-    final group = [
+    var group = [
       for (final e in all)
         if (!e.revoked && e.scopeKind == kind && e.scopeRef == ref) e
     ];
     if (group.isEmpty) return null;
+    // Real guidance always beats a bare name for the same code, in either
+    // language: a name-only row is used only when nothing richer exists here.
+    if (group.any((e) => !_nameOnly(e))) {
+      group = [for (final e in group) if (!_nameOnly(e)) e];
+    }
     KbEntry? inLang(String l) {
       for (final e in group) {
         if (e.language == l) return e;
