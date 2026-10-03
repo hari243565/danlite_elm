@@ -111,6 +111,10 @@ def main():
                                "title_en": "Left Rear Wheel Speed Sensor Circuit Malfunction",
                                "standard_title_en": "Left Rear Wheel Speed Sensor Circuit Malfunction",
                                "meaning_en": "Standard name: Left Rear Wheel Speed Sensor Circuit Malfunction."}))
+    expect("a per-wheel position code (left front)", "E4",
+           lambda e: e.update({"code": "C0010", "content_id": "generic:C0010:en", "system": "chassis",
+                               "title_en": "Left Front Inlet Control", "standard_title_en": "Left Front Inlet Control",
+                               "meaning_en": "Standard name: Left Front Inlet Control."}))
     expect("a manufacturer-defined range", "E4",
            lambda e: e.update({"code": "P1234", "content_id": "generic:P1234:en"}))
     # ---- E5 fixed patterns ---------------------------------------------------------------------------------

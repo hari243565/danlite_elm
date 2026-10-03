@@ -50,8 +50,8 @@ P0030,P,P01,exclude,shipped,AGREE,HO2S Heater Control Circuit (Bank 1 Sensor 1),
 P0031,P,P01,exclude,shipped,AGREE,HO2S Heater Control Circuit Low (Bank 1 Sensor 1),obdex,,
 P0032,P,P01,exclude,shipped,AGREE,HO2S Heater Control Circuit High (Bank 1 Sensor 1),obdex,,
 P0033,P,P01,exclude,disagree,DISAGREE,Turbocharger Bypass Valve Control Circuit,obdex,,
-P0034,P,P01,include,,AGREE,Turbocharger Bypass Valve Control Circuit Low,obdex,voltage_below_threshold,b77b2df3aea8772e3d77a964970fda6200132fcc24aca8f04d9820f1837e0ef6
-P0035,P,P01,include,,AGREE,Turbocharger Bypass Valve Control Circuit High,obdex,voltage_above_threshold,dcf7beb6bcefc9ea65ca464000f4a718cbf7e778d5dfcb1027d756f22df4354e
+P0034,P,P01,exclude,other:words_differ,AGREE,Turbocharger Bypass Valve Control Circuit Low,obdex,,
+P0035,P,P01,exclude,other:words_differ,AGREE,Turbocharger Bypass Valve Control Circuit High,obdex,,
 P0036,P,P01,exclude,shipped,AGREE,HO2S Heater Control Circuit (Bank 1 Sensor 2),obdex,,
 P0037,P,P01,exclude,shipped,AGREE,HO2S Heater Control Circuit Low (Bank 1 Sensor 2),obdex,,
 P0038,P,P01,exclude,shipped,AGREE,HO2S Heater Control Circuit High (Bank 1 Sensor 2),obdex,,
@@ -1385,8 +1385,8 @@ P056A,P,P03,include,,AGREE,Cruise Control Increase Distance Signal,obdex,,3882c7
 P056B,P,P03,include,,AGREE,Cruise Control Decrease Distance Signal,obdex,,a3f658bd5f841df8c344c119c3f6c7c915fc5f5f08ce97e4f5e34d145d877d30
 P056C,P,P03,include,,AGREE,Cruise Control Cancel Signal,obdex,,48608edc865b9990b31d25f3a7d3a0aa3adf04cb5474e4aa228251230dcb55fd
 P056D,P,P03,include,,AGREE,Reductant Control Module System Voltage,obdex,,307372b1ee75a92dce3ff02c595359d8fbef038f915242a9c7a5cf916b1c121a
-P056E,P,P03,include,,AGREE,Cold Start Turbocharger Boost Control A Performance,obdex,performance_or_incorrect_operation,133ab197f16b0900e6d3cf2f095093c82e7377f95d0e65934c5728bd46cf6b1f
-P056F,P,P03,include,,AGREE,Cold Start Turbocharger Boost Control B Performance,obdex,performance_or_incorrect_operation,872aa2d4bb77ddabf1ed876fde9fc334204e290b39e9dc6614458b63823ea9d1
+P056E,P,P03,exclude,other:words_differ,AGREE,Cold Start Turbocharger Boost Control A Performance,obdex,,
+P056F,P,P03,exclude,other:words_differ,AGREE,Cold Start Turbocharger Boost Control B Performance,obdex,,
 P0570,P,P03,exclude,disagree,DISAGREE,Cruise Control Accel Signal Malfunction,obdex,,
 P0571,P,P03,include,,AGREE,"Brake Switch ""A"" Circuit Malfunction",obdex,circuit_fault,7f02147c5fccbab8f0e03afdf7ffbcf60fc73d646e058472af024cc7813d8b1f
 P0572,P,P03,exclude,disagree,DISAGREE,Cruise Control/Brake Switch B Circuit Low,obdex,,
@@ -1528,7 +1528,7 @@ P05F9,P,P04,include,,AGREE,Stop-Start Status Signal Circuit,obdex,,bb8c3eb38c055
 P05FA,P,P04,include,,AGREE,Stop-Start Status Signal Circuit Low,obdex,voltage_below_threshold,88a0a2b6316b442ba0644c9f708578b01d843d6727dbd63426a1fff36575fe52
 P05FB,P,P04,include,,AGREE,Stop-Start Status Signal Circuit High,obdex,voltage_above_threshold,0287a1128a82aabf699266f8f2335156e8e9805f2dabf7680f5be32022b25b28
 P05FC,P,P04,include,,AGREE,Cold Start Fuel Pressure Performance Bank 2,obdex,,f6a78aa901a960b7e108bf16f0e80f9056f45b7e0b42d4036e5e414f954b6a1b
-P05FD,P,P04,include,,AGREE,Turbocharger Boost Control A Temperature Too High,obdex,,d84398cd0a1f7b95146d21930c13800e2468dbab9937c019ae13a2078d00288d
+P05FD,P,P04,exclude,other:words_differ,AGREE,Turbocharger Boost Control A Temperature Too High,obdex,,
 P05FE,P,P04,include,,AGREE,Active Grille Air Shutter C Performance Stuck Off,obdex,,3dc713f6eeae73efbc27815339fb786f6bb5c225be9c0c68b0143d3f3280e608
 P05FF,P,P04,include,,AGREE,Brake Pressure Sensor and Brake Pedal Position Sensor Correlation,obdex,,dec599d2919cf4a6011e49a23c41882836cc7b737b8c1ad1d8648f4e4b1195c9
 P0600,P,P04,exclude,shipped,AGREE,Serial Communication Link,obdex,,
@@ -1809,8 +1809,8 @@ P0712,P,P04,include,,AGREE,Transmission Fluid Temperature Sensor Circuit Low,obd
 P0713,P,P04,include,,AGREE,Transmission Fluid Temperature Sensor Circuit High,obdex,voltage_above_threshold,a9da6b8ebf604f5e31bf5f8f5319cb95327f3211910edf68fd2786fa0f51a4cb
 P0714,P,P04,include,,AGREE,Transmission Fluid Temperature Sensor A Circuit Intermittent,obdex,intermittent,5138fb42b696feda5e4efa32ddd9e23c6e03b9ab1dc8c6138d4895b1376e6a9c
 P0715,P,P04,exclude,disagree,DISAGREE,"Input/Turbine Speed Sensor ""A"" Circuit Malfunction",obdex,,
-P0716,P,P04,include,,AGREE,"Input/Turbine Speed Sensor ""A"" Circuit Range/Performance",obdex,performance_or_incorrect_operation,9be24653328c660e8f2f8d84effa5ec7db0a1977865bfc46b999945a952db957
-P0717,P,P04,include,,AGREE,Input/Turbine Speed Sensor Circuit No Signal,obdex,,61b00ae61379498c2eb47d452c3c108aff16ac2a43c95760b54bbca40f0d0ff3
+P0716,P,P04,exclude,other:words_differ,AGREE,"Input/Turbine Speed Sensor ""A"" Circuit Range/Performance",obdex,,
+P0717,P,P04,exclude,other:words_differ,AGREE,Input/Turbine Speed Sensor Circuit No Signal,obdex,,
 P0718,P,P04,include,,AGREE,Input or Turbine Shaft Speed Sensor A Circuit Intermittent,obdex,intermittent,39401c1f6bba59a293840e0977b59d1d4ec024350a22fcc380343ecf05528013
 P0719,P,P04,include,,AGREE,Brake Switch B Circuit Low,obdex,voltage_below_threshold,b31cec7c75aa3b5ef48c5d73b53db8deddb93f373da38d56574955b70e7e8795
 P071A,P,P04,include,,AGREE,Transmission Mode Switch A Circuit,obdex,,9f041657a8c851d709506f9d3e5b75f8d275d7cd80a600e5e654006250b1063e
@@ -1820,8 +1820,8 @@ P071D,P,P04,include,,AGREE,Transmission Mode Switch B Circuit,obdex,,bd736a871cd
 P071E,P,P04,include,,AGREE,Transmission Mode Switch B Circuit Low,obdex,voltage_below_threshold,d70c13278d6bbf1f6a54e94ca1f5afb1ecc7e92160a0b1be6a39fdf4863e54f9
 P071F,P,P04,include,,AGREE,Transmission Mode Switch B Circuit High,obdex,voltage_above_threshold,4c5c269ed548c94f549e16c0f9fa5f8cfd217282ff04d4a6c0e2f783cebdb66d
 P0720,P,P04,exclude,disagree,DISAGREE,Output Speed Sensor Circuit Malfunction,obdex,,
-P0721,P,P04,include,,AGREE,Output Speed Sensor Circuit Range/Performance,obdex,performance_or_incorrect_operation,2270e152d3edda9b1736d140552fabf1d7d762f0bdfb688face5b93f7cdf773a
-P0722,P,P04,include,,AGREE,Output Speed Sensor Circuit No Signal,obdex,,1861f827ccceb34b58288257a9a6734dfe879a04046f3e3f4ee8eedb1e231622
+P0721,P,P04,exclude,other:words_differ,AGREE,Output Speed Sensor Circuit Range/Performance,obdex,,
+P0722,P,P04,exclude,other:words_differ,AGREE,Output Speed Sensor Circuit No Signal,obdex,,
 P0723,P,P04,include,,AGREE,Output Shaft Speed Sensor Circuit Intermittent,obdex,intermittent,fa8a7c452b4c49e242e38de3bfc20cfc1886bb793a30a1be28fc3fd5819a6c52
 P0724,P,P04,include,,AGREE,Brake Switch B Circuit High,obdex,voltage_above_threshold,076de243f1e59e4152c7a18977747119383e8fb7e34e5d9d8260ef33ec60d63e
 P0725,P,P04,include,,AGREE,Engine Speed Input Circuit,obdex,,2c96fc1bc5a685f018428610752eddb5d954b3bb132de7d1e47f2080b177596c
@@ -2439,7 +2439,7 @@ P0A0B,P,P05,include,,AGREE,High Voltage System Interlock Circuit A Performance,o
 P0A0C,P,P05,include,,AGREE,High Voltage System Interlock Circuit Low,obdex,voltage_below_threshold,f89f6f32d296ccc050f4ae0f4f6f07238f5628b6000f82de8d0a3f4ed261da51
 P0A0D,P,P05,include,,AGREE,High Voltage System Interlock Circuit High,obdex,voltage_above_threshold,280055bb467fe411d56bd50bd3513c85ff19a3781c7728cadc7174bfff494faa
 P0A0E,P,P05,include,,AGREE,High Voltage System Interlock Circuit A Intermittent,obdex,intermittent,92b539de89ea0cdbebc2c4f4604be3bc88289245d6f50b598c7fc9be4d9bb9c3
-P0A0F,P,P05,include,,AGREE,Hybrid Engine Failed to Start,obdex,,a3159e03e3235147a256ac5b16a65eb218d432179d11e3a6dc8245b2344e7ea5
+P0A0F,P,P05,exclude,other:words_differ,AGREE,Hybrid Engine Failed to Start,obdex,,
 P0A10,P,P05,exclude,disagree,DISAGREE,Hybrid Battery Voltage Sense Circuit,obdex,,
 P0A11,P,P05,include,,AGREE,DC/DC Converter Enable Circuit/Open,obdex,open_circuit,4287c0685073483fc3397330d54fb15a41932dd93b839b9a1e1cdbd361e750d5
 P0A12,P,P05,exclude,disagree,DISAGREE,DC/DC Converter Communication,obdex,,
@@ -2551,8 +2551,8 @@ P0A7B,P,P06,exclude,disagree,DISAGREE,Hybrid Battery Pack State of Charge Low,ob
 P0A7C,P,P06,include,,AGREE,Motor Electronics Over Temperature,obdex,,0485dfba6088aeeeab102979af7b5c69479cc84f31cd08a88713652cd3990ad6
 P0A7D,P,P06,exclude,disagree,DISAGREE,Hybrid Battery Pack Low Voltage,obdex,,
 P0A7E,P,P06,exclude,disagree,DISAGREE,Hybrid Battery Pack Overtemperature,obdex,,
-P0A7F,P,P06,include,,AGREE,Hybrid Battery Pack Deterioration,obdex,,85644bae6e52621e15ed983844f90a037d8a9032cd00a6c77712da72c311345b
-P0A80,P,P06,include,,AGREE,Replace Hybrid Battery Pack,obdex,,a9afeccb5a0e8d94bee6516cf585de2692cf7fe4b31cbb254ad2fc2c805f974c
+P0A7F,P,P06,exclude,other:words_differ,AGREE,Hybrid Battery Pack Deterioration,obdex,,
+P0A80,P,P06,exclude,other:words_differ,AGREE,Replace Hybrid Battery Pack,obdex,,
 P0A81,P,P06,exclude,disagree,DISAGREE,Hybrid Battery Pack Cooling Fan 1 Performance,obdex,,
 P0A82,P,P06,exclude,disagree,DISAGREE,Hybrid Battery Pack Cooling Fan 1 Circuit Low,obdex,,
 P0A83,P,P06,exclude,disagree,DISAGREE,Hybrid Battery Pack Cooling Fan 1 Circuit High,obdex,,
@@ -2590,7 +2590,7 @@ P0AA2,P,P06,include,,AGREE,Hybrid/EV Battery Positive Contactor Circuit Stuck Op
 P0AA3,P,P06,include,,AGREE,Hybrid/EV Battery Negative Contactor Circuit,obdex,,65db856473b769b102567221c9506da585cae0cb1f8f0b539b62f9d41430c811
 P0AA4,P,P06,exclude,disagree,DISAGREE,Hybrid Battery Negative Contactor Circuit,obdex,,
 P0AA5,P,P06,include,,AGREE,Hybrid/EV Battery Negative Contactor Circuit Stuck Open,obdex,,57490589a81b60259fd4d60b7780c069758a85e56b5668d0fd79d686db040cac
-P0AA6,P,P06,include,,AGREE,Hybrid Battery Voltage System Isolation Fault,obdex,,9c7d0667b96334e28dd92792ccc329ad4f58625f3d994aec79b7a7bc657f9d7c
+P0AA6,P,P06,exclude,other:words_differ,AGREE,Hybrid Battery Voltage System Isolation Fault,obdex,,
 P0AA7,P,P06,include,,AGREE,Hybrid/EV Battery Voltage Isolation Sensor Circuit,obdex,,1e024272ac97cdbabaa03fbb4be7398e7f8e21e81d892c2da5a80c187372716d
 P0AA8,P,P06,include,,AGREE,Hybrid/EV Battery Voltage Isolation Sensor Circuit Range/Performance,obdex,performance_or_incorrect_operation,a9424d638a00c65c06a72405a037ba6515721ce12bb78c055c971adbd9ce77d7
 P0AA9,P,P06,include,,AGREE,Hybrid/EV Battery Voltage Isolation Sensor Circuit Low,obdex,voltage_below_threshold,f65b19b6096637c505635f2a594471b2fe80a7ff36de010cda70b5139ded2cdf
@@ -3706,21 +3706,21 @@ P0EFE,P,P08,exclude,disagree,DISAGREE,Battery Charger A Input Voltage Sensor C C
 P0FFF,P,P08,exclude,missing,MISSING,Reserved Powertrain Fault,obdex,,
 P2000,P,P08,include,,AGREE,NOx Adsorber Efficiency Below Threshold (Bank 1),obdex,,9276bb9aa56d76c61ffe5ac5e2adee07a828f6bf05769048c048ff1baa178cef
 P2001,P,P08,include,,AGREE,NOx Adsorber Efficiency Below Threshold (Bank 2),obdex,,a78748a0195095f6db33c4b2ae658bc53371ab3275e2121c5b07b8816776668f
-P2002,P,P08,include,,AGREE,Diesel Particulate Filter Efficiency Below Threshold (Bank 1),obdex,,0068534c62939ac5b52310bf655ad9302dda305535ff84ee8d719c51180e6537
-P2003,P,P08,include,,AGREE,Diesel Particulate Filter Efficiency Below Threshold (Bank 2),obdex,,dc635708bbde362376659fa796bb37e358506504f44e78c7868e0f118d2bf5b9
+P2002,P,P08,exclude,other:words_differ,AGREE,Diesel Particulate Filter Efficiency Below Threshold (Bank 1),obdex,,
+P2003,P,P08,exclude,other:words_differ,AGREE,Diesel Particulate Filter Efficiency Below Threshold (Bank 2),obdex,,
 P2004,P,P08,include,,AGREE,Intake Manifold Runner Control Stuck Open (Bank 1),obdex,,7dc46ad06199f4fda9cdb7d1cc03423c2c28a5b879dea7d6f5fb0e78f42dd406
 P2005,P,P08,include,,AGREE,Intake Manifold Runner Control Stuck Open (Bank 2),obdex,,3800b8c6b49fb7639b03eabd11dc85f49d9933634f0409cc0a484276958745bd
 P2006,P,P08,include,,AGREE,Intake Manifold Runner Control Stuck Closed (Bank 1),obdex,,0e0f628c642d08ad7930470369a2ec19ec7fb24e2c9f65f7994724cb3bac036b
 P2007,P,P08,include,,AGREE,Intake Manifold Runner Control Stuck Closed (Bank 2),obdex,,9f2d24be0b432247dc64ddb7b9b9d49f389a41f59180fa022746a95a8eadd57a
-P2008,P,P08,include,,AGREE,Intake Manifold Runner Control Solenoid Circuit Open (Bank 1),obdex,open_circuit,fad3a4cae87b9a25be84de472a154017a39c136c173581e160d4050ba78c6059
-P2009,P,P08,include,,AGREE,Intake Manifold Runner Control Solenoid Circuit Low (Bank 1),obdex,voltage_below_threshold,ba6bc7f9cc8946336a0faf9bfd2e06b22d46e5466be9bacd296d3ee4119347b9
+P2008,P,P08,exclude,other:words_differ,AGREE,Intake Manifold Runner Control Solenoid Circuit Open (Bank 1),obdex,,
+P2009,P,P08,exclude,other:words_differ,AGREE,Intake Manifold Runner Control Solenoid Circuit Low (Bank 1),obdex,,
 P200A,P,P08,include,,AGREE,Intake Manifold Runner Performance (Bank 1),obdex,performance_or_incorrect_operation,3b6a666a3533f0a54f8780e070b53a7ea64ef949b2624904ef3126642f2e918e
 P200B,P,P08,include,,AGREE,Intake Manifold Runner Performance (Bank 2),obdex,performance_or_incorrect_operation,1481fb23205b2e206e284e56a13baca69dd39017618656871809ed54693f92de
 P200C,P,P08,include,,AGREE,Particulate Filter Over Temperature (Bank 1),obdex,,dbe737ce26a30f7c3fabac263e2dd13ea4f3f8333683656927f154ac266807fc
 P200D,P,P08,include,,AGREE,Particulate Filter Over Temperature (Bank 2),obdex,,80672f9d9e0cdafec71d08e481e517d359ecb523a13dc306937a8c7774e95b27
 P200E,P,P08,include,,AGREE,Catalyst System Over Temperature (Bank 1),obdex,,90f692c06d50a1690a1ecdb6feadd5ad81d2275529d17dbcabe46ca0a59452e9
 P200F,P,P08,include,,AGREE,Catalyst System Over Temperature (Bank 2),obdex,,262a933c3786ea95c0ac9cb06ee044afd1eb0cbb00f5c48f0ed11a1a41da476e
-P2010,P,P08,include,,AGREE,Intake Manifold Runner Control Solenoid Circuit High (Bank 1),obdex,voltage_above_threshold,8ee81bceee27841c35ceae1377f068fb38599810c7045b9f71ceb3c56fdee06d
+P2010,P,P08,exclude,other:words_differ,AGREE,Intake Manifold Runner Control Solenoid Circuit High (Bank 1),obdex,,
 P2011,P,P08,include,,AGREE,Intake Manifold Runner Control Circuit/Open (Bank 2),obdex,open_circuit,06902d0c0187ad8d8606d6e1a34968dbb7eb78cc467b73e051078070fa18f614
 P2012,P,P08,include,,AGREE,Intake Manifold Runner Control Circuit Low (Bank 2),obdex,voltage_below_threshold,0ea3601b438cc2d61c376b0b2c8425e8832da1b9a39c0cfba8cb923475ccf13d
 P2013,P,P08,include,,AGREE,Intake Manifold Runner Control Circuit High (Bank 2),obdex,voltage_above_threshold,1acca70dea5af23e43cf82a71b563b846837b32a960d70aca210c6c1a814ef7e
@@ -3942,7 +3942,7 @@ P20EA,P,P09,exclude,disagree,DISAGREE,Reductant Pump Control Circuit Open,obdex,
 P20EB,P,P09,exclude,disagree,DISAGREE,"Reductant Reservoir Heater ""A"" Control Circuit",obdex,,
 P20EC,P,P09,exclude,disagree,DISAGREE,"Reductant Heater ""A"" Control Stuck Off",obdex,,
 P20ED,P,P09,exclude,disagree,DISAGREE,"Reductant Heater ""A"" Control Stuck On",obdex,,
-P20EE,P,P09,include,,AGREE,NOx Catalyst Efficiency Below Threshold (Bank 1),obdex,,da76bf44126ce0d5099fdc762574ee3871ab245b03cd5b6cc249d66b2a367457
+P20EE,P,P09,exclude,other:words_differ,AGREE,NOx Catalyst Efficiency Below Threshold (Bank 1),obdex,,
 P20EF,P,P09,exclude,disagree,DISAGREE,Reductant Injection Valve Performance,obdex,,
 P20F0,P,P09,include,,AGREE,SCR NOx Catalyst Over Temperature (Bank 2),obdex,,ddccca8b6e1322e995a441c111ea12f3a92655da0859750e3af94f319955b931
 P20F1,P,P09,include,,AGREE,SCR NOx Pre-Catalyst Over Temperature (Bank 2),obdex,,3dd8997f3fc351b44616a0c57e18c53d23088250e8fd3fa7fbf91a8f4e7803e2
@@ -4111,8 +4111,8 @@ P2193,P,P09,include,,AGREE,System Too Lean at Higher Load (Bank 2),obdex,,13bc1b
 P2194,P,P09,include,,AGREE,System Too Rich at Higher Load (Bank 2),obdex,,0b36ed9c2f19dbd9a91a9bb1cd3e70e5f515c1f8a9c0883e66eb28fcf9e3e691
 P2195,P,P09,exclude,shipped,AGREE,"O2 Sensor Signal Stuck Lean (Bank 1, Sensor 1)",obdex,,
 P2196,P,P09,exclude,shipped,AGREE,"O2 Sensor Signal Stuck Rich (Bank 1, Sensor 1)",obdex,,
-P2197,P,P09,include,,AGREE,"O2 Sensor Signal Stuck Lean (Bank 2, Sensor 1)",obdex,,98c6793a79e4452e8420f6a9fd8f8aaefe44fa62c1b07b2ca72d6f289e4c3c79
-P2198,P,P09,include,,AGREE,"O2 Sensor Signal Stuck Rich (Bank 2, Sensor 1)",obdex,,9cb04909ee9629da9031768d844007d7de436b8928a6128dcaa046221763591f
+P2197,P,P09,exclude,other:words_differ,AGREE,"O2 Sensor Signal Stuck Lean (Bank 2, Sensor 1)",obdex,,
+P2198,P,P09,exclude,other:words_differ,AGREE,"O2 Sensor Signal Stuck Rich (Bank 2, Sensor 1)",obdex,,
 P2199,P,P09,include,,AGREE,Intake Air Temperature Sensor 1/2 Correlation,obdex,,b71537a0614ac991d00268f06bb30867335e4e4891830db91d271f9b731ddbe4
 P219A,P,P09,include,,AGREE,Bank 1 Air-Fuel Ratio Imbalance,obdex,,99c3e4ed32b0c775fc89948b6c4ba531b2a2e0bdb0efb64260f3a2f69eb06a52
 P219B,P,P09,include,,AGREE,Bank 2 Air-Fuel Ratio Imbalance,obdex,,5f76f9818ad0294de2e6c8318474b9b86004cba9a0ef90eab8f133610de8d20b
@@ -4159,9 +4159,9 @@ P21C3,P,P09,include,,AGREE,Reductant Heater Relay Control Circuit Low,obdex,volt
 P21C4,P,P09,include,,AGREE,Reductant Heater Relay Control Circuit High,obdex,voltage_above_threshold,3f3d6991aa96f7a828464f66a572eba96ffc4ed6b9005c2ce9b56dc986858aa8
 P21C5,P,P09,include,,AGREE,Reductant Level Sensor A Stuck,obdex,,9927045c316c338d6bf1636a9db8c8cb376b4c2c2f1a91d87355050de9690bef
 P21C6,P,P09,include,,AGREE,Reductant Level Sensor B Stuck,obdex,,b1b22b4f3e5e51aa2fd202dae7b559fd6335dcdd4d98015e8db8bcc9a46c1f00
-P21C7,P,P09,include,,AGREE,Reductant Control Module Power Relay Control Circuit/Open,obdex,open_circuit,32496421155a6918cd4f909a08aaf3bfb44cbfd886ea326506d6c252219bacee
-P21C8,P,P09,include,,AGREE,Reductant Control Module Power Relay Control Circuit Low,obdex,voltage_below_threshold,d1a0c83a645107e9d90c4e7d549facccc1dc0474c96fc0e76fe37cf177582876
-P21C9,P,P09,include,,AGREE,Reductant Control Module Power Relay Control Circuit High,obdex,voltage_above_threshold,db1c2378c28dc0342900c9130ecbed518c764de741097a5f9ddc3b1b1b42fd4c
+P21C7,P,P09,exclude,other:words_differ,AGREE,Reductant Control Module Power Relay Control Circuit/Open,obdex,,
+P21C8,P,P09,exclude,other:words_differ,AGREE,Reductant Control Module Power Relay Control Circuit Low,obdex,,
+P21C9,P,P09,exclude,other:words_differ,AGREE,Reductant Control Module Power Relay Control Circuit High,obdex,,
 P21CA,P,P09,include,,AGREE,Reductant Control Module Supply Voltage Circuit,obdex,,5f005ec06176a46dca37d264973a8b47c8a3600217c0bd7c311fb5c2d91104ac
 P21CB,P,P09,include,,AGREE,Reductant Control Module Supply Voltage Low,obdex,,17ceb2c4fae3c90bc274bd597002c4107172b37a132dcf32c6b432d913e80e8a
 P21CC,P,P09,include,,AGREE,Reductant Control Module Supply Voltage High,obdex,,0ce1393b0b37d4c0984f46bac53abe208d28c13393496080054de9a01c6516bc
@@ -4330,8 +4330,8 @@ P226E,P,P09,include,,AGREE,Particulate Filter Deteriorated/Missing Substrate (Ba
 P226F,P,P09,include,,AGREE,Turbocharger Boost Control B Slow Response,obdex,,ca2b70195cc9df308e5ba8d8635fd90d244f7b9396e58098cb551c81db336716
 P2270,P,P09,exclude,shipped,AGREE,"O2 Sensor Signal Stuck Lean (Bank 1, Sensor 2)",obdex,,
 P2271,P,P09,exclude,shipped,AGREE,"O2 Sensor Signal Stuck Rich (Bank 1, Sensor 2)",obdex,,
-P2272,P,P09,include,,AGREE,"O2 Sensor Signal Stuck Lean (Bank 2, Sensor 2)",obdex,,e80c84c392a4d93e70765fb80b97ba24fe9667a7271f7e706d889990ab7ae5c6
-P2273,P,P09,include,,AGREE,"O2 Sensor Signal Stuck Rich (Bank 2, Sensor 2)",obdex,,6f552119c858de0511b591c016fc5fe3cb701b47791842f9fdfe588b13950561
+P2272,P,P09,exclude,other:words_differ,AGREE,"O2 Sensor Signal Stuck Lean (Bank 2, Sensor 2)",obdex,,
+P2273,P,P09,exclude,other:words_differ,AGREE,"O2 Sensor Signal Stuck Rich (Bank 2, Sensor 2)",obdex,,
 P2274,P,P09,include,,AGREE,O2 Sensor Signal Biased/Stuck Lean (Bank 1 Sensor 3),obdex,,b0eeb15a801bb768492f0b7dadb71c28fc23b4a87139a7628b0c040fdfa3ec45
 P2275,P,P09,include,,AGREE,O2 Sensor Signal Biased/Stuck Rich (Bank 1 Sensor 3),obdex,,1b246f104f96b5592324b9f0b1b22334dd687d25022dbb4bd7778f1bab739539
 P2276,P,P09,include,,AGREE,O2 Sensor Signal Biased/Stuck Lean (Bank 2 Sensor 3),obdex,,230c573c6dcabd342434cb52f763a0cc7d31a861fb131f01c9f55107b5cce695
@@ -4588,10 +4588,10 @@ P2370,P,P10,include,,AGREE,Fuel Volume Regulator B Control Circuit Open,obdex,op
 P2371,P,P10,include,,AGREE,Fuel Volume Regulator B Control Circuit Performance,obdex,performance_or_incorrect_operation,74b88ea1c273ff8ce477905d97e14d861233607aedb938d0be01c614fddba71e
 P2372,P,P10,include,,AGREE,Fuel Volume Regulator B Control Circuit Low,obdex,voltage_below_threshold,e046b7989f34b2415fbfe2520e7f7b1ad8d63f67da1c546306e0856446bb0571
 P2373,P,P10,include,,AGREE,Fuel Volume Regulator B Control Circuit High,obdex,voltage_above_threshold,a6b141b55ca2a016f3ed41502da245ad311964ba7b56785f90ecdf1b1bb8a5d0
-P2374,P,P10,include,,AGREE,Turbocharger Inlet Pressure Sensor B Circuit,obdex,,a63d55ba2fa6d3ba975d91b3ef476b7b39d29d148f5d01c1a777563f5b886247
-P2375,P,P10,include,,AGREE,Turbocharger Inlet Pressure Sensor B Circuit Range or Performance,obdex,performance_or_incorrect_operation,d1796ae37474d20c1b538b71c1c41c245d93171debac6865e06018af201e09c1
-P2376,P,P10,include,,AGREE,Turbocharger Inlet Pressure Sensor B Circuit Low,obdex,voltage_below_threshold,a8fa7d0140b4d79d11227d09f2ef08ae11d63fe50ba2e275b5a06a01dc9c5811
-P2377,P,P10,include,,AGREE,Turbocharger Inlet Pressure Sensor B Circuit High,obdex,voltage_above_threshold,f7202e6532de4713c86f073d7c2b89200d95ca025bb9465d3be13548ec780d5f
+P2374,P,P10,exclude,other:words_differ,AGREE,Turbocharger Inlet Pressure Sensor B Circuit,obdex,,
+P2375,P,P10,exclude,other:words_differ,AGREE,Turbocharger Inlet Pressure Sensor B Circuit Range or Performance,obdex,,
+P2376,P,P10,exclude,other:words_differ,AGREE,Turbocharger Inlet Pressure Sensor B Circuit Low,obdex,,
+P2377,P,P10,exclude,other:words_differ,AGREE,Turbocharger Inlet Pressure Sensor B Circuit High,obdex,,
 P2378,P,P10,exclude,disagree,DISAGREE,Turbocharger Inlet Pressure Sensor B Circuit Intermittent or Erratic,obdex,,
 P2379,P,P10,exclude,other:shared_title,AGREE,O2 Sensor Out of Range During Deceleration Bank 2 Sensor 2,obdex,,
 P237A,P,P10,exclude,other:shared_title,AGREE,O2 Sensor Exhaust Sample Error Bank 1 Sensor 2,obdex,,
@@ -4642,7 +4642,7 @@ P23A6,P,P10,include,,AGREE,Exhaust Heat Exchanger Bypass Valve B Stuck Open,obde
 P23A7,P,P10,include,,AGREE,Exhaust Heat Exchanger Bypass Valve B Stuck Closed,obdex,,c127d823e5f8728339b46769407fef0b8ee4de7cf031cf26cd841ab56891dc2c
 P23A8,P,P10,include,,AGREE,Exhaust Heat Exchanger Bypass Valve B Position Sensor Stop Performance,obdex,performance_or_incorrect_operation,b2032a152b84cbe34647893fe4489f8029d60ed64082a14f072f11c4506792a2
 P23A9,P,P10,include,,AGREE,Communication Fault Forced Engine Shutdown,obdex,,9f0fe509a7086cc7ff660c1b1d9c4f924202692ae703f2f61eabc449f1b50560
-P23AA,P,P10,include,,AGREE,Turbocharger Bypass Valve A Stuck,obdex,,0a1ea207fc381d127baea81335b7f82939be4bf44c1c89f7d762f8d1dc19c29b
+P23AA,P,P10,exclude,other:words_differ,AGREE,Turbocharger Bypass Valve A Stuck,obdex,,
 P23AB,P,P10,include,,AGREE,NOx Sensor Processor Performance Bank 1 Sensor 3,obdex,,82c1ddf38a326ff35e58c77f1af8b35808d45fe8afe1e7af584ad858f8425454
 P23AC,P,P10,include,,AGREE,NOx Sensor Circuit Bank 1 Sensor 3,obdex,,35ea92841185cb72b02f8c3dddf57e8d11fc313f21de2b54a6101b9bfecb67cb
 P23AD,P,P10,include,,AGREE,NOx Sensor Circuit Range or Performance Bank 1 Sensor 3,obdex,,ae9ff227555229b72f67535e0ac5a082d17c6152f7958197bc03111373e9d6ba
@@ -4728,11 +4728,11 @@ P23FC,P,P10,include,,AGREE,Cylinder 11 Injector B Air-Fuel Ratio Imbalance,obdex
 P23FD,P,P10,include,,AGREE,Cylinder 12 Injector B Air-Fuel Ratio Imbalance,obdex,,29bef57006788b01122059ae68ba112ba8d50f964f9b4026739963d796db6268
 P23FE,P,P10,include,,AGREE,Bank 1 System B Air-Fuel Ratio Imbalance,obdex,,ebf683a1c3cf32a8aec902a21f38a096bc7fc57e2e59c7ddd527bd978ba0f2eb
 P23FF,P,P10,include,,AGREE,Bank 2 System B Air-Fuel Ratio Imbalance,obdex,,0e276ed92268f5262ab83164d677b5eb6774d9e6b667f1f9c378d4ec18091f0f
-P2400,P,P10,include,,AGREE,EVAP Leak Detection Pump Control Circuit Open,obdex,open_circuit,fca17e69ada5dc3bb4306fed5e6b49fe3216245cd87024b4c54f9fc55f16b011
-P2401,P,P10,include,,AGREE,EVAP Leak Detection Pump Control Circuit Low,obdex,voltage_below_threshold,772653a6dbe56c1ef698f7067f94d1f0d3a6e343430ac76bdc1025ccee6a7056
-P2402,P,P10,include,,AGREE,EVAP Leak Detection Pump Control Circuit High,obdex,voltage_above_threshold,2358d5b79ba313e083297bfc011db92501377c594bfa52cb45466889ab4a6569
+P2400,P,P10,exclude,other:words_differ,AGREE,EVAP Leak Detection Pump Control Circuit Open,obdex,,
+P2401,P,P10,exclude,other:words_differ,AGREE,EVAP Leak Detection Pump Control Circuit Low,obdex,,
+P2402,P,P10,exclude,other:words_differ,AGREE,EVAP Leak Detection Pump Control Circuit High,obdex,,
 P2403,P,P10,include,,AGREE,EVAP System Leak Detection Pump Sense Circuit Open,obdex,open_circuit,e6ef0b811656085e3c84a810e5316ac96b2819e76cfce959ad071ff9f5e2cd1b
-P2404,P,P10,include,,AGREE,EVAP Leak Detection Pump Sense Circuit Range/Performance,obdex,performance_or_incorrect_operation,3ae3bf7805386171f87e869dc949f4ac708c6df5263c39faa48e730b2a37a1ef
+P2404,P,P10,exclude,other:words_differ,AGREE,EVAP Leak Detection Pump Sense Circuit Range/Performance,obdex,,
 P2405,P,P10,include,,AGREE,EVAP System Leak Detection Pump Sense Circuit Low,obdex,voltage_below_threshold,7454c6df29f37d5c321ce851035b091d752f2276e787b989d2b5b269ae0f2b3e
 P2406,P,P10,include,,AGREE,EVAP System Leak Detection Pump Sense Circuit High,obdex,voltage_above_threshold,f122f5bf450043340128d1f99ec46d1bd479989bf178ba861f401471ab17b5f8
 P2407,P,P10,exclude,disagree,DISAGREE,EVAP Leak Detection Pump Sense Circuit Range/Performance,obdex,,
@@ -4761,7 +4761,7 @@ P241D,P,P10,include,,AGREE,SCR Inducement Forced Engine Shutdown,obdex,,c5c1e0b1
 P241E,P,P10,include,,AGREE,Reductant Heater Coolant Control Valve Stuck Closed,obdex,,36d1a559b67ebdc3f0e4ff66220137e4ecf02a0967b3ea7e02ffb1357c645de3
 P241F,P,P10,include,,AGREE,EGR Cooler B Efficiency Below Threshold,obdex,,927ee12afcd1071ea8bb3088783be262ec0050508aa69701111e35a4b0fffdab
 P2420,P,P10,exclude,disagree,DISAGREE,EVAP Switching Valve Stuck Closed,obdex,,
-P2421,P,P10,include,,AGREE,EVAP Vent Valve Stuck Open,obdex,,109cf2dc4326ab18caab4f84b2abeb26c483e59d56eda11fec7a03db06547d42
+P2421,P,P10,exclude,other:words_differ,AGREE,EVAP Vent Valve Stuck Open,obdex,,
 P2422,P,P10,exclude,disagree,DISAGREE,EVAP Canister Vent Valve Stuck Closed,obdex,,
 P2423,P,P10,include,,AGREE,HC Adsorption Catalyst Efficiency Below Threshold Bank 1,obdex,,21304bd98a9d29f86c50110d63fa533db0adf6f0803a812750e72a2836a7e1d3
 P2424,P,P10,include,,AGREE,HC Adsorption Catalyst Efficiency Below Threshold Bank 2,obdex,,b135032c3135673d7a82416d79b2d78a20ceaa84db6cafb2b975a435b81b1489
@@ -4802,7 +4802,7 @@ P2446,P,P10,exclude,disagree,DISAGREE,Secondary Air Injection Pump Stuck Off (Ba
 P2447,P,P10,exclude,disagree,DISAGREE,Secondary Air Injection Pump Stuck On (Bank 2),obdex,,
 P2448,P,P10,include,,AGREE,AIR System High Air Flow Bank 1,obdex,,aea651928241e329a7001e782ca517e673038c6fd382484cff1d5c837645ad5f
 P2449,P,P10,include,,AGREE,AIR System High Air Flow Bank 2,obdex,,015b3bdf345b89ea6b25fe8c57ab0f420ee95df3c9f1fa0dfa90a267dcaa95de
-P244A,P,P10,include,,AGREE,Diesel Particulate Filter Differential Pressure Too Low,obdex,,bf6ef4fffda0361ff8df372f875e3fb833abdac347af5d5cb90aab86cb182db5
+P244A,P,P10,exclude,other:words_differ,AGREE,Diesel Particulate Filter Differential Pressure Too Low,obdex,,
 P244B,P,P10,exclude,disagree,DISAGREE,Diesel Particulate Filter Differential Pressure Sensor Offset,obdex,,
 P244C,P,P10,include,,AGREE,Exhaust Temperature Too Low For Particulate Filter Regeneration Bank 1,obdex,,909ba41fe2b84f531cb3d35e32493683f5acc18ebea18d719cc47f8314e2283e
 P244D,P,P10,exclude,other:title_over_70,AGREE,Exhaust Temperature Too High For Particulate Filter Regeneration Bank 1,obdex,,
@@ -4810,14 +4810,14 @@ P244E,P,P10,include,,AGREE,Exhaust Temperature Too Low For Particulate Filter Re
 P244F,P,P10,exclude,other:title_over_70,AGREE,Exhaust Temperature Too High For Particulate Filter Regeneration Bank 2,obdex,,
 P2450,P,P10,exclude,disagree,DISAGREE,EVAP System Switching Valve Performance/Stuck,obdex,,
 P2451,P,P10,include,,AGREE,EVAP System Switching Valve Stuck Closed,obdex,,3b29d8422967e4b1b73844c17803fbb8dbb5845f15e510c942c7fafa7777b80b
-P2452,P,P10,include,,AGREE,Diesel Particulate Filter Pressure Sensor Circuit,obdex,,b132dfdee6e1ada9c1c51a01b90aefb263779539bcdb689a61cfaa73083a33fb
-P2453,P,P10,include,,AGREE,Diesel Particulate Filter Pressure Sensor Circuit Range/Performance,obdex,performance_or_incorrect_operation,ff518f6723ad508ae28df770f6786954e006e0464ec4fc011bcceb8f16704a97
-P2454,P,P10,include,,AGREE,Diesel Particulate Filter Pressure Sensor Circuit Low,obdex,voltage_below_threshold,6cf15c57126290ecacb8caeee2ef1b3b61736821dcb8efdbba4985ee1c4af2f4
-P2455,P,P10,include,,AGREE,Diesel Particulate Filter Pressure Sensor Circuit High,obdex,voltage_above_threshold,4f8e4d37811d50e2f2caa14bf846fac876d9eaca9e757f6ea5ca205be5a6519c
+P2452,P,P10,exclude,other:words_differ,AGREE,Diesel Particulate Filter Pressure Sensor Circuit,obdex,,
+P2453,P,P10,exclude,other:words_differ,AGREE,Diesel Particulate Filter Pressure Sensor Circuit Range/Performance,obdex,,
+P2454,P,P10,exclude,other:words_differ,AGREE,Diesel Particulate Filter Pressure Sensor Circuit Low,obdex,,
+P2455,P,P10,exclude,other:words_differ,AGREE,Diesel Particulate Filter Pressure Sensor Circuit High,obdex,,
 P2456,P,P10,exclude,disagree,DISAGREE,DPF Differential Pressure Sensor Circuit Intermittent,obdex,,
 P2457,P,P10,exclude,disagree,DISAGREE,EGR Cooler Performance,obdex,,
 P2458,P,P10,exclude,disagree,DISAGREE,DPF Regeneration Duration,obdex,,
-P2459,P,P10,include,,AGREE,Diesel Particulate Filter Regeneration Frequency,obdex,,802fe005581c19c0869aee3fcdbfad1148e5b0a6bd61a0ad46177ec0d1a6ce1d
+P2459,P,P10,exclude,other:words_differ,AGREE,Diesel Particulate Filter Regeneration Frequency,obdex,,
 P245A,P,P10,include,,AGREE,EGR Cooler Bypass Control Circuit Open Bank 1,obdex,,c7ca4aded07fa75c14ae3623dede477969e4d22b1f3904c4f0dcf07092359c14
 P245B,P,P10,include,,AGREE,EGR Cooler Bypass Control Circuit Range or Performance Bank 1,obdex,,7a0b1720f742d753ca7be97d089f89641f26dbd53fe000b3fc624d18eb0a1e37
 P245C,P,P10,include,,AGREE,EGR Cooler Bypass Control Circuit Low Bank 1,obdex,,23e0b49c65e5756f19302e4ca8d40d161b54a160598a4aeb3aacd0f85428d67f
@@ -4827,7 +4827,7 @@ P245F,P,P10,include,,AGREE,Particulate Filter Pressure Sensor B Circuit Range or
 P2460,P,P10,exclude,disagree,DISAGREE,DPF Restriction — Forced Limited Power,obdex,,
 P2461,P,P10,exclude,disagree,DISAGREE,DPF Restriction — Forced Limited,obdex,,
 P2462,P,P10,exclude,disagree,DISAGREE,Diesel Particulate Filter Restriction - Soot Accumulation,obdex,,
-P2463,P,P10,include,,AGREE,Diesel Particulate Filter Restriction — Soot Accumulation,obdex,,14df6fc0a57c391d2ef95f3abf43dea22d720ea21449d1d73843d994a422d192
+P2463,P,P10,exclude,other:words_differ,AGREE,Diesel Particulate Filter Restriction — Soot Accumulation,obdex,,
 P2464,P,P10,exclude,disagree,DISAGREE,Diesel Particulate Filter Differential Pressure Too High,obdex,,
 P2465,P,P10,exclude,disagree,DISAGREE,Diesel Particulate Filter Differential Pressure Sensor Range/Performance,obdex,,
 P2466,P,P10,include,,AGREE,Exhaust Gas Temperature Sensor Circuit Bank 2 Sensor 3,obdex,,2f759ba3fdc0daaef8d89f0beec46f18cadef9546e185cd59fb41dc157da8b46
@@ -5599,14 +5599,14 @@ P2765,P,P12,include,,AGREE,Input/Turbine Shaft Speed Sensor B Circuit,obdex,,b26
 P2766,P,P12,include,,AGREE,Input/Turbine Shaft Speed Sensor B Circuit Range/Performance,obdex,performance_or_incorrect_operation,4202ac83a1f5631454034100b753dca6eb2fae64246c382d049933cc3f282340
 P2767,P,P12,include,,AGREE,Input/Turbine Shaft Speed Sensor B Circuit No Signal,obdex,,4a417acb8bd658534b124b11301439088515fecbe749a473e4406b4b0e5156bf
 P2768,P,P12,include,,AGREE,Input/Turbine Shaft Speed Sensor B Circuit Intermittent,obdex,intermittent,1eb349fa14e3c0afa1e3801bb6294dd6d09370177f0e0b19fa03f61fdf0f5312
-P2769,P,P12,include,,AGREE,Torque Converter Clutch Solenoid Circuit Low,obdex,voltage_below_threshold,28d32dd5dded6484ab4c3c6dadfee89ac898cdac89fea47ba62a7a6a4f58408c
+P2769,P,P12,exclude,other:words_differ,AGREE,Torque Converter Clutch Solenoid Circuit Low,obdex,,
 P276A,P,P12,exclude,other:title_over_70,AGREE,Electric/Auxiliary Transmission Fluid Pump B Motor Supply Voltage Circuit / Open,obdex,,
 P276B,P,P12,exclude,other:title_over_70,AGREE,Electric/Auxiliary Transmission Fluid Pump B Motor Supply Voltage Circuit Low,obdex,,
 P276C,P,P12,exclude,other:title_over_70,AGREE,Electric/Auxiliary Transmission Fluid Pump B Motor Supply Voltage Circuit High,obdex,,
 P276D,P,P12,include,,AGREE,Electric/Auxiliary Transmission Fluid Pump B Motor Current,obdex,,dc0208acfd3ff3daedadd60509cb645834d39435452046f46de0dedc17b4e657
 P276E,P,P12,include,,AGREE,Electric/Auxiliary Transmission Fluid Pump B Motor Current Low,obdex,,fe867f4b0ad3960258c9c0325bd8fdf215fcd38d014b44e47b59734e5ff66458
 P276F,P,P12,include,,AGREE,Electric/Auxiliary Transmission Fluid Pump B Motor Current High,obdex,,c0e3c25b9bc54535fb31d3e20d8f7a6acb4aec562837fe137c675b9bc078a39b
-P2770,P,P12,include,,AGREE,Torque Converter Clutch Solenoid Circuit High,obdex,voltage_above_threshold,904484d14976b3ad588b8ae4f9add88bf9db1cfdd1043e5a01a681ef21798f23
+P2770,P,P12,exclude,other:words_differ,AGREE,Torque Converter Clutch Solenoid Circuit High,obdex,,
 P2771,P,P12,include,,AGREE,Four Wheel Drive (4WD) Low Switch Circuit,obdex,,8059d15bf63a4088251d1fb26f6bbde2cc425c85c26b1ba301a74600c14bda8f
 P2772,P,P12,include,,AGREE,Four Wheel Drive (4WD) Low Switch Circuit Range/Performance,obdex,performance_or_incorrect_operation,d0d84064a7e34f4fbb52b5f4caa46d886e1b686bf0c7347be102ca6b6c0df2b4
 P2773,P,P12,include,,AGREE,Four Wheel Drive (4WD) Low Switch Circuit Low,obdex,voltage_below_threshold,94dfda113f6ceba07a5182e0e759f791160c46f01b9a8bf599cb3f4aed6c361a
@@ -6090,11 +6090,11 @@ P2A65,P,P13,include,,AGREE,Alternative Fuel Tank C Level Sensor Range/Performanc
 P2A66,P,P13,include,,AGREE,Alternative Fuel Tank C Level Sensor Circuit Low,obdex,voltage_below_threshold,40e0c2d40d0c3021114a67c8f1956db1027030bc9f6163f1bf979a23436c1ea4
 P2A67,P,P13,include,,AGREE,Alternative Fuel Tank C Level Sensor Circuit High,obdex,voltage_above_threshold,b46a55bd769cbdc328ce8cf959084982501b60277053a217cf7eee4f88479542
 P2A68,P,P13,include,,AGREE,Alternative Fuel Tank C Level Sensor Circuit Intermittent/Erratic,obdex,intermittent,ec89c09dc3c55866de7507b4cf8d94ee4106b6a970a61483a2ce543e9a089e3b
-P2A69,P,P13,include,,AGREE,Alternative Fuel Rail Pressure Regulator Pressure Sensor Circuit,obdex,,9659ffa23d84d5a024e97a550a38a6f328d43585d9d9f21b875b7899bfdc8065
-P2A6A,P,P13,exclude,other:title_over_70,AGREE,Alternative Fuel Rail Pressure Regulator Pressure Sensor Range/Performance,obdex,,
-P2A6B,P,P13,include,,AGREE,Alternative Fuel Rail Pressure Regulator Pressure Sensor Circuit Low,obdex,voltage_below_threshold,64a73fa8fa147d4af9b9063e67b42b43d8c8c3d0b84cccd1235cd6f103ee2c3b
-P2A6C,P,P13,include,,AGREE,Alternative Fuel Rail Pressure Regulator Pressure Sensor Circuit High,obdex,voltage_above_threshold,9eda6b132059b997f29639442cd04eed36ce6a49f0518598e02d3d242651fd1c
-P2A6D,P,P13,exclude,other:title_over_70,AGREE,Alternative Fuel Rail Pressure Regulator Pressure Sensor Circuit Intermittent/Erratic,obdex,,
+P2A69,P,P13,exclude,other:words_differ,AGREE,Alternative Fuel Rail Pressure Regulator Pressure Sensor Circuit,obdex,,
+P2A6A,P,P13,exclude,other:words_differ,AGREE,Alternative Fuel Rail Pressure Regulator Pressure Sensor Range/Performance,obdex,,
+P2A6B,P,P13,exclude,other:words_differ,AGREE,Alternative Fuel Rail Pressure Regulator Pressure Sensor Circuit Low,obdex,,
+P2A6C,P,P13,exclude,other:words_differ,AGREE,Alternative Fuel Rail Pressure Regulator Pressure Sensor Circuit High,obdex,,
+P2A6D,P,P13,exclude,other:words_differ,AGREE,Alternative Fuel Rail Pressure Regulator Pressure Sensor Circuit Intermittent/Erratic,obdex,,
 P2A6E,P,P13,include,,AGREE,Alternative Fuel Rail Pressure Regulator Inlet Pressure Too Low,obdex,,b396b6f47c10c05cc5e52599835b1f83e9266c0b9698ca5179ba00a73ecbdbe0
 P2A6F,P,P13,include,,AGREE,Alternative Fuel Rail Pressure Regulator Inlet Pressure Too High,obdex,,c081d7a4a8349057322108fa45751ff7772156d94b42a46ade2b27b26a31913c
 P2A70,P,P13,include,,AGREE,Alternative Fuel Hydraulic Fuel Pump Select Valve Control Circuit,obdex,,1138bb50c3a8e9c860cb944c788a5f78bced05643a745b08ff1ad35534e574b0
@@ -6410,7 +6410,7 @@ P2BA5,P,P14,include,,AGREE,Particulate Filter Feedgas Performance,obdex,performa
 P2BA6,P,P14,include,,AGREE,NOx Exceedance - SCR NOx Catalyst Performance,obdex,performance_or_incorrect_operation,46b8ea866f500d9656266d02bb925975a336ce53c84a4aea9b53a6c0154e2f67
 P2BA7,P,P14,include,,AGREE,NOx Exceedence - Empty Reagent Tank,obdex,,369a4dc21ce0f7abdb5f6ab960ed6aa97a53fd5acee9268b06b58660c2546f5e
 P2BA8,P,P14,include,,AGREE,NOx Exceedence - Interruption of Reagent Dosing Activity,obdex,,64465564387c30fae618b99da4442cacefb2f5cb8f73303f0c282502abd3ca4a
-P2BA9,P,P14,include,,AGREE,NOx Exceedence — Insufficient Reagent,obdex,,d3537b3ae8bffb17c8c2eee85e44fdc9583bedffe73ed04e113a066ff4cd87a8
+P2BA9,P,P14,exclude,other:words_differ,AGREE,NOx Exceedence — Insufficient Reagent,obdex,,
 P2BAA,P,P14,exclude,disagree,DISAGREE,"NOx Sensor Range/Performance (Bank 1, Sensor 1)",obdex,,
 P2BAB,P,P14,exclude,disagree,DISAGREE,NOx Exceedence — Reagent System Performance,obdex,,
 P2BAC,P,P14,exclude,disagree,DISAGREE,NOx Exceedence - Insufficient Reagent Quality,obdex,,
@@ -6913,7 +6913,7 @@ P2D9C,P,P15,include,,AGREE,Starter/Generator Phase V Current Circuit Intermitten
 P2D9D,P,P15,include,,AGREE,Starter/Generator Phase W Current Circuit Intermittent/Erratic,obdex,intermittent,927c7ad2de0dda93098f398c73c74e859db9d67ddce23a513743827c3eff1bd1
 P2D9E,P,P15,include,,AGREE,High Voltage System Voltage Low,obdex,,cc865aafb5d66642534359f513d39cc2894ce51405e858bb0441380b98203cc4
 P2D9F,P,P15,include,,AGREE,High Voltage System Voltage High,obdex,,2e7814b6d87c03be2d32cb6d05b05ef78bcd25462a5314dd94d6bf4c794fb94d
-P2DA0,P,P15,include,,AGREE,High Voltage System Voltage Performance,obdex,performance_or_incorrect_operation,9276471f4dea3daa760b7cf87d6da0cf193d77e2613b8c0e78fc07c4b71c583b
+P2DA0,P,P15,exclude,other:words_differ,AGREE,High Voltage System Voltage Performance,obdex,,
 P2DA1,P,P15,include,,AGREE,Gear Shift Control Module B Supply Voltage Low,obdex,,f9bd57724680e2f20279f4dd0fdec3c2a53dc5f567becc7b7e73267951369931
 P2DA2,P,P15,include,,AGREE,Gear Shift Control Module B Supply Voltage High,obdex,,6ca5c0d220a6f91649403b8cfc56c4795253fd59bdd302d8c5012326c6f3eae0
 P2DA3,P,P15,include,,AGREE,Gear Shift Control Module B Overtemperature,obdex,,d96e46840128da556a6f467f267382b28a3ee1835c28b4c44a0690c195745a16
@@ -7032,7 +7032,7 @@ P2E15,P,P15,include,,AGREE,Intermediate Shaft Selection Actuator Position Sensor
 P2E16,P,P15,exclude,other:title_over_70,AGREE,Intermediate Shaft Selection Actuator Position Sensor Range/Performance,obdex,,
 P2E17,P,P15,include,,AGREE,Intermediate Shaft Selection Actuator Position Sensor Circuit Low,obdex,voltage_below_threshold,5d50d3222042c33a94e448ef7730092c6f6fbe50c013e98affe250b08b83de16
 P2E18,P,P15,include,,AGREE,Intermediate Shaft Selection Actuator Position Sensor Circuit High,obdex,voltage_above_threshold,584b3a85d031991f450267ed033524a9216c0ed1e8d060e64320453d3f3d0cdb
-P2E19,P,P15,exclude,other:title_over_70,AGREE,Intermediate Shaft Selection Actuator Position Sensor Circuit Intermittent/Erratic,obdex,,
+P2E19,P,P15,exclude,other:words_differ,AGREE,Intermediate Shaft Selection Actuator Position Sensor Circuit Intermittent/Erratic,obdex,,
 P2E1A,P,P15,include,,AGREE,Drive Motor A Inverter Voltage Sensor A/B Correlation,obdex,,495d0f412a1e8323cccd47e706ccefd22fdb7fb08c3edd2decc7565c02732e14
 P2E1B,P,P15,include,,AGREE,Drive Motor A Phase X Current Sensor Circuit,obdex,,f771f5f668667abdf92b2b7dbc3c46cce3450bb17833c5fe2f46a0085851a7fc
 P2E1C,P,P15,include,,AGREE,Drive Motor A Phase X Current Sensor Circuit Range/Performance,obdex,performance_or_incorrect_operation,6dab4cc5fa5bc34b0081af140a860c19983ccc568f33e2a5053bdc329b0f2cc3
@@ -7358,18 +7358,18 @@ C0001,C,C01,include,,AGREE,TCS Control Channel A Valve 1,obdex,,741b350cfda52161
 C0002,C,C01,include,,AGREE,TCS Control Channel A Valve 2,obdex,,596d58942630a4581859bf834c30b71a44ba4534b4930dc1d3db1a6c691597b6
 C0003,C,C01,include,,AGREE,TCS Control Channel B Valve 1,obdex,,7257ee4f4a3d430c206fb22f1c99ce73541e6a1dc57eaeb4918ebdf02aa0aff0
 C0004,C,C01,include,,AGREE,TCS Control Channel B Valve 2,obdex,,4db98f6064d98bd03f542c23e4f48e658fa3f092fd81cc5d94b0fe6a566015ec
-C0010,C,C01,include,,AGREE,Left Front Inlet Control,obdex,,71565a4f1342a1df7caa5e782ed3d58fa33c250da83e40128939fe4ecf542f86
-C0011,C,C01,include,,AGREE,Left Front Outlet Control,obdex,,a6216ead5baa280d3ac0d2cfbeaf28a6505e49fe80af83ee7bfaebc3349d300b
-C0012,C,C01,include,,AGREE,Left Front Hydraulic Release Too Long,obdex,,a745d34b1a2aba11d253dd91d8df195c01b4004578e77a9e4d1a0b8e0ce711c8
-C0014,C,C01,include,,AGREE,Right Front Inlet Control,obdex,,5321eb57109f8ace65d07e3131f57f88490279d44e1ff59d9d86ebc5c9a5d50a
-C0015,C,C01,include,,AGREE,Right Front Outlet Control,obdex,,92d36682cf03f054faa0b61d9da474ea1e9557c90673335c68f2a219fa729a21
-C0016,C,C01,include,,AGREE,Right Front Hydraulic Release Too Long,obdex,,af91cc4a4efa65fa0d852cde4e419b15a817bb5b4bce4269b7fc52fd8facd670
-C0018,C,C01,include,,AGREE,Left Rear Inlet Control,obdex,,57496f140bc80270ec2b3c94e7556aaeb5e852e851ca499c50ee41c7d4a16525
-C0019,C,C01,include,,AGREE,Left Rear Outlet Control,obdex,,c74e0d5bb0d4b8f9eec21362839527006a9792408d5d6e31738a2ca39289e10d
-C001A,C,C01,include,,AGREE,Left Rear Hydraulic Release Too Long,obdex,,f54a8b313efe6e4861c27c867d780f482b44a8dfa910c11bd17d52dfefbcd556
-C001C,C,C01,include,,AGREE,Right Rear Inlet Control,obdex,,30f004656ca87eef6904bf6dc620c9b5129254ed7f0c94d768bc2ae223536e2b
-C001D,C,C01,include,,AGREE,Right Rear Outlet Control,obdex,,58c9ea928cd2e7e36f2e22504302754877299340d385e0757999254c2953b089
-C001E,C,C01,include,,AGREE,Right Rear Hydraulic Release Too Long,obdex,,fa640f547b5f8635c8da330771d32b3ef294a0f413dc7b4d6e074f51ffcc9b33
+C0010,C,C01,exclude,chassis_wheel_speed,AGREE,Left Front Inlet Control,obdex,,
+C0011,C,C01,exclude,chassis_wheel_speed,AGREE,Left Front Outlet Control,obdex,,
+C0012,C,C01,exclude,chassis_wheel_speed,AGREE,Left Front Hydraulic Release Too Long,obdex,,
+C0014,C,C01,exclude,chassis_wheel_speed,AGREE,Right Front Inlet Control,obdex,,
+C0015,C,C01,exclude,chassis_wheel_speed,AGREE,Right Front Outlet Control,obdex,,
+C0016,C,C01,exclude,chassis_wheel_speed,AGREE,Right Front Hydraulic Release Too Long,obdex,,
+C0018,C,C01,exclude,chassis_wheel_speed,AGREE,Left Rear Inlet Control,obdex,,
+C0019,C,C01,exclude,chassis_wheel_speed,AGREE,Left Rear Outlet Control,obdex,,
+C001A,C,C01,exclude,chassis_wheel_speed,AGREE,Left Rear Hydraulic Release Too Long,obdex,,
+C001C,C,C01,exclude,chassis_wheel_speed,AGREE,Right Rear Inlet Control,obdex,,
+C001D,C,C01,exclude,chassis_wheel_speed,AGREE,Right Rear Outlet Control,obdex,,
+C001E,C,C01,exclude,chassis_wheel_speed,AGREE,Right Rear Hydraulic Release Too Long,obdex,,
 C0020,C,C01,exclude,shipped,AGREE,ABS Pump Motor Circuit,obdex,,
 C0021,C,C01,exclude,disagree,DISAGREE,ABS Pump Motor Circuit Range/Performance,obdex,,
 C0022,C,C01,exclude,disagree,DISAGREE,ABS Pump Motor Circuit Low,obdex,,
@@ -7477,17 +7477,17 @@ C0121,C,C01,exclude,missing,MISSING,Valve Relay Circuit Malfunction,obdex,,
 C0128,C,C01,exclude,missing,MISSING,Low Brake Fluid Indicated,obdex,,
 C0131,C,C01,exclude,missing,MISSING,Master Cylinder Pressure Sensor Range/Performance,obdex,,
 C0136,C,C01,exclude,missing,MISSING,Stop Lamp Switch Circuit,obdex,,
-C0141,C,C01,exclude,missing,MISSING,Left Front ABS Inlet Solenoid Circuit,obdex,,
-C0146,C,C01,exclude,missing,MISSING,Left Front ABS Outlet Solenoid Circuit,obdex,,
-C0148,C,C01,exclude,missing,MISSING,Right Front ABS Outlet Solenoid B Circuit Malfunction,obdex,,
-C0151,C,C01,exclude,missing,MISSING,Right Front ABS Inlet Solenoid Circuit,obdex,,
-C0153,C,C01,exclude,missing,MISSING,Right Front ABS Inlet Solenoid B Circuit Malfunction,obdex,,
-C0156,C,C01,exclude,missing,MISSING,Right Front ABS Outlet Solenoid Circuit,obdex,,
-C0158,C,C01,exclude,missing,MISSING,Left Rear ABS Inlet Solenoid Circuit Malfunction,obdex,,
+C0141,C,C01,exclude,chassis_wheel_speed,MISSING,Left Front ABS Inlet Solenoid Circuit,obdex,,
+C0146,C,C01,exclude,chassis_wheel_speed,MISSING,Left Front ABS Outlet Solenoid Circuit,obdex,,
+C0148,C,C01,exclude,chassis_wheel_speed,MISSING,Right Front ABS Outlet Solenoid B Circuit Malfunction,obdex,,
+C0151,C,C01,exclude,chassis_wheel_speed,MISSING,Right Front ABS Inlet Solenoid Circuit,obdex,,
+C0153,C,C01,exclude,chassis_wheel_speed,MISSING,Right Front ABS Inlet Solenoid B Circuit Malfunction,obdex,,
+C0156,C,C01,exclude,chassis_wheel_speed,MISSING,Right Front ABS Outlet Solenoid Circuit,obdex,,
+C0158,C,C01,exclude,chassis_wheel_speed,MISSING,Left Rear ABS Inlet Solenoid Circuit Malfunction,obdex,,
 C0161,C,C01,exclude,missing,MISSING,ABS/TCS Brake Switch Circuit,obdex,,
-C0163,C,C01,exclude,missing,MISSING,Left Rear ABS Outlet Solenoid Circuit Malfunction,obdex,,
-C0168,C,C01,exclude,missing,MISSING,Right Rear ABS Inlet Solenoid Circuit Malfunction,obdex,,
-C0173,C,C01,exclude,missing,MISSING,Right Rear ABS Outlet Solenoid Circuit Malfunction,obdex,,
+C0163,C,C01,exclude,chassis_wheel_speed,MISSING,Left Rear ABS Outlet Solenoid Circuit Malfunction,obdex,,
+C0168,C,C01,exclude,chassis_wheel_speed,MISSING,Right Rear ABS Inlet Solenoid Circuit Malfunction,obdex,,
+C0173,C,C01,exclude,chassis_wheel_speed,MISSING,Right Rear ABS Outlet Solenoid Circuit Malfunction,obdex,,
 C0185,C,C01,exclude,missing,MISSING,Lateral Acceleration Sensor Range/Performance,obdex,,
 C0186,C,C01,exclude,missing,MISSING,Lateral Acceleration Sensor Circuit,obdex,,
 C0196,C,C01,exclude,missing,MISSING,Yaw Rate Sensor Circuit,obdex,,
@@ -7998,7 +7998,7 @@ B0017,B,B01,exclude,missing,MISSING,Right Front/Passenger Frontal Deployment Loo
 B0018,B,B01,exclude,disagree,DISAGREE,Right Front/Passenger Frontal Deployment Loop Resistance High,obdex,,
 B0019,B,B01,exclude,disagree,DISAGREE,Right Front/Passenger Frontal Deployment Loop Resistance Low,obdex,,
 B001A,B,B01,include,,AGREE,Center Frontal Stage 3 Deployment Control,obdex,,7944bf92bdbdbc09892f93a58734bcd6237d2eebd15b9c9de58a67901d6d086f
-B0020,B,B01,include,,AGREE,Left Side Deployment Control,obdex,,5f41cbf0ba9e6be65b31b1d65b18b3f7dfed6f4ccdf01db1cb84a6747b9532df
+B0020,B,B01,exclude,other:words_differ,AGREE,Left Side Deployment Control,obdex,,
 B0021,B,B01,exclude,disagree,DISAGREE,Left Side Deployment Stage 1 Control,obdex,,
 B0022,B,B01,exclude,disagree,DISAGREE,Left Side Deployment Stage 1 Loop Open,obdex,,
 B0023,B,B01,exclude,missing,MISSING,Left Side Deployment Stage 1 Loop Short to Ground,obdex,,
@@ -8422,7 +8422,7 @@ U009E,U,U01,include,,AGREE,Vehicle Communication Bus J Performance,obdex,perform
 U0100,U,U01,exclude,shipped,AGREE,"Lost Communication with ECM/PCM ""A""",obdex,,
 U0101,U,U01,include,,AGREE,Lost Communication with TCM,obdex,communication_lost,93508464369bb3ab33761e7b98359fea6c7c74cd2a3bcb407dc30ca7fedb3bda
 U0102,U,U01,include,,AGREE,Lost Communication with Transfer Case Control Module,obdex,communication_lost,5a112bb011555dd9b832de1c885d2640d1fbd2187effd2f9aa50fa1b2ec258b9
-U0103,U,U01,include,,AGREE,Lost Communication with Gear Shift Module,obdex,communication_lost,112d8a5647f87c5f1d270e09f19ecf221383fd9fd2c630b2e73cec4053b9efc9
+U0103,U,U01,exclude,other:words_differ,AGREE,Lost Communication with Gear Shift Module,obdex,,
 U0104,U,U01,include,,AGREE,Lost Communication with Cruise Control Module,obdex,communication_lost,b3187f0d2abccc618f888450437ca8a315914b797fdb699749fb70e576d6de42
 U0105,U,U01,include,,AGREE,Lost Communication with Fuel Injector Control Module,obdex,communication_lost,0f094dc9b9d6a2c2706bb5dc3b069e2bfffc6e2b3f8ba31460d686d7ca73cd2a
 U0106,U,U01,include,,AGREE,Lost Communication with Glow Plug Control Module,obdex,communication_lost,1c1b9db881ed1fd9e1466722ed1ad38cedefcd9f217782580f56c69bdff09780
@@ -8505,7 +8505,7 @@ U0155,U,U01,exclude,shipped,AGREE,Lost Communication with Instrument Panel Clust
 U0156,U,U01,include,,AGREE,"Lost Communication with Information Center ""A""",obdex,communication_lost,068530388c8ea5ceb756124d0ed78c2032ea5f3e306161de32768a9f7bc37caa
 U0157,U,U01,exclude,disagree,DISAGREE,Lost Communication with Personalization Control Module,obdex,,
 U0158,U,U01,include,,AGREE,Lost Communication with Head Up Display,obdex,communication_lost,1899fdfc4d6e8d557732ed424bc4715e6b1742712e539a44bd513512b762dfa9
-U0159,U,U01,include,,AGREE,Lost Communication with Parking Assist Module,obdex,communication_lost,de379d5de2c145e52b37fabf583379ee74433cd9bf7e8457054d2f719e983e9c
+U0159,U,U01,exclude,other:words_differ,AGREE,Lost Communication with Parking Assist Module,obdex,,
 U015A,U,U01,include,,AGREE,Lost Communication With Anti-Lock Brake System (ABS) Control Module B,obdex,communication_lost,cda3ae139add6684c71d0af7084fc815b21aec7339eb334c83f413ebfaf0224f
 U015B,U,U01,include,,AGREE,Lost Communication With Power Steering Control Module B,obdex,communication_lost,066162694fc1df3943d3b804a679578eb405c54ab91a5d627fa6e479f7b81540
 U015C,U,U01,include,,AGREE,Lost Communication With Automated Driving System Control Module A,obdex,communication_lost,d4192793093e72438e38a01d8fc7b4046f2258dcb931d015bdd05f2bdaf9af1f
@@ -8554,12 +8554,12 @@ U0188,U,U01,exclude,disagree,DISAGREE,Lost Communication with Audio Rear Control
 U0189,U,U01,exclude,disagree,DISAGREE,Lost Communication with Auxiliary Heater Control Module,obdex,,
 U018A,U,U01,include,,AGREE,Lost Communication With Headlamp Leveling Control Module B,obdex,communication_lost,7f8d4bf0645d45c0e2fb21f95d74e64bea102f240b7b0a8ff16628fc13ff48e8
 U0190,U,U01,exclude,disagree,DISAGREE,Lost Communication with Subwoofer Amplifier Module,obdex,,
-U0191,U,U01,include,,AGREE,Lost Communication with Television Tuner Module,obdex,communication_lost,328216fb436dc22ba5d4f82110d346dea76ad74219acf42e8e4a6ad8c113158f
+U0191,U,U01,exclude,other:words_differ,AGREE,Lost Communication with Television Tuner Module,obdex,,
 U0192,U,U01,include,,AGREE,Lost Communication with Personal Computer,obdex,communication_lost,4e96d5053567258f99aa71071566e08399e486a2781fcc5feb5e28ae4b030aa0
 U0193,U,U01,exclude,disagree,DISAGREE,Lost Communication with Mobile Phone Module,obdex,,
 U0194,U,U01,exclude,disagree,DISAGREE,Lost Communication with Personal Assist Module,obdex,,
 U0195,U,U01,exclude,disagree,DISAGREE,Lost Communication with Satellite Radio Receiver Module,obdex,,
-U0196,U,U01,include,,AGREE,Lost Communication with Rear Seat Entertainment Control Module,obdex,communication_lost,c11ba75784cd37ea5715873fcdf6d34bd3e16df2d657574f407385fc5962afb5
+U0196,U,U01,exclude,other:words_differ,AGREE,Lost Communication with Rear Seat Entertainment Control Module,obdex,,
 U0197,U,U01,exclude,disagree,DISAGREE,Lost Communication with Hands-Free Phone Control Module,obdex,,
 U0198,U,U01,include,,AGREE,Lost Communication with Telematic Control Module,obdex,communication_lost,7a824a4ea3cb6f94dfbf7d96481454b52a428d4951931584a766bbad912531c0
 U0199,U,U01,include,,AGREE,Lost Communication with Door Control Module,obdex,communication_lost,c7b6fc73e051040ac627348992b861a2cc67eeec41750292691d239429a4faaa
@@ -8638,7 +8638,7 @@ U0229,U,U01,include,,AGREE,Lost Communication With Heated Steering Wheel Module,
 U022E,U,U01,include,,AGREE,Lost Communication With Object Detection Maintenance Control Module A,obdex,communication_lost,c638bd1e98798dadfb5272c43edd7ebf1fe82ef555c78bbcd609a9c28e19c631
 U022F,U,U01,include,,AGREE,Lost Communication With Object Detection Maintenance Control Module B,obdex,communication_lost,369089818a21cb073e5795f0ee5684f714cd1052eb18e909caf989623cd9f36f
 U0230,U,U01,include,,AGREE,Lost Communication With Rear Gate Module,obdex,communication_lost,942815e41006605eca36e06ab70e5aae144b24e9ae51d4f9c57ab1771bf5c8a1
-U0231,U,U01,include,,AGREE,Lost Communication with Rain Sensor Module,obdex,communication_lost,bcfe5a62bb1d7264fba3ea0c9f9cacc2a267ed01a1426cfc120dd6e331e00a35
+U0231,U,U01,exclude,other:words_differ,AGREE,Lost Communication with Rain Sensor Module,obdex,,
 U0232,U,U01,exclude,disagree,DISAGREE,Lost Communication with Left Side Obstacle Detection Control Module,obdex,,
 U0233,U,U01,exclude,disagree,DISAGREE,Lost Communication with Right Side Obstacle Detection Control Module,obdex,,
 U0234,U,U01,include,,AGREE,Lost Communication With Convenience Recall Module,obdex,communication_lost,d7e424290d9bc53f9d566472a34af771e6b10f31b931efafa83ada7d013affbe

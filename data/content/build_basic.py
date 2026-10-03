@@ -17,7 +17,7 @@ batch. A batch is DONE when every code it includes is in both packs, so a re-run
 Exclusion precedence (a code is counted under the FIRST reason that applies):
   shipped, held, chassis wheel speed, missing, disagree, other
 where "other" is: title over 70 characters, damaged character in the title, a title shared by several codes, a
-manufacturer-defined range. title_overrides.csv wins where it has the code (applied by title_agreement.py --all).
+manufacturer-defined range, a glued word in the title, or titles that "agree" but are not the same set of words. title_overrides.csv wins where it has the code (applied by title_agreement.py --all).
 """
 import csv
 import hashlib
@@ -28,12 +28,15 @@ import sys
 
 import basic_common as B
 
-WHEEL_SPEED = re.compile(r"wheel[- ]speed|tone wheel|wheel sensor", re.I)
+# chassis wheel-speed codes, plus per-wheel position codes ("Left Front Inlet Control"): a bike has a front and a rear
+# wheel only, and the sources and the makers disagree on which wheel a position names
+WHEEL_SPEED = re.compile(r"wheel[- ]speed|tone wheel|wheel sensor|\b(left|right)\s+(front|rear)\b", re.I)
 OTHER_REASONS = {
     "title_over_70": "title is longer than the importer's 70-character limit",
     "damaged_character": "the title contains a damaged character (U+FFFD) in the source",
     "shared_title": "the same title sits on two or more codes, so it cannot name one of them",
     "manufacturer_range": "manufacturer-defined range; a generic pack must not carry it",
+    "words_differ": "AGREE under the normaliser, but the two titles are not the same set of words (one adds a word)",
     "source_typo": "a word is glued to itself in both sources (CircuitCircuit), so the title is not trusted",
 }
 GLUED_WORD = re.compile(r"([A-Za-z]{4,})" + chr(92) + "1", re.I)
@@ -112,6 +115,8 @@ def do_plan(args):
             reason = "other:manufacturer_range"
         elif GLUED_WORD.search(title):
             reason = "other:source_typo"
+        elif set(T.strip_default(T.normalise(title))) != set(T.strip_default(T.normalise(r["wal33d_title"]))):
+            reason = "other:words_differ"
         elif len(title) > B.TITLE_CAP_EN:
             reason = "other:title_over_70"
         elif len(title_count.get(r["title_in_force"], [])) > 1:
@@ -254,8 +259,9 @@ def do_batch(bid, rows):
         uniq = sorted(set(missing))
         print(f"batch {bid}: {len(uniq)} Hindi words/phrases are missing; run  py build_basic.py --todo {bid}")
         return False
-    en_old = [e for e in B.read_jsonl(B.EN_PACK) if e["code"] not in {r["code"] for r in todo}]
-    hi_old = [e for e in B.read_jsonl(B.HI_PACK) if e["code"] not in {r["code"] for r in todo}]
+    in_batch = {r["code"] for r in rows if r["batch"] == bid}  # includes codes the plan has since excluded
+    en_old = [e for e in B.read_jsonl(B.EN_PACK) if e["code"] not in in_batch]
+    hi_old = [e for e in B.read_jsonl(B.HI_PACK) if e["code"] not in in_batch]
     write_pack(B.EN_PACK, en_old + [english_entry(r) for r in todo])
     write_pack(B.HI_PACK, hi_old + [hindi_entry(r, hi_titles[r["code"]]) for r in todo])
     write_manifests()

@@ -59,7 +59,7 @@ SAFETY = re.compile(r"\b(stop|stops|stopped|stopping|safe|safely|safety|unsafe|r
                     r"hazard\w*|emergency|immediately|urgent\w*|critical|severe|fire|crash\w*|never|must|"
                     r"do not|don't|avoid|brake\w*)\b", re.I)
 SAFETY_HI = re.compile(r"रुक|न चलाएँ|न चलाएं|खतरा|ख़तरा|सुरक्षित|असुरक्षित|तुरंत|फ़ौरन|आपातकाल|ज़रूर|कभी न|बचें")
-WHEEL_SPEED = re.compile(r"wheel[- ]speed|tone wheel|wheel sensor", re.I)
+WHEEL_SPEED = re.compile(r"wheel[- ]speed|tone wheel|wheel sensor|\b(left|right)\s+(front|rear)\b", re.I)
 LATIN_RUN = re.compile(r"[A-Za-z][A-Za-z0-9]*|[0-9]+[A-Za-z][A-Za-z0-9]*")
 ISO = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 HI_MEANING_CAP, HI_ADVICE_CAP = int(200 * 1.6), int(220 * 1.6)
