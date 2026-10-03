@@ -34,6 +34,8 @@ FRAMES = [
     (("software", "incompatibility", "with"), "{x} के साथ सॉफ़्टवेयर असंगति"),
     (("unable", "to", "engage"), "{x} लगाने में असमर्थ"),
     (("stuck", "in"), "{x} में अटका"),
+    (("incorrect", "shift", "from"), "{x} से गलत शिफ़्ट"),
+    (("replace",), "{x} बदलें"),
 ]
 
 

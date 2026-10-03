@@ -8,6 +8,7 @@ that two sources name the same way and that is not already shipped. Built by scr
   py build_basic.py --todo [BATCH]                     Hindi words/phrases the next (or the given) batch still needs
   py build_basic.py --batch BATCH                      build English and Hindi entries of one batch into the packs
   py build_basic.py --next                             build the first batch that is not done
+  py build_basic.py --refresh                          rebuild every finished batch (after a vocabulary change)
   py build_basic.py --manifests                        rewrite the two manifests from the pack files
 
 The packs are generic_basic_en.jsonl and generic_basic_hi.jsonl, grown one batch at a time and committed after each
@@ -33,7 +34,9 @@ OTHER_REASONS = {
     "damaged_character": "the title contains a damaged character (U+FFFD) in the source",
     "shared_title": "the same title sits on two or more codes, so it cannot name one of them",
     "manufacturer_range": "manufacturer-defined range; a generic pack must not carry it",
+    "source_typo": "a word is glued to itself in both sources (CircuitCircuit), so the title is not trusted",
 }
+GLUED_WORD = re.compile(r"([A-Za-z]{4,})" + chr(92) + "1", re.I)
 COLS = ["code", "prefix", "batch", "status", "reason", "verdict", "title", "title_basis", "failure_type",
         "source_sha256"]
 
@@ -107,6 +110,8 @@ def do_plan(args):
             reason = "other:damaged_character"
         elif B.is_manufacturer_defined(c):
             reason = "other:manufacturer_range"
+        elif GLUED_WORD.search(title):
+            reason = "other:source_typo"
         elif len(title) > B.TITLE_CAP_EN:
             reason = "other:title_over_70"
         elif len(title_count.get(r["title_in_force"], [])) > 1:
@@ -306,6 +311,10 @@ def main():
         return
     if "--batch" in a:
         sys.exit(0 if do_batch(a[a.index("--batch") + 1], rows) else 1)
+    if "--refresh" in a:  # rebuild every finished batch (after a vocabulary or phrase change)
+        done = done_batches(rows)
+        ok = all([do_batch(b, rows) for b, d in done.items() if d])
+        sys.exit(0 if ok else 1)
     if "--next" in a:
         done = done_batches(rows)
         left = [b for b, d in done.items() if not d]

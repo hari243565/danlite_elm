@@ -364,3 +364,105 @@ up	अप
 variable	वेरिएबल
 vin	VIN
 wake	वेक
+# round 5 (batches P05-P07): hybrid/EV, transmission and drivetrain words
+12v	12V
+4wd	4WD
+accumulator	एक्यूमुलेटर
+adaptive	एडैप्टिव
+alert	अलर्ट
+anticipate	एंटिसिपेट
+auxiliary	ऑक्सिलरी
+balancing	बैलेंसिंग
+btsi	BTSI
+case	केस
+cell	सेल
+charger	चार्जर
+charging	चार्जिंग
+complete	पूरा
+not complete	पूरा नहीं हुआ
+component	कंपोनेंट
+contactor	कॉन्टैक्टर
+conversion	कन्वर्ज़न
+coupler	कप्लर
+cycling	साइक्लिंग
+date	तारीख
+delivered	डिलीवर किया गया
+deteriorated	खराब हुआ
+deterioration	गिरावट
+disable	डिसेबल
+discharge	डिस्चार्ज
+discharging	डिस्चार्जिंग
+disconnect	डिसकनेक्ट
+down	डाउन
+downshift	डाउनशिफ़्ट
+drive	ड्राइव
+driveline	ड्राइवलाइन
+electric	इलेक्ट्रिक
+electronics	इलेक्ट्रॉनिक्स
+enable	इनेबल
+engaged	लगा हुआ
+ev	EV
+failed	फ़ेल
+failed to start	स्टार्ट होने में फ़ेल
+failed to crank	क्रैंक होने में फ़ेल
+failure	फ़ेल्योर
+for	के लिए
+forward	फ़ॉरवर्ड
+four	चार
+frequency	फ़्रीक्वेंसी
+from	से
+fuse	फ़्यूज़
+gate	गेट
+gears	गियर
+hybrid	हाइब्रिड
+hydraulic	हाइड्रोलिक
+inhibit	इनहिबिट
+interlock	इंटरलॉक
+inverter	इन्वर्टर
+isolation	आइसोलेशन
+leakage	लीकेज
+lever	लीवर
+long	लंबा
+too long	बहुत लंबा
+too short	बहुत छोटा
+manual	मैनुअल
+mount	माउंट
+multiple	एक से ज़्यादा
+negative	नेगेटिव
+pack	पैक
+pawl	पॉल
+pedestrian	पैदल यात्री
+period	अवधि
+phase	फ़ेज़
+pilot	पायलट
+planetary	प्लैनेटरी
+port	पोर्ट
+positive	पॉज़िटिव
+powertrain	पावरट्रेन
+precharge	प्रीचार्ज
+proximity	प्रॉक्सिमिटी
+pull	पुल
+push	पुश
+replace	बदलें
+service	सर्विस
+set	सेट
+short	छोटा
+skip	स्किप
+slippage	स्लिपेज
+slipping	स्लिप हो रहा
+stalled	स्टॉल्ड
+step	स्टेप
+synchronization	सिंक्रनाइज़ेशन
+traction	ट्रैक्शन
+transfer	ट्रांसफ़र
+unit	यूनिट
+unstable	अस्थिर
+upshift	अपशिफ़्ट
+volt	वोल्ट
+wheel	व्हील
+# round 5b: fixed phrases
+over temperature	अधिक तापमान
+overtemperature	अधिक तापमान
+state of charge	स्टेट ऑफ़ चार्ज
+loss of pressure	प्रेशर में हानि
+loss of direction signal	दिशा सिग्नल में हानि
