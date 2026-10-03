@@ -142,3 +142,96 @@ voltage	वोल्टेज
 volume	वॉल्यूम
 # round 1b: grammar phrase aligned with GLOSSARY_HI.md (circuit fault)
 circuit malfunction	सर्किट में खराबी
+# round 2 (batch P02): 78 words
+ac	AC
+activity	गतिविधि
+no activity detected	कोई गतिविधि नहीं मिली
+no signal	कोई सिग्नल नहीं
+no pulses	कोई पल्स नहीं
+no flow detected	कोई फ़्लो नहीं मिला
+below	से नीचे
+above	से ऊपर
+below threshold	सीमा से कम
+above threshold	सीमा से ज़्यादा
+biased	बायस्ड
+cam	कैम
+coil	कॉइल
+cold	कोल्ड
+combustion	कंबशन
+condition	कंडीशन
+contribution	कंट्रीब्यूशन
+converter	कन्वर्टर
+cooling	कूलिंग
+current	करंट
+dc	DC
+diagnostic	डायग्नोस्टिक
+diesel	डीज़ल
+direction	दिशा
+disabled	डिसेबल्ड
+driver	ड्राइवर
+efficiency	एफ़िशिएंसी
+expected	अपेक्षित
+higher than expected	अपेक्षा से ज़्यादा
+lower than expected	अपेक्षा से कम
+fan	फ़ैन
+fault	फ़ॉल्ट
+few	कम
+too few	बहुत कम
+too many	बहुत ज़्यादा
+many	ज़्यादा
+fluid	फ़्लूइड
+fueling	फ़्यूलिंग
+glow	ग्लो
+hardware	हार्डवेयर
+higher	ज़्यादा
+ignition	इग्निशन
+inactive	निष्क्रिय
+indicator	इंडिकेटर
+ion	आयन
+knock	नॉक
+leaking	रिसाव हो रहा
+learned	सीखा गया
+not learned	सीखा नहीं गया
+not specified	निर्दिष्ट नहीं
+not present	मौजूद नहीं
+not	नहीं
+lower	निचला
+metering	मीटरिंग
+misfire	मिसफ़ायर
+monitoring	मॉनिटरिंग
+motor	मोटर
+no	कोई
+offset	ऑफ़सेट
+overboost	ओवरबूस्ट
+underboost	अंडरबूस्ट
+pedal	पैडल
+plug	प्लग
+present	मौजूद
+primary	प्राइमरी
+propulsion	प्रोपल्शन
+pulses	पल्स
+quantity	मात्रा
+reference	रेफ़रेंस
+relapsed	फिर गिरा
+resolution	रेज़ोल्यूशन
+road	रोड
+rotor	रोटर
+rough	रफ़
+secondary	सेकंडरी
+sense	सेंस
+signal	सिग्नल
+single	सिंगल
+specified	निर्दिष्ट
+start	स्टार्ट
+switch	स्विच
+than	से
+thermostat	थर्मोस्टेट
+threshold	सीमा
+throttle	थ्रॉटल
+timer	टाइमर
+transmission	ट्रांसमिशन
+variation	वैरिएशन
+vehicle	वाहन
+vibration	वाइब्रेशन
+wastegate	वेस्टगेट
+with	के साथ
