@@ -3,7 +3,9 @@
 ///
 /// Neither table reads anything from the bike. The list only orders them: a
 /// rider whose active profile is a Royal Enfield sees that reference first;
-/// everyone else sees Honda first, as it was before the second one existed.
+/// everyone else sees Honda first, as it was before the second one existed. The
+/// Yamaha FZ-16 FI meter-code reference is last for everyone except a Yamaha
+/// profile, which sees it first.
 library;
 
 import 'package:flutter/material.dart';
@@ -14,14 +16,25 @@ import '../constants/chassis_dtc_dictionary.dart' show ChassisManufacturers;
 import '../providers/vehicle_provider.dart';
 import 'honda_blink_reference_screen.dart';
 import 'royal_enfield_blink_reference_screen.dart';
+import 'yamaha_fz16_meter_screen.dart';
 
-enum BlinkReference { royalEnfield, honda }
+enum BlinkReference { royalEnfield, honda, yamahaFz16 }
 
 /// The references in display order for the active profile's [make].
 List<BlinkReference> blinkReferenceOrder(String? make) =>
     ChassisManufacturers.resolveKey(make) == ChassisManufacturers.royalEnfield
         ? const [BlinkReference.royalEnfield, BlinkReference.honda]
         : const [BlinkReference.honda, BlinkReference.royalEnfield];
+
+/// Every reference tile in display order: the two blink references in their
+/// own order, with the Yamaha meter codes first on a Yamaha profile and last
+/// otherwise.
+List<BlinkReference> blinkReferenceTiles(String? make) {
+  final blink = blinkReferenceOrder(make);
+  return ChassisManufacturers.resolveKey(make) == ChassisManufacturers.yamaha
+      ? [BlinkReference.yamahaFz16, ...blink]
+      : [...blink, BlinkReference.yamahaFz16];
+}
 
 // Unified Telemetry Design System palette, matching dtc_screen._RC.
 class _LC {
@@ -61,7 +74,7 @@ class BlinkReferencesScreen extends StatelessWidget {
               style: const TextStyle(
                   color: _LC.textMuted, fontSize: 12.5, height: 1.5)),
           const SizedBox(height: 14),
-          for (final ref in blinkReferenceOrder(make)) ...[
+          for (final ref in blinkReferenceTiles(make)) ...[
             _tile(context, ref),
             const SizedBox(height: 10),
           ],
@@ -81,6 +94,11 @@ class BlinkReferencesScreen extends StatelessWidget {
           context.tr('blinkRefTitle'),
           context.tr('blinkRefsHondaSub'),
           (BuildContext _) => const HondaBlinkReferenceScreen(),
+        ),
+      BlinkReference.yamahaFz16 => (
+          context.tr('blinkRefsYamaha'),
+          context.tr('blinkRefsYamahaSub'),
+          (BuildContext _) => const YamahaFz16MeterScreen(),
         ),
     };
     return GestureDetector(

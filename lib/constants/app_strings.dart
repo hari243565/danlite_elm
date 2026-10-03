@@ -688,6 +688,27 @@ class AppStrings {
       'blinkRefsRoyal': 'Royal Enfield older EFI blink codes',
       'blinkRefsRoyalSub': 'Bullet Classic EFI and Bullet Electra EFI (UCE era)',
       'blinkRefsHondaSub': 'ABS warning lamp',
+      'blinkRefsYamaha': 'Yamaha FZ-16 FI meter codes',
+      'blinkRefsYamahaSub': 'Older FZ-16 FI: fault number shown on the meter',
+      'fz16Title': 'Yamaha FZ-16 FI meter codes',
+      'fz16Intro':
+          'This is a look-up table, not a scan. When the key is turned ON, the '
+          'warning lamp lights for 3 seconds and the fault code number shows '
+          'on the meter. Type that number below to see the maker\'s published '
+          'meaning. The app reads nothing from the bike.',
+      'fz16Applies':
+          'This applies to the older FZ-16 FI. It has not been '
+          'confirmed for newer FZ-S FI models.',
+      'fz16Field': 'Number shown on the meter',
+      'fz16Choose': 'Type the number to see the match.',
+      'fz16NoMatch': 'This number is not in the verified list',
+      'fz16Others':
+          'Other codes exist on this bike; they are not listed here because '
+          'they have not been verified. Ask a Yamaha service centre.',
+      'fz16Code15':
+          'Throttle position sensor: open or short circuit detected',
+      'fz16Code16': 'Throttle position sensor: stuck',
+      'fz16Source': 'Source: Yamaha FZ-16 service manual, page 7-24',
       'reBlinkTitle': 'Royal Enfield EFI blink codes',
       'reBlinkAppliesTitle': 'Which bikes this is for',
       'reBlinkApplies':
@@ -1804,6 +1825,26 @@ class AppStrings {
       'blinkRefsRoyal': 'Royal Enfield पुरानी EFI के ब्लिंक कोड',
       'blinkRefsRoyalSub': 'Bullet Classic EFI और Bullet Electra EFI (UCE दौर)',
       'blinkRefsHondaSub': 'ABS वार्निंग लैंप',
+      'blinkRefsYamaha': 'Yamaha FZ-16 FI के मीटर कोड',
+      'blinkRefsYamahaSub': 'पुरानी FZ-16 FI: मीटर पर दिखने वाला फ़ॉल्ट नंबर',
+      'fz16Title': 'Yamaha FZ-16 FI के मीटर कोड',
+      'fz16Intro':
+          'यह देखने की तालिका है, स्कैन नहीं। इग्निशन की ON करने पर वार्निंग लैंप '
+          '3 सेकंड के लिए जलता है और फ़ॉल्ट कोड का नंबर मीटर पर दिखता है। '
+          'निर्माता का प्रकाशित मतलब देखने के लिए वह नंबर नीचे लिखें। ऐप बाइक से '
+          'कुछ नहीं पढ़ता।',
+      'fz16Applies':
+          'यह पुरानी FZ-16 FI के लिए है। नई FZ-S FI मॉडलों के लिए इसकी '
+          'पुष्टि नहीं हुई है।',
+      'fz16Field': 'मीटर पर दिखा नंबर',
+      'fz16Choose': 'मिलान देखने के लिए नंबर लिखें।',
+      'fz16NoMatch': 'यह नंबर सत्यापित सूची में नहीं है',
+      'fz16Others':
+          'इस बाइक के और भी कोड होते हैं; वे यहाँ नहीं दिए गए क्योंकि उन्हें '
+          'सत्यापित नहीं किया गया है। Yamaha सर्विस सेंटर से पूछें।',
+      'fz16Code15': 'थ्रॉटल पोज़ीशन सेंसर: ओपन या शॉर्ट सर्किट मिला',
+      'fz16Code16': 'थ्रॉटल पोज़ीशन सेंसर: अटका हुआ',
+      'fz16Source': 'स्रोत: Yamaha FZ-16 सर्विस मैनुअल, पन्ना 7-24',
       'reBlinkTitle': 'Royal Enfield EFI ब्लिंक कोड',
       'reBlinkAppliesTitle': 'यह किन बाइकों के लिए है',
       'reBlinkApplies':
