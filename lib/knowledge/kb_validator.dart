@@ -13,6 +13,12 @@
 /// `title_hi` in a Hindi one. A non-English pack may carry only some text
 /// fields — the resolver fills the rest from English, with a note.
 ///
+/// One kind of line is held to looser rules: a NAME-ONLY entry, whose
+/// `verification` is exactly `standard_title_only` (the standard's code name and
+/// nothing more). It may leave out causes, hints, can-ride and flags — and it
+/// is refused if it carries any of them, if its level is not INFO, or if its
+/// confidence is not low. Every other entry keeps the full rules.
+///
 /// Pure Dart. Never throws.
 library;
 
@@ -120,6 +126,12 @@ const List<String> _commonRequired = [
   'updated_at',
 ];
 
+const Map<String, bool> _noFlags = <String, bool>{
+  'mil': false,
+  'emissions_relevant': false,
+  'limp_possible': false,
+};
+
 /// A value as text, or null when it is not text (a pack line is untrusted).
 String? _str(Object? v) => v is String ? v : null;
 
@@ -145,17 +157,19 @@ EntryValidation validateEntry(Object? line, PackManifest manifest) {
   void err(String m) => errors.add('$c: $m');
 
   // ── required and allowed fields ────────────────────────────────────────
+  // Name-only is decided by the exact label and nothing else.
+  final nameOnly = r['verification'] == kVerificationStandardTitleOnly;
   final required = <String>[
-    ..._commonRequired,
+    for (final k in _commonRequired)
+      if (!nameOnly || (k != 'can_ride_to_workshop' && k != 'flags')) k,
     'title_$lang',
+    if (nameOnly) ...['meaning_$lang', 'rider_advice_$lang'],
     if (english) ...[
       'standard_title_en',
       'meaning_en',
-      'likely_causes_en',
       'rider_action_basis',
       'rider_advice_en',
-      'can_ride_reason',
-      'technician_hints_en',
+      if (!nameOnly) ...['likely_causes_en', 'can_ride_reason', 'technician_hints_en'],
     ],
   ];
   final missing = [for (final k in required) if (!r.containsKey(k)) k];
@@ -200,26 +214,42 @@ EntryValidation validateEntry(Object? line, PackManifest manifest) {
   // ── enums and types ────────────────────────────────────────────────────
   final level = RiderAction.fromDb(_str(r['rider_action_level']));
   if (level == null) err('bad rider_action_level ${r['rider_action_level']}');
-  final ride = CanRide.fromDb(_str(r['can_ride_to_workshop']));
-  if (ride == null) {
-    err('bad can_ride_to_workshop ${r['can_ride_to_workshop']}');
-  } else if (level != null && !_rideAllowed[level]!.contains(ride)) {
-    err('can_ride_to_workshop ${ride.db} is not allowed for ${level.db} (D4)');
+  final CanRide? ride;
+  if (nameOnly) {
+    // A bare name makes no claim about riding the bike.
+    ride = null;
+    if (level != RiderAction.info) err('a name-only entry must have level INFO');
+    if (r['can_ride_to_workshop'] != null) {
+      err('a name-only entry must not carry can_ride_to_workshop');
+    }
+  } else {
+    ride = CanRide.fromDb(_str(r['can_ride_to_workshop']));
+    if (ride == null) {
+      err('bad can_ride_to_workshop ${r['can_ride_to_workshop']}');
+    } else if (level != null && !_rideAllowed[level]!.contains(ride)) {
+      err('can_ride_to_workshop ${ride.db} is not allowed for ${level.db} (D4)');
+    }
   }
   final confidence = r['confidence'];
   if (confidence is! String || !_confidence.contains(confidence)) {
     err('bad confidence');
+  } else if (nameOnly && confidence != 'low') {
+    err('a name-only entry must have confidence low');
   }
   final updated = r['updated_at'];
   if (updated is! String || !_isoDate.hasMatch(updated)) {
     err('updated_at must be an ISO date');
   }
-  final flags = r['flags'];
+  // A name-only entry may leave the flags out (all false); if it has them,
+  // they are still exactly the three booleans, and none may be set.
+  final Object? flags = nameOnly && !r.containsKey('flags') ? _noFlags : r['flags'];
   if (flags is! Map ||
       flags.keys.toSet().difference({'mil', 'emissions_relevant', 'limp_possible'}).isNotEmpty ||
       flags.length != 3 ||
       !flags.values.every((v) => v is bool)) {
     err('flags must be exactly mil, emissions_relevant, limp_possible booleans');
+  } else if (nameOnly && flags.values.any((v) => v == true)) {
+    err('a name-only entry must not set a flag');
   }
   final derived = r['derived_from'];
   if (derived is! Map ||
@@ -299,22 +329,31 @@ EntryValidation validateEntry(Object? line, PackManifest manifest) {
     return out;
   }
 
+  // Name-only: no causes or hints in any form but an empty list or nothing.
+  List<String> listOrNone(String base, String key) {
+    if (!nameOnly) return list(base, key, required: english);
+    final v = r[key];
+    if (v != null && !(v is List && v.isEmpty)) err('a name-only entry must not carry $key');
+    return const <String>[];
+  }
+
   final title = text('title', 'title_$lang', required: true);
-  final meaning = text('meaning', 'meaning_$lang', required: english);
-  final advice = text('rider_advice', 'rider_advice_$lang', required: english);
-  final causes = list('likely_causes', 'likely_causes_$lang', required: english);
-  final hints = list('technician_hints', 'technician_hints_$lang', required: english);
+  final meaning = text('meaning', 'meaning_$lang', required: english || nameOnly);
+  final advice = text('rider_advice', 'rider_advice_$lang', required: english || nameOnly);
+  final causes = listOrNone('likely_causes', 'likely_causes_$lang');
+  final hints = listOrNone('technician_hints', 'technician_hints_$lang');
   final basis = english
       ? text('rider_action_basis', 'rider_action_basis', required: true)
       : text('rider_action_basis', 'rider_action_basis_$lang');
   final rideReason = english
-      ? text('can_ride_reason', 'can_ride_reason', required: true)
+      ? text('can_ride_reason', 'can_ride_reason', required: !nameOnly)
       : text('can_ride_reason', 'can_ride_reason_$lang');
   // Unsuffixed English fields in a non-English pack are checked, not stored.
   if (!english) {
     text('rider_action_basis', 'rider_action_basis');
     text('can_ride_reason', 'can_ride_reason');
   }
+  if (nameOnly && rideReason != null) err('a name-only entry must not carry a can-ride reason');
 
   // D6: no text may claim verification.
   final allText = [title, meaning, advice, basis, rideReason, ...causes, ...hints]
