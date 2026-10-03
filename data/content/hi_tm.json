@@ -239,6 +239,66 @@
 "en": "The engine may stop, run roughly or not start.",
 "hi": "इंजन बंद हो सकता है, रफ़ चल सकता है या स्टार्ट नहीं हो सकता।"
 },
+"A0076": {
+"en": "The engine may hesitate, run rough or be hard to start at times; get it checked soon.",
+"hi": "इंजन कभी-कभी हिचकिचा सकता है, रफ़ चल सकता है या स्टार्ट करना मुश्किल हो सकता है; जल्द जाँच कराएँ।"
+},
+"A0077": {
+"en": "Avoid hard acceleration and poor-quality petrol; get it checked soon.",
+"hi": "तेज़ एक्सेलरेशन और खराब क्वालिटी के पेट्रोल से बचें; जल्द जाँच कराएँ।"
+},
+"A0079": {
+"en": "The speedometer may read wrongly, and other speed-based functions may be affected.",
+"hi": "स्पीडोमीटर गलत पढ़ सकता है, और स्पीड पर आधारित दूसरे फ़ंक्शन भी प्रभावित हो सकते हैं।"
+},
+"A0081": {
+"en": "Lights may dim and starting may suffer.",
+"hi": "लाइटें मंद हो सकती हैं और स्टार्टिंग में दिक्कत हो सकती है।"
+},
+"A0082": {
+"en": "If the battery goes flat while riding the engine will stop, so avoid night and long rides and get it checked soon.",
+"hi": "अगर चलते समय बैटरी डिस्चार्ज हो गई तो इंजन बंद हो जाएगा, इसलिए रात में और लंबी सवारी से बचें और जल्द जाँच कराएँ।"
+},
+"A0084": {
+"en": "If the starter does not turn the engine, do not keep trying; get it checked soon.",
+"hi": "अगर स्टार्टर इंजन को न घुमाए, तो बार-बार कोशिश न करें; जल्द जाँच कराएँ।"
+},
+"A0085": {
+"en": "If the starter keeps turning after the engine starts, switch off at once.",
+"hi": "अगर इंजन स्टार्ट होने के बाद भी स्टार्टर घूमता रहे, तो तुरंत इंजन बंद करें।"
+},
+"A0086": {
+"en": "The starter may not turn the engine.",
+"hi": "हो सकता है कि स्टार्टर इंजन को न घुमाए।"
+},
+"A0087": {
+"en": "If it does not, do not keep trying; get it checked soon.",
+"hi": "अगर वह न घुमाए, तो बार-बार कोशिश न करें; जल्द जाँच कराएँ।"
+},
+"A0088": {
+"en": "Get it checked soon, and do not keep trying if it does not turn the engine.",
+"hi": "जल्द जाँच कराएँ, और अगर स्टार्टर इंजन को न घुमाए तो बार-बार कोशिश न करें।"
+},
+"A0089": {
+"en": "The engine may stop or not start without warning.",
+"hi": "इंजन बिना चेतावनी के बंद हो सकता है या स्टार्ट नहीं हो सकता।"
+},
+"A0090": {
+"en": "The ECU may stay powered after the ignition is off.",
+"hi": "इग्निशन बंद होने के बाद भी ECU को पावर मिलती रह सकती है।"
+},
+"A0091": {
+"en": "The ECU may lose its learned settings, so idle may be slightly different for a while.",
+"hi": "ECU अपनी सीखी हुई सेटिंग खो सकता है, इसलिए कुछ समय तक आइडल थोड़ा अलग रह सकता है।"
+},
+"A0093": {
+"en": "The battery may go flat if the ECU stays powered after switch-off.",
+"hi": "अगर इग्निशन बंद करने के बाद भी ECU को पावर मिलती रहे, तो बैटरी डिस्चार्ज हो सकती है।"
+},
+"A0094": {
+"en": "The bike may run poorly or lose power.",
+"hi": "बाइक ठीक से नहीं चल सकती या पावर घट सकती है।"
+},
 "C0001": {
 "en": "Worn or faulty throttle position sensor",
 "hi": "थ्रॉटल पोज़ीशन सेंसर घिस गया है या खराब है"
@@ -738,6 +798,114 @@
 "C0125": {
 "en": "Loose or corroded sensor connector",
 "hi": "सेंसर कनेक्टर ढीला है या उसमें जंग लगा है"
+},
+"C0126": {
+"en": "Faulty knock sensor",
+"hi": "नॉक सेंसर खराब है"
+},
+"C0127": {
+"en": "Sensor loose or poorly mounted",
+"hi": "सेंसर ढीला है या ठीक से नहीं लगा है"
+},
+"C0128": {
+"en": "Faulty or loose knock sensor",
+"hi": "नॉक सेंसर खराब या ढीला है"
+},
+"C0129": {
+"en": "Damaged or dirty sensor ring",
+"hi": "सेंसर रिंग टूटी या गंदी है"
+},
+"C0130": {
+"en": "Open circuit in the switch wiring",
+"hi": "स्विच वायरिंग में ओपन सर्किट"
+},
+"C0131": {
+"en": "Dirty throttle body or idle air passage",
+"hi": "थ्रॉटल बॉडी या आइडल एयर पैसेज गंदा है"
+},
+"C0132": {
+"en": "Throttle not closing fully",
+"hi": "थ्रॉटल पूरा बंद नहीं हो रहा"
+},
+"C0133": {
+"en": "Faulty idle air control valve",
+"hi": "आइडल एयर कंट्रोल वाल्व खराब है"
+},
+"C0134": {
+"en": "Open circuit in the valve wiring",
+"hi": "वाल्व वायरिंग में ओपन सर्किट"
+},
+"C0135": {
+"en": "Intake leak that shows up only when cold",
+"hi": "इनटेक लीक जो सिर्फ़ ठंडे इंजन में दिखता है"
+},
+"C0136": {
+"en": "Dirty or coked fuel injector tip",
+"hi": "फ़्यूल इंजेक्टर की नोक गंदी है या उस पर कार्बन जमा है"
+},
+"C0137": {
+"en": "Low compression on one cylinder when cold",
+"hi": "ठंडे में एक सिलेंडर पर कंप्रेशन कम है"
+},
+"C0138": {
+"en": "Sticky valves when cold",
+"hi": "ठंडे में वाल्व चिपचिपे हैं"
+},
+"C0139": {
+"en": "Faulty closed throttle switch",
+"hi": "क्लोज़्ड थ्रॉटल स्विच खराब है"
+},
+"C0140": {
+"en": "Switch out of adjustment or loose",
+"hi": "स्विच एडजस्टमेंट से बाहर है या ढीला है"
+},
+"C0141": {
+"en": "Loose or corroded valve connector",
+"hi": "वाल्व कनेक्टर ढीला है या उसमें जंग लगा है"
+},
+"C0142": {
+"en": "Charging system fault",
+"hi": "चार्जिंग सिस्टम में खराबी"
+},
+"C0143": {
+"en": "Loose or corroded battery terminals or ground",
+"hi": "बैटरी टर्मिनल या ग्राउंड ढीला है या उसमें जंग लगा है"
+},
+"C0144": {
+"en": "Failing voltage regulator",
+"hi": "वोल्टेज रेगुलेटर खराब हो रहा है"
+},
+"C0145": {
+"en": "Faulty starter relay",
+"hi": "स्टार्टर रिले खराब है"
+},
+"C0146": {
+"en": "Faulty ECU power relay (if fitted)",
+"hi": "ECU पावर रिले खराब है (अगर लगा हो)"
+},
+"C0147": {
+"en": "ECU power relay stuck on (if fitted)",
+"hi": "ECU पावर रिले चालू अटका है (अगर लगा हो)"
+},
+"C0148": {
+"en": "Sense wire short to ground",
+"hi": "सेंस वायर का ग्राउंड से शॉर्ट"
+},
+"C0149": {
+"en": "Faulty or sticking ECU power relay (if fitted)",
+"hi": "ECU पावर रिले खराब है या चिपक रहा है (अगर लगा हो)"
+},
+"C0150": {
+"en": "Sense wire short to battery supply",
+"hi": "सेंस वायर का बैटरी सप्लाई से शॉर्ट"
+},
+"C0151": {
+"en": "Broken wiring or loose connector on a sensor",
+"hi": "किसी सेंसर पर वायरिंग टूटी है या कनेक्टर ढीला है"
+},
+"C0152": {
+"en": "Sensor wire or sensor short to ground",
+"hi": "सेंसर वायर या सेंसर का ग्राउंड से शॉर्ट"
 },
 "H0001": {
 "en": "Check the sensor connector for water, corrosion and bent pins",
@@ -1255,6 +1423,182 @@
 "en": "Check the camshaft and crankshaft signals while cranking",
 "hi": "क्रैंकिंग के समय कैमशाफ़्ट और क्रैंकशाफ़्ट के सिग्नल जाँचें"
 },
+"H0130": {
+"en": "Check the sensor signal while cranking",
+"hi": "क्रैंकिंग के समय सेंसर का सिग्नल जाँचें"
+},
+"H0131": {
+"en": "Wiggle the harness and connector while watching the sensor signal",
+"hi": "सेंसर का सिग्नल देखते हुए वायरिंग हार्नेस और कनेक्टर को हिलाएँ"
+},
+"H0132": {
+"en": "Check the ignition wiring for chafing and breaks",
+"hi": "इग्निशन वायरिंग में रगड़ और टूटन जाँचें"
+},
+"H0133": {
+"en": "Check the knock sensor mounting and tightness",
+"hi": "नॉक सेंसर की माउंटिंग और कसाव जाँचें"
+},
+"H0134": {
+"en": "Check the sensor connector and wiring for water and corrosion",
+"hi": "सेंसर कनेक्टर और वायरिंग में पानी और जंग जाँचें"
+},
+"H0135": {
+"en": "Check the sensor signal at idle and under load",
+"hi": "आइडल पर और लोड में सेंसर का सिग्नल जाँचें"
+},
+"H0136": {
+"en": "Check the knock sensor wiring for chafing and the connector for water",
+"hi": "नॉक सेंसर वायरिंग में रगड़ और कनेक्टर में पानी जाँचें"
+},
+"H0137": {
+"en": "Check the sensor mounting and tightness",
+"hi": "सेंसर की माउंटिंग और कसाव जाँचें"
+},
+"H0138": {
+"en": "Check the knock sensor wiring for breaks and the connector for corrosion",
+"hi": "नॉक सेंसर वायरिंग में टूटन और कनेक्टर में जंग जाँचें"
+},
+"H0139": {
+"en": "Check the sensor wiring for chafing and the connector for water",
+"hi": "सेंसर वायरिंग में रगड़ और कनेक्टर में पानी जाँचें"
+},
+"H0140": {
+"en": "Wiggle the harness and connector while watching the speed reading",
+"hi": "स्पीड रीडिंग देखते हुए वायरिंग हार्नेस और कनेक्टर को हिलाएँ"
+},
+"H0141": {
+"en": "Check the switch wiring for chafing and the connector for oil and water",
+"hi": "स्विच वायरिंग में रगड़ और कनेक्टर में ऑयल और पानी जाँचें"
+},
+"H0142": {
+"en": "Check the switch wiring for breaks and the connector for oil and water",
+"hi": "स्विच वायरिंग में टूटन और कनेक्टर में ऑयल और पानी जाँचें"
+},
+"H0143": {
+"en": "Check the throttle returns fully to the closed position",
+"hi": "जाँचें कि थ्रॉटल पूरी तरह बंद स्थिति में लौटता है"
+},
+"H0144": {
+"en": "Check the valve wiring for chafing and the connector for water",
+"hi": "वाल्व वायरिंग में रगड़ और कनेक्टर में पानी जाँचें"
+},
+"H0145": {
+"en": "Check that the idle air control valve moves when the ignition is switched on",
+"hi": "जाँचें कि इग्निशन चालू करने पर आइडल एयर कंट्रोल वाल्व हिलता है"
+},
+"H0146": {
+"en": "Check the valve wiring for breaks and the connector for corrosion",
+"hi": "वाल्व वायरिंग में टूटन और कनेक्टर में जंग जाँचें"
+},
+"H0147": {
+"en": "Compare commanded and actual idle speed on a cold engine",
+"hi": "ठंडे इंजन पर कमांडेड और असली आइडल स्पीड की तुलना करें"
+},
+"H0148": {
+"en": "Check the idle air control valve moves when the engine is cold",
+"hi": "जाँचें कि इंजन ठंडा होने पर आइडल एयर कंट्रोल वाल्व हिलता है"
+},
+"H0149": {
+"en": "Read the freeze-frame data to see the engine temperature when it was stored",
+"hi": "फ़्रीज़-फ़्रेम डेटा पढ़कर देखें कि कोड सेव होते समय इंजन का तापमान क्या था"
+},
+"H0150": {
+"en": "Check the injector spray and compression when the engine is cold",
+"hi": "इंजन ठंडा होने पर इंजेक्टर का स्प्रे और कंप्रेशन जाँचें"
+},
+"H0151": {
+"en": "Check the switch changes state between closed and slightly open throttle",
+"hi": "जाँचें कि थ्रॉटल बंद और थोड़ा खुला होने पर स्विच की स्थिति बदलती है"
+},
+"H0152": {
+"en": "Check the switch connector and wiring for water and corrosion",
+"hi": "स्विच कनेक्टर और वायरिंग में पानी और जंग जाँचें"
+},
+"H0153": {
+"en": "Check the valve connector and wiring for water, corrosion and chafing",
+"hi": "वाल्व कनेक्टर और वायरिंग में पानी, जंग और रगड़ जाँचें"
+},
+"H0154": {
+"en": "Wiggle the harness and connector while the engine idles",
+"hi": "इंजन आइडल पर चलते समय वायरिंग हार्नेस और कनेक्टर को हिलाएँ"
+},
+"H0155": {
+"en": "Check the valve connector for water and corrosion",
+"hi": "वाल्व कनेक्टर में पानी और जंग जाँचें"
+},
+"H0156": {
+"en": "Check the relay and its connector for corrosion and a loose fit",
+"hi": "रिले और उसके कनेक्टर में जंग और ढीलापन जाँचें"
+},
+"H0157": {
+"en": "Check the control wiring for chafing and breaks",
+"hi": "कंट्रोल वायरिंग में रगड़ और टूटन जाँचें"
+},
+"H0158": {
+"en": "Check the relay (if fitted) and its connector for corrosion and a loose fit",
+"hi": "रिले (अगर लगा हो) और उसके कनेक्टर में जंग और ढीलापन जाँचें"
+},
+"H0159": {
+"en": "Check the relay control wiring for breaks and chafing",
+"hi": "रिले कंट्रोल वायरिंग में टूटन और रगड़ जाँचें"
+},
+"H0160": {
+"en": "Check the ECU supply and ground connections",
+"hi": "ECU के सप्लाई और ग्राउंड कनेक्शन जाँचें"
+},
+"H0161": {
+"en": "Check the relay control wiring for chafing against metal parts",
+"hi": "धातु के पुर्ज़ों से रिले कंट्रोल वायरिंग की रगड़ जाँचें"
+},
+"H0162": {
+"en": "Check the relay (if fitted) and its connector for corrosion",
+"hi": "रिले (अगर लगा हो) और उसके कनेक्टर में जंग जाँचें"
+},
+"H0163": {
+"en": "Check the relay control wiring for chafing and breaks",
+"hi": "रिले कंट्रोल वायरिंग में रगड़ और टूटन जाँचें"
+},
+"H0164": {
+"en": "Check that the ECU switches off with the ignition",
+"hi": "जाँचें कि इग्निशन बंद करने पर ECU बंद हो जाता है"
+},
+"H0165": {
+"en": "Check the sense wiring for breaks and chafing",
+"hi": "सेंस वायरिंग में टूटन और रगड़ जाँचें"
+},
+"H0166": {
+"en": "Check the sense wiring for chafing against metal parts",
+"hi": "धातु के पुर्ज़ों से सेंस वायरिंग की रगड़ जाँचें"
+},
+"H0167": {
+"en": "Check whether the ECU power relay (if fitted) releases after key-off",
+"hi": "जाँचें कि इग्निशन बंद करने के बाद ECU पावर रिले (अगर लगा हो) छूट जाता है या नहीं"
+},
+"H0168": {
+"en": "Measure the battery drain with the ignition off",
+"hi": "इग्निशन बंद होने पर बैटरी ड्रेन नापें"
+},
+"H0169": {
+"en": "Check the sense wiring for chafing and breaks",
+"hi": "सेंस वायरिंग में रगड़ और टूटन जाँचें"
+},
+"H0170": {
+"en": "Check the sensor connectors that share the supply for breaks and corrosion",
+"hi": "सप्लाई साझा करने वाले सेंसर कनेक्टर में टूटन और जंग जाँचें"
+},
+"H0171": {
+"en": "Check the ECU connector and the ground connections",
+"hi": "ECU कनेक्टर और ग्राउंड कनेक्शन जाँचें"
+},
+"H0172": {
+"en": "Unplug the sensors one at a time to find which one pulls the supply down",
+"hi": "सेंसर एक-एक करके निकालें और देखें कि कौन सप्लाई को नीचे खींच रहा है"
+},
+"H0173": {
+"en": "Check the sensor wiring for chafing against metal parts",
+"hi": "धातु के पुर्ज़ों से सेंसर वायरिंग की रगड़ जाँचें"
+},
 "M0001": {
 "en": "The bike's computer (ECU) cannot get a reliable reading of how far the throttle is open.",
 "hi": "बाइक का कंप्यूटर (ECU) थ्रॉटल कितना खुला है, इसकी भरोसेमंद रीडिंग नहीं ले पा रहा है।"
@@ -1575,6 +1919,166 @@
 "en": "The camshaft signal does not match what the bike's computer (ECU) expects, so it may not time fuel and spark correctly.",
 "hi": "कैमशाफ़्ट का सिग्नल बाइक के कंप्यूटर (ECU) की उम्मीद से मेल नहीं खाता, इसलिए हो सकता है कि वह ईंधन और स्पार्क का समय ठीक से तय न कर पाए।"
 },
+"M0081": {
+"en": "The camshaft sensor signal is too low for the bike's computer (ECU), often from a short to ground or a failed sensor.",
+"hi": "कैमशाफ़्ट सेंसर का सिग्नल बाइक के कंप्यूटर (ECU) के लिए बहुत कम है, जो अक्सर ग्राउंड से शॉर्ट या सेंसर खराब होने से होता है।"
+},
+"M0082": {
+"en": "The camshaft sensor signal is too high for the bike's computer (ECU), often from a short to battery supply or an open circuit.",
+"hi": "कैमशाफ़्ट सेंसर का सिग्नल बाइक के कंप्यूटर (ECU) के लिए बहुत ज़्यादा है, जो अक्सर बैटरी सप्लाई से शॉर्ट या ओपन सर्किट से होता है।"
+},
+"M0083": {
+"en": "The camshaft sensor signal is lost at times, so the bike's computer (ECU) may sometimes time fuel and spark wrongly.",
+"hi": "कैमशाफ़्ट सेंसर का सिग्नल कभी-कभी गायब हो जाता है, इसलिए बाइक का कंप्यूटर (ECU) कभी-कभी ईंधन और स्पार्क का समय गलत तय कर सकता है।"
+},
+"M0084": {
+"en": "The bike's computer (ECU) found a fault in an ignition coil circuit, so the spark may be weak or missing.",
+"hi": "बाइक के कंप्यूटर (ECU) को इग्निशन कॉइल सर्किट में खराबी मिली है, इसलिए स्पार्क कमज़ोर हो सकता है या नहीं भी बन सकता।"
+},
+"M0085": {
+"en": "The knock control system is not working correctly, so the bike's computer (ECU) may not be able to protect the engine from knocking.",
+"hi": "नॉक कंट्रोल सिस्टम ठीक से काम नहीं कर रहा, इसलिए हो सकता है कि बाइक का कंप्यूटर (ECU) इंजन को नॉकिंग से न बचा पाए।"
+},
+"M0086": {
+"en": "The bike's computer (ECU) found a fault in the knock sensor circuit, so it may not hear engine knock.",
+"hi": "बाइक के कंप्यूटर (ECU) को नॉक सेंसर सर्किट में खराबी मिली है, इसलिए हो सकता है कि उसे इंजन का नॉक सुनाई न दे।"
+},
+"M0087": {
+"en": "The knock sensor signal does not match what the bike's computer (ECU) expects, so it cannot tell normal engine noise from harmful knocking.",
+"hi": "नॉक सेंसर का सिग्नल बाइक के कंप्यूटर (ECU) की उम्मीद से मेल नहीं खाता, इसलिए वह इंजन की सामान्य आवाज़ और हानिकारक नॉकिंग में फ़र्क नहीं कर पाता।"
+},
+"M0088": {
+"en": "The knock sensor signal is too low for the bike's computer (ECU), often from a short to ground or a failed sensor.",
+"hi": "नॉक सेंसर का सिग्नल बाइक के कंप्यूटर (ECU) के लिए बहुत कम है, जो अक्सर ग्राउंड से शॉर्ट या सेंसर खराब होने से होता है।"
+},
+"M0089": {
+"en": "The knock sensor signal is too high for the bike's computer (ECU), often from a short to battery supply or an open circuit.",
+"hi": "नॉक सेंसर का सिग्नल बाइक के कंप्यूटर (ECU) के लिए बहुत ज़्यादा है, जो अक्सर बैटरी सप्लाई से शॉर्ट या ओपन सर्किट से होता है।"
+},
+"M0090": {
+"en": "The knock sensor signal is lost or changes suddenly at times, so the bike's computer (ECU) may sometimes misjudge engine knock.",
+"hi": "नॉक सेंसर का सिग्नल कभी-कभी गायब हो जाता है या अचानक बदल जाता है, इसलिए बाइक का कंप्यूटर (ECU) कभी-कभी इंजन नॉक का गलत अंदाज़ा लगा सकता है।"
+},
+"M0091": {
+"en": "The vehicle speed signal does not match what the bike's computer (ECU) expects, so the speed reading may be wrong.",
+"hi": "वाहन की स्पीड का सिग्नल बाइक के कंप्यूटर (ECU) की उम्मीद से मेल नहीं खाता, इसलिए स्पीड की रीडिंग गलत हो सकती है।"
+},
+"M0092": {
+"en": "The vehicle speed signal is too low for the bike's computer (ECU), often from a short to ground or a failed sensor.",
+"hi": "वाहन की स्पीड का सिग्नल बाइक के कंप्यूटर (ECU) के लिए बहुत कम है, जो अक्सर ग्राउंड से शॉर्ट या सेंसर खराब होने से होता है।"
+},
+"M0093": {
+"en": "The vehicle speed signal is lost, changes suddenly or reads too high, often from a loose connector or a short to battery supply.",
+"hi": "वाहन की स्पीड का सिग्नल गायब हो जाता है, अचानक बदल जाता है या बहुत ज़्यादा पढ़ता है, जो अक्सर ढीले कनेक्टर या बैटरी सप्लाई से शॉर्ट से होता है।"
+},
+"M0094": {
+"en": "The neutral switch signal is too low for the bike's computer (ECU), often from a short to ground.",
+"hi": "न्यूट्रल स्विच का सिग्नल बाइक के कंप्यूटर (ECU) के लिए बहुत कम है, जो अक्सर ग्राउंड से शॉर्ट से होता है।"
+},
+"M0095": {
+"en": "The neutral switch signal is too high for the bike's computer (ECU), often from a short to battery supply or an open circuit.",
+"hi": "न्यूट्रल स्विच का सिग्नल बाइक के कंप्यूटर (ECU) के लिए बहुत ज़्यादा है, जो अक्सर बैटरी सप्लाई से शॉर्ट या ओपन सर्किट से होता है।"
+},
+"M0096": {
+"en": "The engine idles slower than the bike's computer (ECU) wants, even after it tries to correct it.",
+"hi": "इंजन बाइक के कंप्यूटर (ECU) की चाही हुई स्पीड से धीमा आइडल कर रहा है, सुधारने की कोशिश के बाद भी।"
+},
+"M0097": {
+"en": "The engine idles faster than the bike's computer (ECU) wants, even after it tries to correct it.",
+"hi": "इंजन बाइक के कंप्यूटर (ECU) की चाही हुई स्पीड से तेज़ आइडल कर रहा है, सुधारने की कोशिश के बाद भी।"
+},
+"M0098": {
+"en": "The idle air control signal is too low for the bike's computer (ECU), often from a short to ground.",
+"hi": "आइडल एयर कंट्रोल का सिग्नल बाइक के कंप्यूटर (ECU) के लिए बहुत कम है, जो अक्सर ग्राउंड से शॉर्ट से होता है।"
+},
+"M0099": {
+"en": "The idle air control signal is too high for the bike's computer (ECU), often from a short to battery supply or an open circuit.",
+"hi": "आइडल एयर कंट्रोल का सिग्नल बाइक के कंप्यूटर (ECU) के लिए बहुत ज़्यादा है, जो अक्सर बैटरी सप्लाई से शॉर्ट या ओपन सर्किट से होता है।"
+},
+"M0100": {
+"en": "The bike's computer (ECU) cannot control the idle speed properly during a cold start.",
+"hi": "बाइक का कंप्यूटर (ECU) कोल्ड स्टार्ट के दौरान आइडल स्पीड को ठीक से कंट्रोल नहीं कर पाता।"
+},
+"M0101": {
+"en": "The engine idles roughly after a cold start, which the bike's computer (ECU) has noticed.",
+"hi": "कोल्ड स्टार्ट के बाद इंजन रफ़ आइडल करता है, जिसे बाइक के कंप्यूटर (ECU) ने पकड़ा है।"
+},
+"M0102": {
+"en": "The bike's computer (ECU) found a fault in the switch that tells it the throttle is fully closed, so idle control may be wrong.",
+"hi": "बाइक के कंप्यूटर (ECU) को उस स्विच में खराबी मिली है जो बताता है कि थ्रॉटल पूरा बंद है, इसलिए आइडल कंट्रोल गलत हो सकता है।"
+},
+"M0103": {
+"en": "The bike's computer (ECU) found a fault in the circuit of the idle air control valve, so it cannot hold the idle speed steady.",
+"hi": "बाइक के कंप्यूटर (ECU) को आइडल एयर कंट्रोल वाल्व के सर्किट में खराबी मिली है, इसलिए वह आइडल स्पीड को स्थिर नहीं रख पाता।"
+},
+"M0104": {
+"en": "The idle air control circuit loses contact at times, so the bike's computer (ECU) sometimes loses control of the idle speed.",
+"hi": "आइडल एयर कंट्रोल सर्किट कभी-कभी संपर्क खो देता है, इसलिए बाइक का कंप्यूटर (ECU) कभी-कभी आइडल स्पीड पर कंट्रोल खो देता है।"
+},
+"M0105": {
+"en": "The idle speed does not follow the bike's computer (ECU), so it may go up and down or stay too high or too low.",
+"hi": "आइडल स्पीड बाइक के कंप्यूटर (ECU) के कहे अनुसार नहीं चलती, इसलिए वह ऊपर-नीचे हो सकती है या बहुत ज़्यादा या बहुत कम रह सकती है।"
+},
+"M0106": {
+"en": "The bike's computer (ECU) found a problem with the electrical system voltage that it receives.",
+"hi": "बाइक के कंप्यूटर (ECU) को मिलने वाले इलेक्ट्रिकल सिस्टम वोल्टेज में समस्या मिली है।"
+},
+"M0107": {
+"en": "The electrical system voltage keeps going up and down, so lights may flicker and the bike's computer (ECU) cannot rely on it.",
+"hi": "इलेक्ट्रिकल सिस्टम वोल्टेज बार-बार ऊपर-नीचे होता है, इसलिए लाइटें टिमटिमा सकती हैं और बाइक का कंप्यूटर (ECU) उस पर भरोसा नहीं कर सकता।"
+},
+"M0108": {
+"en": "The bike's computer (ECU) found a fault in the circuit that switches the starter relay, so the starter may not work as it should.",
+"hi": "बाइक के कंप्यूटर (ECU) को स्टार्टर रिले को चालू करने वाले सर्किट में खराबी मिली है, इसलिए हो सकता है कि स्टार्टर ठीक से काम न करे।"
+},
+"M0109": {
+"en": "The starter relay control signal is too low for the bike's computer (ECU), often from a short to ground.",
+"hi": "स्टार्टर रिले का कंट्रोल सिग्नल बाइक के कंप्यूटर (ECU) के लिए बहुत कम है, जो अक्सर ग्राउंड से शॉर्ट से होता है।"
+},
+"M0110": {
+"en": "The starter relay control signal is too high for the bike's computer (ECU), often from a short to battery supply.",
+"hi": "स्टार्टर रिले का कंट्रोल सिग्नल बाइक के कंप्यूटर (ECU) के लिए बहुत ज़्यादा है, जो अक्सर बैटरी सप्लाई से शॉर्ट से होता है।"
+},
+"M0111": {
+"en": "The bike's computer (ECU) found a break in the circuit that switches its main power relay (if fitted), so the ECU may lose power.",
+"hi": "बाइक के कंप्यूटर (ECU) को अपने मुख्य पावर रिले (अगर लगा हो) को चालू करने वाले सर्किट में टूटन मिली है, इसलिए ECU की पावर जा सकती है।"
+},
+"M0112": {
+"en": "The signal that switches the ECU power relay (if fitted) is too low for the bike's computer (ECU), often from a short to ground.",
+"hi": "ECU पावर रिले (अगर लगा हो) को चालू करने वाला सिग्नल बाइक के कंप्यूटर (ECU) के लिए बहुत कम है, जो अक्सर ग्राउंड से शॉर्ट से होता है।"
+},
+"M0113": {
+"en": "The signal that switches the ECU power relay (if fitted) is too high for the bike's computer (ECU), often from a short to battery supply.",
+"hi": "ECU पावर रिले (अगर लगा हो) को चालू करने वाला सिग्नल बाइक के कंप्यूटर (ECU) के लिए बहुत ज़्यादा है, जो अक्सर बैटरी सप्लाई से शॉर्ट से होता है।"
+},
+"M0114": {
+"en": "The line that lets the bike's computer (ECU) check its power relay (if fitted) is broken, so the ECU cannot confirm the relay switched.",
+"hi": "वह लाइन टूटी है जिससे बाइक का कंप्यूटर (ECU) अपने पावर रिले (अगर लगा हो) को जाँचता है, इसलिए ECU पक्का नहीं कर सकता कि रिले चालू हुआ।"
+},
+"M0115": {
+"en": "The line that lets the bike's computer (ECU) check its power relay (if fitted) reads too low, often from a short to ground.",
+"hi": "वह लाइन जिससे बाइक का कंप्यूटर (ECU) अपने पावर रिले (अगर लगा हो) को जाँचता है, बहुत कम पढ़ रही है, जो अक्सर ग्राउंड से शॉर्ट से होता है।"
+},
+"M0116": {
+"en": "The bike's computer (ECU) saw its power relay (if fitted) switch off earlier than it expected after the ignition was turned off.",
+"hi": "बाइक के कंप्यूटर (ECU) ने देखा कि इग्निशन बंद करने के बाद उसका पावर रिले (अगर लगा हो) अपेक्षा से पहले बंद हो गया।"
+},
+"M0117": {
+"en": "The bike's computer (ECU) saw its power relay (if fitted) stay on longer than it expected after the ignition was turned off.",
+"hi": "बाइक के कंप्यूटर (ECU) ने देखा कि इग्निशन बंद करने के बाद उसका पावर रिले (अगर लगा हो) अपेक्षा से ज़्यादा देर चालू रहा।"
+},
+"M0118": {
+"en": "The line that lets the bike's computer (ECU) check its power relay (if fitted) reads too high, often from a short to battery supply.",
+"hi": "वह लाइन जिससे बाइक का कंप्यूटर (ECU) अपने पावर रिले (अगर लगा हो) को जाँचता है, बहुत ज़्यादा पढ़ रही है, जो अक्सर बैटरी सप्लाई से शॉर्ट से होता है।"
+},
+"M0119": {
+"en": "The bike's computer (ECU) found a break in the shared supply it gives its sensors, so several sensors may read wrongly.",
+"hi": "बाइक के कंप्यूटर (ECU) को उस साझा सप्लाई में टूटन मिली है जो वह अपने सेंसरों को देता है, इसलिए कई सेंसर गलत रीडिंग दे सकते हैं।"
+},
+"M0120": {
+"en": "The shared supply that the bike's computer (ECU) gives its sensors is too low, often from a short to ground in one of them.",
+"hi": "बाइक का कंप्यूटर (ECU) अपने सेंसरों को जो साझा सप्लाई देता है वह बहुत कम है, जो अक्सर उनमें से किसी एक में ग्राउंड से शॉर्ट से होता है।"
+},
 "R0001": {
 "en": "idle may be uneven; avoid traffic and long trips",
 "hi": "आइडल अस्थिर हो सकता है; ट्रैफ़िक और लंबे सफ़र से बचें"
@@ -1758,6 +2262,66 @@
 "R0046": {
 "en": "engine may stop at any time; arrange transport",
 "hi": "इंजन कभी भी बंद हो सकता है; बाइक ले जाने का इंतज़ाम करें"
+},
+"R0047": {
+"en": "may run rough at times; short trip only",
+"hi": "कभी-कभी रफ़ चल सकता है; सिर्फ़ छोटा सफ़र"
+},
+"R0048": {
+"en": "ride gently; engine knock protection may be lost",
+"hi": "धीरे चलाएँ; इंजन नॉक से सुरक्षा खत्म हो सकती है"
+},
+"R0049": {
+"en": "ride gently; engine knock protection may be wrong",
+"hi": "धीरे चलाएँ; इंजन नॉक से सुरक्षा गलत हो सकती है"
+},
+"R0050": {
+"en": "ride gently; engine knock protection unreliable",
+"hi": "धीरे चलाएँ; इंजन नॉक से सुरक्षा भरोसेमंद नहीं"
+},
+"R0051": {
+"en": "ride gently and avoid heavy traffic; no long trips",
+"hi": "धीरे चलाएँ और भारी ट्रैफ़िक से बचें; लंबा सफ़र न करें"
+},
+"R0052": {
+"en": "cold idle may be unsteady; avoid heavy traffic",
+"hi": "ठंडे में आइडल अस्थिर हो सकता है; भारी ट्रैफ़िक से बचें"
+},
+"R0053": {
+"en": "cold idle may be rough; avoid heavy traffic",
+"hi": "ठंडे में आइडल रफ़ हो सकता है; भारी ट्रैफ़िक से बचें"
+},
+"R0054": {
+"en": "idle may be unsteady at times; avoid heavy traffic",
+"hi": "आइडल कभी-कभी अस्थिर हो सकता है; भारी ट्रैफ़िक से बचें"
+},
+"R0055": {
+"en": "short trip to a workshop; stop if the battery gets hot or swollen",
+"hi": "वर्कशॉप तक छोटा सफ़र; बैटरी गर्म या फूली हो तो रुकें"
+},
+"R0056": {
+"en": "if it starts, go straight to a workshop; the starter may fail next time",
+"hi": "अगर स्टार्ट हो जाए तो सीधे वर्कशॉप जाएँ; अगली बार स्टार्टर फ़ेल हो सकता है"
+},
+"R0057": {
+"en": "ride only if the starter stops after the engine starts",
+"hi": "सिर्फ़ तब चलाएँ जब इंजन स्टार्ट होने के बाद स्टार्टर बंद हो जाए"
+},
+"R0058": {
+"en": "ECU may lose power at any time; arrange transport",
+"hi": "ECU की पावर कभी भी जा सकती है; बाइक ले जाने का इंतज़ाम करें"
+},
+"R0059": {
+"en": "ride with care; go to a workshop soon",
+"hi": "सावधानी से चलाएँ; जल्द वर्कशॉप जाएँ"
+},
+"R0060": {
+"en": "battery may go flat overnight; go to a workshop soon",
+"hi": "बैटरी रात भर में डिस्चार्ज हो सकती है; जल्द वर्कशॉप जाएँ"
+},
+"R0061": {
+"en": "several sensors may misread; avoid traffic and long trips",
+"hi": "कई सेंसर गलत पढ़ सकते हैं; ट्रैफ़िक और लंबे सफ़र से बचें"
 },
 "T0001": {
 "en": "Throttle position sensor A: circuit fault",
@@ -2078,5 +2642,165 @@
 "T0080": {
 "en": "Camshaft position sensor A: performance or incorrect operation",
 "hi": "कैमशाफ़्ट पोज़ीशन सेंसर A: परफ़ॉर्मेंस या गलत कामकाज"
+},
+"T0081": {
+"en": "Camshaft position sensor A: voltage below threshold",
+"hi": "कैमशाफ़्ट पोज़ीशन सेंसर A: वोल्टेज सीमा से कम"
+},
+"T0082": {
+"en": "Camshaft position sensor A: voltage above threshold",
+"hi": "कैमशाफ़्ट पोज़ीशन सेंसर A: वोल्टेज सीमा से ज़्यादा"
+},
+"T0083": {
+"en": "Camshaft position sensor A: intermittent circuit fault",
+"hi": "कैमशाफ़्ट पोज़ीशन सेंसर A: सर्किट में बीच-बीच में खराबी"
+},
+"T0084": {
+"en": "Ignition coil: primary or secondary circuit fault",
+"hi": "इग्निशन कॉइल: प्राइमरी या सेकंडरी सर्किट में खराबी"
+},
+"T0085": {
+"en": "Knock control system: fault",
+"hi": "नॉक कंट्रोल सिस्टम: खराबी"
+},
+"T0086": {
+"en": "Knock sensor: circuit fault",
+"hi": "नॉक सेंसर: सर्किट में खराबी"
+},
+"T0087": {
+"en": "Knock sensor: performance or incorrect operation",
+"hi": "नॉक सेंसर: परफ़ॉर्मेंस या गलत कामकाज"
+},
+"T0088": {
+"en": "Knock sensor: voltage below threshold",
+"hi": "नॉक सेंसर: वोल्टेज सीमा से कम"
+},
+"T0089": {
+"en": "Knock sensor: voltage above threshold",
+"hi": "नॉक सेंसर: वोल्टेज सीमा से ज़्यादा"
+},
+"T0090": {
+"en": "Knock sensor: intermittent circuit fault",
+"hi": "नॉक सेंसर: सर्किट में बीच-बीच में खराबी"
+},
+"T0091": {
+"en": "Vehicle speed sensor A: performance or incorrect operation",
+"hi": "व्हीकल स्पीड सेंसर A: परफ़ॉर्मेंस या गलत कामकाज"
+},
+"T0092": {
+"en": "Vehicle speed sensor A: voltage below threshold",
+"hi": "व्हीकल स्पीड सेंसर A: वोल्टेज सीमा से कम"
+},
+"T0093": {
+"en": "Vehicle speed sensor A: intermittent or voltage above threshold",
+"hi": "व्हीकल स्पीड सेंसर A: बीच-बीच में खराबी या वोल्टेज सीमा से ज़्यादा"
+},
+"T0094": {
+"en": "Neutral switch input: voltage below threshold",
+"hi": "न्यूट्रल स्विच इनपुट: वोल्टेज सीमा से कम"
+},
+"T0095": {
+"en": "Neutral switch input: voltage above threshold",
+"hi": "न्यूट्रल स्विच इनपुट: वोल्टेज सीमा से ज़्यादा"
+},
+"T0096": {
+"en": "Idle speed lower than expected",
+"hi": "आइडल स्पीड उम्मीद से कम"
+},
+"T0097": {
+"en": "Idle speed higher than expected",
+"hi": "आइडल स्पीड उम्मीद से ज़्यादा"
+},
+"T0098": {
+"en": "Idle air control circuit: voltage below threshold",
+"hi": "आइडल एयर कंट्रोल सर्किट: वोल्टेज सीमा से कम"
+},
+"T0099": {
+"en": "Idle air control circuit: voltage above threshold",
+"hi": "आइडल एयर कंट्रोल सर्किट: वोल्टेज सीमा से ज़्यादा"
+},
+"T0100": {
+"en": "Cold start idle control: performance or incorrect operation",
+"hi": "कोल्ड स्टार्ट आइडल कंट्रोल: परफ़ॉर्मेंस या गलत कामकाज"
+},
+"T0101": {
+"en": "Rough idle after a cold start",
+"hi": "कोल्ड स्टार्ट के बाद रफ़ आइडल"
+},
+"T0102": {
+"en": "Closed throttle switch: circuit fault",
+"hi": "क्लोज़्ड थ्रॉटल स्विच: सर्किट में खराबी"
+},
+"T0103": {
+"en": "Idle air control circuit: circuit fault",
+"hi": "आइडल एयर कंट्रोल सर्किट: सर्किट में खराबी"
+},
+"T0104": {
+"en": "Idle air control circuit: intermittent circuit fault",
+"hi": "आइडल एयर कंट्रोल सर्किट: सर्किट में बीच-बीच में खराबी"
+},
+"T0105": {
+"en": "Idle air control system: performance or incorrect operation",
+"hi": "आइडल एयर कंट्रोल सिस्टम: परफ़ॉर्मेंस या गलत कामकाज"
+},
+"T0106": {
+"en": "System voltage: fault",
+"hi": "सिस्टम वोल्टेज: खराबी"
+},
+"T0107": {
+"en": "System voltage unstable",
+"hi": "सिस्टम वोल्टेज अस्थिर"
+},
+"T0108": {
+"en": "Starter relay circuit: circuit fault",
+"hi": "स्टार्टर रिले सर्किट: सर्किट में खराबी"
+},
+"T0109": {
+"en": "Starter relay circuit: voltage below threshold",
+"hi": "स्टार्टर रिले सर्किट: वोल्टेज सीमा से कम"
+},
+"T0110": {
+"en": "Starter relay circuit: voltage above threshold",
+"hi": "स्टार्टर रिले सर्किट: वोल्टेज सीमा से ज़्यादा"
+},
+"T0111": {
+"en": "ECU power relay control circuit: open circuit",
+"hi": "ECU पावर रिले कंट्रोल सर्किट: ओपन सर्किट"
+},
+"T0112": {
+"en": "ECU power relay control circuit: voltage below threshold",
+"hi": "ECU पावर रिले कंट्रोल सर्किट: वोल्टेज सीमा से कम"
+},
+"T0113": {
+"en": "ECU power relay control circuit: voltage above threshold",
+"hi": "ECU पावर रिले कंट्रोल सर्किट: वोल्टेज सीमा से ज़्यादा"
+},
+"T0114": {
+"en": "ECU power relay sense circuit: open circuit",
+"hi": "ECU पावर रिले सेंस सर्किट: ओपन सर्किट"
+},
+"T0115": {
+"en": "ECU power relay sense circuit: voltage below threshold",
+"hi": "ECU पावर रिले सेंस सर्किट: वोल्टेज सीमा से कम"
+},
+"T0116": {
+"en": "ECU power relay switched off too early",
+"hi": "ECU पावर रिले बहुत जल्दी बंद हुआ"
+},
+"T0117": {
+"en": "ECU power relay switched off too late",
+"hi": "ECU पावर रिले बहुत देर से बंद हुआ"
+},
+"T0118": {
+"en": "ECU power relay sense circuit: voltage above threshold",
+"hi": "ECU पावर रिले सेंस सर्किट: वोल्टेज सीमा से ज़्यादा"
+},
+"T0119": {
+"en": "Sensor supply A: open circuit",
+"hi": "सेंसर सप्लाई A: ओपन सर्किट"
+},
+"T0120": {
+"en": "Sensor supply A: voltage below threshold",
+"hi": "सेंसर सप्लाई A: वोल्टेज सीमा से कम"
 }
 }
