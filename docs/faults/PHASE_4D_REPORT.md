@@ -1,7 +1,7 @@
 # Phase 4D report: neutral chip for name-only cards, Yamaha R15 manual table, Yamaha FZ-16 meter codes
 
 Branch `feat/fault-4d` (from `main` @ `c18d898`, Phase 4C). `main` was not touched and nothing was merged.
-Commits: M1+M2 `3b6422d`, M3 `1932152`, M4 `f21dfb3`, then this report.
+Commits: M1+M2 `3b6422d`, M3 `1932152`, M4 `f21dfb3`, first report `72d2049`; then the owner's three follow-ups: M5 `427578e`, M6 `62874dd`, M7 `1401e67`, and this updated report.
 `ios/Runner/GeneratedPluginRegistrant.m` is still modified and was never staged.
 
 ## What was done
@@ -13,17 +13,29 @@ Commits: M1+M2 `3b6422d`, M3 `1932152`, M4 `f21dfb3`, then this report.
 | M3 | 21 standard P-codes from the Yamaha R15 2022 manual (page 8-47) with Yamaha's fail-safe columns, for a Yamaha profile whose model is exactly R15, R15M or YZF155 and whose model year is 2022 or later. It beats generic guidance, a bare name and the older table for that bike only. | `phase4d_r15_table_test.dart` (105): every row, scope, year rule, precedence, ride answers, Hindi, strings. `phase4d_r15_screens_test.dart` (38): card, lookup with mechanic section, scan history, 20 other-bike cases |
 | M4 | Under "Blink-code references": Yamaha FZ-16 FI meter codes, manual page 7-24. Type the number on the meter. 15 = throttle position sensor, open or short circuit detected; 16 = throttle position sensor, stuck. The screen always says other codes exist, are not listed because they are not verified, and to ask a Yamaha service centre; and that it is not confirmed for newer FZ-S FI models. | `phase4d_fz16_meter_test.dart` (22): both rows, every other number, no-match, odd input, both languages, list order |
 
+## Follow-ups (owner request before merge)
+
+| Item | In plain words | Proving tests |
+|---|---|---|
+| M5 | The R15 maker text for **P00D1** and **P2195** is no longer shown (their wording conflicts with the standard names). On an R15 those two codes now get the generic standard meaning. The two rows and their "reconstructed" notes stay in the table, marked `withheld: true`, with a comment saying how to restore them after manual page 8-47 is checked. **P0132** stays visible with the Draft line. | `phase4d_r15_table_test.dart`, `phase4d_r15_screens_test.dart`: both codes, with and without a store, English and Hindi, year known or not; 19 rows still shown; P0132 draft |
+| M6 | The profile's model year can be unknown (nullable). The form no longer pre-selects the current year: it starts at "Not set" and has an explicit "Year unknown" choice. A one-time migration (flag `vehicleYearUnknownMigrationV1`) sets the year of every existing saved profile to unknown, writes it back, and asks nothing. A year the rider sets afterwards is never wiped; a fresh install sets the flag too. An unreadable saved year reads as unknown. The R15 rule is unchanged: unknown shows the table with the check-your-model-year note. | `phase4d_profile_year_test.dart` (27): model, migration (4 profiles, runs once, fresh install, flag already set, bad data), form (6 cases), R15 with unknown / 2021 / 2022 / 2025, card in English and Hindi |
+| M7 | "Look up a code": a code in standard format now resolves through the generic path on every make, including Bosch-ABS makes (Yamaha, Bajaj, Suzuki, KTM), and shows this bike's maker-table meaning first when the profile has one. Bosch raw module codes (5043H) keep their raw handling. A code in a manufacturer range shows "Meaning of manufacturer-defined codes can differ by make" (English and Hindi). | `phase4d_lookup_standard_codes_test.dart` (35): P0107 on Yamaha, Bajaj, no profile and six more makes, P1xxx, P3000, C1043, U2000, B2000, 5043H, 5200H |
+
+How M7 works: a new resolver mode `FaultDomain.lookup` is used only by the lookup screen. In it, the rule that stops a Bosch make's codes from getting generic text (which is about values READ from its module) does not apply to a code the rider typed in standard format. The reading screens (engine and ABS) and the default mode are unchanged and tested to be. The Bosch derived C1xxx values are in the manufacturer range, so they never get generic text either way.
+
+Where the year is read: the profile card (now "Year unknown · PETROL · ..."), the profile's display name (no longer prints "null" or a made-up year), the scan-history snapshot, and the R15 rule. Nothing else in the app (fuel economy, performance, trips) reads the profile year; confirmed by searching the code. The profile form is English-only today, so "Not set" and "Year unknown" are plain English there like the rest of that form.
+
 ## M3 decisions and facts
 
 **Static table in code, not a knowledge pack.** The pack format can name a vehicle scope, but it can only carry AI-written guidance: no "manufacturer manual" verification value, no model year rule, no fail-safe columns. Widening the signed, hashed importer for one table is the larger risk. So the table is `lib/constants/maker_engine_tables.dart`, following the Royal Enfield ABS table pattern, and it reuses the existing label "From the manufacturer's service manual".
 
 **Scope is exact.** The make must resolve to Yamaha and the normalised model must exactly equal one of: r15, r15m, r15v4, yzfr15, yzfr15m, yzfr15v4, yzf155, yzf155a, yamahar15, yamahar15m. "R15 V3", "R15S", "FZ-S", "MT-15", a blank model, another make's "R15" get nothing. The resolver also re-checks the make, so a forced vehicle key on a Honda is ignored.
 
-**Year rule.** The profile stores `year` as a plain whole number, never empty (default 2020 in the code and for older saved profiles; the form pre-selects the current year). Rule as applied: before 2022, never; 2022 or later, shown; year unknown, shown with "This table is from the 2022 R15/R15M manual; check your model year." The unknown branch cannot be reached by the profile form today (see gaps).
+**Year rule.** Before 2022, never; 2022 or later, shown; year unknown, shown with "This table is from the 2022 R15/R15M manual; check your model year." Since M6 the profile can really hold "unknown", so the unknown branch is reachable (every profile saved before M6 becomes unknown).
 
 **Ride answer.** Stop and "cannot ride" where the maker says the engine will not start or the bike cannot be driven (P0201, P0335, P0351); otherwise Service soon and "with care". A line under the card says this is Danlite's reading of the fail-safe column, not Yamaha's wording. Dealer-tool items, the "to be checked" notes and the source line are in the mechanic section only (code lookup).
 
-**Unverified rows.** P00D1 and P2195 (reconstructed) and P0132 (inferred) show the Draft line on the card and a "to be checked against the manual page" note in the mechanic section.
+**Unverified rows.** Since M5, P00D1 and P2195 (reconstructed) are withheld and fall back to the generic meaning. P0132 (inferred) is shown with the Draft line on the card and a "to be checked against the manual page" note in the mechanic section.
 
 ## Strings (new)
 
@@ -37,11 +49,13 @@ English / Hindi pairs, all with matching keys (parity tests):
 - `makerCheckReconstructed` / `makerCheckInferred`: "This row is to be checked against the manual page: it was reconstructed / its place in the table was worked out, not read from the page"
 - `makerSourceR15`: "Source: Yamaha R15 / R15M / YZF155-A 2022 service manual, page 8-47"
 - `blinkRefsYamaha`, `blinkRefsYamahaSub`, `fz16Title`, `fz16Intro`, `fz16Applies` ("This applies to the older FZ-16 FI. It has not been confirmed for newer FZ-S FI models."), `fz16Field`, `fz16Choose`, `fz16NoMatch`, `fz16Others` ("Other codes exist on this bike; they are not listed here because they have not been verified. Ask a Yamaha service centre."), `fz16Code15`, `fz16Code16`, `fz16Source` ("Source: Yamaha FZ-16 service manual, page 7-24")
+- `lookupMfrRangeNote`: "Meaning of manufacturer-defined codes can differ by make" / "निर्माता-परिभाषित कोड का मतलब अलग-अलग मेक में अलग हो सकता है"
+- The profile form's "Not set" and "Year unknown" (English only, like the rest of that form)
 - The 21 Yamaha meanings in Hindi are in the table file and are marked machine-translated (the existing Hindi-machine line shows).
 
-## M5 results
+## Final verification (after the follow-ups)
 
-- Whole suite: **1,381 pass, 0 fail** (1,195 before, 186 new). Three Phase 4C card tests were changed on purpose to the new owner-decided behaviour (Info chip becomes Name only; the repeated line is now absent). One optional `year` parameter was added to the shared screen-test setup.
+- Whole suite after the follow-ups: **1,455 pass, 0 fail** (1,195 before Phase 4D). Changes to older tests: the first report's note below, and the R15 tests that used P00D1 / P2195 now use P0132 or test the fallback. (First report: three Phase 4C card tests were changed on purpose to the new owner-decided behaviour (Info chip becomes Name only; the repeated line is now absent). One optional `year` and one `yearUnknown` parameter were added to the shared screen-test setup.)
 - `flutter analyze`: the same 7 known issues, nothing new.
 - `flutter build apk --debug`: succeeds.
 - `main` is `c18d898d9141d3a335f5a3b07b6617a7f3ec20ca`, the same as at the start, locally and on `origin`.
@@ -54,16 +68,14 @@ Fixed (inside M3):
 - **Share in scan history was refused in debug builds** (it asked the screen for a translation outside a build). Release was fine. Fixed because Share is the path this change touches.
 
 Not fixed:
-1. **The profile cannot say "no model year".** `VehicleProfile.year` is a whole number, 2020 by default for the code and for old saved profiles (those would never get the R15 table), and the form pre-selects the current year, so an untouched form counts as 2022 or later with no note. A nullable year or an "unknown" entry in the form would make the rule honest.
-2. **Two owner rows disagree with the standard's own names.** P2195 is "signal stuck lean" in the standard, but the brief says "open circuit". P00D1 is "heater performance" in the standard, but the brief says "no normal signal while driving". Both are marked reconstructed and show Draft. Consider hiding the three unverified rows until the page is checked (a one-line filter on `check`).
-3. **The brief says 14 rows; it lists 21 codes.** All 21 are in. Likely 14 manual lines, some covering more than one code.
-4. **Code lookup of an engine code on a Bosch make (Yamaha, Bajaj, Suzuki, KTM) shows "show it to your dealer"** instead of the generic meaning, because the lookup does not know which module the code came from. Older behaviour, not changed. The R15 (2022 and later) is the exception: it now gets the maker meaning.
-5. **The lookup list is not bike-aware.** An R15 owner typing P0107 sees the generic title in the list; the Yamaha meaning is on the page it opens.
+1. **Two R15 rows are withheld, not checked.** P00D1 and P2195 stay out until someone reads manual page 8-47 (P2195 is "signal stuck lean" in the standard, "open circuit" in the brief; P00D1 is "heater performance" in the standard, "no normal signal while driving" in the brief). Restoring either is deleting its `withheld: true`.
+2. **The brief said 14 rows; it listed 21 codes.** All 21 are in the data (19 are shown).
+3. **The lookup list is not bike-aware.** An R15 owner typing P0107 sees the generic title in the list; the Yamaha meaning is on the page it opens.
+4. **Typed C-codes on an ABS bike.** A standard-range C code (C0xxx) typed on a bike with an ABS platform now gets the generic meaning unless that platform's own table lists it (the table still wins). That is what M7 asked for; the platform's own table is checked first.
 
 ## What the owner must decide
 
-1. Keep the three unverified rows visible with the Draft line, or hide them until the manual page is checked (item 2).
-2. The year rule at its edges: R15 V4 bikes sold in late 2021 are hidden (year 2021). Move the cut-off, or keep 2022.
-3. Make the profile year nullable / add "unknown" (item 1)?
-4. Keep the grey card colour for name-only cards, or only the chip?
-5. Merge `feat/fault-4d` into `main` now? (Phase 4C is already in `main`.)
+1. Who checks manual page 8-47 so P00D1 and P2195 can be restored (and P0132's Draft mark removed).
+2. The year cut-off for the R15 table: R15 V4 bikes sold in late 2021 are hidden when the year is 2021. Keep 2022, or move it.
+3. Keep the grey card colour for name-only cards, or only the chip?
+4. Merge `feat/fault-4d` into `main` now? (Phase 4C is already in `main`.) Note the M6 migration runs on the first start after the update and clears the model year of every saved profile.
