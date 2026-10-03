@@ -327,8 +327,13 @@ def check_row(en, hi, ctx):
             err("H9", f"{label}: the English says do not ride but the Hindi has no do-not-ride wording (न चलाएँ)")
         if hi_dnr and not en_dnr:
             err("H9", f"{label}: Hindi do-not-ride wording where the English does not say it")
-        if level == "MONITOR" and (hi_stop or hi_dnr):
-            err("H9", f"{label}: a MONITOR entry must not contain stop or do-not-ride wording")
+        if level == "MONITOR":
+            # The one allowed exception is the fixed petrol-smell sentence (rule R4 adds it to any entry that
+            # mentions fuel); everything else in a MONITOR entry must be free of stop wording.
+            petrol_hi = ctx.sentences["PETROL"][1]
+            rest = " ".join(s for s in C.hi_sentences(text_hi) if s != petrol_hi)
+            if STOP_HI.search(rest) or DNR_HI.search(rest):
+                err("H9", f"{label}: a MONITOR entry must not contain stop or do-not-ride wording")
     if level == "STOP" and not (STOP_HI.search(adv_hi_text) or DNR_HI.search(adv_hi_text)):
         err("H9", "a STOP entry must contain the Hindi stop wording (रुकें) or do-not-ride wording (न चलाएँ)")
     return errs

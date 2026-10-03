@@ -138,3 +138,10 @@ forms** (alternatives separated by " / "). Keep four columns and no pipe charact
 | throttle body | थ्रॉटल बॉडी | थ्रॉटल बॉडी | |
 | fuel cap | फ़्यूल कैप | फ़्यूल कैप | |
 | headlight | हेडलाइट | हेडलाइट | |
+| purge valve | पर्ज वाल्व | पर्ज वाल्व | |
+| vent valve | वेंट वाल्व | वेंट वाल्व | |
+| vapour | वेपर | वेपर | fuel vapour = फ़्यूल वेपर |
+| evaporative | इवेपोरेटिव | इवेपोरेटिव | |
+| secondary air | सेकंडरी एयर | सेकंडरी एयर | |
+| knock control | नॉक कंट्रोल | नॉक कंट्रोल | |
+| coolant | कूलेंट | कूलेंट | |
