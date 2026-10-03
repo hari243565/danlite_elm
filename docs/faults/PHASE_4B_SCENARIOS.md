@@ -13,7 +13,7 @@ sits on the Fault Codes tab above the results (both the Engine and the ABS / Cha
 
 | Question | Answer | Proving test |
 |---|---|---|
-| Which section does a code belong to? | Rule (a) a code the ABS module scan returned is Brakes & ABS, whatever its number; (b) else the resolved knowledge entry's system when it names one; (c) else the code's letter and range | `fault_domain_test.dart` "B1 mapping…" (49 cases), "rule (a)" (5), "rule (b)" (7), "a blink pattern" (1) |
+| Which section does a code belong to? | Rule (a) a code the ABS module scan returned is Brakes & ABS, whatever its number; (b) else the resolved knowledge entry's system when it names one; (c) else the code's letter and range | `fault_domain_test.dart` "B1 mapping…" (46 individual codes plus 2 more checks), "rule (a)" (5), "rule (b)" (7), "a blink pattern" (1) |
 | Ranges | P00xx–P06xx, P1xxx, P20xx–P26xx, P3xxx → Engine & emissions; P07xx–P09xx, P27xx → Transmission & riding aids; C → Brakes & ABS; B → Body; U → Network; everything else → Other | same, every boundary (P0699/P0700, P0999/P0A00, P2699/P2700, P2799/P2800, P0FFF, P1000, P3FFF…) |
 | Engine card | Not scanned / Scanning / The bike did not answer / The engine computer is busy / refused / lost contact / connection type not readable yet / No faults / N faults. A list left from an earlier answer is **not** counted once the last read failed | `fault_domain_test.dart` "B1 cards: engine" (10); `fault_sections_screen_test.dart` "B1 cards on the screen" |
 | Brakes & ABS card | One state per ABS scan outcome (not scanned, scanning, no reply, busy, adapter cannot address, link lost, no faults, N faults). ABS codes kept from a scan that later lost the link are **not** counted | `fault_domain_test.dart` "B1 cards: Brakes & ABS" (8) |
@@ -122,3 +122,27 @@ rpm 800 hidden with the RPM row kept; absent + unknown hidden; absent + off show
 
 Note: only the exact reading 0 counts as off for the snapshot's own speed, as the brief says — a cranking 150 RPM
 hides the row rather than claiming the engine was off.
+
+## B6 — verification
+
+| Check | Result |
+|---|---|
+| Full suite | 1006 tests pass (782 earlier + 224 new: 90 domain logic, 19 section screen, 8 entry points, 15 adapter help, 41 Royal Enfield reference, 51 fuel status) |
+| `flutter analyze` | 7 issues, the same 7 as before (dashboard, fuel, hud ×4, realtime) |
+| `flutter build apk --debug` | succeeds |
+| `main` | still `15fbde2`, as recorded at the start; all work is on `feat/fault-4b`, not merged |
+| Outside scope | not touched: the Clear Codes sequence and message, the ABS probe/sweep/recovery, the K-line gate, `obd_service.dart`, auth, payments, backend, portal, admin, `pubspec.yaml` and `pubspec.lock`. No network call added. No release build |
+
+## Found beyond the brief (listed, not fixed — outside B1 to B5)
+
+1. **The ABS tab's own summary bar shows "0 CODES" in green before any ABS scan, and after a scan the module never
+   answered** (`_buildChassisSummaryBar`: value is `codes.length`, colour green when empty). That is an unscanned or
+   unreached module shown as clean. The new Brakes & ABS card says "Not scanned" / "No reply from the ABS module" in
+   those states; the old bar was left alone.
+2. **A card can hold an old answer.** Engine polling pauses while the ABS tab is open, so the Engine card keeps the last
+   answered result. The summary bar already shows "LIVE SCAN · n min ago"; the cards do not show an age.
+3. **"None found" on Body, Network, Transmission and Other after an engine-only scan** is what the brief specifies,
+   with the caption "Based on the engine and ABS scans.". A rider may still read it as "body modules checked".
+4. **Rule (b) of the domain order is a no-op today** (see B1 decisions).
+5. **The Hindi `noFaultCodes` and `faultCodesDtc` still use the older "दोष कोड" wording** (known, owner decision
+   pending from A-4). The new cards use their own short strings ("कोई फ़ॉल्ट नहीं") and so do not depend on it.
