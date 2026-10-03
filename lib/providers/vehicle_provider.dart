@@ -7,7 +7,9 @@ class VehicleProfile {
   String name;
   String make;
   String model;
-  int year;
+  /// The model year, or null when it is not known. It used to default to a
+  /// made-up number, which nothing could tell from a real one.
+  int? year;
   String fuelType;      // petrol / diesel / hybrid / electric
   double engineSizeL;
   int powerBhp;
@@ -21,7 +23,7 @@ class VehicleProfile {
     required this.name,
     this.make = '',
     this.model = '',
-    this.year = 2020,
+    this.year,
     this.fuelType = 'petrol',
     this.engineSizeL = 1.6,
     this.powerBhp = 120,
@@ -31,7 +33,8 @@ class VehicleProfile {
     DateTime? createdAt,
   }) : createdAt = createdAt ?? DateTime.now();
 
-  String get displayName => name.isNotEmpty ? name : '$year $make $model';
+  String get displayName =>
+      name.isNotEmpty ? name : [if (year != null) '$year', make, model].join(' ').trim();
 
   Map<String, dynamic> toJson() => {
     'id': id, 'name': name, 'make': make, 'model': model,
@@ -42,7 +45,7 @@ class VehicleProfile {
 
   factory VehicleProfile.fromJson(Map<String, dynamic> j) => VehicleProfile(
     id: j['id'], name: j['name'] ?? '', make: j['make'] ?? '',
-    model: j['model'] ?? '', year: j['year'] ?? 2020,
+    model: j['model'] ?? '', year: _yearOf(j['year']),
     fuelType: j['fuel'] ?? 'petrol',
     engineSizeL: (j['engL'] as num?)?.toDouble() ?? 1.6,
     powerBhp: j['bhp'] ?? 120,
@@ -51,14 +54,20 @@ class VehicleProfile {
     createdAt: j['ca'] != null ? DateTime.parse(j['ca']) : DateTime.now(),
   );
 
+  /// A saved year is a whole number above zero; anything else (missing, null,
+  /// text, a decimal) reads as unknown.
+  static int? _yearOf(Object? v) => v is int && v > 0 ? v : null;
+
+  /// [clearYear] sets the year to unknown (a null [year] means "keep it").
   VehicleProfile copyWith({
+    bool clearYear = false,
     String? name, String? make, String? model, int? year,
     String? fuelType, double? engineSizeL, int? powerBhp,
     double? weightKg, String? vin, String? notes,
   }) => VehicleProfile(
     id: id,
     name: name ?? this.name, make: make ?? this.make,
-    model: model ?? this.model, year: year ?? this.year,
+    model: model ?? this.model, year: clearYear ? null : (year ?? this.year),
     fuelType: fuelType ?? this.fuelType,
     engineSizeL: engineSizeL ?? this.engineSizeL,
     powerBhp: powerBhp ?? this.powerBhp,
@@ -67,6 +76,9 @@ class VehicleProfile {
     createdAt: createdAt,
   );
 }
+
+/// Set once the one-time "year becomes unknown" migration has run.
+const String _yearMigrationKey = 'vehicleYearUnknownMigrationV1';
 
 class VehicleProvider extends ChangeNotifier {
   List<VehicleProfile> _vehicles = [];
@@ -79,6 +91,21 @@ class VehicleProvider extends ChangeNotifier {
     final prefs = await SharedPreferences.getInstance();
     final raw = prefs.getStringList('vehicles') ?? [];
     _vehicles = raw.map((s) => VehicleProfile.fromJson(jsonDecode(s))).toList();
+    // One time: the year of every profile saved before the year could be
+    // unknown only ever held an arbitrary default (2020, or the year the form
+    // pre-selected), so it is set to unknown. Nothing is asked. A fresh install
+    // has nothing to migrate; the flag is set either way, so a year the rider
+    // sets afterwards is never wiped.
+    if (prefs.getBool(_yearMigrationKey) != true) {
+      for (final v in _vehicles) {
+        v.year = null;
+      }
+      if (_vehicles.isNotEmpty) {
+        await prefs.setStringList(
+            'vehicles', _vehicles.map((v) => jsonEncode(v.toJson())).toList());
+      }
+      await prefs.setBool(_yearMigrationKey, true);
+    }
     final activeId = prefs.getString('activeVehicle');
     if (activeId != null) {
       _active = _vehicles.where((v) => v.id == activeId).firstOrNull;
@@ -93,7 +120,6 @@ class VehicleProvider extends ChangeNotifier {
       name: 'My Vehicle',
       make: 'Unknown',
       model: 'Vehicle',
-      year: DateTime.now().year,
     );
     _vehicles.add(def);
     _active = def;

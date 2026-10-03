@@ -127,7 +127,7 @@ class _VehicleCard extends StatelessWidget {
                 ],
               ]),
               const SizedBox(height: 3),
-              Text('${vehicle.year} · ${vehicle.fuelType.toUpperCase()} · '
+              Text('${vehicle.year ?? 'Year unknown'} · ${vehicle.fuelType.toUpperCase()} · '
                   '${vehicle.engineSizeL.toStringAsFixed(1)}L · ${vehicle.powerBhp} BHP',
                   style: const TextStyle(fontSize: 12, color: AppColors.textSecondary)),
             ])),
@@ -195,6 +195,9 @@ class _EmptyVehicles extends StatelessWidget {
 }
 
 // ── Vehicle Form ──────────────────────────────────────────────────────────────
+/// The form's explicit "Year unknown" choice (never a real year).
+const int _kYearUnknown = -1;
+
 class _VehicleForm extends StatefulWidget {
   final VehicleProfile? existing;
   final VehicleProvider provider;
@@ -206,7 +209,9 @@ class _VehicleForm extends StatefulWidget {
 class _VehicleFormState extends State<_VehicleForm> {
   final _formKey = GlobalKey<FormState>();
   late final TextEditingController _name, _make, _model, _vin, _notes, _bhp, _weight;
-  late int _year;
+  /// null = not chosen yet ("Not set"); [_kYearUnknown] = the explicit
+  /// "Year unknown" choice. Both are saved as an unknown year.
+  int? _year;
   late String _fuel;
   late double _engineSize;
 
@@ -221,7 +226,7 @@ class _VehicleFormState extends State<_VehicleForm> {
     _notes      = TextEditingController(text: v?.notes ?? '');
     _bhp        = TextEditingController(text: (v?.powerBhp ?? 120).toString());
     _weight     = TextEditingController(text: (v?.weightKg ?? 1200).toStringAsFixed(0));
-    _year       = v?.year        ?? DateTime.now().year;
+    _year       = v?.year;
     _fuel       = v?.fuelType    ?? 'petrol';
     _engineSize = v?.engineSizeL ?? 1.6;
   }
@@ -237,7 +242,8 @@ class _VehicleFormState extends State<_VehicleForm> {
     final v = VehicleProfile(
       id: widget.existing?.id ?? DateTime.now().millisecondsSinceEpoch.toString(),
       name: _name.text.trim(), make: _make.text.trim(), model: _model.text.trim(),
-      year: _year, fuelType: _fuel, engineSizeL: _engineSize,
+      year: (_year == null || _year == _kYearUnknown) ? null : _year,
+      fuelType: _fuel, engineSizeL: _engineSize,
       powerBhp: int.tryParse(_bhp.text) ?? 120,
       weightKg: double.tryParse(_weight.text) ?? 1200,
       vin: _vin.text.trim(), notes: _notes.text.trim(),
@@ -283,10 +289,17 @@ class _VehicleFormState extends State<_VehicleForm> {
                       validator: (v) => v!.isEmpty ? 'Required' : null),
                   _FormField(ctrl: _make, label: 'Make', hint: 'e.g. Maruti Suzuki'),
                   _FormField(ctrl: _model, label: 'Model', hint: 'e.g. Swift VXi'),
-                  _DropField(label: 'Year', value: _year,
-                    items: List.generate(35, (i) => DateTime.now().year - i),
-                    display: (y) => '$y',
-                    onChanged: (v) => setState(() => _year = v!)),
+                  _DropField<int>(label: 'Year', value: _year, hint: 'Not set',
+                    items: [
+                      _kYearUnknown,
+                      ...List.generate(35, (i) => DateTime.now().year - i),
+                      // A saved year outside that range must still be selectable.
+                      if (_year != null && _year != _kYearUnknown &&
+                          (_year! > DateTime.now().year || _year! <= DateTime.now().year - 35))
+                        _year!,
+                    ],
+                    display: (y) => y == _kYearUnknown ? 'Year unknown' : '$y',
+                    onChanged: (v) => setState(() => _year = v)),
                   _DropField<String>(label: 'Fuel Type', value: _fuel,
                     items: ['petrol','diesel','hybrid','electric','cng','lpg'],
                     display: (f) => f[0].toUpperCase() + f.substring(1),
@@ -349,10 +362,12 @@ class _FormField extends StatelessWidget {
 }
 
 class _DropField<T> extends StatelessWidget {
-  final String label; final T value; final List<T> items;
+  final String label; final T? value; final List<T> items;
   final String Function(T) display; final ValueChanged<T?> onChanged;
+  final String? hint;
   const _DropField({required this.label, required this.value,
-      required this.items, required this.display, required this.onChanged});
+      required this.items, required this.display, required this.onChanged,
+      this.hint});
   @override
   Widget build(BuildContext context) => Padding(
     padding: const EdgeInsets.only(bottom: 14),
@@ -361,7 +376,7 @@ class _DropField<T> extends StatelessWidget {
           color: AppColors.textSecondary)),
       const SizedBox(height: 6),
       DropdownButtonFormField<T>(
-        initialValue: value, decoration: const InputDecoration(),
+        initialValue: value, decoration: InputDecoration(hintText: hint),
         items: items.map((i) => DropdownMenuItem(value: i, child: Text(display(i)))).toList(),
         onChanged: onChanged),
     ]),
