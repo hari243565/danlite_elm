@@ -1,0 +1,144 @@
+# Hindi vocabulary for the basic tier (english word or phrase<TAB>Hindi). Rules: workshop loanwords for parts, ABS/ECU-style acronyms stay Latin, Latin digits, nukta spellings (ऑफ़ फ़्यूल फ़ैन), see GLOSSARY_HI.md. Machine translation, not read by a person.
+# round 1 (batch P01): 133 words
+activated	सक्रिय
+activation	एक्टिवेशन
+actuator	एक्चुएटर
+advanced	एडवांस्ड
+air	एयर
+alternative	वैकल्पिक
+ambient	एम्बिएंट
+assisted	असिस्टेड
+at max limit	अधिकतम सीमा पर
+at min limit	न्यूनतम सीमा पर
+at limit	सीमा पर
+balance	बैलेंस
+bank	बैंक
+bank1	बैंक 1
+bank2	बैंक 2
+barometric	बैरोमेट्रिक
+battery	बैटरी
+blocked	ब्लॉक
+body	बॉडी
+boost	बूस्ट
+bypass	बायपास
+camshaft	कैमशाफ़्ट
+charge	चार्ज
+circuit	सर्किट
+closed	बंद
+composition	कंपोज़िशन
+control	कंट्रोल
+coolant	कूलेंट
+cooler	कूलर
+correlation	कोरिलेशन
+cranking	क्रैंकिंग
+crankshaft	क्रैंकशाफ़्ट
+cylinder	सिलेंडर
+delayed	देरी से
+delivery	डिलीवरी
+detected	पाया गया
+detection	डिटेक्शन
+engine	इंजन
+enter	प्रवेश
+erratic	अनियमित
+error	एरर
+evap	EVAP
+exceeded	पार हो गया
+excessive	अत्यधिक
+exchanger	एक्सचेंजर
+exhaust	एग्ज़ॉस्ट
+filter	फ़िल्टर
+flow	फ़्लो
+forced	ज़बरन
+frequent	बार-बार
+fuel	फ़्यूल
+head	हेड
+heat	हीट
+heater	हीटर
+high	हाई
+ho2s	HO2S
+humidity	ह्यूमिडिटी
+illumination	रोशनी
+incorrect	गलत
+injection	इंजेक्शन
+injector	इंजेक्टर
+inlet	इनलेट
+input	इनपुट
+insufficient	अपर्याप्त
+intake	इनटेक
+intermittent	बीच-बीच में
+large	बड़ा
+leak	रिसाव
+lean	लीन
+learning	लर्निंग
+level	लेवल
+limit	सीमा
+limited	सीमित
+line	लाइन
+loop	लूप
+low	लो
+malfunction	खराबी
+map	MAP
+mass	मास
+max	अधिकतम
+mechanical	मैकेनिकल
+mil	MIL
+min	न्यूनतम
+module	मॉड्यूल
+o2	O2
+of	का
+off	ऑफ़
+oil	ऑयल
+on	ऑन
+open	ओपन
+or	या
+out of range	रेंज से बाहर
+outlet	आउटलेट
+over	ओवर
+overspeed	ओवरस्पीड
+performance	परफ़ॉर्मेंस
+position	पोज़ीशन
+power	पावर
+pressure	प्रेशर
+profile	प्रोफ़ाइल
+pump	पंप
+radiator	रेडिएटर
+rail	रेल
+range	रेंज
+ratio	रेशियो
+regulator	रेगुलेटर
+relief	रिलीफ़
+requested	अनुरोधित
+resistance	रेज़िस्टेंस
+response	रिस्पॉन्स
+restricted	बाधित
+retarded	रिटार्डेड
+rich	रिच
+sensor	सेंसर
+shutoff	शटऑफ़
+signals	सिग्नल
+slow	धीमा
+small	छोटा
+solenoid	सोलेनॉइड
+state	स्टेट
+stuck	अटका
+supercharger	सुपरचार्जर
+supply	सप्लाई
+swapped	अदला-बदली हुई
+system	सिस्टम
+tank	टैंक
+temperature	तापमान
+time	समय
+timing	टाइमिंग
+to	से
+too	बहुत
+too low	बहुत कम
+too high	बहुत ज़्यादा
+trim	ट्रिम
+turbine	टरबाइन
+turbocharger	टर्बोचार्जर
+valve	वाल्व
+vapor	वेपर
+voltage	वोल्टेज
+volume	वॉल्यूम
+# round 1b: grammar phrase aligned with GLOSSARY_HI.md (circuit fault)
+circuit malfunction	सर्किट में खराबी

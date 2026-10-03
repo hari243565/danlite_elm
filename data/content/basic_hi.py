@@ -1,0 +1,131 @@
+#!/usr/bin/env python3
+"""Hindi for the basic tier: a deterministic, vocabulary-driven translation of a standard code title.
+
+Why not one Hindi sentence per title: the standard's titles are built from a small vocabulary (about 740 distinct
+words in the included titles). Translating the vocabulary once and composing every title from it means the same
+English word is the same Hindi word in every title, and identical English is always identical Hindi.
+
+Files (both in this folder, UTF-8, one entry per line, '#' starts a comment, columns separated by a TAB):
+  basic_hi_vocab.tsv    english word or phrase (lower case)  ->  Hindi   (the translation memory; grows in rounds)
+  basic_hi_titles.tsv   whole English title (exact)          ->  Hindi   (rare overrides; checked before the vocabulary)
+
+How a title is translated:
+  1. an exact entry in basic_hi_titles.tsv wins;
+  2. otherwise the title is split into words and punctuation, the longest phrase in the vocabulary is matched at each
+     position, single capital letters (sensor A, bus B), numbers and punctuation pass through unchanged, and the
+     original spacing is kept;
+  3. a few sentence frames reorder the words ("Lost Communication With X" -> "X से संचार टूट गया").
+A word with no entry raises Missing(words); the builder lists them (build_basic.py --todo) and nothing is guessed.
+"""
+import os
+import re
+import unicodedata
+
+import basic_common as B
+
+TOKEN = re.compile(r"[A-Za-z0-9]+|[–—]|[^\sA-Za-z0-9]")
+PASS_THROUGH = re.compile(r"^(?:[A-Za-z]|\d+|[^A-Za-z0-9\s])$")
+MAX_PHRASE = 7
+
+# sentence frames: leading words (lower case) -> Hindi template with {x} for the translated remainder
+FRAMES = [
+    (("lost", "communication", "with"), "{x} से संचार टूट गया"),
+    (("invalid", "data", "received", "from"), "{x} से अमान्य डेटा मिला"),
+    (("software", "incompatibility", "with"), "{x} के साथ सॉफ़्टवेयर असंगति"),
+]
+
+
+class Missing(Exception):
+    def __init__(self, words):
+        super().__init__("no Hindi for: " + ", ".join(sorted(set(words))))
+        self.words = list(words)
+
+
+def nfc(s):
+    return unicodedata.normalize("NFC", s)
+
+
+def read_tsv(path):
+    out = {}
+    if not os.path.exists(path):
+        return out
+    with open(path, encoding="utf-8") as f:
+        for n, line in enumerate(f, 1):
+            line = line.rstrip("\n").rstrip("\r")
+            if not line.strip() or line.lstrip().startswith("#"):
+                continue
+            if "\t" not in line:
+                raise SystemExit(f"{os.path.basename(path)} line {n}: expected 'english<TAB>hindi'")
+            en, hi = line.split("\t", 1)
+            en, hi = " ".join(en.strip().split()), nfc(hi.split("\t#")[0].strip())
+            key = en if path == B.TITLE_OVERRIDES_HI else en.lower()
+            if key in out and out[key] != hi:
+                raise SystemExit(f"{os.path.basename(path)} line {n}: {en!r} translated twice with different text")
+            out[key] = hi
+    return out
+
+
+def tokens(title):
+    """[(text, space_before)] for a title."""
+    out = []
+    for m in TOKEN.finditer(title):
+        out.append((m.group(0), m.start() > 0 and title[m.start() - 1].isspace()))
+    return out
+
+
+class Translator:
+    def __init__(self):
+        self.vocab = read_tsv(B.VOCAB)
+        self.titles = read_tsv(B.TITLE_OVERRIDES_HI)
+        self.phrases = {}
+        for k, v in self.vocab.items():
+            self.phrases[tuple(TOKEN.findall(k))] = v
+
+    def _units(self, toks, missing):
+        """Translate a token list to [(hindi, space_before)]."""
+        out, i = [], 0
+        low = [t[0].lower() for t in toks]
+        while i < len(toks):
+            hit = None
+            for n in range(min(MAX_PHRASE, len(toks) - i), 0, -1):
+                key = tuple(low[i:i + n])
+                if key in self.phrases:
+                    hit = (n, self.phrases[key])
+                    break
+            if hit:
+                out.append((hit[1], toks[i][1]))
+                i += hit[0]
+                continue
+            text = toks[i][0]
+            if PASS_THROUGH.match(text):
+                out.append((text, toks[i][1]))
+            else:
+                missing.append(low[i])
+                out.append((text, toks[i][1]))
+            i += 1
+        return out
+
+    @staticmethod
+    def _join(units):
+        s = ""
+        for k, (text, sp) in enumerate(units):
+            s += (" " if (sp and k) else "") + text
+        return s
+
+    def translate(self, title):
+        title = " ".join(title.split())
+        if title in self.titles:
+            return self.titles[title]
+        toks = tokens(title)
+        low = tuple(t[0].lower() for t in toks)
+        missing = []
+        for lead, tmpl in FRAMES:
+            if low[:len(lead)] == lead and len(toks) > len(lead):
+                rest = self._units(toks[len(lead):], missing)
+                if missing:
+                    raise Missing(missing)
+                return nfc(tmpl.replace("{x}", self._join(rest)))
+        units = self._units(toks, missing)
+        if missing:
+            raise Missing(missing)
+        return nfc(self._join(units))

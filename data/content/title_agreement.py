@@ -5,6 +5,9 @@ Usage:
   python3 title_agreement.py [--db /tmp/dtc-database/data/dtc_codes.db] [--ranking relevance_ranking.csv]
                              [--seed generic_en_seed.jsonl] [--out title_agreement.csv]
                              [--held held_back_titles_v2.csv]
+  python3 title_agreement.py --all --obdex /path/to/obdex [--db ...] [--out title_agreement_all.csv]
+      Phase 3A: the same verdict rule over EVERY code of the OBDex generic list (9,533 codes), not only the 387
+      selected ones. The normaliser, the discriminators and the 0.80 threshold are the ones below, unchanged.
 
 Sources (both scratch clones live OUTSIDE the project repository):
   OBDex      https://github.com/foerbsnavi/OBDex   (CC0-1.0 data)  titles come from relevance_ranking.csv
@@ -152,6 +155,45 @@ def load_wal(db_path):
     return {c: d for c, d in rows}
 
 
+def load_obdex_titles(obdex_dir):
+    """{code: raw OBDex English title} for every entry of data/generic/*.yaml (read-only, nothing executed)."""
+    import glob
+    import yaml
+    loader = getattr(yaml, "CSafeLoader", yaml.SafeLoader)
+    out = {}
+    for f in sorted(glob.glob(os.path.join(obdex_dir, "data", "generic", "*.yaml"))):
+        with open(f, encoding="utf-8") as fh:
+            for e in yaml.load(fh, Loader=loader):
+                out[e["code"]] = " ".join(str(e["title"]["en"]).split())
+    return out
+
+
+def load_overrides(path=None):
+    path = path or os.path.join(HERE, "title_overrides.csv")
+    with open(path, encoding="utf-8", newline="") as fh:
+        return {r["code"]: r["verified_title"] for r in csv.DictReader(fh)}
+
+
+def run_all(db, obdex_dir, out):
+    """Verdict for every OBDex code. The title in force is the override (title_overrides.csv) if there is one."""
+    wal = load_wal(db)
+    ob = load_obdex_titles(obdex_dir)
+    ov = load_overrides()
+    cols = ["code", "obdex_title", "wal33d_title", "title_in_force", "title_status", "similarity", "verdict", "note"]
+    tot = {}
+    with open(out, "w", encoding="utf-8", newline="") as fh:
+        w = csv.DictWriter(fh, fieldnames=cols)
+        w.writeheader()
+        for c in sorted(ob):
+            std = ov.get(c, ob[c])
+            sim, verdict, note = compare(std, wal.get(c))
+            w.writerow({"code": c, "obdex_title": ob[c], "wal33d_title": wal.get(c, ""), "title_in_force": std,
+                        "title_status": "override" if c in ov else "obdex", "similarity": f"{sim:.2f}",
+                        "verdict": verdict, "note": note})
+            tot[verdict] = tot.get(verdict, 0) + 1
+    print(f"{len(ob)} codes; verdicts {tot}")
+
+
 def main():
     a = sys.argv[1:]
 
@@ -159,6 +201,10 @@ def main():
         return a[a.index(name) + 1] if name in a else default
 
     db = opt("--db", os.environ.get("DTC_DB", "/tmp/dtc-database/data/dtc_codes.db"))
+    if "--all" in a:
+        run_all(db, opt("--obdex", os.environ.get("OBDEX_DIR", "/tmp/obdex")),
+                opt("--out", os.path.join(HERE, "title_agreement_all.csv")))
+        return
     ranking = opt("--ranking", os.path.join(HERE, "relevance_ranking.csv"))
     seed = opt("--seed", os.path.join(HERE, "generic_en_seed.jsonl"))
     out = opt("--out", os.path.join(HERE, "title_agreement.csv"))

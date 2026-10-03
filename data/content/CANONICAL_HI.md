@@ -73,3 +73,14 @@ Latin script, native verbs for actions (रुकें, जाँचें, क
 - Stop wording (a rider is told to stop): a word from the group **रुकें / रुक जाएँ**.
 - Do-not-ride wording (a rider is told not to ride): **न चलाएँ** (always with the chandrabindu: चलाएँ).
 - The engine stopping by itself is always written **बंद हो** (never "रुक"), so "रुक" in a row always means the rider.
+
+## Basic tier (Phase 3A): fixed sentences of the standard-name-only entries
+
+Translated ONCE here; `basic_common.py` holds the same strings and `validate_basic.py` fails if the two differ or if a
+basic Hindi row changes them. The meaning pattern has one placeholder, `{title}`, filled with the Hindi title.
+
+| ID | English | Hindi |
+|---|---|---|
+| BASIC-ADVICE | This code has a standard name only. We have no further guidance for it yet. If the warning lamp is on or the bike runs badly, have it checked soon. | इस कोड का सिर्फ़ मानक नाम उपलब्ध है। अभी इसके बारे में हमारे पास और जानकारी नहीं है। अगर चेतावनी लैंप जल रहा हो या बाइक ठीक से न चल रही हो, तो जल्द जाँच कराएँ। |
+| BASIC-MEANING | Standard name: {title}. | मानक नाम: {title}। |
+| BASIC-BASIS | Draft: standard name only | ड्राफ़्ट: सिर्फ़ मानक नाम |
