@@ -171,6 +171,74 @@
 "en": "The bike may idle badly, hesitate or jerk.",
 "hi": "आइडल खराब हो सकता है, बाइक हिचकिचा सकती है या झटके दे सकती है।"
 },
+"A0057": {
+"en": "The bike may hesitate, jerk or idle badly at times.",
+"hi": "बाइक कभी-कभी हिचकिचा सकती है, झटके दे सकती है या आइडल खराब हो सकता है।"
+},
+"A0058": {
+"en": "The engine may run rough or lose power at times; get it checked soon.",
+"hi": "इंजन कभी-कभी रफ़ चल सकता है या पावर घट सकती है; जल्द जाँच कराएँ।"
+},
+"A0059": {
+"en": "The bike usually rides normally, though cold starting or fuel use may be slightly off at times.",
+"hi": "बाइक आमतौर पर सामान्य चलती है, पर ठंडी स्टार्टिंग या ईंधन खपत कभी-कभी थोड़ी गड़बड़ हो सकती है।"
+},
+"A0060": {
+"en": "The bike may be hard to start or idle badly at times; get it checked soon.",
+"hi": "बाइक को कभी-कभी स्टार्ट करना मुश्किल हो सकता है या आइडल खराब हो सकता है; जल्द जाँच कराएँ।"
+},
+"A0062": {
+"en": "If your bike has a radiator, do not open the cap while it is hot.",
+"hi": "अगर आपकी बाइक में रेडिएटर है, तो गर्म होने पर उसका ढक्कन न खोलें।"
+},
+"A0063": {
+"en": "The bike should ride normally but may use more fuel until warm.",
+"hi": "बाइक सामान्य चलनी चाहिए, पर गर्म होने तक ज़्यादा ईंधन इस्तेमाल कर सकती है।"
+},
+"A0065": {
+"en": "The bike should ride normally but may run roughly until warm.",
+"hi": "बाइक सामान्य चलनी चाहिए, पर गर्म होने तक रफ़ चल सकती है।"
+},
+"A0066": {
+"en": "The bike should ride normally but may use more fuel and warm up slowly.",
+"hi": "बाइक सामान्य चलनी चाहिए, पर ज़्यादा ईंधन इस्तेमाल कर सकती है और धीरे गर्म हो सकती है।"
+},
+"A0067": {
+"en": "The bike should ride normally, but the oil temperature reading may be wrong.",
+"hi": "बाइक सामान्य चलनी चाहिए, लेकिन ऑयल तापमान की रीडिंग गलत हो सकती है।"
+},
+"A0068": {
+"en": "The bike should ride normally, but the oil temperature reading is wrong.",
+"hi": "बाइक सामान्य चलनी चाहिए, लेकिन ऑयल तापमान की रीडिंग गलत है।"
+},
+"A0069": {
+"en": "The bike should ride normally, but the oil temperature reading may be lost.",
+"hi": "बाइक सामान्य चलनी चाहिए, लेकिन ऑयल तापमान की रीडिंग गायब हो सकती है।"
+},
+"A0070": {
+"en": "The engine may hesitate, run rough, lose power or use more fuel.",
+"hi": "इंजन हिचकिचा सकता है, रफ़ चल सकता है, पावर घट सकती है या ज़्यादा ईंधन इस्तेमाल कर सकता है।"
+},
+"A0071": {
+"en": "The engine may misfire, lose power or stop.",
+"hi": "इंजन मिसफ़ायर कर सकता है, पावर घट सकती है या बंद हो सकता है।"
+},
+"A0072": {
+"en": "The fuel pump may stay powered when it should be off; get it checked soon.",
+"hi": "फ़्यूल पंप को पावर मिलती रह सकती है जबकि उसे बंद होना चाहिए; जल्द जाँच कराएँ।"
+},
+"A0073": {
+"en": "The engine may stop suddenly without warning.",
+"hi": "इंजन बिना चेतावनी के अचानक बंद हो सकता है।"
+},
+"A0074": {
+"en": "The pump may run at the wrong times or stop, and the engine may stop suddenly.",
+"hi": "पंप गलत समय पर चल सकता है या बंद हो सकता है, और इंजन अचानक बंद हो सकता है।"
+},
+"A0075": {
+"en": "The engine may stop, run roughly or not start.",
+"hi": "इंजन बंद हो सकता है, रफ़ चल सकता है या स्टार्ट नहीं हो सकता।"
+},
 "C0001": {
 "en": "Worn or faulty throttle position sensor",
 "hi": "थ्रॉटल पोज़ीशन सेंसर घिस गया है या खराब है"
@@ -486,6 +554,190 @@
 "C0079": {
 "en": "Failed instrument cluster",
 "hi": "इंस्ट्रूमेंट क्लस्टर खराब हो गया है"
+},
+"C0080": {
+"en": "Loose or corroded connector at the sensor",
+"hi": "सेंसर पर कनेक्टर ढीला है या उसमें जंग लगा है"
+},
+"C0081": {
+"en": "Chafed wiring that breaks contact at times",
+"hi": "रगड़ खाई वायरिंग जो कभी-कभी संपर्क छोड़ देती है"
+},
+"C0082": {
+"en": "Faulty or slow intake pressure (MAP) sensor",
+"hi": "इनटेक प्रेशर (MAP) सेंसर खराब या सुस्त है"
+},
+"C0083": {
+"en": "Blocked or loose hose or seal at the sensor (if hose-fed)",
+"hi": "सेंसर का होज़ या सील बंद या ढीली है (अगर होज़ से जुड़ा हो)"
+},
+"C0084": {
+"en": "Loose or corroded connector",
+"hi": "कनेक्टर ढीला है या उसमें जंग लगा है"
+},
+"C0085": {
+"en": "Sensor heated by engine heat or poorly fitted",
+"hi": "सेंसर इंजन की गर्मी से गर्म हो गया है या ठीक से नहीं लगा है"
+},
+"C0086": {
+"en": "Thermostat not closing (liquid-cooled bikes)",
+"hi": "थर्मोस्टैट बंद नहीं हो रहा (लिक्विड-कूल्ड बाइक)"
+},
+"C0087": {
+"en": "Low coolant level or coolant leak (liquid-cooled bikes)",
+"hi": "कूलेंट कम है या कूलेंट लीक है (लिक्विड-कूल्ड बाइक)"
+},
+"C0088": {
+"en": "Faulty thermostat or water pump (liquid-cooled bikes)",
+"hi": "थर्मोस्टैट या वाटर पंप खराब है (लिक्विड-कूल्ड बाइक)"
+},
+"C0089": {
+"en": "Thermostat stuck open (liquid-cooled bikes)",
+"hi": "थर्मोस्टैट खुला अटका है (लिक्विड-कूल्ड बाइक)"
+},
+"C0090": {
+"en": "Thermostat stuck open",
+"hi": "थर्मोस्टैट खुला अटका है"
+},
+"C0091": {
+"en": "Aged or failed oxygen sensor",
+"hi": "ऑक्सीजन सेंसर पुराना है या खराब हो गया है"
+},
+"C0092": {
+"en": "Sensor heater slow to warm up",
+"hi": "सेंसर का हीटर देर से गर्म होता है"
+},
+"C0093": {
+"en": "Contaminated oxygen sensor (silicone, oil or coolant)",
+"hi": "ऑक्सीजन सेंसर दूषित है (सिलिकॉन, ऑयल या कूलेंट)"
+},
+"C0094": {
+"en": "Failed oxygen sensor",
+"hi": "ऑक्सीजन सेंसर खराब हो गया है"
+},
+"C0095": {
+"en": "Wiring fault at the sensor",
+"hi": "सेंसर पर वायरिंग की खराबी"
+},
+"C0096": {
+"en": "Open or burnt heater element in the sensor",
+"hi": "सेंसर का हीटर एलिमेंट ओपन या जला हुआ है"
+},
+"C0097": {
+"en": "Blown heater fuse (if fitted)",
+"hi": "हीटर का फ़्यूज़ उड़ गया है (अगर लगा हो)"
+},
+"C0098": {
+"en": "Heater control wire short to ground",
+"hi": "हीटर कंट्रोल वायर का ग्राउंड से शॉर्ट"
+},
+"C0099": {
+"en": "Shorted heater element in the sensor",
+"hi": "सेंसर का हीटर एलिमेंट शॉर्ट है"
+},
+"C0100": {
+"en": "Heater control wire short to battery supply",
+"hi": "हीटर कंट्रोल वायर का बैटरी सप्लाई से शॉर्ट"
+},
+"C0101": {
+"en": "Open circuit in the heater wiring or element",
+"hi": "हीटर वायरिंग या एलिमेंट में ओपन सर्किट"
+},
+"C0102": {
+"en": "Fuel pressure too low or too high",
+"hi": "फ़्यूल प्रेशर बहुत कम या बहुत ज़्यादा है"
+},
+"C0103": {
+"en": "Open or failed injector coil",
+"hi": "इंजेक्टर कॉइल ओपन या खराब है"
+},
+"C0104": {
+"en": "Broken wiring or loose connector",
+"hi": "वायरिंग टूटी है या कनेक्टर ढीला है"
+},
+"C0105": {
+"en": "Fault inside the ECU (less common)",
+"hi": "ECU के अंदर खराबी (कम आम)"
+},
+"C0106": {
+"en": "Injector wire short to ground",
+"hi": "इंजेक्टर वायर का ग्राउंड से शॉर्ट"
+},
+"C0107": {
+"en": "Shorted injector coil",
+"hi": "इंजेक्टर कॉइल शॉर्ट है"
+},
+"C0108": {
+"en": "Injector wire short to battery supply",
+"hi": "इंजेक्टर वायर का बैटरी सप्लाई से शॉर्ट"
+},
+"C0109": {
+"en": "Open circuit in the injector or its wiring",
+"hi": "इंजेक्टर या उसकी वायरिंग में ओपन सर्किट"
+},
+"C0110": {
+"en": "Blocked or worn fuel injector",
+"hi": "फ़्यूल इंजेक्टर बंद या घिसा हुआ है"
+},
+"C0111": {
+"en": "Intake leak near cylinder 1",
+"hi": "सिलेंडर 1 के पास इनटेक लीक"
+},
+"C0112": {
+"en": "Low compression on cylinder 2",
+"hi": "सिलेंडर 2 में कंप्रेशन कम है"
+},
+"C0113": {
+"en": "Intake leak near cylinder 2",
+"hi": "सिलेंडर 2 के पास इनटेक लीक"
+},
+"C0114": {
+"en": "Failed or worn fuel pump motor",
+"hi": "फ़्यूल पंप मोटर खराब या घिसी हुई है"
+},
+"C0115": {
+"en": "Corroded pump ground or connector",
+"hi": "पंप का ग्राउंड या कनेक्टर जंग लगा हुआ है"
+},
+"C0116": {
+"en": "Fuel pump relay stuck closed (if fitted)",
+"hi": "फ़्यूल पंप रिले बंद अटका है (अगर लगा हो)"
+},
+"C0117": {
+"en": "Wire short to battery supply",
+"hi": "वायर का बैटरी सप्लाई से शॉर्ट"
+},
+"C0118": {
+"en": "Corroded connector with poor contact",
+"hi": "जंग लगा कनेक्टर, जिसमें संपर्क खराब है"
+},
+"C0119": {
+"en": "Loose or corroded pump connector",
+"hi": "पंप कनेक्टर ढीला है या उसमें जंग लगा है"
+},
+"C0120": {
+"en": "Fault in the ECU pump driver (less common)",
+"hi": "ECU के पंप ड्राइवर में खराबी (कम आम)"
+},
+"C0121": {
+"en": "Control wire short to ground",
+"hi": "कंट्रोल वायर का ग्राउंड से शॉर्ट"
+},
+"C0122": {
+"en": "Control wire short to battery supply",
+"hi": "कंट्रोल वायर का बैटरी सप्लाई से शॉर्ट"
+},
+"C0123": {
+"en": "Sensor loose or at the wrong gap",
+"hi": "सेंसर ढीला है या गलत गैप पर है"
+},
+"C0124": {
+"en": "Open circuit in the sensor wiring",
+"hi": "सेंसर वायरिंग में ओपन सर्किट"
+},
+"C0125": {
+"en": "Loose or corroded sensor connector",
+"hi": "सेंसर कनेक्टर ढीला है या उसमें जंग लगा है"
 },
 "H0001": {
 "en": "Check the sensor connector for water, corrosion and bent pins",
@@ -823,6 +1075,186 @@
 "en": "Check the sensor mounting and the connector for water and corrosion",
 "hi": "सेंसर की माउंटिंग और कनेक्टर में पानी और जंग जाँचें"
 },
+"H0085": {
+"en": "Wiggle the harness and connector while watching the throttle reading on the scan tool",
+"hi": "स्कैन टूल पर थ्रॉटल रीडिंग देखते हुए वायरिंग हार्नेस और कनेक्टर को हिलाएँ"
+},
+"H0086": {
+"en": "Look for sudden changes in the reading while moving the throttle slowly",
+"hi": "थ्रॉटल को धीरे-धीरे घुमाते हुए रीडिंग में अचानक बदलाव देखें"
+},
+"H0087": {
+"en": "Check the sensor hose (if hose-fed) or seal for cracks and blockage",
+"hi": "सेंसर होज़ (अगर होज़ से जुड़ा हो) या सील में दरार और रुकावट जाँचें"
+},
+"H0088": {
+"en": "Check for intake air leaks after the throttle",
+"hi": "थ्रॉटल के बाद इनटेक में हवा का रिसाव जाँचें"
+},
+"H0089": {
+"en": "Wiggle the harness and connector while watching the pressure reading",
+"hi": "प्रेशर रीडिंग देखते हुए वायरिंग हार्नेस और कनेक्टर को हिलाएँ"
+},
+"H0090": {
+"en": "Check the sensor fit and the connector for water and corrosion",
+"hi": "सेंसर की फ़िटिंग और कनेक्टर में पानी और जंग जाँचें"
+},
+"H0091": {
+"en": "Wiggle the harness and connector while watching the temperature reading",
+"hi": "तापमान रीडिंग देखते हुए वायरिंग हार्नेस और कनेक्टर को हिलाएँ"
+},
+"H0092": {
+"en": "Check the sensor connector for coolant seepage, water and corrosion",
+"hi": "सेंसर कनेक्टर में कूलेंट का रिसाव, पानी और जंग जाँचें"
+},
+"H0093": {
+"en": "Check the engine oil level and the coolant level (liquid-cooled bikes)",
+"hi": "इंजन ऑयल लेवल और कूलेंट लेवल जाँचें (लिक्विड-कूल्ड बाइक)"
+},
+"H0094": {
+"en": "Look for a lean mixture and for blocked airflow around the engine",
+"hi": "लीन मिक्सचर और इंजन के आसपास हवा के रास्ते में रुकावट की जाँच करें"
+},
+"H0095": {
+"en": "Very short rides or very cold weather can also cause this code",
+"hi": "बहुत छोटी सवारी या बहुत ठंडा मौसम भी इस कोड की वजह बन सकता है"
+},
+"H0096": {
+"en": "Compare the scan tool reading with the real engine temperature on a long ride",
+"hi": "लंबी सवारी पर स्कैन टूल की रीडिंग की तुलना इंजन के असली तापमान से करें"
+},
+"H0097": {
+"en": "Check the thermostat opens only when the engine is hot",
+"hi": "जाँचें कि थर्मोस्टैट सिर्फ़ तब खुलता है जब इंजन गर्म हो"
+},
+"H0098": {
+"en": "Compare the scan tool reading with the engine temperature after a cold start",
+"hi": "ठंडी स्टार्टिंग के बाद स्कैन टूल की रीडिंग की तुलना इंजन तापमान से करें"
+},
+"H0099": {
+"en": "Check the wiring for chafing and the connector for oil and water",
+"hi": "वायरिंग में रगड़ और कनेक्टर में ऑयल और पानी जाँचें"
+},
+"H0100": {
+"en": "Watch how fast the sensor reading switches between rich and lean when warm",
+"hi": "गर्म होने पर देखें कि सेंसर की रीडिंग रिच और लीन के बीच कितनी तेज़ी से बदलती है"
+},
+"H0101": {
+"en": "Check the sensor harness for heat damage",
+"hi": "सेंसर वायरिंग हार्नेस में गर्मी से नुकसान जाँचें"
+},
+"H0102": {
+"en": "Check the sensor heater circuit and wiring",
+"hi": "सेंसर हीटर सर्किट और वायरिंग जाँचें"
+},
+"H0103": {
+"en": "Check that the sensor reading changes with throttle and warm-up",
+"hi": "जाँचें कि थ्रॉटल और वॉर्म-अप के साथ सेंसर की रीडिंग बदलती है"
+},
+"H0104": {
+"en": "Look for silicone sealant, oil or coolant contamination of the sensor",
+"hi": "सेंसर पर सिलिकॉन सीलेंट, ऑयल या कूलेंट का असर देखें"
+},
+"H0105": {
+"en": "Check the heater fuse, if fitted",
+"hi": "हीटर का फ़्यूज़ जाँचें, अगर लगा हो"
+},
+"H0106": {
+"en": "Check the heater wiring for chafing and heat damage",
+"hi": "हीटर वायरिंग में रगड़ और गर्मी से नुकसान जाँचें"
+},
+"H0107": {
+"en": "Check the heater wiring for chafing against the engine",
+"hi": "इंजन से हीटर वायरिंग की रगड़ जाँचें"
+},
+"H0108": {
+"en": "Check the heater wiring for chafing and the connector for corrosion",
+"hi": "हीटर वायरिंग में रगड़ और कनेक्टर में जंग जाँचें"
+},
+"H0109": {
+"en": "Check fuel pressure and the oxygen sensor reading",
+"hi": "फ़्यूल प्रेशर और ऑक्सीजन सेंसर की रीडिंग जाँचें"
+},
+"H0110": {
+"en": "Check the injector wiring for chafing and breaks",
+"hi": "इंजेक्टर वायरिंग में रगड़ और टूटन जाँचें"
+},
+"H0111": {
+"en": "Check the injector wiring for chafing against metal parts",
+"hi": "धातु के पुर्ज़ों से इंजेक्टर वायरिंग की रगड़ जाँचें"
+},
+"H0112": {
+"en": "Check the injector connector for water and corrosion",
+"hi": "इंजेक्टर कनेक्टर में पानी और जंग जाँचें"
+},
+"H0113": {
+"en": "Read the freeze-frame data to see when the fault happens",
+"hi": "फ़्रीज़-फ़्रेम डेटा पढ़कर देखें कि खराबी कब होती है"
+},
+"H0114": {
+"en": "Check ignition and fuel delivery on this cylinder first",
+"hi": "पहले इस सिलेंडर पर इग्निशन और ईंधन की सप्लाई जाँचें"
+},
+"H0115": {
+"en": "Check the injector and compression on this cylinder",
+"hi": "इस सिलेंडर का इंजेक्टर और कंप्रेशन जाँचें"
+},
+"H0116": {
+"en": "Check the pump connector and wiring for corrosion and chafing",
+"hi": "पंप कनेक्टर और वायरिंग में जंग और रगड़ जाँचें"
+},
+"H0117": {
+"en": "Check the pump ground connection",
+"hi": "पंप का ग्राउंड कनेक्शन जाँचें"
+},
+"H0118": {
+"en": "Check whether the pump runs with the ignition off",
+"hi": "जाँचें कि इग्निशन बंद होने पर भी पंप चलता है या नहीं"
+},
+"H0119": {
+"en": "Check the pump relay (if fitted) and the supply wiring for a short to battery supply",
+"hi": "पंप रिले (अगर लगा हो) और सप्लाई वायरिंग में बैटरी सप्लाई से शॉर्ट जाँचें"
+},
+"H0120": {
+"en": "Wiggle the pump harness and connector while the pump runs",
+"hi": "पंप चलते समय पंप हार्नेस और कनेक्टर को हिलाएँ"
+},
+"H0121": {
+"en": "Check the control wiring for breaks and chafing",
+"hi": "कंट्रोल वायरिंग में टूटन और रगड़ जाँचें"
+},
+"H0122": {
+"en": "Check the control wiring for chafing against metal parts",
+"hi": "धातु के पुर्ज़ों से कंट्रोल वायरिंग की रगड़ जाँचें"
+},
+"H0123": {
+"en": "Check the control wiring for chafing and the connectors for corrosion",
+"hi": "कंट्रोल वायरिंग में रगड़ और कनेक्टर में जंग जाँचें"
+},
+"H0124": {
+"en": "Check the relay (if fitted) switches off with the ignition",
+"hi": "जाँचें कि रिले (अगर लगा हो) इग्निशन बंद होने पर बंद हो जाता है"
+},
+"H0125": {
+"en": "Check the sensor mounting, gap and connector for oil and heat damage",
+"hi": "सेंसर की माउंटिंग, गैप और कनेक्टर में ऑयल और गर्मी से नुकसान जाँचें"
+},
+"H0126": {
+"en": "Check the sensor connector and wiring for breaks and corrosion",
+"hi": "सेंसर कनेक्टर और वायरिंग में टूटन और जंग जाँचें"
+},
+"H0127": {
+"en": "Wiggle the harness and connector while watching engine speed on the scan tool",
+"hi": "स्कैन टूल पर इंजन स्पीड देखते हुए हार्नेस और कनेक्टर को हिलाएँ"
+},
+"H0128": {
+"en": "Check the sensor mounting and the connector for oil and corrosion",
+"hi": "सेंसर की माउंटिंग और कनेक्टर में ऑयल और जंग जाँचें"
+},
+"H0129": {
+"en": "Check the camshaft and crankshaft signals while cranking",
+"hi": "क्रैंकिंग के समय कैमशाफ़्ट और क्रैंकशाफ़्ट के सिग्नल जाँचें"
+},
 "M0001": {
 "en": "The bike's computer (ECU) cannot get a reliable reading of how far the throttle is open.",
 "hi": "बाइक का कंप्यूटर (ECU) थ्रॉटल कितना खुला है, इसकी भरोसेमंद रीडिंग नहीं ले पा रहा है।"
@@ -983,6 +1415,166 @@
 "en": "The throttle position reading does not match what the bike's computer (ECU) expects, so the throttle opening may be misread.",
 "hi": "थ्रॉटल पोज़ीशन की रीडिंग बाइक के कंप्यूटर (ECU) की उम्मीद से मेल नहीं खाती, इसलिए हो सकता है कि थ्रॉटल का खुलना गलत पढ़ा जा रहा हो।"
 },
+"M0041": {
+"en": "The throttle position reading is lost or changes suddenly at times, so the bike's computer (ECU) sometimes misreads the throttle.",
+"hi": "थ्रॉटल पोज़ीशन की रीडिंग कभी-कभी गायब हो जाती है या अचानक बदल जाती है, इसलिए बाइक का कंप्यूटर (ECU) कभी-कभी थ्रॉटल को गलत पढ़ लेता है।"
+},
+"M0042": {
+"en": "The intake pressure reading does not match engine conditions, so the bike's computer (ECU) may misjudge engine load.",
+"hi": "इनटेक प्रेशर की रीडिंग इंजन की हालत से मेल नहीं खाती, इसलिए बाइक का कंप्यूटर (ECU) इंजन लोड का गलत अंदाज़ा लगा सकता है।"
+},
+"M0043": {
+"en": "The intake pressure reading is lost or changes suddenly at times, so the bike's computer (ECU) sometimes misjudges engine load.",
+"hi": "इनटेक प्रेशर की रीडिंग कभी-कभी गायब हो जाती है या अचानक बदल जाती है, इसलिए बाइक का कंप्यूटर (ECU) कभी-कभी इंजन लोड का गलत अंदाज़ा लगा लेता है।"
+},
+"M0044": {
+"en": "The intake air temperature reading does not match the conditions, so the bike's computer (ECU) may correct the fuelling wrongly.",
+"hi": "इनटेक हवा के तापमान की रीडिंग हालात से मेल नहीं खाती, इसलिए बाइक का कंप्यूटर (ECU) ईंधन सुधार गलत कर सकता है।"
+},
+"M0045": {
+"en": "The intake air temperature reading is lost or changes suddenly at times, so the bike's computer (ECU) sometimes corrects the fuelling wrongly.",
+"hi": "इनटेक हवा के तापमान की रीडिंग कभी-कभी गायब हो जाती है या अचानक बदल जाती है, इसलिए बाइक का कंप्यूटर (ECU) कभी-कभी ईंधन सुधार गलत कर देता है।"
+},
+"M0046": {
+"en": "The engine temperature reading does not match what the bike's computer (ECU) expects, so it may misjudge how hot the engine is.",
+"hi": "इंजन के तापमान की रीडिंग बाइक के कंप्यूटर (ECU) की उम्मीद से मेल नहीं खाती, इसलिए वह गलत आँक सकता है कि इंजन कितना गर्म है।"
+},
+"M0047": {
+"en": "The engine temperature reading is lost or changes suddenly at times, so the bike's computer (ECU) sometimes misjudges how hot the engine is.",
+"hi": "इंजन के तापमान की रीडिंग कभी-कभी गायब हो जाती है या अचानक बदल जाती है, इसलिए बाइक का कंप्यूटर (ECU) कभी-कभी गलत आँक लेता है कि इंजन कितना गर्म है।"
+},
+"M0048": {
+"en": "The engine temperature went above the limit that the bike's computer (ECU) allows.",
+"hi": "इंजन का तापमान उस सीमा से ऊपर चला गया जो बाइक का कंप्यूटर (ECU) मंज़ूर करता है।"
+},
+"M0049": {
+"en": "The engine is warming up too slowly, or its temperature reading is too low, so the bike's computer (ECU) cannot begin fine fuel control.",
+"hi": "इंजन बहुत धीरे गर्म हो रहा है या उसके तापमान की रीडिंग बहुत कम है, इसलिए बाइक का कंप्यूटर (ECU) सटीक ईंधन कंट्रोल शुरू नहीं कर पाता।"
+},
+"M0050": {
+"en": "The engine does not reach the temperature that the bike's computer (ECU) needs for stable running.",
+"hi": "इंजन उस तापमान तक नहीं पहुँचता जो बाइक के कंप्यूटर (ECU) को स्थिर चलने के लिए चाहिए।"
+},
+"M0051": {
+"en": "The engine is not warming up to its normal temperature, which may mean the thermostat is stuck open.",
+"hi": "इंजन अपने सामान्य तापमान तक गर्म नहीं हो रहा, जिसका मतलब हो सकता है कि थर्मोस्टैट खुला अटका है।"
+},
+"M0052": {
+"en": "The oil temperature reading does not match what the bike's computer (ECU) expects, so the reading may be wrong.",
+"hi": "ऑयल तापमान की रीडिंग बाइक के कंप्यूटर (ECU) की उम्मीद से मेल नहीं खाती, इसलिए रीडिंग गलत हो सकती है।"
+},
+"M0053": {
+"en": "The oil temperature signal is lower than the bike's computer (ECU) expects, so the oil looks hotter than it is; often a short to ground.",
+"hi": "ऑयल तापमान का सिग्नल बाइक के कंप्यूटर (ECU) की उम्मीद से कम है, इसलिए ऑयल असल से ज़्यादा गर्म दिखता है; यह अक्सर ग्राउंड से शॉर्ट होता है।"
+},
+"M0054": {
+"en": "The oil temperature signal is higher than the bike's computer (ECU) expects, so the oil looks colder than it is; often an open circuit.",
+"hi": "ऑयल तापमान का सिग्नल बाइक के कंप्यूटर (ECU) की उम्मीद से ज़्यादा है, इसलिए ऑयल असल से ज़्यादा ठंडा दिखता है; यह अक्सर ओपन सर्किट होता है।"
+},
+"M0055": {
+"en": "The oil temperature reading is lost or changes suddenly at times, so the bike's computer (ECU) sometimes gets a wrong reading.",
+"hi": "ऑयल तापमान की रीडिंग कभी-कभी गायब हो जाती है या अचानक बदल जाती है, इसलिए बाइक के कंप्यूटर (ECU) को कभी-कभी गलत रीडिंग मिलती है।"
+},
+"M0056": {
+"en": "The oxygen sensor reacts too slowly to changes in the air-fuel mixture, so the bike's computer (ECU) cannot adjust the fuel mixture quickly enough.",
+"hi": "ऑक्सीजन सेंसर हवा-ईंधन मिक्सचर में बदलाव पर बहुत धीरे प्रतिक्रिया देता है, इसलिए बाइक का कंप्यूटर (ECU) ईंधन मिक्सचर को समय पर एडजस्ट नहीं कर पाता।"
+},
+"M0057": {
+"en": "The oxygen sensor signal stays on lean all the time, so the bike's computer (ECU) cannot trust it to adjust the fuel mixture.",
+"hi": "ऑक्सीजन सेंसर का सिग्नल हर समय लीन पर बना रहता है, इसलिए बाइक का कंप्यूटर (ECU) ईंधन मिक्सचर एडजस्ट करने के लिए उस पर भरोसा नहीं कर सकता।"
+},
+"M0058": {
+"en": "The oxygen sensor signal stays on rich all the time, so the bike's computer (ECU) cannot trust it to adjust the fuel mixture.",
+"hi": "ऑक्सीजन सेंसर का सिग्नल हर समय रिच पर बना रहता है, इसलिए बाइक का कंप्यूटर (ECU) ईंधन मिक्सचर एडजस्ट करने के लिए उस पर भरोसा नहीं कर सकता।"
+},
+"M0059": {
+"en": "The bike's computer (ECU) found a fault in the control circuit that switches the oxygen sensor heater on and off.",
+"hi": "बाइक के कंप्यूटर (ECU) को उस कंट्रोल सर्किट में खराबी मिली है जो ऑक्सीजन सेंसर के हीटर को चालू और बंद करता है।"
+},
+"M0060": {
+"en": "The oxygen sensor heater control signal is too low for the bike's computer (ECU), often from a short to ground.",
+"hi": "ऑक्सीजन सेंसर हीटर कंट्रोल का सिग्नल बाइक के कंप्यूटर (ECU) के लिए बहुत कम है, जो अक्सर ग्राउंड से शॉर्ट से होता है।"
+},
+"M0061": {
+"en": "The oxygen sensor heater control signal is too high for the bike's computer (ECU), often from a short to battery supply or an open circuit.",
+"hi": "ऑक्सीजन सेंसर हीटर कंट्रोल का सिग्नल बाइक के कंप्यूटर (ECU) के लिए बहुत ज़्यादा है, जो अक्सर बैटरी सप्लाई से शॉर्ट या ओपन सर्किट से होता है।"
+},
+"M0062": {
+"en": "The bike's computer (ECU) is making large fuel corrections, but the engine still gets too much or too little fuel.",
+"hi": "बाइक का कंप्यूटर (ECU) ईंधन में बड़े सुधार कर रहा है, फिर भी इंजन को बहुत ज़्यादा या बहुत कम ईंधन मिल रहा है।"
+},
+"M0063": {
+"en": "The bike's computer (ECU) found a break in an injector circuit, so an injector may get no signal and a cylinder may get no fuel.",
+"hi": "बाइक के कंप्यूटर (ECU) को इंजेक्टर सर्किट में टूटन मिली है, इसलिए हो सकता है कि इंजेक्टर को सिग्नल न मिले और किसी सिलेंडर को ईंधन न मिले।"
+},
+"M0064": {
+"en": "The cylinder 1 injector signal is too low for the bike's computer (ECU), often from a short to ground or a shorted injector coil.",
+"hi": "सिलेंडर 1 के इंजेक्टर का सिग्नल बाइक के कंप्यूटर (ECU) के लिए बहुत कम है, जो अक्सर ग्राउंड से शॉर्ट या शॉर्ट इंजेक्टर कॉइल से होता है।"
+},
+"M0065": {
+"en": "The cylinder 1 injector signal is too high for the bike's computer (ECU), often from a short to battery supply or an open circuit.",
+"hi": "सिलेंडर 1 के इंजेक्टर का सिग्नल बाइक के कंप्यूटर (ECU) के लिए बहुत ज़्यादा है, जो अक्सर बैटरी सप्लाई से शॉर्ट या ओपन सर्किट से होता है।"
+},
+"M0066": {
+"en": "The cylinder 2 injector signal is too low for the bike's computer (ECU), often from a short to ground or a shorted injector coil.",
+"hi": "सिलेंडर 2 के इंजेक्टर का सिग्नल बाइक के कंप्यूटर (ECU) के लिए बहुत कम है, जो अक्सर ग्राउंड से शॉर्ट या शॉर्ट इंजेक्टर कॉइल से होता है।"
+},
+"M0067": {
+"en": "The cylinder 2 injector signal is too high for the bike's computer (ECU), often from a short to battery supply or an open circuit.",
+"hi": "सिलेंडर 2 के इंजेक्टर का सिग्नल बाइक के कंप्यूटर (ECU) के लिए बहुत ज़्यादा है, जो अक्सर बैटरी सप्लाई से शॉर्ट या ओपन सर्किट से होता है।"
+},
+"M0068": {
+"en": "The bike's computer (ECU) found that cylinder 1 is not working as well as the other cylinder, so the engine may run rough.",
+"hi": "बाइक के कंप्यूटर (ECU) ने पाया कि सिलेंडर 1 दूसरे सिलेंडर जितना अच्छा काम नहीं कर रहा, इसलिए इंजन रफ़ चल सकता है।"
+},
+"M0069": {
+"en": "The bike's computer (ECU) found that cylinder 2 is not working as well as the other cylinder, so the engine may run rough.",
+"hi": "बाइक के कंप्यूटर (ECU) ने पाया कि सिलेंडर 2 दूसरे सिलेंडर जितना अच्छा काम नहीं कर रहा, इसलिए इंजन रफ़ चल सकता है।"
+},
+"M0070": {
+"en": "The fuel pump circuit (secondary) reads too low for the bike's computer (ECU), so the pump may not run properly.",
+"hi": "फ़्यूल पंप सर्किट (सेकंडरी) बाइक के कंप्यूटर (ECU) को बहुत कम पढ़ रहा है, इसलिए हो सकता है कि पंप ठीक से न चले।"
+},
+"M0071": {
+"en": "The fuel pump circuit (secondary) reads too high for the bike's computer (ECU), often from a short to battery supply that keeps the pump powered.",
+"hi": "फ़्यूल पंप सर्किट (सेकंडरी) बाइक के कंप्यूटर (ECU) को बहुत ज़्यादा पढ़ रहा है, जो अक्सर बैटरी सप्लाई से शॉर्ट से होता है जिससे पंप को पावर मिलती रहती है।"
+},
+"M0072": {
+"en": "The fuel pump circuit (secondary) loses contact at times, so the pump may stop for a moment and the engine may stop suddenly.",
+"hi": "फ़्यूल पंप सर्किट (सेकंडरी) कभी-कभी संपर्क खो देता है, इसलिए पंप कुछ पल के लिए बंद हो सकता है और इंजन अचानक बंद हो सकता है।"
+},
+"M0073": {
+"en": "The bike's computer (ECU) found a break in the circuit that switches the fuel pump on, so the pump may not run.",
+"hi": "बाइक के कंप्यूटर (ECU) को फ़्यूल पंप को चालू करने वाले सर्किट में टूटन मिली है, इसलिए हो सकता है कि पंप न चले।"
+},
+"M0074": {
+"en": "The signal that switches the fuel pump on is too low for the bike's computer (ECU), often from a short to ground.",
+"hi": "फ़्यूल पंप को चालू करने वाला सिग्नल बाइक के कंप्यूटर (ECU) के लिए बहुत कम है, जो अक्सर ग्राउंड से शॉर्ट से होता है।"
+},
+"M0075": {
+"en": "The signal that switches the fuel pump on is too high for the bike's computer (ECU), often from a short to battery supply.",
+"hi": "फ़्यूल पंप को चालू करने वाला सिग्नल बाइक के कंप्यूटर (ECU) के लिए बहुत ज़्यादा है, जो अक्सर बैटरी सप्लाई से शॉर्ट से होता है।"
+},
+"M0076": {
+"en": "The crankshaft signal does not match what the bike's computer (ECU) expects, so it may misjudge engine speed and position.",
+"hi": "क्रैंकशाफ़्ट का सिग्नल बाइक के कंप्यूटर (ECU) की उम्मीद से मेल नहीं खाता, इसलिए वह इंजन स्पीड और पोज़ीशन का गलत अंदाज़ा लगा सकता है।"
+},
+"M0077": {
+"en": "The crankshaft sensor signal is too low for the bike's computer (ECU), often from a short to ground or a failed sensor.",
+"hi": "क्रैंकशाफ़्ट सेंसर का सिग्नल बाइक के कंप्यूटर (ECU) के लिए बहुत कम है, जो अक्सर ग्राउंड से शॉर्ट या सेंसर खराब होने से होता है।"
+},
+"M0078": {
+"en": "The crankshaft sensor signal is too high for the bike's computer (ECU), often from a short to battery supply or an open circuit.",
+"hi": "क्रैंकशाफ़्ट सेंसर का सिग्नल बाइक के कंप्यूटर (ECU) के लिए बहुत ज़्यादा है, जो अक्सर बैटरी सप्लाई से शॉर्ट या ओपन सर्किट से होता है।"
+},
+"M0079": {
+"en": "The crankshaft sensor signal is lost at times, so the bike's computer (ECU) may lose engine speed and position for a moment.",
+"hi": "क्रैंकशाफ़्ट सेंसर का सिग्नल कभी-कभी गायब हो जाता है, इसलिए बाइक का कंप्यूटर (ECU) कुछ पल के लिए इंजन स्पीड और पोज़ीशन खो सकता है।"
+},
+"M0080": {
+"en": "The camshaft signal does not match what the bike's computer (ECU) expects, so it may not time fuel and spark correctly.",
+"hi": "कैमशाफ़्ट का सिग्नल बाइक के कंप्यूटर (ECU) की उम्मीद से मेल नहीं खाता, इसलिए हो सकता है कि वह ईंधन और स्पार्क का समय ठीक से तय न कर पाए।"
+},
 "R0001": {
 "en": "idle may be uneven; avoid traffic and long trips",
 "hi": "आइडल अस्थिर हो सकता है; ट्रैफ़िक और लंबे सफ़र से बचें"
@@ -1102,6 +1694,70 @@
 "R0030": {
 "en": "without lamps you may miss a warning; ride carefully",
 "hi": "लैंप के बिना कोई चेतावनी छूट सकती है; सावधानी से चलाएँ"
+},
+"R0031": {
+"en": "throttle may work wrongly at times; avoid traffic and long trips",
+"hi": "थ्रॉटल कभी-कभी गलत काम कर सकता है; ट्रैफ़िक और लंबे सफ़र से बचें"
+},
+"R0032": {
+"en": "may run rough at times; ride gently, no long trips",
+"hi": "कभी-कभी रफ़ चल सकता है; धीरे चलाएँ, लंबा सफ़र न करें"
+},
+"R0033": {
+"en": "start and idle may be wrong at times; short trip",
+"hi": "स्टार्ट और आइडल कभी-कभी गलत हो सकते हैं; छोटा सफ़र"
+},
+"R0034": {
+"en": "overheating can destroy the engine; arrange transport",
+"hi": "ओवरहीट से इंजन पूरी तरह खराब हो सकता है; बाइक ले जाने का इंतज़ाम करें"
+},
+"R0035": {
+"en": "emissions and fuel use only",
+"hi": "सिर्फ़ उत्सर्जन और ईंधन खपत की बात"
+},
+"R0036": {
+"en": "may run roughly until warm",
+"hi": "गर्म होने तक रफ़ चल सकता है"
+},
+"R0037": {
+"en": "engine runs cool; fuel use up",
+"hi": "इंजन ठंडा चलता है; ईंधन खपत ज़्यादा"
+},
+"R0038": {
+"en": "usually rideable; mixture control is only slow",
+"hi": "आमतौर पर चलाने लायक; सिर्फ़ मिक्सचर कंट्रोल धीमा है"
+},
+"R0039": {
+"en": "usually rideable; mixture control affected",
+"hi": "आमतौर पर चलाने लायक; मिक्सचर कंट्रोल पर असर"
+},
+"R0040": {
+"en": "mixture is wrong; short, gentle ride only",
+"hi": "मिक्सचर गलत है; सिर्फ़ छोटी, धीमी सवारी"
+},
+"R0041": {
+"en": "ride only if the engine runs normally; go to a workshop soon",
+"hi": "सिर्फ़ तब चलाएँ जब इंजन सामान्य चले; जल्द वर्कशॉप जाएँ"
+},
+"R0042": {
+"en": "pump may stop at any time; arrange transport",
+"hi": "पंप कभी भी बंद हो सकता है; बाइक ले जाने का इंतज़ाम करें"
+},
+"R0043": {
+"en": "no pump, no fuel; arrange transport",
+"hi": "पंप नहीं, तो ईंधन नहीं; बाइक ले जाने का इंतज़ाम करें"
+},
+"R0044": {
+"en": "pump may not run; arrange transport",
+"hi": "पंप चल न पाए; बाइक ले जाने का इंतज़ाम करें"
+},
+"R0045": {
+"en": "pump control lost; arrange transport",
+"hi": "पंप का कंट्रोल खत्म; बाइक ले जाने का इंतज़ाम करें"
+},
+"R0046": {
+"en": "engine may stop at any time; arrange transport",
+"hi": "इंजन कभी भी बंद हो सकता है; बाइक ले जाने का इंतज़ाम करें"
 },
 "T0001": {
 "en": "Throttle position sensor A: circuit fault",
@@ -1262,5 +1918,165 @@
 "T0040": {
 "en": "Throttle position sensor A: performance or incorrect operation",
 "hi": "थ्रॉटल पोज़ीशन सेंसर A: परफ़ॉर्मेंस या गलत कामकाज"
+},
+"T0041": {
+"en": "Throttle position sensor A: intermittent circuit fault",
+"hi": "थ्रॉटल पोज़ीशन सेंसर A: सर्किट में बीच-बीच में खराबी"
+},
+"T0042": {
+"en": "Intake pressure (MAP) sensor: performance or incorrect operation",
+"hi": "इनटेक प्रेशर (MAP) सेंसर: परफ़ॉर्मेंस या गलत कामकाज"
+},
+"T0043": {
+"en": "Intake pressure (MAP) sensor: intermittent circuit fault",
+"hi": "इनटेक प्रेशर (MAP) सेंसर: सर्किट में बीच-बीच में खराबी"
+},
+"T0044": {
+"en": "Intake air temperature sensor: performance or incorrect operation",
+"hi": "इनटेक हवा तापमान सेंसर: परफ़ॉर्मेंस या गलत कामकाज"
+},
+"T0045": {
+"en": "Intake air temperature sensor: intermittent circuit fault",
+"hi": "इनटेक हवा तापमान सेंसर: सर्किट में बीच-बीच में खराबी"
+},
+"T0046": {
+"en": "Engine temperature sensor: performance or incorrect operation",
+"hi": "इंजन तापमान सेंसर: परफ़ॉर्मेंस या गलत कामकाज"
+},
+"T0047": {
+"en": "Engine (coolant) temperature sensor: intermittent circuit fault",
+"hi": "इंजन (कूलेंट) तापमान सेंसर: सर्किट में बीच-बीच में खराबी"
+},
+"T0048": {
+"en": "Engine overheating detected",
+"hi": "इंजन ओवरहीट पाया गया"
+},
+"T0049": {
+"en": "Engine not warming up enough for fuel control",
+"hi": "ईंधन कंट्रोल के लिए इंजन पर्याप्त गर्म नहीं हो रहा"
+},
+"T0050": {
+"en": "Engine temperature too low for stable running",
+"hi": "स्थिर चलने के लिए इंजन का तापमान बहुत कम"
+},
+"T0051": {
+"en": "Thermostat: engine stays below normal temperature",
+"hi": "थर्मोस्टैट: इंजन सामान्य तापमान से नीचे रहता है"
+},
+"T0052": {
+"en": "Engine oil temperature sensor: performance or incorrect operation",
+"hi": "इंजन ऑयल तापमान सेंसर: परफ़ॉर्मेंस या गलत कामकाज"
+},
+"T0053": {
+"en": "Engine oil temperature sensor: voltage below threshold",
+"hi": "इंजन ऑयल तापमान सेंसर: वोल्टेज सीमा से कम"
+},
+"T0054": {
+"en": "Engine oil temperature sensor: voltage above threshold",
+"hi": "इंजन ऑयल तापमान सेंसर: वोल्टेज सीमा से ज़्यादा"
+},
+"T0055": {
+"en": "Engine oil temperature sensor: intermittent circuit fault",
+"hi": "इंजन ऑयल तापमान सेंसर: सर्किट में बीच-बीच में खराबी"
+},
+"T0056": {
+"en": "Oxygen (O2) sensor, upstream: slow response",
+"hi": "ऑक्सीजन (O2) सेंसर, अपस्ट्रीम: धीमी प्रतिक्रिया"
+},
+"T0057": {
+"en": "Oxygen (O2) sensor, upstream: signal stuck lean",
+"hi": "ऑक्सीजन (O2) सेंसर, अपस्ट्रीम: सिग्नल लीन पर अटका"
+},
+"T0058": {
+"en": "Oxygen (O2) sensor, upstream: signal stuck rich",
+"hi": "ऑक्सीजन (O2) सेंसर, अपस्ट्रीम: सिग्नल रिच पर अटका"
+},
+"T0059": {
+"en": "Oxygen sensor heater control (upstream): circuit fault",
+"hi": "ऑक्सीजन सेंसर हीटर कंट्रोल (अपस्ट्रीम): सर्किट में खराबी"
+},
+"T0060": {
+"en": "Oxygen sensor heater control (upstream): voltage below threshold",
+"hi": "ऑक्सीजन सेंसर हीटर कंट्रोल (अपस्ट्रीम): वोल्टेज सीमा से कम"
+},
+"T0061": {
+"en": "Oxygen sensor heater control (upstream): voltage above threshold",
+"hi": "ऑक्सीजन सेंसर हीटर कंट्रोल (अपस्ट्रीम): वोल्टेज सीमा से ज़्यादा"
+},
+"T0062": {
+"en": "Fuel mixture correction (fuel trim) fault",
+"hi": "फ़्यूल मिक्सचर करेक्शन (फ़्यूल ट्रिम) में खराबी"
+},
+"T0063": {
+"en": "Fuel injector: open circuit",
+"hi": "फ़्यूल इंजेक्टर: ओपन सर्किट"
+},
+"T0064": {
+"en": "Fuel injector, cylinder 1: voltage below threshold",
+"hi": "फ़्यूल इंजेक्टर, सिलेंडर 1: वोल्टेज सीमा से कम"
+},
+"T0065": {
+"en": "Fuel injector, cylinder 1: voltage above threshold",
+"hi": "फ़्यूल इंजेक्टर, सिलेंडर 1: वोल्टेज सीमा से ज़्यादा"
+},
+"T0066": {
+"en": "Fuel injector, cylinder 2: voltage below threshold",
+"hi": "फ़्यूल इंजेक्टर, सिलेंडर 2: वोल्टेज सीमा से कम"
+},
+"T0067": {
+"en": "Fuel injector, cylinder 2: voltage above threshold",
+"hi": "फ़्यूल इंजेक्टर, सिलेंडर 2: वोल्टेज सीमा से ज़्यादा"
+},
+"T0068": {
+"en": "Cylinder 1 is not working as well as the other cylinder",
+"hi": "सिलेंडर 1 दूसरे सिलेंडर जितना अच्छा काम नहीं कर रहा"
+},
+"T0069": {
+"en": "Cylinder 2 is not working as well as the other cylinder",
+"hi": "सिलेंडर 2 दूसरे सिलेंडर जितना अच्छा काम नहीं कर रहा"
+},
+"T0070": {
+"en": "Fuel pump circuit (secondary): voltage below threshold",
+"hi": "फ़्यूल पंप सर्किट (सेकंडरी): वोल्टेज सीमा से कम"
+},
+"T0071": {
+"en": "Fuel pump circuit (secondary): voltage above threshold",
+"hi": "फ़्यूल पंप सर्किट (सेकंडरी): वोल्टेज सीमा से ज़्यादा"
+},
+"T0072": {
+"en": "Fuel pump circuit (secondary): intermittent circuit fault",
+"hi": "फ़्यूल पंप सर्किट (सेकंडरी): सर्किट में बीच-बीच में खराबी"
+},
+"T0073": {
+"en": "Fuel pump control circuit: open circuit",
+"hi": "फ़्यूल पंप कंट्रोल सर्किट: ओपन सर्किट"
+},
+"T0074": {
+"en": "Fuel pump control circuit: voltage below threshold",
+"hi": "फ़्यूल पंप कंट्रोल सर्किट: वोल्टेज सीमा से कम"
+},
+"T0075": {
+"en": "Fuel pump control circuit: voltage above threshold",
+"hi": "फ़्यूल पंप कंट्रोल सर्किट: वोल्टेज सीमा से ज़्यादा"
+},
+"T0076": {
+"en": "Crankshaft position sensor A: performance or incorrect operation",
+"hi": "क्रैंकशाफ़्ट पोज़ीशन सेंसर A: परफ़ॉर्मेंस या गलत कामकाज"
+},
+"T0077": {
+"en": "Crankshaft position sensor A: voltage below threshold",
+"hi": "क्रैंकशाफ़्ट पोज़ीशन सेंसर A: वोल्टेज सीमा से कम"
+},
+"T0078": {
+"en": "Crankshaft position sensor A: voltage above threshold",
+"hi": "क्रैंकशाफ़्ट पोज़ीशन सेंसर A: वोल्टेज सीमा से ज़्यादा"
+},
+"T0079": {
+"en": "Crankshaft position sensor A: intermittent circuit fault",
+"hi": "क्रैंकशाफ़्ट पोज़ीशन सेंसर A: सर्किट में बीच-बीच में खराबी"
+},
+"T0080": {
+"en": "Camshaft position sensor A: performance or incorrect operation",
+"hi": "कैमशाफ़्ट पोज़ीशन सेंसर A: परफ़ॉर्मेंस या गलत कामकाज"
 }
 }
