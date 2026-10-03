@@ -77,12 +77,22 @@ enum Provenance {
   structureOnly('provenanceStructure'),
 
   /// No meaning: the raw value only.
-  rawOnly('provenanceRaw');
+  rawOnly('provenanceRaw'),
+
+  /// A knowledge-store entry that has the standard's code name and no guidance
+  /// yet (`verification: standard_title_only`). Added last so every older
+  /// label keeps its place.
+  standardTitleOnly('provenanceStandardTitleOnly');
 
   const Provenance(this.labelKey);
 
   /// `AppStrings` key of the plain verification label.
   final String labelKey;
+
+  /// The answer came from the knowledge store (guidance, or a bare standard
+  /// name), so the screens render it as store content with this label.
+  bool get isStoreGuidance =>
+      this == Provenance.aiGuidance || this == Provenance.standardTitleOnly;
 }
 
 /// What is known about the bike. Unknown is null, never false.
@@ -491,7 +501,11 @@ class FaultResolver {
 
     return ResolvedFault(
       level: level,
-      provenance: Provenance.aiGuidance,
+      // The less-claiming label wins if either row says "title only".
+      provenance: facts.verification == kVerificationStandardTitleOnly ||
+              primary.verification == kVerificationStandardTitleOnly
+          ? Provenance.standardTitleOnly
+          : Provenance.aiGuidance,
       code: code,
       displayCode: record.displayCode,
       languageRequested: language,

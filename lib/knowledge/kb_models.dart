@@ -104,6 +104,10 @@ enum HiStatus {
   }
 }
 
+/// `verification` of an entry that carries the standard's code name and nothing
+/// more (no guidance written yet). The resolver gives it its own label.
+const String kVerificationStandardTitleOnly = 'standard_title_only';
+
 /// One stored meaning for one code, in one scope and one language.
 ///
 /// Text fields are nullable: a Hindi row may carry only some of them, and the

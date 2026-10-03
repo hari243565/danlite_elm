@@ -37,6 +37,7 @@ const Set<String> _derivedModes = {'adapted', 'structure-only'};
 const Set<String> kAllowedVerification = {
   'ai_authored_from_standard_title',
   'ai_authored_adapted',
+  kVerificationStandardTitleOnly,
 };
 
 /// D4: which can-ride answers each rider action level allows.
