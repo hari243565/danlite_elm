@@ -109,9 +109,14 @@ String _valueText(BuildContext context, SnapshotValue v) {
 // ═══════════════════════════════════════════════════════════════════════════
 
 class ContextSnapshotView extends StatelessWidget {
-  const ContextSnapshotView({super.key, required this.result, this.cardCode});
+  const ContextSnapshotView(
+      {super.key, required this.result, this.cardCode, this.engineState});
 
   final FreezeFrameResult result;
+
+  /// What is otherwise known about the engine (from the live engine report),
+  /// for the fuel-system row: null when nothing is known.
+  final EngineState? engineState;
 
   /// The code of the card this is shown on, so a snapshot that belongs to a
   /// DIFFERENT code says so. Null on the Freeze Frame screen.
@@ -135,7 +140,11 @@ class ContextSnapshotView extends StatelessWidget {
           ));
         }
         for (final v in snapshot.values) {
-          if (v is SnapshotFuelSystem && !v.reportsAnything) continue;
+          if (v is SnapshotFuelSystem &&
+              !fuelSystemRowIsShown(v,
+                  snapshotRpm: snapshot.rpm, engineState: engineState)) {
+            continue;
+          }
           body.add(_row(context.tr(v.pid.labelKey), _valueText(context, v),
               FaultPalette.cyan));
         }

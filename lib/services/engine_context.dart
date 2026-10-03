@@ -503,6 +503,24 @@ final class SnapshotFuelSystem extends SnapshotValue {
       system1 != FuelStatusKind.none || system2 != FuelStatusKind.none;
 }
 
+/// Whether the fuel-system status row is shown at all.
+///
+/// A status of 0 means the engine was off. That is only said when the engine is
+/// KNOWN to be off: the snapshot's own engine speed ([snapshotRpm]) is exactly
+/// 0 — it wins over everything, including a live reading, because it describes
+/// the same moment as the status — or, when the snapshot has no engine speed,
+/// the engine is otherwise known to be off ([engineState]). A running engine or
+/// an unknown state hides the row: "engine off" beside a running engine, or on
+/// a guess, would be a wrong answer. Every other status is shown whatever the
+/// engine speed.
+bool fuelSystemRowIsShown(SnapshotFuelSystem f,
+    {required double? snapshotRpm, required EngineState? engineState}) {
+  if (!f.reportsAnything) return false;
+  if (f.system1 != FuelStatusKind.engineOff) return true;
+  if (snapshotRpm != null) return snapshotRpm == 0;
+  return engineState == EngineState.off;
+}
+
 /// One snapshot value, scaled with the SAME formula and unit as the live
 /// reading of that PID ([ObdParser.parsePid]); fuel-system status has no live
 /// equivalent and is decoded here.
@@ -557,6 +575,17 @@ class FreezeFrameSnapshot {
   final bool supportListUnreadable;
 
   bool get incomplete => unreadPids.isNotEmpty || supportListUnreadable;
+
+  /// The engine speed the bike recorded in this snapshot, or null when it did
+  /// not report one.
+  double? get rpm {
+    for (final v in values) {
+      if (v is SnapshotNumber && v.pid == SnapshotPid.rpm && !v.value.isNaN) {
+        return v.value;
+      }
+    }
+    return null;
+  }
 }
 
 /// What a snapshot read established. Six honest outcomes (plus "not asked" for

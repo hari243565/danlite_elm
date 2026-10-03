@@ -101,3 +101,24 @@ Decisions and notes (B4):
   that code differently; the app follows the manual.
 - Hindi for part names is the workshop loanword (थ्रॉटल, मैनिफ़ोल्ड, इग्निशन कॉइल…); all of it is **proposed**, not the
   owner's own wording, and is listed in the final report.
+
+## B5 — fuel-system status 0 ("Engine off") only when the engine is known to be off
+
+The fuel-system status in the freeze-frame snapshot says "Engine off" for the value 0 (A-4b F2). That was shown even
+beside a snapshot whose own engine speed was 2,400 RPM. Now the row is shown only when the snapshot's own engine speed
+is exactly 0 or, when the snapshot has no engine speed, the engine is otherwise known to be off (the live engine
+report). A running engine or an unknown state hides the whole row. Every other fuel status is untouched.
+
+| Snapshot's own RPM | Engine otherwise (live) | "Engine off" row |
+|---|---|---|
+| 0 | anything (unknown, running, off, none) | shown (the snapshot describes the same moment as the status) |
+| greater than 0 (including a cranking 150) | anything | hidden |
+| absent | off | shown |
+| absent | running, unknown, none | hidden |
+
+Proving test: `fuel_status_engine_off_test.dart` — the 32 rpm × state combinations, the two precedence cases, every other
+status unchanged, a status that reports nothing still hidden, and the real screen in English and Hindi (rpm 0 shown;
+rpm 800 hidden with the RPM row kept; absent + unknown hidden; absent + off shown; absent + running hidden).
+
+Note: only the exact reading 0 counts as off for the snapshot's own speed, as the brief says — a cranking 150 RPM
+hides the row rather than claiming the engine was off.

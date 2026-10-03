@@ -2500,7 +2500,10 @@ class _CardDetailsState extends State<_CardDetails> {
                         strokeWidth: 2, color: _RC.neonCyan)),
               ),
             if (snapshot != null)
-              ContextSnapshotView(result: snapshot, cardCode: widget.code),
+              ContextSnapshotView(
+                  result: snapshot,
+                  cardCode: widget.code,
+                  engineState: obd.engineReport?.engineState),
             if (counters != null) ...[
               const SizedBox(height: 10),
               ContextCountersView(counters: counters, lampOn: obd.contextLampOn),
@@ -2620,7 +2623,10 @@ class _FreezeFrameSheetState extends State<_FreezeFrameSheet> {
                         strokeWidth: 2, color: _RC.neonCyan),
                   ),
                 ),
-              if (snapshot != null) ContextSnapshotView(result: snapshot),
+              if (snapshot != null)
+                ContextSnapshotView(
+                    result: snapshot,
+                    engineState: obd.engineReport?.engineState),
               if (counters != null) ...[
                 const SizedBox(height: 12),
                 ContextCountersView(counters: counters, lampOn: obd.contextLampOn),
