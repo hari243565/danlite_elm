@@ -32,6 +32,8 @@ FRAMES = [
     (("lost", "communication", "with"), "{x} से संचार टूट गया"),
     (("invalid", "data", "received", "from"), "{x} से अमान्य डेटा मिला"),
     (("software", "incompatibility", "with"), "{x} के साथ सॉफ़्टवेयर असंगति"),
+    (("unable", "to", "engage"), "{x} लगाने में असमर्थ"),
+    (("stuck", "in"), "{x} में अटका"),
 ]
 
 
