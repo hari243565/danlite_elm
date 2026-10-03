@@ -216,6 +216,7 @@ class ResolvedFault {
     this.structure,
     this.legacySeverity,
     this.scopeLabel,
+    this.hindiMachine = false,
   });
 
   final ResolvedLevel level;
@@ -259,6 +260,10 @@ class ResolvedFault {
 
   /// Which table answered, for the lookup screen ("Classic 350").
   final String? scopeLabel;
+
+  /// The text shown is Hindi from a row marked `machine`: translated by a
+  /// program and not yet read by a person. The card says so.
+  final bool hindiMachine;
 
   /// Something is not in the asked language.
   bool get languageFallback =>
@@ -501,6 +506,7 @@ class FaultResolver {
       englishFields: primary.language == language ? english : const <String>{},
       conditions: conditions,
       scopeLabel: kind == ScopeKind.generic ? null : ref,
+      hindiMachine: primary.language == 'hi' && primary.hiStatus == HiStatus.machine,
     );
   }
 

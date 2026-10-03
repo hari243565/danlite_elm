@@ -261,6 +261,27 @@ class ProvenanceLine extends StatelessWidget {
             ],
           ),
         ),
+        // Hindi from a machine-translated row: one short line under the draft
+        // line. Never on English or on anything the app wrote itself.
+        if (r.hindiMachine)
+          Padding(
+            padding: const EdgeInsets.only(top: 4),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Icon(Icons.translate_rounded, size: 13, color: FaultPalette.textMuted),
+                const SizedBox(width: 5),
+                Expanded(
+                  child: Text(context.tr('faultHindiMachine'),
+                      style: const TextStyle(
+                          color: FaultPalette.textMuted,
+                          fontSize: 10.5,
+                          fontStyle: FontStyle.italic,
+                          height: 1.4)),
+                ),
+              ],
+            ),
+          ),
       ],
     );
   }

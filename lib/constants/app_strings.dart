@@ -304,6 +304,8 @@ class AppStrings {
       'provenanceDraft': 'Draft: not yet independently reviewed.',
       'provenanceStandardTitleOnly':
           'Standard code name only; no further guidance yet',
+      'faultHindiMachine':
+          'Hindi is machine-translated and has not been checked by a person.',
       'faultShowingEnglish':
           'Showing English: this text is not available in your language yet.',
       'faultPartlyEnglish': 'Some of this text is shown in English.',
@@ -1406,6 +1408,8 @@ class AppStrings {
       'provenanceDraft': 'ड्राफ़्ट: अभी किसी दूसरे व्यक्ति ने जाँचा नहीं है।',
       'provenanceStandardTitleOnly':
           'सिर्फ़ मानक कोड नाम; अभी आगे की जानकारी नहीं है',
+      'faultHindiMachine':
+          'यह हिंदी मशीन से अनुवादित है और अभी किसी व्यक्ति ने इसे जाँचा नहीं है।',
       'faultShowingEnglish':
           'अंग्रेज़ी में दिखा रहे हैं: यह जानकारी अभी हिंदी में उपलब्ध नहीं है।',
       'faultPartlyEnglish': 'इसका कुछ हिस्सा अंग्रेज़ी में दिखाया गया है।',
