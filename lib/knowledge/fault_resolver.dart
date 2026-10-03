@@ -265,6 +265,13 @@ class ResolvedFault {
   /// program and not yet read by a person. The card says so.
   final bool hindiMachine;
 
+  /// The answer is a bare standard name and nothing more
+  /// (`verification: standard_title_only`). The screens give it a neutral
+  /// "Name only" chip instead of the rider-action chip, and show its title
+  /// once. Its rider action stays INFO in the data, so ordering and the
+  /// CRITICAL count are unchanged.
+  bool get isNameOnly => provenance == Provenance.standardTitleOnly;
+
   /// Something is not in the asked language.
   bool get languageFallback =>
       languageUsed != languageRequested || englishFields.isNotEmpty;

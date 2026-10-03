@@ -381,13 +381,14 @@ void main() {
     final en = linesOf(kBasicEnDir).firstWhere((l) => l['code'] == code);
     final hi = linesOf(kBasicHiDir).firstWhere((l) => l['code'] == code);
 
-    testWidgets('English: name, Info chip, advice, label, draft; no empty sections', (tester) async {
+    testWidgets('English: name, Name-only chip, advice, label, draft; no empty sections', (tester) async {
       final env = await screens.setUp(tester, sim: EngineSim(mode03: codeReply(code)));
       final xs = await screens.showDtc(tester, env);
       expect(xs, contains(en['title_en']));
-      expect(xs, contains(en['meaning_en']));
+      expect(xs, isNot(contains(en['meaning_en'])), reason: '4D M2: the repeated line is hidden');
       expect(xs, contains(en['rider_advice_en']));
-      expect(xs, contains(AppStrings.get('riderActionInfo', 'en')));
+      expect(xs, contains(AppStrings.get('riderActionNameOnly', 'en')), reason: '4D M1');
+      expect(xs, isNot(contains(AppStrings.get('riderActionInfo', 'en'))));
       expect(xs, contains('${AppStrings.get('provenanceStandardTitleOnly', 'en')}. '
           '${AppStrings.get('provenanceDraft', 'en')}'));
       expect(xs, isNot(contains(AppStrings.get('faultLikelyCauses', 'en').toUpperCase())));
@@ -404,9 +405,10 @@ void main() {
       final env = await screens.setUp(tester, lang: 'hi', sim: EngineSim(mode03: codeReply(code)));
       final xs = await screens.showDtc(tester, env);
       expect(xs, contains(hi['title_hi']));
-      expect(xs, contains(hi['meaning_hi']));
+      expect(xs, isNot(contains(hi['meaning_hi'])), reason: '4D M2: the repeated line is hidden');
       expect(xs, contains(hi['rider_advice_hi']));
-      expect(xs, contains(AppStrings.get('riderActionInfo', 'hi')));
+      expect(xs, contains(AppStrings.get('riderActionNameOnly', 'hi')), reason: '4D M1');
+      expect(xs, isNot(contains(AppStrings.get('riderActionInfo', 'hi'))));
       expect(xs, contains('${AppStrings.get('provenanceStandardTitleOnly', 'hi')}. '
           '${AppStrings.get('provenanceDraft', 'hi')}'));
       expect(xs, isNot(contains(AppStrings.get('faultShowingEnglish', 'hi'))));
@@ -424,7 +426,8 @@ void main() {
       expect(xs, contains(en['title_en']));
       expect(xs, contains(en['rider_advice_en']));
       expect(xs, contains(AppStrings.get('faultShowingEnglish', 'bn')));
-      expect(xs, contains(AppStrings.get('riderActionInfo', 'bn')));
+      expect(xs, contains(AppStrings.get('riderActionNameOnly', 'bn')));
+      expect(xs, isNot(contains(AppStrings.get('riderActionInfo', 'bn'))));
       expect(xs, isNot(contains(hi['title_hi'])));
       await env.close(tester);
     });

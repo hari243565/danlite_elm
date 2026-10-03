@@ -1984,8 +1984,11 @@ class _HazardCard extends StatelessWidget {
 
   /// Card colour: the rider action when the resolver knows one, else the
   /// older severity band.
-  Color _cardColor(ResolvedFault r) =>
-      r.riderAction != null ? riderActionColor(r.riderAction!) : _severityColor;
+  Color _cardColor(ResolvedFault r) => r.isNameOnly
+      ? _RC.textMuted
+      : r.riderAction != null
+          ? riderActionColor(r.riderAction!)
+          : _severityColor;
 
   Color get _severityColor {
     switch (code.severity) {
@@ -2221,7 +2224,7 @@ class _HazardCard extends StatelessWidget {
                         // Rider action (icon + word) when the resolver knows
                         // one; the older severity label otherwise.
                         if (r.riderAction != null)
-                          RiderActionChip(r.riderAction!)
+                          FaultActionChip(r)
                         else
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),

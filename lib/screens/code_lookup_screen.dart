@@ -316,7 +316,7 @@ class CodeLookupDetailScreen extends StatelessWidget {
         padding: const EdgeInsets.fromLTRB(16, 16, 16, 28),
         children: [
           if (r.riderAction != null)
-            Align(alignment: Alignment.centerLeft, child: RiderActionChip(r.riderAction!)),
+            Align(alignment: Alignment.centerLeft, child: FaultActionChip(r)),
           const SizedBox(height: 8),
           Text(describeResolved(context, r),
               style: const TextStyle(

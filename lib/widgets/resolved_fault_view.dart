@@ -97,6 +97,51 @@ class RiderActionChip extends StatelessWidget {
   }
 }
 
+/// The chip for a name-only answer: grey, icon plus word, and none of the
+/// rider-action colours. A bare standard name is not advice, and "Info" next
+/// to a title that mentions fuel pressure, brakes or misfire can read as
+/// "nothing to worry about".
+class NameOnlyChip extends StatelessWidget {
+  const NameOnlyChip({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    const c = FaultPalette.textMuted;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+      decoration: BoxDecoration(
+        color: c.withValues(alpha: 0.14),
+        borderRadius: BorderRadius.circular(6),
+        border: Border.all(color: c.withValues(alpha: 0.5)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Icon(Icons.label_outline_rounded, size: 13, color: c),
+          const SizedBox(width: 4),
+          Text(context.tr('riderActionNameOnly'),
+              style: const TextStyle(color: c, fontSize: 11, fontWeight: FontWeight.w800)),
+        ],
+      ),
+    );
+  }
+}
+
+/// The one chip every screen draws for a resolved answer: the neutral "Name
+/// only" chip for a bare name, the rider-action chip otherwise, nothing when
+/// the answer has no rider action.
+class FaultActionChip extends StatelessWidget {
+  const FaultActionChip(this.r, {super.key});
+  final ResolvedFault r;
+
+  @override
+  Widget build(BuildContext context) {
+    if (r.isNameOnly) return const NameOnlyChip();
+    final a = r.riderAction;
+    return a == null ? const SizedBox.shrink() : RiderActionChip(a);
+  }
+}
+
 /// The guidance below the title.
 class ResolvedGuidance extends StatelessWidget {
   const ResolvedGuidance(this.r, {super.key, this.showHints = false});
@@ -127,7 +172,13 @@ class ResolvedGuidance extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final meaning = r.meaning ?? '';
+    // A name-only card shows its title once: the "Standard name: <title>."
+    // line only repeats it. (The line stays in the data.)
+    final title = r.title ?? '';
+    final repeatsTitle = r.isNameOnly &&
+        title.isNotEmpty &&
+        (r.meaning ?? '').contains(title);
+    final meaning = repeatsTitle ? '' : (r.meaning ?? '');
     final advice = r.riderAdvice ?? '';
     final reason = r.canRideReason ?? '';
     final conditions = [

@@ -324,7 +324,7 @@ class _SessionDetail extends StatelessWidget {
                               color: _C.textMain, fontFamily: 'monospace',
                               fontWeight: FontWeight.w900, fontSize: 16)),
                       const SizedBox(width: 8),
-                      if (r.riderAction != null) RiderActionChip(r.riderAction!),
+                      if (r.riderAction != null) FaultActionChip(r),
                     ]),
                     const SizedBox(height: 6),
                     Text(describeResolved(context, r),
