@@ -140,10 +140,10 @@ void main() {
       final s = await open(tester, EngineSim(mode03: twoCodes));
       expect(s.inCard('engine'), containsAll(['1', t('sectionFaultOne')]));
       expect(s.inCard('network'), containsAll(['1', t('sectionFoundN').replaceAll('{n}', '1')]));
-      expect(s.inCard('body'), contains(t('sectionNoneFound')));
+      expect(s.inCard('body'), contains(t('sectionNoneInResults')));
       expect(s.inCard('body'), contains(t('sectionBasedOn')));
-      expect(s.inCard('transmission'), contains(t('sectionNoneFound')));
-      expect(s.inCard('other'), contains(t('sectionNoneFound')));
+      expect(s.inCard('transmission'), contains(t('sectionNoneInResults')));
+      expect(s.inCard('other'), contains(t('sectionNoneInResults')));
       // The ABS module was never scanned and must not be called clean.
       expect(s.inCard('brakes'), contains(t('sectionNotScanned')));
       expect(s.inCard('brakes'), isNot(contains(t('sectionNoFaults'))));
@@ -153,7 +153,7 @@ void main() {
     testWidgets('engine answered with nothing: no faults', (tester) async {
       final s = await open(tester, EngineSim(mode03: '43 00'));
       expect(s.inCard('engine'), contains(t('sectionNoFaults')));
-      expect(s.inCard('body'), contains(t('sectionNoneFound')));
+      expect(s.inCard('body'), contains(t('sectionNoneInResults')));
       expect(s.inCard('brakes'), contains(t('sectionNotScanned')));
       await s.close();
     });
@@ -165,7 +165,7 @@ void main() {
       expect(s.inCard('engine'), isNot(contains(t('sectionNoFaults'))));
       for (final n in ['body', 'network', 'transmission', 'other']) {
         expect(s.inCard(n), contains(t('sectionNotScannedYet')), reason: n);
-        expect(s.inCard(n), isNot(contains(t('sectionNoneFound'))), reason: n);
+        expect(s.inCard(n), isNot(contains(t('sectionNoneInResults'))), reason: n);
       }
       await s.close();
     });
@@ -247,7 +247,7 @@ void main() {
       await s.tap(s.card('body'));
       expect(s.texts, isNot(contains('P0133')));
       expect(s.texts, isNot(contains('U0100')));
-      expect(s.texts, contains(t('sectionNoneFound')));
+      expect(s.texts, contains(t('sectionNoneInResults')));
       await s.close();
     });
 
@@ -309,7 +309,7 @@ void main() {
           expect(s.texts, contains(t(k, lang)), reason: k);
         }
         expect(s.inCard('engine'), contains(t('sectionFaultOne', lang)));
-        expect(s.inCard('body'), contains(t('sectionNoneFound', lang)));
+        expect(s.inCard('body'), contains(t('sectionNoneInResults', lang)));
         expect(s.inCard('body'), contains(t('sectionBasedOn', lang)));
         await s.close();
       });
@@ -320,7 +320,7 @@ void main() {
         'sectionEngine', 'sectionBrakes', 'sectionBody', 'sectionNetwork',
         'sectionTransmission', 'sectionOther', 'sectionAll', 'sectionNotScanned',
         'sectionNotScannedYet', 'sectionScanning', 'sectionFaultOne',
-        'sectionFaultsN', 'sectionFoundN', 'sectionNoFaults', 'sectionNoneFound',
+        'sectionFaultsN', 'sectionFoundN', 'sectionNoFaults', 'sectionNoneInResults',
         'sectionBasedOn', 'sectionFromEngineScan', 'sectionEngineBusy',
         'sectionNotReadable',
       ];

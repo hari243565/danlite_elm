@@ -296,7 +296,10 @@ void main() {
     var texts = await renderedTexts(tester, obd);
     expect(texts, contains('P0133'));
     expect(texts.any((t) => t.startsWith('LIVE SCAN')), isTrue);
-    expect(texts.any((t) => t.startsWith('Read at')), isFalse);
+    // Phase 4A H3c: the Engine CARD always carries its own read time, so an
+    // old result never looks live from another tab. The summary bar is still
+    // the LIVE SCAN stamp, never a "Read at" - exactly one, and it is the card's.
+    expect(texts.where((t) => t.startsWith('Read at')).length, 1);
 
     // 2. The adapter stops answering 03: the read times out.
     await tester.runAsync(() async {

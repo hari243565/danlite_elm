@@ -585,6 +585,7 @@ class _DtcScreenState extends State<DtcScreen> {
       absOutcome: obd.chassisScanOutcome,
       absScanning: obd.chassisScanInFlight,
       absCodes: obd.chassisDtcCodes,
+      absReadAt: obd.chassisReadAt,
       knowledgeSystemOf: knowledgeSystemOf,
     );
     return (found: found, summaries: summaries);
@@ -637,7 +638,7 @@ class _DtcScreenState extends State<DtcScreen> {
         return switch (s.status) {
           SectionStatus.found =>
             context.trArgs('sectionFoundN', {'n': '${s.count}'}),
-          SectionStatus.noFaults => context.tr('sectionNoneFound'),
+          SectionStatus.noFaults => context.tr('sectionNoneInResults'),
           _ => context.tr('sectionNotScannedYet'),
         };
     }
@@ -681,6 +682,7 @@ class _DtcScreenState extends State<DtcScreen> {
               title: _sectionName(context, s.section),
               state: _sectionState(context, s),
               caption: _sectionCaption(context, s),
+              stamp: s.readAt == null ? null : _readAtLabel(context, s.readAt!),
               badge: s.status == SectionStatus.found ? s.count : null,
               selected: _section == s.section,
               width: 152,
@@ -701,6 +703,7 @@ class _DtcScreenState extends State<DtcScreen> {
     required double width,
     String? state,
     String? caption,
+    String? stamp,
     int? badge,
   }) {
     final accent = selected ? _RC.neonCyan : _RC.textMuted;
@@ -765,6 +768,16 @@ class _DtcScreenState extends State<DtcScreen> {
               if (caption != null) ...[
                 const Spacer(),
                 Text(caption,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style:
+                        const TextStyle(color: _RC.textMuted, fontSize: 9)),
+              ],
+              // When the scan this card describes finished: an older result
+              // must not look live while the rider is on another tab.
+              if (stamp != null) ...[
+                if (caption == null) const Spacer(),
+                Text(stamp,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style:
@@ -1670,6 +1683,15 @@ class _DtcScreenState extends State<DtcScreen> {
   Widget _buildChassisSummaryBar(
       BuildContext context, ObdService obd, List<DtcCode> codes) {
     final responded = obd.chassisRespondingModule;
+    // Green "0" only when the module answered with nothing; a module that was
+    // never scanned or never replied has no count to show.
+    final summary = absSummaryFor(obd.chassisScanOutcome,
+        scanning: obd.chassisScanInFlight);
+    final countColor = switch (summary.tone) {
+      SummaryTone.clean => _RC.neonGreen,
+      SummaryTone.faults => _RC.neonRed,
+      SummaryTone.neutral => _RC.textMuted,
+    };
     return Container(
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
       decoration: const BoxDecoration(
@@ -1680,14 +1702,16 @@ class _DtcScreenState extends State<DtcScreen> {
         children: [
           _statChip(
               label: context.tr('dtcCodesChip'),
-              value: '${codes.length}',
-              color: codes.isEmpty ? _RC.neonGreen : _RC.neonRed),
+              value: summary.showsCount ? '${codes.length}' : '—',
+              color: countColor),
           const SizedBox(width: 10),
           Expanded(
             child: Text(
-              responded.isEmpty
-                  ? context.tr('moduleAbs')
-                  : '${context.tr('absRespondingModule')}: $responded',
+              summary.noteKey != null
+                  ? context.tr(summary.noteKey!)
+                  : responded.isEmpty
+                      ? context.tr('moduleAbs')
+                      : '${context.tr('absRespondingModule')}: $responded',
               textAlign: TextAlign.end,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,

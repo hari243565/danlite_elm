@@ -118,7 +118,7 @@ enum SectionStatus {
 
 class SectionSummary {
   const SectionSummary(this.section, this.status, this.count,
-      {this.fromEngineScanOnly = false});
+      {this.fromEngineScanOnly = false, this.readAt});
 
   final FaultSection section;
   final SectionStatus status;
@@ -131,6 +131,63 @@ class SectionSummary {
   /// engine computer's list) and the ABS module itself has not reported any.
   /// The card says where they came from instead of implying an ABS scan.
   final bool fromEngineScanOnly;
+
+  /// Engine and Brakes & ABS only: when the scan this card describes finished,
+  /// so an older result never looks live while the rider is elsewhere. Null
+  /// when nothing was scanned yet, or a scan is running (its number is about
+  /// to change). The other four cards never carry one: they summarise two
+  /// scans and have no read time of their own.
+  final DateTime? readAt;
+}
+
+/// How the ABS summary chip reads.
+enum SummaryTone {
+  /// The module answered and has no codes: the only green.
+  clean,
+
+  /// The module answered and has codes.
+  faults,
+
+  /// No answer, not scanned, or a scan running: no number, no colour claim.
+  neutral,
+}
+
+class AbsSummary {
+  const AbsSummary(this.tone, this.noteKey);
+
+  final SummaryTone tone;
+
+  /// `AppStrings` key for the words beside the chip, or null to keep the
+  /// module name. Always an existing ABS outcome string.
+  final String? noteKey;
+
+  /// A count is only a fact when the module answered.
+  bool get showsCount => tone != SummaryTone.neutral;
+}
+
+/// What the ABS summary chip says for [outcome]. A code count of zero is shown
+/// as "0" in green only for [ChassisScanOutcome.clean]; every other state that
+/// has no codes on screen (never scanned, no reply, busy, adapter limit, link
+/// lost, scan running) is neutral, so an unreached module is never shown as a
+/// healthy one.
+AbsSummary absSummaryFor(ChassisScanOutcome outcome, {required bool scanning}) {
+  if (scanning) return const AbsSummary(SummaryTone.neutral, 'sectionScanning');
+  switch (outcome) {
+    case ChassisScanOutcome.clean:
+      return const AbsSummary(SummaryTone.clean, null);
+    case ChassisScanOutcome.faultsFound:
+      return const AbsSummary(SummaryTone.faults, null);
+    case ChassisScanOutcome.idle:
+      return const AbsSummary(SummaryTone.neutral, 'sectionNotScanned');
+    case ChassisScanOutcome.noModuleResponse:
+      return const AbsSummary(SummaryTone.neutral, 'absNoModule');
+    case ChassisScanOutcome.moduleBusy:
+      return const AbsSummary(SummaryTone.neutral, 'absModuleBusyTitle');
+    case ChassisScanOutcome.addressingUnsupported:
+      return const AbsSummary(SummaryTone.neutral, 'absAddressingUnsupported');
+    case ChassisScanOutcome.linkUnavailable:
+      return const AbsSummary(SummaryTone.neutral, 'connectionFailed');
+  }
 }
 
 /// One code from a scan that answered, with its section and its source.
@@ -192,6 +249,7 @@ List<SectionSummary> summariseSections({
   required ChassisScanOutcome absOutcome,
   required bool absScanning,
   required List<DtcCode> absCodes,
+  DateTime? absReadAt,
   FaultSystem? Function(DtcCode code)? knowledgeSystemOf,
 }) {
   final found = foundCodes(
@@ -254,14 +312,23 @@ List<SectionSummary> summariseSections({
         FaultSection.engine => SectionSummary(
             s,
             engineStatus(),
-            engineAnswered ? countOf(s) : 0),
+            engineAnswered ? countOf(s) : 0,
+            readAt: engineScanning ? null : engineRead?.at),
         FaultSection.brakes => () {
             final n = countOf(s);
             final fromEngineOnly = n > 0 &&
                 !found.any((f) => f.section == s && f.fromAbs) &&
                 !absScanning;
+            // The time of the scan the card's words describe: the ABS scan
+            // when there is one, the engine read when its C codes are all
+            // there is.
+            final DateTime? at = absScanning
+                ? null
+                : absOutcome != ChassisScanOutcome.idle
+                    ? absReadAt
+                    : (fromEngineOnly ? engineRead?.at : null);
             return SectionSummary(s, brakesStatus(n), n,
-                fromEngineScanOnly: fromEngineOnly);
+                fromEngineScanOnly: fromEngineOnly, readAt: at);
           }(),
         _ => SectionSummary(
             s,
