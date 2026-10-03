@@ -13,6 +13,7 @@ library;
 
 import 'dart:convert';
 import 'dart:io' show gzip;
+import 'dart:typed_data' show BytesBuilder;
 
 import 'package:sqflite/sqflite.dart';
 
@@ -29,6 +30,14 @@ const int kMaxPackDecodedBytes = 50 * 1024 * 1024;
 
 /// SQLite on old Android allows 999 host parameters; stay well under it.
 const int _sqlChunk = 400;
+
+/// Rows handled between two hand-backs to the event loop. A pack of 10,000
+/// entries is ~250 ms of parsing and checking in one go; done in slices of
+/// this size the screen keeps drawing and taps keep landing while it runs.
+const int _sliceRows = 250;
+
+/// Let the event loop run (frames, taps, timers) before the next slice.
+Future<void> _yield() => Future<void>.delayed(Duration.zero);
 
 enum ImportRefusal {
   manifestInvalid,
@@ -206,8 +215,15 @@ class KnowledgeStore {
   static String _escapeLike(String s) =>
       s.replaceAll('\\', '\\\\').replaceAll('%', '\\%').replaceAll('_', '\\_');
 
-  Future<List<KbEntry>> _entries(String sql, List<Object?> args) async =>
-      [for (final r in await db.rawQuery(sql, args)) KbEntry.fromRow(r)];
+  Future<List<KbEntry>> _entries(String sql, List<Object?> args) async {
+    final rows = await db.rawQuery(sql, args);
+    final out = <KbEntry>[];
+    for (final r in rows) {
+      out.add(KbEntry.fromRow(r));
+      if (out.length % _sliceRows == 0) await _yield();
+    }
+    return out;
+  }
 
   // ══════════════════════════════════════════════════════════════════════
   // Import
@@ -256,7 +272,9 @@ class KnowledgeStore {
     if (entriesBytes.length > kMaxPackBytes) return refuse(ImportRefusal.tooLarge);
 
     // ── integrity and signature ─────────────────────────────────────────
-    if (await sha256Hex(entriesBytes) != m.contentSha256) {
+    final hash = await sha256Hex(entriesBytes);
+    await _yield();
+    if (hash != m.contentSha256) {
       return refuse(ImportRefusal.hashMismatch);
     }
     if (source == PackSource.downloaded) {
@@ -285,18 +303,23 @@ class KnowledgeStore {
     } catch (e) {
       return refuse(ImportRefusal.entriesInvalid, ['entries file cannot be decompressed']);
     }
+    await _yield();
     final String text;
     try {
       text = utf8.decode(raw);
     } on FormatException {
       return refuse(ImportRefusal.notUtf8);
     }
+    await _yield();
+    final textLines = const LineSplitter().convert(text);
+    await _yield();
     final entries = <KbEntry>[];
     final errors = <String>[];
     final ids = <String>{};
     var lineNo = 0;
-    for (final line in const LineSplitter().convert(text)) {
+    for (final line in textLines) {
       lineNo++;
+      if (lineNo % _sliceRows == 0) await _yield();
       if (line.trim().isEmpty) continue;
       Object? json;
       try {
@@ -350,11 +373,15 @@ class KnowledgeStore {
         await txn.delete('kb_revoked', where: 'pack_id = ?', whereArgs: [m.packId]);
         final half = entries.length ~/ 2;
         Future<void> insert(Iterable<KbEntry> rows) async {
-          final b = txn.batch();
-          for (final e in rows) {
-            b.insert('kb_entry', e.toRow());
+          final list = rows.toList();
+          for (var i = 0; i < list.length; i += _sliceRows * 2) {
+            final b = txn.batch();
+            for (final e in list.skip(i).take(_sliceRows * 2)) {
+              b.insert('kb_entry', e.toRow());
+            }
+            await b.commit(noResult: true);
+            await _yield();
           }
-          await b.commit(noResult: true);
         }
 
         await insert(entries.take(half));
@@ -394,12 +421,14 @@ class KnowledgeStore {
 
   static List<int> _maybeGunzip(List<int> bytes) {
     if (bytes.length < 2 || bytes[0] != 0x1f || bytes[1] != 0x8b) return bytes;
-    final out = <int>[];
+    // BytesBuilder keeps the chunks as bytes; a growable List<int> would spend
+    // 8 bytes of memory per byte of a pack that can expand to 50 MB.
+    final out = BytesBuilder(copy: false);
     final sink = ChunkedConversionSink<List<int>>.withCallback((chunks) {});
     final conv = gzip.decoder.startChunkedConversion(_CappedSink(out, sink));
     conv.add(bytes);
     conv.close();
-    return out;
+    return out.takeBytes();
   }
 }
 
@@ -415,13 +444,13 @@ class _TooLarge implements Exception {}
 /// small file that expands enormously cannot exhaust memory.
 class _CappedSink implements Sink<List<int>> {
   _CappedSink(this.out, this.inner);
-  final List<int> out;
+  final BytesBuilder out;
   final Sink<List<int>> inner;
 
   @override
   void add(List<int> data) {
     if (out.length + data.length > kMaxPackDecodedBytes) throw _TooLarge();
-    out.addAll(data);
+    out.add(data);
   }
 
   @override
