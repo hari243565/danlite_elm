@@ -3,3 +3,10 @@ Coolant Temperature Relapsed Below Diagnostic Monitoring Temperature	कूल�
 Misfire Detected with Low Fuel	लो फ़्यूल के साथ मिसफ़ायर पाया गया
 Up and Down Shift Switch to Transmission Range Correlation	अप और डाउन शिफ़्ट स्विच और ट्रांसमिशन रेंज का कोरिलेशन
 System Voltage Too Low for Voltage Step Down Conversion	वोल्टेज स्टेप डाउन कन्वर्ज़न के लिए सिस्टम वोल्टेज बहुत कम
+Air Leak Between MAF and Throttle Body	MAF और थ्रॉटल बॉडी के बीच एयर रिसाव
+Air Leak Between Throttle Body and Intake Valves	थ्रॉटल बॉडी और इनटेक वाल्व के बीच एयर रिसाव
+Air Flow Restriction/Air Leak Between Air Filter and MAF (Bank 2)	एयर फ़्लो रुकावट/एयर रिसाव, एयर फ़िल्टर और MAF के बीच (बैंक 2)
+Air Flow Restriction/Air Leak Between Air Filter and MAF (Bank 1)	एयर फ़्लो रुकावट/एयर रिसाव, एयर फ़िल्टर और MAF के बीच (बैंक 1)
+Vehicle Conditions Incorrect for Particulate Filter Regeneration	पर्टिकुलेट फ़िल्टर रीजनरेशन के लिए वाहन की स्थितियाँ गलत
+Alternative Fuel System - Injector Leakage to Rail Detected	वैकल्पिक फ़्यूल सिस्टम - इंजेक्टर से रेल तक लीकेज पाया गया
+Excessive Time to Enter Alternative Fuel Control	वैकल्पिक फ़्यूल कंट्रोल में प्रवेश में अत्यधिक समय

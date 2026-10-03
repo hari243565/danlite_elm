@@ -466,3 +466,62 @@ overtemperature	अधिक तापमान
 state of charge	स्टेट ऑफ़ चार्ज
 loss of pressure	प्रेशर में हानि
 loss of direction signal	दिशा सिग्नल में हानि
+# round 6 (batches P08-P10)
+accumulation	एक्यूमुलेशन
+adjustment	एडजस्टमेंट
+adsorber	एडसॉर्बर
+adsorption	एडसॉर्प्शन
+ash	ऐश
+at	पर
+at idle	आइडल पर
+at higher load	ज़्यादा लोड पर
+between	के बीच
+blockage	ब्लॉकेज
+conditions	स्थितियाँ
+consumption	खपत
+deceleration	डिसेलरेशन
+differential	डिफ़रेंशियल
+duration	अवधि
+during	के दौरान
+during deceleration	डिसेलरेशन के दौरान
+during balance	बैलेंस के दौरान
+during cylinder deactivation	सिलेंडर डीएक्टिवेशन के दौरान
+exceeding	पार
+exceeding learn limit	लर्न सीमा पार
+exceeded control limits	कंट्रोल सीमा पार
+exceeded learning limits	लर्निंग सीमा पार
+exceeded learning limit	लर्निंग सीमा पार
+feedback	फ़ीडबैक
+fired	फ़ायर्ड
+group	ग्रुप
+hc	HC
+ice	बर्फ़
+imbalance	असंतुलन
+imt	IMT
+incomplete	अधूरा
+inducement	इंड्यूसमेंट
+learn	लर्न
+limits	सीमाएँ
+maf	MAF
+matter	मैटर
+maximum	अधिकतम
+missing	गायब
+particulate	पर्टिकुलेट
+post	पोस्ट
+pre	प्री
+pumping	पंपिंग
+quality	क्वालिटी
+regeneration	रीजनरेशन
+runner	रनर
+sample	सैंपल
+sensing	सेंसिंग
+soot	सूट
+substrate	सबस्ट्रेट
+sudden	अचानक
+valves	वाल्व
+water	वाटर
+# round 6b: phrases
+off idle	आइडल से बाहर
+closed loop	क्लोज़्ड लूप
+water in fuel	फ़्यूल में पानी
+unable to achieve locked position	लॉक्ड पोज़ीशन तक पहुँचने में असमर्थ

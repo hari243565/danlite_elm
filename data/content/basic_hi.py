@@ -36,6 +36,12 @@ FRAMES = [
     (("stuck", "in"), "{x} में अटका"),
     (("incorrect", "shift", "from"), "{x} से गलत शिफ़्ट"),
     (("replace",), "{x} बदलें"),
+    (("excessive", "time", "to", "enter", "closed", "loop"), "{x}: क्लोज़्ड लूप में प्रवेश में अत्यधिक समय"),
+]
+# rules for a phrase in the MIDDLE of a title: words before it ({a}) and after it ({b}) are translated separately.
+# A trailing "(Bank 1 ...)" group (one that contains letters) stays at the end.
+MIDDLE = [
+    (("shorted", "to"), "{a} का {b} से शॉर्ट"),
 ]
 
 
@@ -129,7 +135,32 @@ class Translator:
                 if missing:
                     raise Missing(missing)
                 return nfc(tmpl.replace("{x}", self._join(rest)))
+        for mid, tmpl in MIDDLE:
+            hit = self._split_middle(toks, low, mid)
+            if hit:
+                a, b, tail = hit
+                ua, ub = self._units(a, missing), self._units(b, missing)
+                ut = self._units(tail, missing)
+                if missing:
+                    raise Missing(missing)
+                text = tmpl.replace("{a}", self._join(ua)).replace("{b}", self._join(ub))
+                return nfc(text + ((" " if tail[0][1] else "") + self._join(ut) if tail else ""))
         units = self._units(toks, missing)
         if missing:
             raise Missing(missing)
         return nfc(self._join(units))
+
+    @staticmethod
+    def _split_middle(toks, low, mid):
+        n = len(mid)
+        for i in range(1, len(toks) - n):
+            if tuple(low[i:i + n]) == mid:
+                rest = toks[i + n:]
+                tail = []
+                if rest and rest[-1][0] == ")":
+                    j = max(k for k, t in enumerate(rest) if t[0] == "(") if any(t[0] == "(" for t in rest) else None
+                    if j is not None and any(t[0].isalpha() for t in rest[j:]):
+                        tail, rest = rest[j:], rest[:j]
+                if rest:
+                    return toks[:i], rest, tail
+        return None
