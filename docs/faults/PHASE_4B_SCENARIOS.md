@@ -39,3 +39,14 @@ sits on the Fault Codes tab above the results (both the Engine and the ABS / Cha
 - **Engine card, "No faults" with other codes on screen.** If the engine answered and every code in its list belongs
   to another section, the Engine card says "No faults" and the other card shows the count.
 - The cards appear only when connected; disconnected, nothing could have been scanned.
+
+## B2 — entry points
+
+"Look up a code" and "Scan history" were reachable only through two unlabelled app-bar icons. They are now labelled
+buttons on the tab itself: in a row above the section cards when connected, and in place of the single lookup button
+when no adapter is connected (neither needs one). The same two existing screens open; no logic changed, and the
+app-bar icons are kept.
+
+| Question | Answer | Proving test |
+|---|---|---|
+| Reachable, labelled, connected and not | Both buttons present, labelled in the rider's language, each opens the existing screen | `fault_entry_points_test.dart` "B2 …" (8 tests: connected × disconnected × lookup/history, Hindi labels, old icon still works) |

@@ -422,7 +422,10 @@ class _DtcScreenState extends State<DtcScreen> {
         children: [
           if (recorder?.enabled ?? false) _recorderStrip(context),
           _buildModuleSelector(context),
-          if (sections != null) _buildSectionStrip(context, sections.summaries),
+          if (sections != null) ...[
+            _buildToolsRow(context),
+            _buildSectionStrip(context, sections.summaries),
+          ],
           Expanded(
             child: obd.isConnected
                 ? (_module == DtcModule.engine
@@ -451,6 +454,62 @@ class _DtcScreenState extends State<DtcScreen> {
                       fontSize: 11.5,
                       fontWeight: FontWeight.w700)),
             ),
+          ],
+        ),
+      );
+
+  // ── Entry points (Phase 4B, B2) ───────────────────────────────────────────
+  // The lookup and the scan history already existed behind two unlabelled
+  // app-bar icons. These are the same screens, reached by labelled controls.
+
+  void _openHistory() => Navigator.of(context).push(
+      MaterialPageRoute<void>(builder: (_) => const ScanHistoryScreen()));
+
+  Widget _toolChip(
+          {required String name,
+          required IconData icon,
+          required String label,
+          required VoidCallback onTap}) =>
+      OutlinedButton.icon(
+        key: ValueKey('tool-$name'),
+        onPressed: onTap,
+        icon: Icon(icon, size: 16),
+        label: Text(label,
+            maxLines: 1,
+            style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 11.5)),
+        style: OutlinedButton.styleFrom(
+          foregroundColor: _RC.neonCyan,
+          side: BorderSide(color: _RC.neonCyan.withValues(alpha: 0.45)),
+          visualDensity: VisualDensity.compact,
+          padding: const EdgeInsets.symmetric(horizontal: 10),
+        ),
+      );
+
+  List<Widget> _toolChips(BuildContext context) => [
+        _toolChip(
+            name: 'lookup',
+            icon: Icons.manage_search_rounded,
+            label: context.tr('lookupTitle'),
+            onTap: _openLookup),
+        _toolChip(
+            name: 'history',
+            icon: Icons.history_rounded,
+            label: context.tr('historyTitle'),
+            onTap: _openHistory),
+      ];
+
+  /// One row of labelled controls above the section cards.
+  Widget _buildToolsRow(BuildContext context) => Container(
+        height: 48,
+        decoration: const BoxDecoration(
+          color: _RC.surface,
+          border: Border(bottom: BorderSide(color: _RC.border)),
+        ),
+        child: ListView(
+          scrollDirection: Axis.horizontal,
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
+          children: [
+            for (final c in _toolChips(context)) ...[c, const SizedBox(width: 8)],
           ],
         ),
       );
@@ -824,17 +883,13 @@ class _DtcScreenState extends State<DtcScreen> {
                   textAlign: TextAlign.center,
                   style: const TextStyle(color: _RC.textMuted, fontSize: 13)),
             ),
-            // Lookup needs no adapter: offer it right here.
+            // The lookup and the history need no adapter: offer them here.
             const SizedBox(height: 18),
-            OutlinedButton.icon(
-              onPressed: _openLookup,
-              icon: const Icon(Icons.manage_search_rounded, size: 18),
-              label: Text(context.tr('lookupTitle'),
-                  style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 12.5)),
-              style: OutlinedButton.styleFrom(
-                foregroundColor: _RC.neonCyan,
-                side: BorderSide(color: _RC.neonCyan.withValues(alpha: 0.45)),
-              ),
+            Wrap(
+              alignment: WrapAlignment.center,
+              spacing: 8,
+              runSpacing: 8,
+              children: _toolChips(context),
             ),
           ],
         ),
