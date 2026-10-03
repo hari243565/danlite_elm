@@ -645,6 +645,57 @@ class AppStrings {
       'adapterHelpBlinkBody':
           'Some bikes can only be read by blink code or with a dealer tool.',
 
+      // ── Phase 4B: blink-code references (English; the Hindi is below) ──────
+      'blinkRefsTitle': 'Blink-code references',
+      'blinkRefsIntro':
+          'Look-up tables for bikes whose fault codes are shown by a warning '
+          'lamp. They read nothing from your bike.',
+      'blinkRefsRoyal': 'Royal Enfield older EFI blink codes',
+      'blinkRefsRoyalSub': 'Bullet Classic EFI and Bullet Electra EFI (UCE era)',
+      'blinkRefsHondaSub': 'ABS warning lamp',
+      'reBlinkTitle': 'Royal Enfield EFI blink codes',
+      'reBlinkAppliesTitle': 'Which bikes this is for',
+      'reBlinkApplies':
+          'This applies ONLY to the Bullet Classic EFI and Bullet Electra EFI '
+          'of the UCE era. It does NOT apply to the BS6 Classic 350, Meteor or '
+          'Hunter.',
+      'reBlinkIntro':
+          'This is a look-up table, not a scan. Your bike\'s warning lamp '
+          'shows the code; you count the blinks and read the maker\'s '
+          'published meaning here. The app reads nothing from the bike.',
+      'reBlinkHowTo': 'How to get the blinks',
+      'reBlinkHowToBody':
+          'Put a wire into the open single-pole test-pin connector near the '
+          'engine control unit and ground it to earth. The warning lamp then '
+          'blinks a LONG count and a SHORT count. Count the long blinks '
+          'first, then the short ones.',
+      'reBlinkNotGiven':
+          'The manual pages read do not say how long each blink lasts or how '
+          'to clear the codes. If you are unsure, ask a Royal Enfield service '
+          'centre.',
+      'reBlinkChoose': 'Choose the long and short counts to see the match.',
+      'reBlinkNoMatch': 'No code in the table for this pattern',
+      'reBlinkNoMatchDesc':
+          'The table has no entry for this combination. Count the blinks '
+          'again, or ask a Royal Enfield service centre to read the code.',
+      'reBlinkDealerCode': 'Dealer-tool code',
+      'reBlinkMfrCode': 'Manufacturer code',
+      'reBlinkEffectRuns': 'Runs, but under-performs',
+      'reBlinkEffectNoStart': 'Cranks, but will not start',
+      'reBlinkSource':
+          'Source: Royal Enfield Bullet Classic EFI service manual, pages 163 '
+          'to 164.',
+      'reBlinkMeaningTps': 'Throttle position sensor circuit',
+      'reBlinkMeaningMap': 'Manifold pressure sensor circuit',
+      'reBlinkMeaningEot': 'Engine oil temperature sensor circuit',
+      'reBlinkMeaningO2': 'Oxygen sensor circuit',
+      'reBlinkMeaningO2Heater': 'Oxygen sensor heater circuit',
+      'reBlinkMeaningRollover': 'Rollover (tip-over) sensor circuit',
+      'reBlinkMeaningInjector': 'Fuel injector circuit',
+      'reBlinkMeaningCoil': 'Ignition coil circuit',
+      'reBlinkMeaningFuelPump': 'Fuel pump circuit',
+      'reBlinkMeaningCrank': 'Crankshaft position sensor circuit',
+
       'emissionReadiness': 'Emission Readiness',
       'freezeFrameTitle': 'Freeze Frame Data',
       'freezeFrameDesc':
@@ -1669,6 +1720,55 @@ class AppStrings {
       'adapterHelpBlinkTitle': 'ब्लिंक कोड या डीलर टूल',
       'adapterHelpBlinkBody':
           'कुछ बाइकें सिर्फ़ ब्लिंक कोड से या डीलर टूल से ही पढ़ी जा सकती हैं।',
+
+      // ── Phase 4B: blink-code references. PROPOSED Hindi (not the owner's
+      // own wording). Part names are workshop loanwords; ECU stays Latin.
+      'blinkRefsTitle': 'ब्लिंक कोड संदर्भ',
+      'blinkRefsIntro':
+          'उन बाइकों के लिए देखने की तालिकाएँ जिनके फ़ॉल्ट कोड वार्निंग लैंप से '
+          'दिखते हैं। ये बाइक से कुछ नहीं पढ़तीं।',
+      'blinkRefsRoyal': 'Royal Enfield पुरानी EFI के ब्लिंक कोड',
+      'blinkRefsRoyalSub': 'Bullet Classic EFI और Bullet Electra EFI (UCE दौर)',
+      'blinkRefsHondaSub': 'ABS वार्निंग लैंप',
+      'reBlinkTitle': 'Royal Enfield EFI ब्लिंक कोड',
+      'reBlinkAppliesTitle': 'यह किन बाइकों के लिए है',
+      'reBlinkApplies':
+          'यह सिर्फ़ UCE दौर की Bullet Classic EFI और Bullet Electra EFI पर लागू '
+          'होता है। यह BS6 Classic 350, Meteor या Hunter पर लागू नहीं होता।',
+      'reBlinkIntro':
+          'यह देखने की तालिका है, स्कैन नहीं। कोड बाइक का वार्निंग लैंप दिखाता है; '
+          'आप ब्लिंक गिनकर यहाँ निर्माता का प्रकाशित मतलब देखते हैं। ऐप बाइक से '
+          'कुछ नहीं पढ़ता।',
+      'reBlinkHowTo': 'ब्लिंक कैसे निकालें',
+      'reBlinkHowToBody':
+          'ECU के पास खुले सिंगल-पोल टेस्ट-पिन कनेक्टर में एक तार लगाएँ और उसे '
+          'अर्थ से जोड़ें। इसके बाद वार्निंग लैंप पहले LONG गिनती और फिर SHORT '
+          'गिनती में ब्लिंक करता है। पहले लंबे ब्लिंक गिनें, फिर छोटे।',
+      'reBlinkNotGiven':
+          'जो मैनुअल पन्ने पढ़े गए, उनमें यह नहीं बताया गया कि हर ब्लिंक कितनी देर '
+          'का होता है या कोड कैसे साफ़ करें। पक्का न हो तो Royal Enfield सर्विस '
+          'सेंटर से पूछें।',
+      'reBlinkChoose': 'मिलान देखने के लिए लंबी और छोटी गिनती चुनें।',
+      'reBlinkNoMatch': 'इस पैटर्न के लिए तालिका में कोई कोड नहीं',
+      'reBlinkNoMatchDesc':
+          'तालिका में इस जोड़ी की कोई प्रविष्टि नहीं है। ब्लिंक दोबारा गिनें, या '
+          'Royal Enfield सर्विस सेंटर से कोड पढ़वाएँ।',
+      'reBlinkDealerCode': 'डीलर टूल का कोड',
+      'reBlinkMfrCode': 'निर्माता का कोड',
+      'reBlinkEffectRuns': 'चलती है, पर कमज़ोर चलती है',
+      'reBlinkEffectNoStart': 'क्रैंक होती है, पर स्टार्ट नहीं होती',
+      'reBlinkSource':
+          'स्रोत: Royal Enfield Bullet Classic EFI सर्विस मैनुअल, पन्ने 163 से 164।',
+      'reBlinkMeaningTps': 'थ्रॉटल पोज़िशन सेंसर सर्किट',
+      'reBlinkMeaningMap': 'मैनिफ़ोल्ड प्रेशर सेंसर सर्किट',
+      'reBlinkMeaningEot': 'इंजन ऑयल तापमान सेंसर सर्किट',
+      'reBlinkMeaningO2': 'ऑक्सीजन सेंसर सर्किट',
+      'reBlinkMeaningO2Heater': 'ऑक्सीजन सेंसर हीटर सर्किट',
+      'reBlinkMeaningRollover': 'रोलओवर (गिरने का) सेंसर सर्किट',
+      'reBlinkMeaningInjector': 'फ़्यूल इंजेक्टर सर्किट',
+      'reBlinkMeaningCoil': 'इग्निशन कॉइल सर्किट',
+      'reBlinkMeaningFuelPump': 'फ़्यूल पंप सर्किट',
+      'reBlinkMeaningCrank': 'क्रैंकशाफ़्ट पोज़िशन सेंसर सर्किट',
 
       'emissionReadiness': 'उत्सर्जन तत्परता',
       'freezeFrameDesc':

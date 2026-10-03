@@ -70,3 +70,34 @@ cannot read yet, and bikes that can only be read by blink code or a dealer tool.
 
 Decision: the link also appears under "The adapter cannot address the ABS module" (not named in the brief) because
 that is the same adapter-reach problem in its plainest form. Easy to remove: `absOutcomeOffersAdapterHelp`.
+
+## B4 — Royal Enfield older-EFI blink reference (manual look-up, NOT a scan)
+
+Source: Royal Enfield Bullet Classic EFI service manual (221 pp), pages 163 to 164, read in full by the owner's
+assistant on 2026-10-01. Applies **only** to the Bullet Classic EFI and Bullet Electra EFI of the UCE era; the screen
+says so, in a bordered card before the procedure, and says it does NOT apply to the BS6 Classic 350, Meteor or Hunter.
+A small "Blink-code references" list (button on the Fault Codes tab, connected or not) leads to this screen and to
+the existing Honda one; a Royal Enfield vehicle profile sees the Royal Enfield entry first, anyone else sees Honda first
+(as before). The Honda screen, its table and the ABS blink gate that opens it are untouched.
+
+| Question | Answer | Proving test |
+|---|---|---|
+| The table is the manual's | Ten rows, the owner's order: 0-6 P0120, 0-9 P0105, 1-1 P0195, 1-7 P0130, 4-5 P0135 (run, under-perform); 1-5 P1630, 3-3 P0201, 3-7 P0351, 4-1 P0230, 6-6 P0335 (crank, will not start). P1630 alone is labelled "Manufacturer code" | `royal_enfield_blink_test.dart` "the table is the manual's table, row for row" (14) |
+| Every row, through the screen | Entering long then short shows the pattern, the dealer-tool code, the meaning and the effect | "each row, entered as long then short counts…" |
+| No match | All 90 unlisted patterns of 0..9 × 0..9 say "No code in the table for this pattern" and send the rider to a Royal Enfield service centre; long/short order matters (6-0 ≠ 0-6) | "B4 no match and input limits" (4), "a pattern not in the table…" |
+| Input limits | Pickers offer exactly 0 to 9 for each count; the lookup rejects anything outside 0..9; a half-entered pattern is not a pattern | "the pickers offer exactly 0 to 9", "only one count chosen", "counts outside 0..9 never match" |
+| Nothing pre-selected | The screen opens with a prompt, not a "match" the rider never entered | "nothing is chosen at first" |
+| States the gaps | The manual pages read give no blink duration and no way to clear codes; the screen says so | "the procedure is the manual's, and the gaps are stated" |
+| Provenance | The existing "From the manufacturer's service manual" label, plus a source line naming the manual and pages 163 to 164 | "says what it is, which bikes, how, and what it does not know" (en, hi) |
+| Not a scan | No button that reads anything; the existing "MANUAL REFERENCE — NOT A LIVE SCAN" badge first | "there is no scan or read button anywhere on it" |
+| The list and its order | Royal Enfield profile (spelling-tolerant: "ROYAL-ENFIELD", "RE") → Royal Enfield first; Honda, other makes, no profile → Honda first | "B4 the list of references" (5) |
+| Reachable from the tab | "Blink-code references" button, connected and disconnected | "B4 reachable from the Fault Codes tab" (2) |
+| Strings | 30 keys in English and Hindi, translated, Latin digits, Latin-script names kept; other languages fall back to English | "B4 strings" (3) |
+
+Decisions and notes (B4):
+
+- The table reads "long first, short second" exactly as the owner wrote it (0,6 = zero long, six short).
+- P0195 is shown as the manual states it ("engine oil temperature sensor circuit"), even though other sources title
+  that code differently; the app follows the manual.
+- Hindi for part names is the workshop loanword (थ्रॉटल, मैनिफ़ोल्ड, इग्निशन कॉइल…); all of it is **proposed**, not the
+  owner's own wording, and is listed in the final report.

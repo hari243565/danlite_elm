@@ -23,6 +23,7 @@ import '../models/vehicle_data.dart';
 import '../widgets/engine_context_view.dart';
 import '../widgets/resolved_fault_view.dart';
 import 'adapter_help_screen.dart';
+import 'blink_references_screen.dart';
 import 'code_lookup_screen.dart';
 import 'honda_blink_reference_screen.dart';
 import 'scan_history_screen.dart';
@@ -485,6 +486,9 @@ class _DtcScreenState extends State<DtcScreen> {
   void _openHistory() => Navigator.of(context).push(
       MaterialPageRoute<void>(builder: (_) => const ScanHistoryScreen()));
 
+  void _openBlinkReferences() => Navigator.of(context).push(
+      MaterialPageRoute<void>(builder: (_) => const BlinkReferencesScreen()));
+
   void _openAdapterHelp() => Navigator.of(context).push(
       MaterialPageRoute<void>(builder: (_) => const AdapterHelpScreen()));
 
@@ -532,6 +536,11 @@ class _DtcScreenState extends State<DtcScreen> {
             icon: Icons.history_rounded,
             label: context.tr('historyTitle'),
             onTap: _openHistory),
+        _toolChip(
+            name: 'blink-refs',
+            icon: Icons.menu_book_rounded,
+            label: context.tr('blinkRefsTitle'),
+            onTap: _openBlinkReferences),
       ];
 
   /// One row of labelled controls above the section cards.
