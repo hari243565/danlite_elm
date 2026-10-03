@@ -617,6 +617,34 @@ class AppStrings {
       'sectionEngineBusy': 'The engine computer is busy',
       'sectionNotReadable': 'Connection type not readable yet',
 
+      // ── Phase 4B: adapter help (English; the Hindi is below) ───────────────
+      'adapterHelpTitle': 'Which adapter works best?',
+      'adapterHelpIntro':
+          'This is general guidance. It does not promise that any adapter will '
+          'work with your bike.',
+      'adapterHelpEngineTitle': 'Reading engine codes',
+      'adapterHelpEngineBody':
+          'Most ELM327 adapters can read engine fault codes if your bike has '
+          'an OBD-II socket and the ignition is ON.',
+      'adapterHelpOtherTitle': 'Reading other modules, such as ABS',
+      'adapterHelpOtherBody':
+          'This needs an adapter that can address other modules. Many cheap '
+          'clones cannot. Adapters built on the STN11xx chip document that '
+          'they can.',
+      'adapterHelpConnTitle': 'How the adapter connects',
+      'adapterHelpConnBody':
+          'Today the app works with classic Bluetooth and Wi-Fi adapters.',
+      'adapterHelpCableTitle': 'The cable',
+      'adapterHelpCableBody':
+          'Many bikes need a bike-specific cable from their 2, 3, 4 or 6-pin '
+          'socket to the 16-pin adapter.',
+      'adapterHelpOlderTitle': 'Older bikes',
+      'adapterHelpOlderBody':
+          'Some older bikes use a connection type the app cannot read yet.',
+      'adapterHelpBlinkTitle': 'Blink code or dealer tool',
+      'adapterHelpBlinkBody':
+          'Some bikes can only be read by blink code or with a dealer tool.',
+
       'emissionReadiness': 'Emission Readiness',
       'freezeFrameTitle': 'Freeze Frame Data',
       'freezeFrameDesc':
@@ -1612,6 +1640,35 @@ class AppStrings {
       'sectionFromEngineScan': 'इंजन स्कैन से मिला।',
       'sectionEngineBusy': 'इंजन ECU व्यस्त है',
       'sectionNotReadable': 'कनेक्शन प्रकार अभी पढ़ा नहीं जा सकता',
+
+      // ── Phase 4B: adapter help. PROPOSED Hindi (not the owner's own wording).
+      'adapterHelpTitle': 'कौन-सा एडेप्टर सबसे अच्छा चलता है?',
+      'adapterHelpIntro':
+          'यह सामान्य जानकारी है। इसका मतलब यह नहीं कि कोई भी एडेप्टर आपकी बाइक पर '
+          'चलेगा ही।',
+      'adapterHelpEngineTitle': 'इंजन के फ़ॉल्ट कोड पढ़ना',
+      'adapterHelpEngineBody':
+          'ज़्यादातर ELM327 एडेप्टर इंजन के फ़ॉल्ट कोड पढ़ लेते हैं, बशर्ते बाइक में '
+          'OBD-II सॉकेट हो और इग्निशन ON हो।',
+      'adapterHelpOtherTitle': 'दूसरे मॉड्यूल पढ़ना, जैसे ABS',
+      'adapterHelpOtherBody':
+          'इसके लिए ऐसा एडेप्टर चाहिए जो दूसरे मॉड्यूल को एड्रेस कर सके। कई सस्ते '
+          'क्लोन ऐसा नहीं कर पाते। STN11xx चिप पर बने एडेप्टर के दस्तावेज़ों में यह '
+          'क्षमता बताई गई है।',
+      'adapterHelpConnTitle': 'एडेप्टर कैसे जुड़ता है',
+      'adapterHelpConnBody':
+          'अभी ऐप क्लासिक Bluetooth और Wi-Fi एडेप्टर के साथ चलता है।',
+      'adapterHelpCableTitle': 'केबल',
+      'adapterHelpCableBody':
+          'कई बाइकों में बाइक-विशेष केबल लगती है, जो बाइक के 2, 3, 4 या 6-पिन सॉकेट '
+          'से 16-पिन एडेप्टर तक जाती है।',
+      'adapterHelpOlderTitle': 'पुरानी बाइकें',
+      'adapterHelpOlderBody':
+          'कुछ पुरानी बाइकें ऐसे कनेक्शन का उपयोग करती हैं जिसे ऐप अभी नहीं पढ़ '
+          'सकता।',
+      'adapterHelpBlinkTitle': 'ब्लिंक कोड या डीलर टूल',
+      'adapterHelpBlinkBody':
+          'कुछ बाइकें सिर्फ़ ब्लिंक कोड से या डीलर टूल से ही पढ़ी जा सकती हैं।',
 
       'emissionReadiness': 'उत्सर्जन तत्परता',
       'freezeFrameDesc':

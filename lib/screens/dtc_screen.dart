@@ -22,6 +22,7 @@ import '../services/session_recorder.dart';
 import '../models/vehicle_data.dart';
 import '../widgets/engine_context_view.dart';
 import '../widgets/resolved_fault_view.dart';
+import 'adapter_help_screen.dart';
 import 'code_lookup_screen.dart';
 import 'honda_blink_reference_screen.dart';
 import 'scan_history_screen.dart';
@@ -41,6 +42,19 @@ ResolvedFault resolveForCard(BuildContext context, DtcCode code,
   return FaultResolver(index: KnowledgeIndex.empty, legacy: legacyEngineText)
       .resolve(record, vehicle, lang, domain: domain);
 }
+
+/// "Which adapter works best?" is offered when the engine computer did not
+/// answer — but not when it answered "response pending" (that is a busy
+/// module, not a reach problem), refused, answered or lost the link.
+@visibleForTesting
+bool engineReadOffersAdapterHelp(EngineDtcRead? read) =>
+    read is EngineNoAnswer && read.reason != EngineNoAnswerReason.moduleBusy;
+
+/// ...and when the ABS module did not reply or the adapter cannot address it.
+@visibleForTesting
+bool absOutcomeOffersAdapterHelp(ChassisScanOutcome outcome) =>
+    outcome == ChassisScanOutcome.noModuleResponse ||
+    outcome == ChassisScanOutcome.addressingUnsupported;
 
 /// What the section strip and the section list are built from, once per build.
 typedef _SectionData = ({List<FoundCode> found, List<SectionSummary> summaries});
@@ -397,6 +411,12 @@ class _DtcScreenState extends State<DtcScreen> {
                 color: _RC.textMain, fontWeight: FontWeight.w800)),
         actions: [
           IconButton(
+            key: const ValueKey('adapter-help-icon'),
+            tooltip: context.tr('adapterHelpTitle'),
+            onPressed: _openAdapterHelp,
+            icon: const Icon(Icons.help_outline_rounded, color: _RC.neonCyan),
+          ),
+          IconButton(
             tooltip: context.tr('lookupTitle'),
             onPressed: _openLookup,
             icon: const Icon(Icons.manage_search_rounded, color: _RC.neonCyan),
@@ -464,6 +484,22 @@ class _DtcScreenState extends State<DtcScreen> {
 
   void _openHistory() => Navigator.of(context).push(
       MaterialPageRoute<void>(builder: (_) => const ScanHistoryScreen()));
+
+  void _openAdapterHelp() => Navigator.of(context).push(
+      MaterialPageRoute<void>(builder: (_) => const AdapterHelpScreen()));
+
+  /// The link under a "nothing answered" state (Phase 4B, B3).
+  Widget _adapterHelpLink(BuildContext context) => Align(
+        alignment: AlignmentDirectional.centerStart,
+        child: TextButton.icon(
+          key: const ValueKey('adapter-help-link'),
+          onPressed: _openAdapterHelp,
+          icon: const Icon(Icons.help_outline_rounded, size: 16),
+          label: Text(context.tr('adapterHelpTitle'),
+              style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 12.5)),
+          style: TextButton.styleFrom(foregroundColor: _RC.neonCyan),
+        ),
+      );
 
   Widget _toolChip(
           {required String name,
@@ -1018,6 +1054,9 @@ class _DtcScreenState extends State<DtcScreen> {
           title: context.tr('dtcNoAnswerTitle'),
           body: context.tr(busy ? 'dtcModuleBusyBody' : 'dtcNoAnswerBody'),
           detail: busy ? null : context.tr('dtcNoAnswerChecklist'),
+          action: engineReadOffersAdapterHelp(read)
+              ? _adapterHelpLink(context)
+              : null,
         );
         break;
       case EngineRefused():
@@ -1079,6 +1118,7 @@ class _DtcScreenState extends State<DtcScreen> {
     String? title,
     required String body,
     String? detail,
+    Widget? action,
   }) =>
       Container(
         padding: const EdgeInsets.all(16),
@@ -1114,6 +1154,10 @@ class _DtcScreenState extends State<DtcScreen> {
               Text(detail,
                   style: const TextStyle(
                       color: _RC.textMuted, fontSize: 12.5, height: 1.5)),
+            ],
+            if (action != null) ...[
+              const SizedBox(height: 6),
+              action,
             ],
           ],
         ),
@@ -1774,6 +1818,10 @@ class _DtcScreenState extends State<DtcScreen> {
             textAlign: TextAlign.center,
             style: const TextStyle(
                 color: _RC.textMuted, fontSize: 13, height: 1.5)),
+        if (absOutcomeOffersAdapterHelp(obd.chassisScanOutcome)) ...[
+          const SizedBox(height: 10),
+          Center(child: _adapterHelpLink(context)),
+        ],
         // Surfaced above the log, not buried in it: this is the one line that
         // tells a returning rider the app is not re-guessing from scratch.
         if (learned.isNotEmpty) ...[

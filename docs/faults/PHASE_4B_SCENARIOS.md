@@ -50,3 +50,23 @@ app-bar icons are kept.
 | Question | Answer | Proving test |
 |---|---|---|
 | Reachable, labelled, connected and not | Both buttons present, labelled in the rider's language, each opens the existing screen | `fault_entry_points_test.dart` "B2 …" (8 tests: connected × disconnected × lookup/history, Hindi labels, old icon still works) |
+
+## B3 — adapter help ("Which adapter works best?")
+
+A static screen, English and Hindi, six short points: what an ELM327 adapter reads (engine codes, with an OBD-II
+socket and ignition ON), why other modules such as ABS need an adapter that can address them (many cheap clones
+cannot; STN11xx-based adapters document it), the links the app uses today (classic Bluetooth and Wi-Fi), the
+bike-specific cable from a 2, 3, 4 or 6-pin socket to the 16-pin adapter, older bikes with a connection type the app
+cannot read yet, and bikes that can only be read by blink code or a dealer tool. No brand, price, link or promise.
+
+| Question | Answer | Proving test |
+|---|---|---|
+| Says only what is known | Each statement matches the brief; exactly 14 texts on the screen (title, intro, six headings, six bodies) | `adapter_help_test.dart` "B3 the screen says only what is known" (4) |
+| No promotion | No URL, price, currency, brand name or "recommend" in either language | `adapter_help_test.dart` "no brand, price, link or promise" |
+| Reached from the help icon | App-bar `?` icon, connected or not, with a spoken label | `adapter_help_test.dart` "B3 how it is reached" (3) |
+| Reached from "The bike did not answer" | Link under that state only — **not** for a busy module, a refusal, a lost link or an answer | `adapter_help_test.dart` "when the link is offered" (every `EngineNoAnswerReason`), "links to it" |
+| Reached from "No reply from the ABS module" | Link under no-reply and under "adapter cannot address the ABS module"; not for a clean scan, an ABS fault list, busy, link lost or never scanned | `adapter_help_test.dart` (every `ChassisScanOutcome`) |
+| Strings | 14 keys in English and Hindi, translated, Latin digits; the Hindi spellings are covered by `hindi_consistency_test.dart` | `adapter_help_test.dart` "English and Hindi both exist…" |
+
+Decision: the link also appears under "The adapter cannot address the ABS module" (not named in the brief) because
+that is the same adapter-reach problem in its plainest form. Easy to remove: `absOutcomeOffersAdapterHelp`.
